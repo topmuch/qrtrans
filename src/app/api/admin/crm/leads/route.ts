@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import { z } from 'zod';
+import { sendEmail, getEmailSettings, getNewLeadEmailTemplate } from '@/lib/email';
 
 export const dynamic = 'force-dynamic';
 
@@ -71,6 +72,45 @@ export async function POST(request: NextRequest) {
     });
 
     console.log('Created lead:', lead);
+
+    // 📧 Send email notification to superadmin
+    try {
+      const emailSettings = await getEmailSettings();
+      if (emailSettings && emailSettings.provider === 'smtp') {
+        const recipientEmail = emailSettings.recipientEmail || emailSettings.fromEmail;
+        if (recipientEmail) {
+          const template = getNewLeadEmailTemplate({
+            name: lead.name,
+            email: lead.email,
+            phone: lead.phone || undefined,
+            company: lead.company || undefined,
+            source: lead.source || undefined,
+            notes: lead.notes || undefined,
+          });
+
+          await sendEmail({
+            to: recipientEmail,
+            subject: `🆕 Nouveau lead CRM — ${lead.name}${lead.company ? ` (${lead.company})` : ''}`,
+            html: template.html,
+            text: template.text,
+            type: 'new_lead',
+          });
+          console.log(`📧 New lead notification sent for ${lead.name} to ${recipientEmail}`);
+        }
+      }
+    } catch (emailError) {
+      console.error('Failed to send new lead email:', emailError);
+    }
+
+    // 🔔 Create in-app notification for SuperAdmin
+    await prisma.notification.create({
+      data: {
+        type: 'new_lead',
+        message: `🆕 Nouveau lead : ${lead.name}${lead.company ? ` — ${lead.company}` : ''}`,
+        read: false,
+      }
+    });
+
     return NextResponse.json({ lead });
 
   } catch (error) {

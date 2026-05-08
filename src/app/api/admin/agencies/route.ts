@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { z } from 'zod';
+import { sendEmail, getEmailSettings, getNewAgencyEmailTemplate } from '@/lib/email';
 
 // Validation schema
 const agencySchema = z.object({
@@ -59,6 +60,42 @@ export async function POST(request: NextRequest) {
         email: validatedData.email || null,
         phone: validatedData.phone || null,
         address: validatedData.address || null,
+      }
+    });
+
+    // 📧 Send email notification to superadmin
+    try {
+      const emailSettings = await getEmailSettings();
+      if (emailSettings && emailSettings.provider === 'smtp') {
+        const recipientEmail = emailSettings.recipientEmail || emailSettings.fromEmail;
+        if (recipientEmail) {
+          const template = getNewAgencyEmailTemplate({
+            name: agency.name,
+            email: agency.email || undefined,
+            phone: agency.phone || undefined,
+            address: agency.address || undefined,
+          });
+
+          await sendEmail({
+            to: recipientEmail,
+            subject: `🏢 Nouvelle agence créée — ${agency.name}`,
+            html: template.html,
+            text: template.text,
+            type: 'new_agency',
+          });
+          console.log(`📧 New agency notification sent for ${agency.name} to ${recipientEmail}`);
+        }
+      }
+    } catch (emailError) {
+      console.error('Failed to send new agency email:', emailError);
+    }
+
+    // 🔔 Create in-app notification for SuperAdmin
+    await db.notification.create({
+      data: {
+        type: 'new_agency',
+        message: `🏢 Nouvelle agence créée : ${agency.name}${agency.email ? ` (${agency.email})` : ''}`,
+        read: false,
       }
     });
 

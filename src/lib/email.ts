@@ -538,6 +538,161 @@ export function getBaggageFoundEmailTemplate(data: {
   };
 }
 
+export function getNewAgencyEmailTemplate(data: {
+  name: string;
+  email?: string;
+  phone?: string;
+  address?: string;
+}): { html: string; text: string } {
+  const now = new Date().toLocaleString('fr-FR');
+  return {
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <div style="text-align: center; margin-bottom: 30px;">
+          <h1 style="color: #ff7f00; margin: 0;">QRBag</h1>
+        </div>
+        <div style="background: #eef2ff; border: 2px solid #6366f1; border-radius: 10px; padding: 30px;">
+          <h2 style="color: #4f46e5; margin-top: 0;">🏢 Nouvelle agence créée</h2>
+          <p style="color: #666;">Une nouvelle agence a été ajoutée au système :</p>
+          <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+            <tr>
+              <td style="padding: 8px 0; color: #999; font-size: 14px; border-bottom: 1px solid #eee;">Nom de l'agence</td>
+              <td style="padding: 8px 0; font-weight: bold; color: #333; border-bottom: 1px solid #eee;">${data.name}</td>
+            </tr>
+            ${data.email ? `
+            <tr>
+              <td style="padding: 8px 0; color: #999; font-size: 14px; border-bottom: 1px solid #eee;">Email</td>
+              <td style="padding: 8px 0; font-weight: bold; color: #333; border-bottom: 1px solid #eee;">${data.email}</td>
+            </tr>` : ''}
+            ${data.phone ? `
+            <tr>
+              <td style="padding: 8px 0; color: #999; font-size: 14px; border-bottom: 1px solid #eee;">Téléphone</td>
+              <td style="padding: 8px 0; font-weight: bold; color: #333; border-bottom: 1px solid #eee;">${data.phone}</td>
+            </tr>` : ''}
+            ${data.address ? `
+            <tr>
+              <td style="padding: 8px 0; color: #999; font-size: 14px;">Adresse</td>
+              <td style="padding: 8px 0; font-weight: bold; color: #333;">${data.address}</td>
+            </tr>` : ''}
+          </table>
+        </div>
+        <p style="color: #999; font-size: 12px; text-align: center; margin-top: 20px;">Notification automatique QRBag — ${now}</p>
+        <div style="text-align: center; color: #999; font-size: 12px;">
+          <p>© QRBag - Tous droits réservés</p>
+        </div>
+      </div>
+    `,
+    text: `🏢 QRBag - Nouvelle agence créée\n\nNom: ${data.name}\nEmail: ${data.email || 'Non renseigné'}\nTéléphone: ${data.phone || 'Non renseigné'}\nAdresse: ${data.address || 'Non renseignée'}\n\nNotification automatique QRBag — ${now}\n© QRBag`,
+  };
+}
+
+export function getAgencyMessageEmailTemplate(data: {
+  agencyName: string;
+  subject?: string;
+  message: string;
+  priority?: string;
+  senderEmail?: string;
+}): { html: string; text: string } {
+  const now = new Date().toLocaleString('fr-FR');
+  const priorityBadge = data.priority === 'urgent'
+    ? '<span style="background:#fee2e2;color:#dc2626;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:bold;">🔴 URGENT</span>'
+    : data.priority === 'high'
+    ? '<span style="background:#fef3c7;color:#d97706;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:bold;">🟡 HAUTE</span>'
+    : '';
+  return {
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <div style="text-align: center; margin-bottom: 30px;">
+          <h1 style="color: #ff7f00; margin: 0;">QRBag</h1>
+        </div>
+        <div style="background: #fffbeb; border: 2px solid #f59e0b; border-radius: 10px; padding: 30px;">
+          <h2 style="color: #d97706; margin-top: 0;">💬 Nouveau message d'une agence</h2>
+          ${priorityBadge ? `<div style="margin: 10px 0;">${priorityBadge}</div>` : ''}
+          <table style="width: 100%; border-collapse: collapse; margin-top: 15px;">
+            <tr>
+              <td style="padding: 8px 0; color: #999; font-size: 14px; border-bottom: 1px solid #eee;">Agence</td>
+              <td style="padding: 8px 0; font-weight: bold; color: #333; border-bottom: 1px solid #eee;">${data.agencyName}</td>
+            </tr>
+            ${data.subject ? `
+            <tr>
+              <td style="padding: 8px 0; color: #999; font-size: 14px; border-bottom: 1px solid #eee;">Sujet</td>
+              <td style="padding: 8px 0; font-weight: bold; color: #333; border-bottom: 1px solid #eee;">${data.subject}</td>
+            </tr>` : ''}
+            ${data.senderEmail ? `
+            <tr>
+              <td style="padding: 8px 0; color: #999; font-size: 14px; border-bottom: 1px solid #eee;">Email agence</td>
+              <td style="padding: 8px 0; font-weight: bold; color: #333; border-bottom: 1px solid #eee;">${data.senderEmail}</td>
+            </tr>` : ''}
+          </table>
+          <div style="background: #fff; border: 1px solid #fde68a; border-radius: 8px; padding: 15px; margin-top: 20px;">
+            <p style="color: #333; font-size: 14px; line-height: 1.6; white-space: pre-wrap;">${data.message}</p>
+          </div>
+        </div>
+        <p style="color: #999; font-size: 12px; text-align: center; margin-top: 20px;">Notification automatique QRBag — ${now}</p>
+        <div style="text-align: center; color: #999; font-size: 12px;">
+          <p>© QRBag - Tous droits réservés</p>
+        </div>
+      </div>
+    `,
+    text: `💬 QRBag - Nouveau message d'une agence\n\nAgence: ${data.agencyName}\n${data.subject ? `Sujet: ${data.subject}\n` : ''}${data.senderEmail ? `Email: ${data.senderEmail}\n` : ''}${data.priority ? `Priorité: ${data.priority}\n` : ''}\nMessage:\n${data.message}\n\nNotification automatique QRBag — ${now}\n© QRBag`,
+  };
+}
+
+export function getNewLeadEmailTemplate(data: {
+  name: string;
+  email: string;
+  phone?: string;
+  company?: string;
+  source?: string;
+  notes?: string;
+}): { html: string; text: string } {
+  const now = new Date().toLocaleString('fr-FR');
+  return {
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <div style="text-align: center; margin-bottom: 30px;">
+          <h1 style="color: #ff7f00; margin: 0;">QRBag</h1>
+        </div>
+        <div style="background: #f0fdf4; border: 2px solid #22c55e; border-radius: 10px; padding: 30px;">
+          <h2 style="color: #16a34a; margin-top: 0;">🆕 Nouveau lead CRM</h2>
+          <p style="color: #666;">Un nouveau prospect a été ajouté :</p>
+          <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+            <tr>
+              <td style="padding: 8px 0; color: #999; font-size: 14px; border-bottom: 1px solid #eee;">Nom</td>
+              <td style="padding: 8px 0; font-weight: bold; color: #333; border-bottom: 1px solid #eee;">${data.name}</td>
+            </tr>
+            <tr>
+              <td style="padding: 8px 0; color: #999; font-size: 14px; border-bottom: 1px solid #eee;">Email</td>
+              <td style="padding: 8px 0; font-weight: bold; color: #333; border-bottom: 1px solid #eee;">${data.email}</td>
+            </tr>
+            ${data.phone ? `
+            <tr>
+              <td style="padding: 8px 0; color: #999; font-size: 14px; border-bottom: 1px solid #eee;">Téléphone</td>
+              <td style="padding: 8px 0; font-weight: bold; color: #333; border-bottom: 1px solid #eee;">${data.phone}</td>
+            </tr>` : ''}
+            ${data.company ? `
+            <tr>
+              <td style="padding: 8px 0; color: #999; font-size: 14px; border-bottom: 1px solid #eee;">Entreprise</td>
+              <td style="padding: 8px 0; font-weight: bold; color: #333; border-bottom: 1px solid #eee;">${data.company}</td>
+            </tr>` : ''}
+            ${data.source ? `
+            <tr>
+              <td style="padding: 8px 0; color: #999; font-size: 14px;">Source</td>
+              <td style="padding: 8px 0; font-weight: bold; color: #333;">${data.source}</td>
+            </tr>` : ''}
+          </table>
+          ${data.notes ? `<div style="background: #fff; border: 1px solid #bbf7d0; border-radius: 8px; padding: 15px; margin-top: 20px;"><p style="color: #666; font-size: 14px;"><strong>Notes :</strong> ${data.notes}</p></div>` : ''}
+        </div>
+        <p style="color: #999; font-size: 12px; text-align: center; margin-top: 20px;">Notification automatique QRBag — ${now}</p>
+        <div style="text-align: center; color: #999; font-size: 12px;">
+          <p>© QRBag - Tous droits réservés</p>
+        </div>
+      </div>
+    `,
+    text: `🆕 QRBag - Nouveau lead CRM\n\nNom: ${data.name}\nEmail: ${data.email}\nTéléphone: ${data.phone || 'Non renseigné'}\nEntreprise: ${data.company || 'Non renseignée'}\nSource: ${data.source || 'Non renseignée'}\n${data.notes ? `Notes: ${data.notes}\n` : ''}\nNotification automatique QRBag — ${now}\n© QRBag`,
+  };
+}
+
 export async function verifyEmailCode(code: string, email: string, type: 'email_verification' | 'password_reset'): Promise<{ valid: boolean; error?: string }> {
   const emailToken = await prisma.emailToken.findFirst({
     where: {

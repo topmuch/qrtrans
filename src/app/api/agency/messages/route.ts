@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
+import { sendEmail, getEmailSettings, getAgencyMessageEmailTemplate } from '@/lib/email';
 
 // GET - Fetch messages for agency
 export async function GET(request: NextRequest) {
@@ -33,15 +34,12 @@ export async function GET(request: NextRequest) {
 
     // Filter by type
     if (type === 'assistance_agence') {
-      // Messages sent by this agency to superadmin
       where.type = 'assistance_agence';
       where.agencyId = agencyId;
     } else if (type === 'reponse_assistance') {
-      // Responses from superadmin to this agency
       where.type = 'reponse_assistance';
       where.recipientAgencyId = agencyId;
     } else if (type === 'message_superadmin') {
-      // Messages from superadmin specifically for this agency
       where.type = 'message_superadmin';
       where.recipientAgencyId = agencyId;
     }
@@ -78,7 +76,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// POST - Create a new message from agency
+// POST - Create a new message from agency to superadmin
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
@@ -100,6 +98,46 @@ export async function POST(request: NextRequest) {
         content: typeof content === 'string' ? content : JSON.stringify(content),
         status: 'non_lu',
       },
+    });
+
+    // 📧 Send email notification to superadmin
+    try {
+      const emailSettings = await getEmailSettings();
+      if (emailSettings && emailSettings.provider === 'smtp') {
+        const recipientEmail = emailSettings.recipientEmail || emailSettings.fromEmail;
+        if (recipientEmail) {
+          const contentObj = typeof content === 'string' ? {} : content;
+          const template = getAgencyMessageEmailTemplate({
+            agencyName: senderName || 'Agence',
+            subject: subject || undefined,
+            message: typeof content === 'string' ? content : (contentObj.message || contentObj.description || JSON.stringify(content)),
+            priority: typeof content === 'object' ? contentObj.priority : undefined,
+            senderEmail: typeof content === 'object' ? contentObj.agencyEmail : undefined,
+          });
+
+          await sendEmail({
+            to: recipientEmail,
+            subject: `💬 Message de ${senderName || 'Agence'}${subject ? ` — ${subject}` : ''}`,
+            html: template.html,
+            text: template.text,
+            type: 'agency_message',
+            agencyId,
+          });
+          console.log(`📧 Agency message notification sent from ${senderName || 'Agence'} to ${recipientEmail}`);
+        }
+      }
+    } catch (emailError) {
+      console.error('Failed to send agency message email:', emailError);
+    }
+
+    // 🔔 Create in-app notification for SuperAdmin
+    await db.notification.create({
+      data: {
+        type: 'agency_message',
+        agencyId,
+        message: `💬 ${senderName || 'Une agence'} vous a envoyé un message${subject ? ` : ${subject}` : ''}`,
+        read: false,
+      }
     });
 
     return NextResponse.json({ success: true, message });
