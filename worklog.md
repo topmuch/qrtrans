@@ -91,6 +91,32 @@ Work Log:
 - ESLint: 0 errors
 - Pushed commit 9e79625
 
+---
+Task ID: 5
+Agent: Main Agent
+Task: Fix email sending (stub → nodemailer) + update login page images
+
+Work Log:
+- ROOT CAUSE: sendViaSMTP() in src/lib/email.ts was a STUB — logged config and always returned {success:true} without actually sending any email
+- Installed nodemailer + @types/nodemailer
+- Rewrote sendViaSMTP() with real nodemailer transport: createTransport → verify() → sendMail()
+- Added proper error handling: catches SMTP errors and returns meaningful error messages
+- Updated console mode test API to warn users when in Console mode (no real emails sent)
+- Updated admin settings page to display amber warning for console mode test results
+- Generated 2 new AI images for login pages:
+  - login-agence-bg.png: woman with luggage at modern airport terminal
+  - login-admin-bg.png: businessman scanning QR code on luggage at airport
+- Updated LoginPage.tsx config to use new .png images (was .webp)
+- Removed old .webp files
+- ESLint: 0 errors
+- Both login pages tested: /agence/connexion and /admin/connexion return 200
+
+Stage Summary:
+- Email sending is now REAL — uses nodemailer with SMTP verification
+- Console mode shows warning that no real emails are sent
+- Login pages have new airport-themed images
+- Files modified: src/lib/email.ts, src/app/api/admin/email-settings/test/route.ts, src/app/admin/parametres/page.tsx, src/components/auth/LoginPage.tsx
+
 Stage Summary:
 - Commit: 9e79625 fix: 7 superadmin bugs resolved
 - 13 files changed, 799 insertions(+), 779 deletions(-)

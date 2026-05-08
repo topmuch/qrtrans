@@ -41,9 +41,17 @@ export async function POST(request: NextRequest) {
 
     if (result.success) {
       await updateTestStatus(true);
+      // Warn if in console mode (no real email sent)
+      if (settings.provider === 'console') {
+        return NextResponse.json({
+          success: true,
+          message: 'Email de test affiché dans la console serveur (mode Console). Aucun email réel envoyé. Passez en mode SMTP pour envoyer de vrais emails.',
+          consoleMode: true,
+        });
+      }
       return NextResponse.json({
         success: true,
-        message: 'Email de test envoyé avec succes !',
+        message: 'Email de test envoyé avec succès !',
       });
     } else {
       const errorMsg = result.error || "Erreur lors de l'envoi";

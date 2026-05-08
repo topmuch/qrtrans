@@ -270,7 +270,7 @@ export default function ParametresPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [testEmail, setTestEmail] = useState('');
   const [sendingTest, setSendingTest] = useState(false);
-  const [testResult, setTestResult] = useState<{ success: boolean; message: string } | null>(null);
+  const [testResult, setTestResult] = useState<{ success: boolean; message: string; warning?: boolean } | null>(null);
   const [emailSaving, setEmailSaving] = useState(false);
   const [emailSaved, setEmailSaved] = useState(false);
 
@@ -375,7 +375,11 @@ export default function ParametresPage() {
       const data = await response.json();
       
       if (data.success) {
-        setTestResult({ success: true, message: 'Email de test envoyé avec succès !' });
+        if (data.consoleMode) {
+          setTestResult({ success: true, message: data.message, warning: true });
+        } else {
+          setTestResult({ success: true, message: 'Email de test envoyé avec succès !' });
+        }
       } else {
         setTestResult({ success: false, message: data.error || 'Erreur lors de l\'envoi de l\'email' });
       }
@@ -969,17 +973,27 @@ export default function ParametresPage() {
               
               {/* Test Result */}
               {testResult && (
-                <div className={`mt-4 p-4 rounded-xl flex items-center gap-3 ${
-                  testResult.success 
+                <div className={`mt-4 p-4 rounded-xl flex items-start gap-3 ${
+                  testResult.warning
+                    ? 'bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-800'
+                    : testResult.success 
                     ? 'bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-800' 
                     : 'bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-800'
                 }`}>
-                  {testResult.success ? (
+                  {testResult.warning ? (
+                    <AlertCircle className="w-5 h-5 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
+                  ) : testResult.success ? (
                     <CheckCircle className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                   ) : (
                     <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400" />
                   )}
-                  <span className={testResult.success ? 'text-emerald-800 dark:text-emerald-200' : 'text-red-800 dark:text-red-200'}>
+                  <span className={`text-sm ${
+                    testResult.warning 
+                      ? 'text-amber-800 dark:text-amber-200' 
+                      : testResult.success 
+                      ? 'text-emerald-800 dark:text-emerald-200' 
+                      : 'text-red-800 dark:text-red-200'
+                  }`}>
                     {testResult.message}
                   </span>
                 </div>

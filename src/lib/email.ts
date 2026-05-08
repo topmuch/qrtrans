@@ -1,5 +1,6 @@
 import prisma from './prisma';
 import crypto from 'crypto';
+import nodemailer from 'nodemailer';
 
 // Email provider types
 export type EmailProvider = 'console' | 'smtp';
@@ -181,32 +182,51 @@ export async function updateTestStatus(success: boolean, error?: string): Promis
   }
 }
 
-// Send via SMTP using Node.js net module (basic SMTP implementation)
+// Send via SMTP using nodemailer
 async function sendViaSMTP(config: EmailConfig, emailData: EmailData): Promise<{ success: boolean; error?: string }> {
   if (!config.smtpHost || !config.smtpPort) {
     return { success: false, error: 'Configuration SMTP incomplète (hôte ou port manquant)' };
   }
 
-  // For SMTP, we'll use a simple implementation
-  // In production, you might want to use nodemailer or similar
-  // For now, we'll simulate SMTP sending and log to console
-  
-  console.log('📧 SMTP Email Configuration:', {
-    host: config.smtpHost,
-    port: config.smtpPort,
-    user: config.smtpUser,
-    encryption: config.smtpEncryption,
-    from: `${config.fromName} <${config.fromEmail}>`,
-    to: emailData.to,
-    subject: emailData.subject,
-  });
-  
-  // Simulate SMTP sending
-  // In a real implementation, you would connect to the SMTP server here
-  // For demonstration, we'll return success
-  // TODO: Implement actual SMTP connection using nodemailer or similar
-  
-  return { success: true };
+  try {
+    console.log('📧 SMTP Email — Connecting to:', config.smtpHost, 'port:', config.smtpPort);
+
+    const transporter = nodemailer.createTransport({
+      host: config.smtpHost,
+      port: Number(config.smtpPort),
+      secure: config.smtpEncryption === 'ssl' || Number(config.smtpPort) === 465,
+      auth: {
+        user: config.smtpUser || '',
+        pass: config.smtpPassword || '',
+      },
+      tls: {
+        rejectUnauthorized: false,
+      },
+    });
+
+    // Verify transporter connection
+    await transporter.verify();
+    console.log('📧 SMTP Email — Connection verified successfully');
+
+    const toAddresses = Array.isArray(emailData.to) ? emailData.to : [emailData.to];
+
+    const mailOptions: nodemailer.SendMailOptions = {
+      from: `"${config.fromName}" <${config.fromEmail}>`,
+      to: toAddresses.join(', '),
+      subject: emailData.subject,
+      html: emailData.html,
+      text: emailData.text,
+    };
+
+    const info = await transporter.sendMail(mailOptions);
+    console.log('📧 SMTP Email — Sent successfully, Message ID:', info.messageId);
+
+    return { success: true };
+  } catch (error: unknown) {
+    const err = error as Error;
+    console.error('📧 SMTP Email — Failed:', err.message);
+    return { success: false, error: `Erreur SMTP: ${err.message}` };
+  }
 }
 
 // Main send email function
