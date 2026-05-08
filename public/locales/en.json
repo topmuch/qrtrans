@@ -27,10 +27,10 @@
     "error_occurred": "An error occurred. Please try again."
   },
   "finder": {
-    "success_badge": "Protected Baggage",
+    "success_badge": "BAGGAGE SUCCESSFULLY IDENTIFIED",
     "owner_info": "Owner Information",
     "travel_details": "Travel Details",
-    "share_gps": "Share my GPS Location",
+    "share_gps": "SHARE MY GPS LOCATION",
     "contact_the_owner_title": "Contact the Owner",
     "by_whatsapp": "WhatsApp",
     "by_phone": "Call",

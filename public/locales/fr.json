@@ -27,10 +27,10 @@
     "error_occurred": "Une erreur s'est produite. Veuillez réessayer."
   },
   "finder": {
-    "success_badge": "Bagage protégé",
+    "success_badge": "BAGAGE IDENTIFIÉ AVEC SUCCÈS",
     "owner_info": "Informations du propriétaire",
     "travel_details": "Détails du voyage",
-    "share_gps": "Partager ma position GPS",
+    "share_gps": "PARTAGER MA POSITION GPS",
     "contact_the_owner_title": "Contacter le propriétaire",
     "by_whatsapp": "WhatsApp",
     "by_phone": "Appeler",

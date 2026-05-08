@@ -554,7 +554,7 @@ export default function ScanPage() {
           {/* ─── Owner Info Block ─── */}
           {baggage && (
             <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-5 md:p-6 mb-4">
-              <h3 className="text-orange-400 text-sm font-bold uppercase tracking-widest mb-4">
+              <h3 className="text-[#FFFFFF] text-sm font-bold uppercase tracking-widest mb-4">
                 {t('finder.owner_info')}
               </h3>
               <div className="flex items-center gap-4 mb-3">
@@ -580,7 +580,7 @@ export default function ScanPage() {
           {/* ─── Travel Details Block ─── */}
           {baggage && (
             <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-5 md:p-6 mb-5">
-              <h3 className="text-orange-400 text-sm font-bold uppercase tracking-widest mb-4">
+              <h3 className="text-[#FFFFFF] text-sm font-bold uppercase tracking-widest mb-4">
                 {t('finder.travel_details')}
               </h3>
               <div className="space-y-3">
@@ -659,8 +659,8 @@ export default function ScanPage() {
                   <div className="flex items-start gap-3">
                     <AlertTriangle className="w-6 h-6 text-orange-400 flex-shrink-0 mt-0.5" />
                     <div>
-                      <p className="text-orange-300 text-base font-medium">{t('finder.gps_unavailable')}</p>
-                      <p className="text-orange-400/80 text-base mt-1">{geoError}</p>
+                      <p className="text-[#FFFFFF] text-base font-medium">{t('finder.gps_unavailable')}</p>
+                      <p className="text-[#FFFFFF] text-base mt-1">{geoError}</p>
                     </div>
                   </div>
                 </div>
@@ -668,7 +668,7 @@ export default function ScanPage() {
 
               {/* Manual Location Input */}
               <div className={sharedPosition ? 'opacity-75' : ''}>
-                <label className="text-base font-medium text-white/70 mb-1.5 block">
+                <label className="text-base font-medium text-[#FFFFFF] mb-1.5 block">
                   {sharedPosition ? t('finder.location_optional') : t('finder.location_label')}
                 </label>
                 <input
@@ -700,7 +700,7 @@ export default function ScanPage() {
 
               {/* ─── Contact The Owner — Two Buttons ─── */}
               <div className="pt-2">
-                <h3 className="text-orange-400 text-sm font-bold uppercase tracking-widest text-center mb-4">
+                <h3 className="text-[#FFFFFF] text-sm font-bold uppercase tracking-widest text-center mb-4">
                   {t('finder.contact_the_owner_title')}
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -736,7 +736,7 @@ export default function ScanPage() {
                 <button
                   onClick={handleShareLocation}
                   disabled={isLoadingLocation}
-                  className="w-full py-3 text-base text-white/70 hover:text-white flex items-center justify-center gap-2 transition-colors min-h-[48px]"
+                  className="w-full py-3 text-base text-[#FFFFFF] hover:text-white flex items-center justify-center gap-2 transition-colors min-h-[48px]"
                 >
                   <Navigation className="w-5 h-5" />
                   {isLoadingLocation ? t('finder.locating') : t('finder.retry_gps')}
@@ -746,8 +746,8 @@ export default function ScanPage() {
           )}
 
           {/* ─── Trust Note ─── */}
-          <div className="mt-6 text-center text-base text-white/60 tracking-wide">
-            <Shield className="w-5 h-5 inline mr-1.5 text-white/40" />
+          <div className="mt-6 text-center text-base text-[#FFFFFF] tracking-wide">
+            <Shield className="w-5 h-5 inline mr-1.5 text-[#FFFFFF]" />
             {t('finder.trust_note')}
           </div>
         </div>
