@@ -86,6 +86,8 @@ model Baggage {
   status            String    @default("pending_activation") // pending_activation, active, scanned, lost, found, blocked
   flightNumber      String?
   destination       String?
+  departureDate     DateTime? // Date de départ saisie lors de l'activation
+  departureTime     String?   // Heure de départ saisie lors de l'activation (ex: "08:30")
   createdAt         DateTime  @default(now())
   expiresAt         DateTime?
   lastScanDate      DateTime?

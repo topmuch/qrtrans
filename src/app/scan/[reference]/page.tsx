@@ -43,6 +43,9 @@ interface BaggageData {
     phone?: string;
     declaredLostAt?: string | null;
     foundAt?: string | null;
+    createdAt?: string | null;
+    departureDate?: string | null;
+    departureTime?: string | null;
   };
 }
 
@@ -54,14 +57,14 @@ function LanguageSelector({ lang, setLang }: { lang: Language; setLang: (l: Lang
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-1.5 px-3 py-1.5 bg-white/20 rounded-full text-white hover:bg-white/30 transition-colors text-sm font-medium backdrop-blur-sm"
+        className="flex items-center gap-1.5 px-3 py-1.5 bg-white/10 rounded-full text-slate-300 hover:bg-white/20 transition-colors text-sm font-medium backdrop-blur-sm border border-white/10"
       >
         <Globe className="w-4 h-4" />
         <span>{LANGUAGE_NAMES[lang]}</span>
       </button>
 
       {isOpen && (
-        <div className="absolute top-full right-0 mt-2 bg-[#1a1a2e] border border-white/20 rounded-xl shadow-2xl overflow-hidden z-50 min-w-[140px] backdrop-blur-sm">
+        <div className="absolute top-full right-0 mt-2 bg-[#1a1a2e] border border-indigo-700 rounded-xl shadow-2xl overflow-hidden z-50 min-w-[140px] backdrop-blur-sm">
           {(['fr', 'en', 'ar'] as Language[]).map((l) => (
             <button
               key={l}
@@ -71,8 +74,8 @@ function LanguageSelector({ lang, setLang }: { lang: Language; setLang: (l: Lang
               }}
               className={`w-full px-4 py-3 text-left text-sm font-medium transition-colors ${
                 lang === l 
-                  ? 'bg-white/20 text-white' 
-                  : 'text-white/80 hover:bg-white/10 hover:text-white'
+                  ? 'bg-indigo-600/30 text-amber-400' 
+                  : 'text-slate-300 hover:bg-indigo-900/50 hover:text-slate-100'
               }`}
             >
               {LANGUAGE_NAMES[l]}
@@ -176,10 +179,10 @@ function ActivationRedirect({ type, reference, t, lang, setLang }: {
 // Loading Component
 function LoadingScreen({ t }: { t: (key: string) => string }) {
   return (
-    <main className="min-h-screen bg-[#080c1a] flex items-center justify-center">
+    <main className="min-h-screen bg-[#0c0a2a] flex items-center justify-center">
       <div className="text-center text-white">
-        <div className="animate-spin w-12 h-12 border-4 border-white/30 border-t-white rounded-full mx-auto mb-4"></div>
-        <p>{t('common.loading')}</p>
+        <div className="animate-spin w-12 h-12 border-4 border-indigo-500/30 border-t-amber-500 rounded-full mx-auto mb-4"></div>
+        <p className="text-slate-300">{t('common.loading')}</p>
       </div>
     </main>
   );
@@ -220,19 +223,19 @@ function ErrorScreen({
   const config = errorConfig[type as keyof typeof errorConfig] || errorConfig.not_found;
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-[#080c1a] to-[#0d1220] flex items-center justify-center p-4 relative">
+    <main className="min-h-screen bg-[#0c0a2a] flex items-center justify-center p-4 relative">
       <div className="absolute top-4 right-4">
         <LanguageSelector lang={lang} setLang={setLang} />
       </div>
 
-      <div className="max-w-md w-full bg-[#111827] rounded-xl p-8 text-center border border-[#1a2238]">
+      <div className="max-w-md w-full bg-indigo-900/60 rounded-xl p-8 text-center border border-indigo-700">
         <div className="w-20 h-20 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
           {config.icon}
         </div>
-        <h1 className="text-2xl font-bold text-[#e0e6f0] mb-2">{config.title}</h1>
-        <p className="text-[#8b9bb4] mb-6">{config.message}</p>
+        <h1 className="text-2xl font-bold text-slate-100 mb-2">{config.title}</h1>
+        <p className="text-slate-400 mb-6">{config.message}</p>
         <button
-          className="px-6 py-2 border border-[#1a2238] text-[#8b9bb4] rounded-lg hover:bg-[#1a2238] transition-colors"
+          className="px-6 py-2 border border-indigo-700 text-slate-400 rounded-lg hover:bg-indigo-800/50 transition-colors"
           onClick={() => router.push('/')}
         >
           {t('common.back_home')}
@@ -247,7 +250,7 @@ function SuccessToast({ show, message }: { show: boolean; message: string }) {
   if (!show) return null;
   
   return (
-    <div className="fixed top-5 right-5 bg-[#ffd700] text-black px-6 py-4 rounded-xl shadow-lg z-50 animate-in slide-in-from-right duration-300">
+    <div className="fixed top-5 right-5 bg-amber-500 text-slate-900 px-6 py-4 rounded-xl shadow-lg z-50 animate-in slide-in-from-right duration-300">
       <div className="flex items-center gap-3">
         <CheckCircle className="w-5 h-5" />
         <div>
@@ -259,7 +262,7 @@ function SuccessToast({ show, message }: { show: boolean; message: string }) {
   );
 }
 
-// Contact Modal Component
+// Contact Modal Component — Dark Indigo Theme
 function ContactModal({ 
   show, 
   onClose, 
@@ -277,30 +280,30 @@ function ContactModal({
 
   return (
     <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-xl p-6 w-full max-w-sm">
+      <div className="bg-indigo-900 border border-indigo-700 rounded-xl p-6 w-full max-w-sm shadow-2xl">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="font-bold text-lg text-gray-900">{t('finder.contact_owner')}</h3>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+          <h3 className="font-bold text-lg text-slate-100">{t('finder.contact_owner')}</h3>
+          <button onClick={onClose} className="text-slate-400 hover:text-slate-200 transition-colors">
             <X className="w-5 h-5" />
           </button>
         </div>
-        <p className="text-gray-600 text-center text-sm mb-6">
+        <p className="text-slate-400 text-center text-sm mb-6">
           {t('finder.choose_method')}
         </p>
         
-        {/* WhatsApp Button - Yellow Gold */}
+        {/* WhatsApp Button */}
         <button 
           onClick={onWhatsApp}
-          className="w-full py-4 bg-[#ffd700] hover:bg-[#ffeb3b] text-black rounded-xl mb-3 flex items-center justify-center gap-3 font-semibold transition-colors border border-[#ffa500]"
+          className="w-full py-4 bg-green-600 hover:bg-green-500 text-white rounded-xl mb-3 flex items-center justify-center gap-3 font-semibold transition-colors"
         >
           <MessageCircle className="w-5 h-5" />
           {t('finder.by_whatsapp')}
         </button>
         
-        {/* Phone Button - Yellow Gold */}
+        {/* Phone Button */}
         <button 
           onClick={onPhone}
-          className="w-full py-4 bg-[#ffd700] hover:bg-[#ffeb3b] text-black rounded-xl flex items-center justify-center gap-3 font-semibold transition-colors border border-[#ffa500]"
+          className="w-full py-4 bg-amber-500 hover:bg-amber-400 text-slate-900 rounded-xl flex items-center justify-center gap-3 font-semibold transition-colors"
         >
           <Phone className="w-5 h-5" />
           {t('finder.by_phone')}
@@ -308,7 +311,7 @@ function ContactModal({
         
         <button 
           onClick={onClose} 
-          className="mt-4 text-gray-500 w-full text-center text-sm hover:text-gray-700"
+          className="mt-4 text-slate-500 w-full text-center text-sm hover:text-slate-300 transition-colors"
         >
           {t('common.cancel')}
         </button>
@@ -317,7 +320,7 @@ function ContactModal({
   );
 }
 
-// Main Scan Page - New Design with Indigo Buttons
+// Main Scan Page
 export default function ScanPage() {
   const params = useParams();
   const router = useRouter();
@@ -385,7 +388,7 @@ export default function ScanPage() {
           },
           {
             enableHighAccuracy: true,
-            timeout: 10000, // ⏱️ 10s critical for iOS
+            timeout: 10000,
             maximumAge: 0
           }
         );
@@ -403,20 +406,17 @@ export default function ScanPage() {
       let errorMessage = '';
 
       if (geoErr.code === 1) {
-        // PERMISSION_DENIED - User refused
         errorMessage = t('errors.location_permission_denied') || '⚠️ Accès à la localisation refusé. Activez-la dans Réglages > Safari > QRBag ou entrez le lieu manuellement.';
       } else if (geoErr.code === 2) {
-        // POSITION_UNAVAILABLE
         errorMessage = t('errors.location_unavailable') || '📍 Service de localisation indisponible. Activez-le dans Réglages > Confidentialité > Services de localisation.';
       } else if (geoErr.code === 3) {
-        // TIMEOUT - iOS silent blocking
         errorMessage = t('errors.location_timeout') || '⏳ Détection impossible. Veuillez entrer le lieu manuellement.';
       } else {
         errorMessage = t('errors.location_failed') || 'Impossible de détecter votre position.';
       }
 
       setGeoError(errorMessage);
-      setShowManualLocation(true); // Show manual input fallback
+      setShowManualLocation(true);
     } finally {
       setIsLoadingLocation(false);
     }
@@ -495,6 +495,30 @@ export default function ScanPage() {
     window.location.href = `tel:${phoneNumber}`;
   }, [baggageData]);
 
+  // Format date for display
+  const formatDate = (dateStr?: string | null) => {
+    if (!dateStr) return null;
+    const locale = lang === 'ar' ? 'ar-SA' : lang === 'en' ? 'en-US' : 'fr-FR';
+    return new Date(dateStr).toLocaleDateString(locale, {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+    });
+  };
+
+  // Validate finder form before contacting
+  const validateFinderForm = (): boolean => {
+    if (!sharedPosition && !otherLocation.trim()) {
+      setGeoError(t('finder.please_enter_location') || 'Veuillez entrer le lieu où vous avez trouvé le bagage.');
+      return false;
+    }
+    if (!finderName.trim() || !finderPhone.trim()) {
+      alert(t('finder.fill_info'));
+      return false;
+    }
+    return true;
+  };
+
   // Loading state
   if (loading) {
     return <LoadingScreen t={t} />;
@@ -525,13 +549,13 @@ export default function ScanPage() {
   if (baggageData?.status === 'expired') {
     const expiredAt = (baggageData as any).expiredAt || '';
     const agencyName = (baggageData as any).agency || '';
-    const params = new URLSearchParams({
+    const urlParams = new URLSearchParams({
       ref: reference,
       ...(expiredAt && { expired: expiredAt }),
       ...(agencyName && { agency: agencyName })
     });
     if (typeof window !== 'undefined') {
-      window.location.href = `/expired?${params.toString()}`;
+      window.location.href = `/expired?${urlParams.toString()}`;
     }
     return <LoadingScreen t={t} />;
   }
@@ -542,66 +566,106 @@ export default function ScanPage() {
   const isDeclaredLost = baggage?.declaredLostAt && !baggage?.foundAt;
   const isVoyageur = baggage?.type === 'voyageur';
 
-  // Main render - New design with rose-violet gradient and yellow buttons
+  // ─── Main Render — Dark Violet Night Theme ───
   return (
     <main 
-      className="min-h-screen flex items-center justify-center p-4" 
+      className="min-h-screen bg-[#0c0a2a] flex items-center justify-center p-4" 
       dir={dir}
-      style={{ background: 'linear-gradient(180deg, #ff0080 0%, #4b0082 100%)' }}
     >
       {/* Language Selector */}
-      <div className="absolute top-4 right-4">
+      <div className="absolute top-4 right-4 z-40">
         <LanguageSelector lang={lang} setLang={setLang} />
       </div>
 
       {/* Success Toast */}
       <SuccessToast show={showSuccess} message={t('finder.message_sent')} />
 
-      {/* Main Card */}
-      <div className="w-full max-w-sm bg-white/95 backdrop-blur-md border border-white/50 rounded-2xl overflow-hidden shadow-2xl">
+      {/* Content Container */}
+      <div className="w-full max-w-sm">
         {/* Urgent Banner for Lost Baggage */}
         {isDeclaredLost && (
-          <div className="bg-red-600 text-white text-center py-2 px-4">
+          <div className="bg-red-600 text-white text-center py-2.5 px-4 rounded-t-2xl">
             <p className="font-bold text-sm flex items-center justify-center gap-2">
               <AlertTriangle className="w-4 h-4" />
-              URGENT - Bagage signalé perdu !
+              URGENT – Bagage signalé perdu !
             </p>
           </div>
         )}
 
-        <div className="p-6">
-          {/* Header */}
-          <div className="text-center mb-6">
-            <div className="w-12 h-12 bg-[#ff0080] rounded-full flex items-center justify-center mx-auto mb-4">
-              <Luggage className="h-6 w-6 text-white" />
-            </div>
-            <h2 className="text-xl font-bold text-gray-900">
-              {t('finder.found_baggage')}
-            </h2>
-            <p className="text-gray-600 text-sm mt-1">
-              {t('finder.help_owner')}
-            </p>
-          </div>
+        {/* Success Badge — Amber, Premium rounded-full */}
+        <div className={`bg-amber-500 text-slate-900 text-center py-3 px-6 rounded-full font-bold text-base md:text-lg shadow-lg hover:shadow-xl transition-shadow tracking-wide mx-4 -mt-2 relative z-10 ${isDeclaredLost ? '' : ''}`}>
+          {t('finder.success_badge')} ✈️
+        </div>
 
-          {/* Owner Info */}
+        {/* Main Card — Dark Indigo */}
+        <div className="bg-indigo-950/80 border border-indigo-800 rounded-b-2xl p-5 backdrop-blur-sm">
+          
+          {/* ─── Owner Info Block ─── */}
           {baggage && (
-            <div className="bg-gradient-to-r from-[#ff0080]/10 to-[#4b0082]/10 rounded-xl p-4 mb-6 border border-[#ff0080]/20">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-[#ff0080]/20 rounded-full flex items-center justify-center">
-                  <MapPin className="w-5 h-5 text-[#ff0080]" />
+            <div className="bg-slate-800/80 border border-slate-700/60 rounded-xl p-4 mb-3">
+              <h3 className="text-amber-400/90 text-[10px] font-bold uppercase tracking-widest mb-3">
+                {t('finder.owner_info')}
+              </h3>
+              <div className="flex items-center gap-3 mb-2">
+                <div className="w-11 h-11 bg-indigo-700/60 rounded-full flex items-center justify-center border border-indigo-600/40">
+                  <Luggage className="w-5 h-5 text-amber-400" />
                 </div>
                 <div>
-                  <div className="font-bold text-gray-900">{baggage.travelerName}</div>
-                  <div className="text-gray-600 text-sm">{reference}</div>
-                  {baggage.agency && (
-                    <div className="text-gray-500 text-xs">{baggage.agency}</div>
-                  )}
+                  <div className="text-slate-100 font-bold text-base leading-tight">
+                    {baggage.travelerName}
+                  </div>
+                  <div className="text-slate-500 text-xs font-mono mt-0.5">{reference}</div>
                 </div>
+              </div>
+              {baggage.agency && (
+                <div className="text-slate-400 text-xs flex items-center gap-1.5 mt-2 pl-1">
+                  <Shield className="w-3.5 h-3.5 text-indigo-400" />
+                  {baggage.agency}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ─── Travel Details Block ─── */}
+          {baggage && (
+            <div className="bg-slate-800/80 border border-slate-700/60 rounded-xl p-4 mb-4">
+              <h3 className="text-amber-400/90 text-[10px] font-bold uppercase tracking-widest mb-3">
+                {t('finder.travel_details')}
+              </h3>
+              <div className="space-y-2.5">
+                {baggage.flightNumber && (
+                  <div className="flex items-center gap-2.5">
+                    <Plane className="w-4 h-4 text-indigo-400 flex-shrink-0" />
+                    <span className="text-slate-100 text-sm font-medium">{baggage.flightNumber}</span>
+                  </div>
+                )}
+                {baggage.destination && (
+                  <div className="flex items-center gap-2.5">
+                    <MapPin className="w-4 h-4 text-indigo-400 flex-shrink-0" />
+                    <span className="text-slate-100 text-sm">{baggage.destination}</span>
+                  </div>
+                )}
+                {baggage.departureDate && (
+                  <div className="flex items-center gap-2.5">
+                    <Clock className="w-4 h-4 text-indigo-400 flex-shrink-0" />
+                    <span className="text-slate-100 text-sm">
+                      {formatDate(baggage.departureDate)}{baggage.departureTime ? ` – ${baggage.departureTime}` : ''}
+                    </span>
+                  </div>
+                )}
+                {!baggage.departureDate && baggage.createdAt && (
+                  <div className="flex items-center gap-2.5">
+                    <Clock className="w-4 h-4 text-indigo-400 flex-shrink-0" />
+                    <span className="text-slate-200 text-sm">
+                      {t('finder.activation_date')} {formatDate(baggage.createdAt)}
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
           )}
 
-          {/* Step 1: Share GPS Button (Yellow Gold) */}
+          {/* ─── Step 1: GPS Share Button (Amber) ─── */}
           {!showForm && (
             <button
               onClick={() => {
@@ -609,7 +673,7 @@ export default function ScanPage() {
                 handleShareLocation();
               }}
               disabled={isLoadingLocation}
-              className="w-full py-4 px-6 bg-[#ffd700] hover:bg-[#ffeb3b] text-black rounded-xl font-bold transition-colors flex items-center justify-center gap-3 shadow-lg border border-[#ffa500]"
+              className="w-full py-4 px-6 bg-amber-500 hover:bg-amber-600 text-slate-900 rounded-xl font-bold text-lg transition-all flex items-center justify-center gap-3 shadow-lg hover:shadow-xl mb-4 disabled:opacity-70"
             >
               {isLoadingLocation ? (
                 <>
@@ -619,41 +683,41 @@ export default function ScanPage() {
               ) : (
                 <>
                   <Navigation className="w-5 h-5" />
-                  📍 {t('finder.share_gps')}
+                  {t('finder.share_gps')}
                 </>
               )}
             </button>
           )}
 
-          {/* Step 2: Form (after GPS click) */}
+          {/* ─── Step 2: Finder Form ─── */}
           {showForm && (
-            <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-300">
-              {/* GPS Success Status */}
+            <div className="space-y-3 animate-in fade-in slide-in-from-bottom-4 duration-300">
+              {/* GPS Success */}
               {sharedPosition && !geoError && (
-                <div className="p-3 bg-green-500/20 border border-green-500/30 rounded-xl flex items-center gap-2">
-                  <CheckCircle className="w-5 h-5 text-green-600" />
-                  <span className="text-gray-800 text-sm">
+                <div className="p-3 bg-green-500/15 border border-green-500/30 rounded-xl flex items-center gap-2">
+                  <CheckCircle className="w-5 h-5 text-green-400" />
+                  <span className="text-slate-200 text-sm">
                     ✓ {locationText}
                   </span>
                 </div>
               )}
 
-              {/* GPS Error - iOS Friendly */}
+              {/* GPS Error — Orange */}
               {geoError && (
-                <div className="p-3 bg-orange-100 border border-orange-300 rounded-xl">
+                <div className="p-3 bg-orange-500/15 border border-orange-500/30 rounded-xl">
                   <div className="flex items-start gap-2">
-                    <AlertTriangle className="w-5 h-5 text-orange-600 flex-shrink-0 mt-0.5" />
+                    <AlertTriangle className="w-5 h-5 text-orange-400 flex-shrink-0 mt-0.5" />
                     <div>
-                      <p className="text-orange-800 text-sm font-medium">{t('finder.gps_unavailable')}</p>
-                      <p className="text-orange-700 text-xs mt-1">{geoError}</p>
+                      <p className="text-orange-300 text-sm font-medium">{t('finder.gps_unavailable')}</p>
+                      <p className="text-orange-400/80 text-xs mt-1">{geoError}</p>
                     </div>
                   </div>
                 </div>
               )}
 
-              {/* Manual Location Input - Always visible after GPS attempt */}
+              {/* Manual Location Input */}
               <div className={sharedPosition ? 'opacity-75' : ''}>
-                <label className="text-xs text-gray-500 mb-1 block">
+                <label className="text-[10px] text-slate-400 mb-1 block font-medium uppercase tracking-wider">
                   {sharedPosition ? t('finder.location_optional') : t('finder.location_label')}
                 </label>
                 <input
@@ -661,7 +725,7 @@ export default function ScanPage() {
                   placeholder={sharedPosition ? t('finder.location_optional_placeholder') : t('finder.location_placeholder')}
                   value={otherLocation}
                   onChange={(e) => setOtherLocation(e.target.value)}
-                  className="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#ff0080] focus:border-transparent"
+                  className="w-full px-4 py-3 bg-slate-800/80 border border-slate-600/50 rounded-xl text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/60 focus:border-transparent transition-all"
                 />
               </div>
 
@@ -671,7 +735,7 @@ export default function ScanPage() {
                 placeholder={t('finder.first_name')}
                 value={finderName}
                 onChange={(e) => setFinderName(e.target.value)}
-                className="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#ff0080] focus:border-transparent"
+                className="w-full px-4 py-3 bg-slate-800/80 border border-slate-600/50 rounded-xl text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/60 focus:border-transparent transition-all"
               />
 
               {/* WhatsApp Input */}
@@ -680,46 +744,48 @@ export default function ScanPage() {
                 placeholder={`${t('finder.whatsapp')} (+33612345678)`}
                 value={finderPhone}
                 onChange={(e) => setFinderPhone(e.target.value)}
-                className="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#ff0080] focus:border-transparent"
+                className="w-full px-4 py-3 bg-slate-800/80 border border-slate-600/50 rounded-xl text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/60 focus:border-transparent transition-all"
               />
 
-              {/* Contact Button (Yellow Gold) - Can work without GPS */}
-              <button
-                onClick={() => {
-                  // Only require location if GPS failed and no manual input
-                  if (!sharedPosition && !otherLocation.trim()) {
-                    // Show inline message instead of alert
-                    setGeoError(t('finder.please_enter_location') || 'Veuillez entrer le lieu où vous avez trouvé le bagage.');
-                    return;
-                  }
-                  if (!finderName.trim() || !finderPhone.trim()) {
-                    alert(t('finder.fill_info'));
-                    return;
-                  }
-                  setShowContactModal(true);
-                }}
-                disabled={isSubmitting}
-                className="w-full py-4 px-6 bg-[#ffd700] hover:bg-[#ffeb3b] text-black rounded-xl font-bold transition-colors flex items-center justify-center gap-3 shadow-lg disabled:opacity-70 border border-[#ffa500]"
-              >
-                {isSubmitting ? (
-                  <>
-                    <span className="animate-spin">⏳</span>
-                    {t('finder.sending')}
-                  </>
-                ) : (
-                  <>
-                    <Phone className="w-5 h-5" />
-                    📞 {t('finder.contact_owner')}
-                  </>
-                )}
-              </button>
+              {/* ─── Contact The Owner — Two Buttons ─── */}
+              <div className="pt-2">
+                <h3 className="text-amber-400/90 text-[10px] font-bold uppercase tracking-widest text-center mb-3">
+                  {t('finder.contact_the_owner_title')}
+                </h3>
+                <div className="grid grid-cols-2 gap-3">
+                  {/* WhatsApp Button */}
+                  <button
+                    onClick={() => {
+                      if (!validateFinderForm()) return;
+                      handleWhatsApp();
+                    }}
+                    disabled={isSubmitting}
+                    className="py-3.5 px-3 bg-green-600 hover:bg-green-500 text-white rounded-xl font-bold transition-colors flex items-center justify-center gap-2 text-sm disabled:opacity-70 shadow-lg shadow-green-600/20"
+                  >
+                    <MessageCircle className="w-4 h-4" />
+                    {t('finder.by_whatsapp')}
+                  </button>
+                  {/* Phone Button */}
+                  <button
+                    onClick={() => {
+                      if (!validateFinderForm()) return;
+                      handlePhoneCall();
+                    }}
+                    disabled={isSubmitting}
+                    className="py-3.5 px-3 bg-amber-500 hover:bg-amber-400 text-slate-900 rounded-xl font-bold transition-colors flex items-center justify-center gap-2 text-sm disabled:opacity-70 shadow-lg shadow-amber-500/20"
+                  >
+                    <Phone className="w-4 h-4" />
+                    {t('finder.by_phone')}
+                  </button>
+                </div>
+              </div>
 
-              {/* Retry GPS Button */}
+              {/* Retry GPS */}
               {geoError && !sharedPosition && (
                 <button
                   onClick={handleShareLocation}
                   disabled={isLoadingLocation}
-                  className="w-full py-2 text-sm text-gray-600 hover:text-gray-800 flex items-center justify-center gap-2"
+                  className="w-full py-2 text-sm text-slate-500 hover:text-slate-300 flex items-center justify-center gap-2 transition-colors"
                 >
                   <Navigation className="w-4 h-4" />
                   {isLoadingLocation ? t('finder.locating') : t('finder.retry_gps')}
@@ -728,17 +794,15 @@ export default function ScanPage() {
             </div>
           )}
 
-          {/* Footer */}
-          <div className="mt-6 text-center text-xs text-gray-500">
-            <Shield className="w-4 h-4 inline mr-1" />
-            {t('finder.privacy_notice')}
-            <br />
-            QRBag © 2026 by MMASOLUTION
+          {/* ─── Trust Note ─── */}
+          <div className="mt-5 text-center text-[10px] text-slate-500 tracking-wide">
+            <Shield className="w-3.5 h-3.5 inline mr-1 text-indigo-400/60" />
+            {t('finder.trust_note')}
           </div>
         </div>
       </div>
 
-      {/* Contact Modal */}
+      {/* Contact Modal — Dark Theme */}
       <ContactModal
         show={showContactModal}
         onClose={() => setShowContactModal(false)}

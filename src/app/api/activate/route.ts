@@ -11,6 +11,8 @@ const activateSchema = z.object({
   whatsappOwner: z.string().min(1, 'WhatsApp number is required'),
   flightNumber: z.string().optional(),
   destination: z.string().optional(),
+  departureDate: z.string().optional(),
+  departureTime: z.string().optional(),
 });
 
 export async function POST(request: NextRequest) {
@@ -53,6 +55,8 @@ export async function POST(request: NextRequest) {
         whatsappOwner: validatedData.whatsappOwner,
         flightNumber: validatedData.flightNumber || null,
         destination: validatedData.destination || null,
+        departureDate: validatedData.departureDate ? new Date(validatedData.departureDate) : null,
+        departureTime: validatedData.departureTime || null,
         status: 'active',
         expiresAt,
         createdAt: new Date(),
@@ -80,6 +84,8 @@ export async function POST(request: NextRequest) {
               travelerFirstName: validatedData.travelerFirstName,
               travelerLastName: validatedData.travelerLastName,
               whatsappOwner: validatedData.whatsappOwner,
+              departureDate: validatedData.departureDate ? new Date(validatedData.departureDate) : null,
+              departureTime: validatedData.departureTime || null,
               status: 'active',
               expiresAt,
               createdAt: new Date(),

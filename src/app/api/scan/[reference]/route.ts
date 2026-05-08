@@ -85,6 +85,9 @@ export async function GET(
         whatsappOwner: baggage.whatsappOwner || null,
         declaredLostAt: baggage.declaredLostAt,
         foundAt: baggage.foundAt,
+        createdAt: baggage.createdAt?.toISOString() || null,
+        departureDate: baggage.departureDate?.toISOString() || null,
+        departureTime: baggage.departureTime || null,
       }
     });
 

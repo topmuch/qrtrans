@@ -32,6 +32,8 @@ function InscrireContent() {
     lastName: '',
     flightNumber: '',
     destination: '',
+    departureDate: '',
+    departureTime: '',
     whatsapp: '',
   });
 
@@ -57,6 +59,8 @@ function InscrireContent() {
           whatsappOwner: formData.whatsapp,
           flightNumber: formData.flightNumber,
           destination: formData.destination,
+          departureDate: formData.departureDate || undefined,
+          departureTime: formData.departureTime || undefined,
         }),
       });
 
@@ -256,6 +260,34 @@ function InscrireContent() {
                         value={formData.destination}
                         onChange={(e) => setFormData({ ...formData, destination: e.target.value })}
                         className="bg-white/10 border-white/20 text-white placeholder:text-white/40"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Departure Date & Time */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="departureDate" className="text-white">
+                        Date de départ
+                      </Label>
+                      <Input
+                        id="departureDate"
+                        type="date"
+                        value={formData.departureDate}
+                        onChange={(e) => setFormData({ ...formData, departureDate: e.target.value })}
+                        className="bg-white/10 border-white/20 text-white placeholder:text-white/40 [color-scheme:dark]"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="departureTime" className="text-white">
+                        Heure de départ
+                      </Label>
+                      <Input
+                        id="departureTime"
+                        type="time"
+                        value={formData.departureTime}
+                        onChange={(e) => setFormData({ ...formData, departureTime: e.target.value })}
+                        className="bg-white/10 border-white/20 text-white placeholder:text-white/40 [color-scheme:dark]"
                       />
                     </div>
                   </div>

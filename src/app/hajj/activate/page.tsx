@@ -20,6 +20,10 @@ function HajjActivateContent() {
     reference: '',
     firstName: '',
     lastName: '',
+    flightNumber: '',
+    destination: '',
+    departureDate: '',
+    departureTime: '',
     whatsapp: '',
   });
 
@@ -43,6 +47,10 @@ function HajjActivateContent() {
           travelerFirstName: formData.firstName,
           travelerLastName: formData.lastName,
           whatsappOwner: formData.whatsapp,
+          flightNumber: formData.flightNumber,
+          destination: formData.destination,
+          departureDate: formData.departureDate || undefined,
+          departureTime: formData.departureTime || undefined,
         }),
       });
 
@@ -178,6 +186,61 @@ function HajjActivateContent() {
                     onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
                     className="bg-white/10 border-white/20 text-white placeholder:text-white/40"
                     required
+                  />
+                </div>
+              </div>
+
+              {/* Flight, Destination, Departure */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="flightNumber" className="text-white">
+                    Numéro de vol
+                  </Label>
+                  <Input
+                    id="flightNumber"
+                    placeholder="SV1234"
+                    value={formData.flightNumber}
+                    onChange={(e) => setFormData({ ...formData, flightNumber: e.target.value.toUpperCase() })}
+                    className="bg-white/10 border-white/20 text-white placeholder:text-white/40"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="destination" className="text-white">
+                    Destination
+                  </Label>
+                  <Input
+                    id="destination"
+                    placeholder="Djeddah"
+                    value={formData.destination}
+                    onChange={(e) => setFormData({ ...formData, destination: e.target.value })}
+                    className="bg-white/10 border-white/20 text-white placeholder:text-white/40"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="departureDate" className="text-white">
+                    Date de départ
+                  </Label>
+                  <Input
+                    id="departureDate"
+                    type="date"
+                    value={formData.departureDate}
+                    onChange={(e) => setFormData({ ...formData, departureDate: e.target.value })}
+                    className="bg-white/10 border-white/20 text-white placeholder:text-white/40 [color-scheme:dark]"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="departureTime" className="text-white">
+                    Heure de départ
+                  </Label>
+                  <Input
+                    id="departureTime"
+                    type="time"
+                    value={formData.departureTime}
+                    onChange={(e) => setFormData({ ...formData, departureTime: e.target.value })}
+                    className="bg-white/10 border-white/20 text-white placeholder:text-white/40 [color-scheme:dark]"
                   />
                 </div>
               </div>
