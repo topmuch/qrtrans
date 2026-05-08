@@ -1,15 +1,16 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import Link from 'next/link';
 import { Button } from "@/components/ui/button";
+import { motion, useInView } from 'framer-motion';
 import {
   Plane,
   Luggage,
   QrCode,
   Shield,
   Smartphone,
-  Battery,
+  BatteryMedium,
   MapPin,
   MessageCircle,
   CheckCircle,
@@ -18,61 +19,92 @@ import {
   X,
   Mail,
   Phone,
-  MapPinned,
-  Lock,
-  Zap,
-  Eye,
   ArrowRight,
   Facebook,
   Twitter,
   Instagram,
-  Play
+  Play,
+  Lock,
+  Bell,
+  Zap,
+  Users,
+  Headphones,
+  ChevronRight,
 } from "lucide-react";
 
-// Navigation Component
+/* ──────────────────────────────────────────────
+   Fade-in wrapper (Framer Motion)
+   ────────────────────────────────────────────── */
+function FadeIn({ children, className, delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { once: true, margin: '-60px' });
+  return (
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, y: 32 }}
+      animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 32 }}
+      transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94], delay }}
+      className={className}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+/* ══════════════════════════════════════════════
+   NAVIGATION
+   ══════════════════════════════════════════════ */
 function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  if (typeof window !== 'undefined') {
+    window.addEventListener('scroll', () => setScrolled(window.scrollY > 20));
+  }
+
+  const navLinks = [
+    { label: 'Solutions', href: '/#solutions' },
+    { label: 'Comment ça marche', href: '/#comment' },
+    { label: 'Tarifs', href: '/#tarifs' },
+    { label: 'Contact', href: '/contact' },
+  ];
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-[#080c1a]/95 backdrop-blur-md border-b border-[#1a2238]">
+    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'bg-white/90 backdrop-blur-xl shadow-sm' : 'bg-white'}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-16 lg:h-18">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2">
-            <div className="w-10 h-10 bg-gradient-to-br from-[#ff2a6d] to-[#d35400] rounded-lg flex items-center justify-center shadow-lg shadow-[#ff2a6d]/20">
-              <QrCode className="w-6 h-6 text-white" />
+          <Link href="/" className="flex items-center gap-2.5">
+            <div className="w-9 h-9 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl flex items-center justify-center shadow-md shadow-orange-500/20">
+              <QrCode className="w-5 h-5 text-white" />
             </div>
-            <span className="text-xl font-bold text-[#ff2a6d]">QRBag</span>
+            <span className="text-xl font-bold text-slate-900 tracking-tight">QRBag</span>
           </Link>
 
           {/* Desktop Nav */}
           <div className="hidden md:flex items-center gap-8">
-            <a href="/#solutions" className="text-[#e0e6f0] hover:text-[#ff2a6d] transition-colors">Solutions</a>
-            <a href="/#comment" className="text-[#e0e6f0] hover:text-[#ff2a6d] transition-colors">Comment ça marche</a>
-            <a href="/#tarifs" className="text-[#e0e6f0] hover:text-[#ff2a6d] transition-colors">Tarifs</a>
-            <Link href="/contact" className="text-[#e0e6f0] hover:text-[#ff2a6d] transition-colors">Contact</Link>
+            {navLinks.map(link => (
+              <a key={link.href} href={link.href} className="text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors duration-200">
+                {link.label}
+              </a>
+            ))}
           </div>
 
-          {/* CTA Buttons */}
+          {/* Desktop CTA Buttons */}
           <div className="hidden md:flex items-center gap-3">
             <Link href="/demo">
-              <Button variant="ghost" className="text-[#e0e6f0] hover:text-[#ff2a6d]">
-                <Play className="w-4 h-4 mr-1" />
+              <Button variant="ghost" className="text-slate-600 hover:text-slate-900 text-sm font-medium gap-1.5">
+                <Play className="w-3.5 h-3.5" />
                 Démo
               </Button>
             </Link>
             <Link href="/agence/connexion">
-              <Button variant="ghost" className="text-[#b8860b] hover:text-[#d4af37] border border-[#b8860b]/30">
+              <Button variant="ghost" className="text-slate-500 hover:text-slate-900 text-sm font-medium border border-slate-200 hover:border-slate-300">
                 Espace Agence
               </Button>
             </Link>
-            <Link href="/admin/connexion">
-              <Button variant="ghost" className="text-[#ff2a6d] hover:text-[#e01e5a] border border-[#ff2a6d]/30">
-                SuperAdmin
-              </Button>
-            </Link>
             <Link href="/devenir-partenaire">
-              <Button className="bg-[#ff2a6d] hover:bg-[#e01e5a] text-white font-medium shadow-lg shadow-[#ff2a6d]/20">
+              <Button className="bg-orange-500 hover:bg-orange-600 text-white font-medium text-sm shadow-md shadow-orange-500/25 rounded-full px-5">
                 Devenir Partenaire
               </Button>
             </Link>
@@ -80,8 +112,9 @@ function Navigation() {
 
           {/* Mobile Menu Button */}
           <button
-            className="md:hidden text-[#e0e6f0]"
+            className="md:hidden text-slate-700 p-1"
             onClick={() => setIsOpen(!isOpen)}
+            aria-label="Menu"
           >
             {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
@@ -89,23 +122,26 @@ function Navigation() {
 
         {/* Mobile Menu */}
         {isOpen && (
-          <div className="md:hidden py-4 border-t border-[#1a2238]">
-            <div className="flex flex-col gap-4">
-              <a href="/#solutions" className="text-[#e0e6f0] hover:text-[#ff2a6d]" onClick={() => setIsOpen(false)}>Solutions</a>
-              <a href="/#comment" className="text-[#e0e6f0] hover:text-[#ff2a6d]" onClick={() => setIsOpen(false)}>Comment ça marche</a>
-              <a href="/#tarifs" className="text-[#e0e6f0] hover:text-[#ff2a6d]" onClick={() => setIsOpen(false)}>Tarifs</a>
-              <Link href="/contact" className="text-[#e0e6f0] hover:text-[#ff2a6d]" onClick={() => setIsOpen(false)}>Contact</Link>
+          <div className="md:hidden py-4 border-t border-slate-100">
+            <div className="flex flex-col gap-3">
+              {navLinks.map(link => (
+                <a key={link.href} href={link.href} className="text-slate-600 hover:text-slate-900 font-medium py-2" onClick={() => setIsOpen(false)}>
+                  {link.label}
+                </a>
+              ))}
+              <hr className="border-slate-100" />
               <Link href="/demo" onClick={() => setIsOpen(false)}>
-                <Button variant="ghost" className="w-full text-[#ff2a6d]">Voir la Démo</Button>
+                <Button variant="ghost" className="w-full text-slate-600 justify-start gap-2">
+                  <Play className="w-4 h-4" /> Voir la Démo
+                </Button>
               </Link>
               <Link href="/agence/connexion" onClick={() => setIsOpen(false)}>
-                <Button variant="ghost" className="w-full text-[#b8860b] border border-[#b8860b]/30">Espace Agence</Button>
-              </Link>
-              <Link href="/admin/connexion" onClick={() => setIsOpen(false)}>
-                <Button variant="ghost" className="w-full text-[#ff2a6d] border border-[#ff2a6d]/30">SuperAdmin</Button>
+                <Button variant="ghost" className="w-full text-slate-500 border border-slate-200 justify-start">Espace Agence</Button>
               </Link>
               <Link href="/devenir-partenaire" onClick={() => setIsOpen(false)}>
-                <Button className="w-full bg-[#ff2a6d] hover:bg-[#e01e5a] text-white">Devenir Partenaire</Button>
+                <Button className="w-full bg-orange-500 hover:bg-orange-600 text-white font-medium rounded-full">
+                  Devenir Partenaire
+                </Button>
               </Link>
             </div>
           </div>
@@ -115,130 +151,157 @@ function Navigation() {
   );
 }
 
-// Hero Section
+/* ══════════════════════════════════════════════
+   HERO SECTION
+   ══════════════════════════════════════════════ */
 function HeroSection() {
   return (
-    <section className="min-h-screen flex items-center pt-16 pb-20 px-4 bg-[#080c1a] relative overflow-hidden">
-      {/* Background Gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-[#ff2a6d]/5 via-transparent to-[#d35400]/5 pointer-events-none" />
-      
+    <section className="relative min-h-screen flex items-center pt-20 pb-16 px-4 bg-white overflow-hidden">
+      {/* Subtle background pattern */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-20 right-0 w-[600px] h-[600px] bg-orange-50 rounded-full blur-3xl opacity-60" />
+        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-purple-50 rounded-full blur-3xl opacity-40" />
+      </div>
+
       <div className="max-w-7xl mx-auto w-full relative z-10">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
+        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           {/* Left Content */}
-          <div className="text-center lg:text-left">
+          <div className="text-center lg:text-left max-w-xl mx-auto lg:mx-0">
             {/* Badge */}
-            <div className="inline-flex items-center gap-2 mb-6">
-              <span className="px-4 py-2 bg-[#ff2a6d]/20 border border-[#ff2a6d]/50 text-[#ff2a6d] text-sm rounded-full font-medium animate-pulse">
-                🔥 La protection intelligente pour vos bagages
-              </span>
-            </div>
+            <FadeIn>
+              <div className="inline-flex items-center gap-2 mb-8 px-4 py-2 bg-orange-50 border border-orange-100 rounded-full">
+                <span className="w-2 h-2 bg-orange-500 rounded-full animate-pulse" />
+                <span className="text-sm font-medium text-orange-700">La protection intelligente pour vos bagages</span>
+              </div>
+            </FadeIn>
 
             {/* Title */}
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
-              Un bagage perdu = un voyage gâché.
-              <span className="block bg-gradient-to-r from-[#ff2a6d] to-[#d35400] bg-clip-text text-transparent text-3xl md:text-4xl lg:text-5xl mt-2">
-                Avec QRBag, retrouvez-le en quelques heures.
-              </span>
-            </h1>
+            <FadeIn delay={0.1}>
+              <h1 className="text-4xl sm:text-5xl lg:text-[3.5rem] font-bold text-slate-900 mb-6 leading-[1.1] tracking-tight">
+                Un bagage perdu{' '}
+                <span className="text-slate-400">=</span>{' '}
+                <span className="text-orange-500">un voyage gâché.</span>
+              </h1>
+            </FadeIn>
 
-            {/* Subtitle */}
-            <p className="text-[#a0a8b8] text-lg md:text-xl mb-8 max-w-xl mx-auto lg:mx-0">
-              Il suffit d&apos;un QR code pour le retrouver. Géolocalisé en temps réel, activé en 30 secondes, vous êtes notifié par WhatsApp dès qu&apos;il est trouvé.
-            </p>
+            <FadeIn delay={0.2}>
+              <p className="text-lg sm:text-xl text-slate-500 mb-10 leading-relaxed max-w-lg mx-auto lg:mx-0">
+                Avec QRBag, retrouvez-le en quelques heures&nbsp;&mdash; sans application, sans batterie, sans stress.
+              </p>
+            </FadeIn>
 
             {/* CTAs */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-              <Link href="/contact">
-                <Button className="bg-[#ff2a6d] hover:bg-[#e01e5a] text-white px-8 py-6 rounded-lg font-bold text-lg shadow-xl shadow-[#ff2a6d]/30 transition-all hover:scale-105">
-                  📦 Commander mes QR
-                </Button>
-              </Link>
-              <Link href="/demo">
-                <Button className="bg-[#d35400] hover:bg-[#c04800] text-white px-8 py-6 rounded-lg font-bold text-lg transition-all hover:scale-105">
-                  <Play className="w-5 h-5 mr-2" />
-                  Voir la démo
-                </Button>
-              </Link>
-            </div>
+            <FadeIn delay={0.3}>
+              <div className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start">
+                <Link href="/contact">
+                  <Button className="bg-orange-500 hover:bg-orange-600 text-white px-7 py-3.5 rounded-full font-semibold text-sm shadow-lg shadow-orange-500/25 transition-all hover:shadow-orange-500/40 hover:scale-[1.02] gap-2">
+                    Commander mes QR
+                    <ArrowRight className="w-4 h-4" />
+                  </Button>
+                </Link>
+                <Link href="/demo">
+                  <Button variant="ghost" className="text-slate-700 border border-slate-200 hover:border-orange-300 hover:text-orange-600 px-7 py-3.5 rounded-full font-semibold text-sm gap-2 bg-white">
+                    <Play className="w-4 h-4" />
+                    Voir la démo interactive
+                  </Button>
+                </Link>
+              </div>
+            </FadeIn>
 
             {/* Trust Pills */}
-            <div className="flex flex-wrap justify-center lg:justify-start gap-4 mt-8">
-              <div className="flex items-center gap-2 bg-[#0d1220] px-4 py-2 rounded-full border border-[#1a2238]">
-                <Smartphone className="w-4 h-4 text-[#ff2a6d]" />
-                <span className="text-[#a0a8b8] text-sm">Sans application</span>
+            <FadeIn delay={0.4}>
+              <div className="flex flex-wrap justify-center lg:justify-start gap-3 mt-10">
+                {[
+                  { icon: Smartphone, text: 'Sans application' },
+                  { icon: BatteryMedium, text: 'Sans batterie' },
+                  { icon: MapPin, text: 'Géolocalisé' },
+                ].map(item => (
+                  <div key={item.text} className="flex items-center gap-2 px-3.5 py-2 bg-slate-50 rounded-full border border-slate-100">
+                    <item.icon className="w-4 h-4 text-orange-500" />
+                    <span className="text-xs font-medium text-slate-600">{item.text}</span>
+                  </div>
+                ))}
               </div>
-              <div className="flex items-center gap-2 bg-[#0d1220] px-4 py-2 rounded-full border border-[#1a2238]">
-                <Battery className="w-4 h-4 text-[#ff2a6d]" />
-                <span className="text-[#a0a8b8] text-sm">Sans batterie</span>
-              </div>
-              <div className="flex items-center gap-2 bg-[#0d1220] px-4 py-2 rounded-full border border-[#1a2238]">
-                <MapPin className="w-4 h-4 text-[#ff2a6d]" />
-                <span className="text-[#a0a8b8] text-sm">Géolocalisé</span>
-              </div>
-            </div>
+            </FadeIn>
           </div>
 
-          {/* Right Content - QR Code Display */}
-          <div className="hidden lg:flex justify-center">
+          {/* Right Content — QR Code Card */}
+          <FadeIn delay={0.2} className="hidden lg:flex justify-center">
             <div className="relative">
-              {/* Glow Effect */}
-              <div className="absolute inset-0 bg-[#ff2a6d]/20 blur-3xl rounded-full animate-pulse" />
-              <div className="absolute inset-4 bg-[#d35400]/10 blur-2xl rounded-full" />
+              {/* Decorative glow */}
+              <div className="absolute -inset-8 bg-gradient-to-tr from-orange-100/60 via-purple-100/40 to-transparent rounded-full blur-2xl" />
 
-              {/* QR Card */}
-              <div className="relative bg-[#0d1220] rounded-3xl p-8 border border-[#1a2238] shadow-2xl hover:scale-105 transition-transform duration-300">
-                <div className="w-64 h-64 bg-white rounded-2xl flex flex-col items-center justify-center shadow-lg relative overflow-hidden">
-                  {/* QR Pattern Background */}
-                  <div className="absolute inset-0 opacity-5">
-                    <div className="grid grid-cols-8 grid-rows-8 h-full w-full p-2 gap-0.5">
-                      {[...Array(64)].map((_, i) => (
-                        <div key={i} className="bg-[#ff2a6d] rounded-sm" />
-                      ))}
+              {/* Card */}
+              <div className="relative bg-white rounded-3xl p-8 shadow-2xl shadow-slate-200/60 border border-slate-100">
+                {/* Luggage tag shape */}
+                <div className="relative bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl p-1">
+                  <div className="bg-white rounded-xl p-8 flex flex-col items-center">
+                    {/* QR Code visual */}
+                    <div className="relative">
+                      <div className="absolute inset-0 opacity-[0.03]">
+                        <div className="grid grid-cols-12 grid-rows-12 h-48 w-48 gap-px">
+                          {[...Array(144)].map((_, i) => (
+                            <div key={i} className="bg-slate-900 rounded-[1px]" />
+                          ))}
+                        </div>
+                      </div>
+                      <QrCode className="w-40 h-40 text-slate-900 relative z-10" strokeWidth={1} />
+                    </div>
+
+                    {/* Tag hole */}
+                    <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-6 h-3 bg-slate-100 rounded-b-full border border-slate-200 border-t-0" />
+
+                    <div className="mt-6 text-center">
+                      <p className="font-mono text-sm font-semibold text-slate-900 tracking-wider">QR-DEMO-001</p>
+                      <p className="text-xs text-slate-400 mt-1">www.qrbag.com/scan/demo-001</p>
                     </div>
                   </div>
-                  <QrCode className="w-44 h-44 text-[#080c1a] relative z-10" />
-                  <p className="text-[#080c1a] font-mono text-sm mt-2 font-bold">DEMO-001</p>
                 </div>
+
                 <div className="mt-6 text-center">
-                  <p className="text-[#ff2a6d] font-medium">Scannez pour voir la démo</p>
-                  <p className="text-[#a0a8b8] text-sm mt-1">Activation en 30 secondes</p>
+                  <p className="text-sm font-semibold text-slate-800">Scannez pour voir la démo</p>
+                  <p className="text-xs text-slate-400 mt-0.5">Activation en 30 secondes</p>
                 </div>
-                <Link href="/demo">
-                  <Button className="w-full mt-4 bg-[#ff2a6d] hover:bg-[#e01e5a] text-white">
+
+                <Link href="/demo" className="block mt-5">
+                  <Button className="w-full bg-orange-500 hover:bg-orange-600 text-white rounded-full font-semibold text-sm shadow-md shadow-orange-500/25">
                     Essayer maintenant
                   </Button>
                 </Link>
               </div>
             </div>
-          </div>
+          </FadeIn>
         </div>
       </div>
     </section>
   );
 }
 
-// Stats Section
+/* ══════════════════════════════════════════════
+   STATISTICS
+   ══════════════════════════════════════════════ */
 function StatsSection() {
   const stats = [
-    { value: "10K+", label: "Bagages protégés", icon: "📦" },
-    { value: "500+", label: "Agences partenaires", icon: "🤝" },
-    { value: "98%", label: "Taux de récupération", icon: "✅" },
-    { value: "24/7", label: "Support disponible", icon: "🛠️" }
+    { value: '10K+', label: 'Bagages protégés', icon: Luggage },
+    { value: '500+', label: 'Agences partenaires', icon: Users },
+    { value: '98%', label: 'Taux de récupération', icon: CheckCircle },
+    { value: '24/7', label: 'Support disponible', icon: Headphones },
   ];
 
   return (
-    <section className="py-16 px-4 bg-[#080c1a]">
-      <div className="max-w-6xl mx-auto">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-          {stats.map((stat, index) => (
-            <div
-              key={index}
-              className="text-center p-6 bg-[#0d1220] rounded-xl border border-[#1a2238] hover:border-[#ff2a6d]/30 transition-all hover:scale-105"
-            >
-              <div className="text-4xl mb-3">{stat.icon}</div>
-              <div className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-[#ff2a6d] to-[#d35400] bg-clip-text text-transparent mb-1">{stat.value}</div>
-              <div className="text-[#a0a8b8] text-sm">{stat.label}</div>
-            </div>
+    <section className="py-20 px-4 bg-slate-50 border-y border-slate-100">
+      <div className="max-w-5xl mx-auto">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+          {stats.map((stat, i) => (
+            <FadeIn key={stat.label} delay={i * 0.08}>
+              <div className="bg-white rounded-2xl p-6 lg:p-8 border border-slate-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 text-center">
+                <div className="w-11 h-11 bg-orange-50 rounded-xl flex items-center justify-center mx-auto mb-4">
+                  <stat.icon className="w-5 h-5 text-orange-500" />
+                </div>
+                <p className="text-3xl lg:text-4xl font-bold text-slate-900 tracking-tight">{stat.value}</p>
+                <p className="text-sm text-slate-500 mt-1">{stat.label}</p>
+              </div>
+            </FadeIn>
           ))}
         </div>
       </div>
@@ -246,206 +309,267 @@ function StatsSection() {
   );
 }
 
-// Solutions Section
+/* ══════════════════════════════════════════════
+   SOLUTIONS
+   ══════════════════════════════════════════════ */
 function SolutionsSection() {
+  const solutions = [
+    {
+      title: 'Hajj & Omra',
+      description: 'Protection complète pour les pèlerins avec 3 bagages inclus (cabine + 2 soutes). Gérée par votre agence de voyage partenaire.',
+      icon: (
+        <svg viewBox="0 0 48 48" className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M24 4L6 12v12c0 10 8 18 18 22 10-4 18-12 18-22V12L24 4z" />
+          <rect x="20" y="18" width="8" height="12" rx="1" />
+          <path d="M22 18v-3a2 2 0 014 0v3" />
+          <path d="M20 26h8" />
+        </svg>
+      ),
+      color: 'emerald',
+      href: '/hajj-omra',
+    },
+    {
+      title: 'Voyageurs Standard',
+      description: 'Protection flexible pour tous vos voyages. Choisissez 1 ou 3 bagages avec une durée adaptée à vos besoins.',
+      icon: <Plane className="w-8 h-8" />,
+      color: 'orange',
+      href: '/voyageurs-standard',
+    },
+    {
+      title: '100% Sécurisé',
+      description: 'Vos données personnelles sont protégées et cryptées. Aucune information sensible n\'est exposée publiquement.',
+      icon: <Lock className="w-8 h-8" />,
+      color: 'purple',
+      href: '/confidentialite',
+    },
+  ];
+
+  const colorMap: Record<string, { bg: string; border: string; iconBg: string; iconColor: string; badge: string; badgeText: string; btn: string; btnHover: string; btnText: string }> = {
+    emerald: {
+      bg: 'bg-emerald-600',
+      border: 'border-emerald-600',
+      iconBg: 'bg-emerald-100',
+      iconColor: 'text-emerald-700',
+      badge: 'bg-emerald-50 border-emerald-100',
+      badgeText: 'text-emerald-700',
+      btn: 'bg-emerald-600',
+      btnHover: 'hover:bg-emerald-700',
+      btnText: 'text-white',
+    },
+    orange: {
+      bg: 'bg-orange-500',
+      border: 'border-orange-500',
+      iconBg: 'bg-orange-100',
+      iconColor: 'text-orange-600',
+      badge: 'bg-orange-50 border-orange-100',
+      badgeText: 'text-orange-700',
+      btn: 'bg-orange-500',
+      btnHover: 'hover:bg-orange-600',
+      btnText: 'text-white',
+    },
+    purple: {
+      bg: 'bg-purple-700',
+      border: 'border-purple-700',
+      iconBg: 'bg-purple-100',
+      iconColor: 'text-purple-700',
+      badge: 'bg-purple-50 border-purple-100',
+      badgeText: 'text-purple-700',
+      btn: 'bg-purple-700',
+      btnHover: 'hover:bg-purple-800',
+      btnText: 'text-white',
+    },
+  };
+
   return (
-    <section id="solutions" className="py-20 px-4 bg-[#0d1220]">
+    <section id="solutions" className="py-24 px-4 bg-white">
       <div className="max-w-6xl mx-auto">
         {/* Title */}
-        <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-[#ff2a6d] to-[#d35400] bg-clip-text text-transparent mb-4">
+        <FadeIn className="text-center mb-16">
+          <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4 tracking-tight">
             Deux solutions, une protection
           </h2>
-          <p className="text-[#a0a8b8] text-lg max-w-2xl mx-auto">
+          <p className="text-lg text-slate-500 max-w-2xl mx-auto">
             Que vous soyez pèlerin ou voyageur, QRBag s&apos;adapte à vos besoins avec des solutions sur mesure.
           </p>
-        </div>
+        </FadeIn>
 
         {/* Cards */}
-        <div className="grid md:grid-cols-3 gap-6">
-          {/* Hajj Card */}
-          <div className="group bg-gradient-to-br from-[#1e3a2e] to-[#0d5e34] rounded-2xl p-6 border border-[#1e3a2e]/50 hover:scale-105 transition-all duration-300 shadow-xl hover:shadow-[#1e3a2e]/30">
-            <div className="text-5xl mb-4">🕋</div>
-            <h3 className="text-xl font-bold text-white mb-3">Hajj & Omra</h3>
-            <p className="text-white/80 mb-6 text-sm leading-relaxed">
-              Protection complète pour les pèlerins avec 3 bagages inclus (cabine + 2 soutes). Gérée par votre agence de voyage partenaire.
-            </p>
-            <Link href="/hajj-omra">
-              <Button className="w-full bg-white/20 hover:bg-white/30 text-white border border-white/30">
-                En savoir plus <ArrowRight className="w-4 h-4 ml-2" />
-              </Button>
-            </Link>
-          </div>
+        <div className="grid md:grid-cols-3 gap-5">
+          {solutions.map((sol, i) => {
+            const c = colorMap[sol.color];
+            return (
+              <FadeIn key={sol.title} delay={i * 0.1}>
+                <div className={`group h-full rounded-2xl p-7 border border-slate-100 bg-white shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col`}>
+                  {/* Icon */}
+                  <div className={`w-14 h-14 ${c.iconBg} rounded-2xl flex items-center justify-center mb-6`}>
+                    <span className={c.iconColor}>{sol.icon}</span>
+                  </div>
 
-          {/* Voyageur Card */}
-          <div className="group bg-gradient-to-br from-[#d35400] to-[#e67e22] rounded-2xl p-6 border border-[#d35400]/50 hover:scale-105 transition-all duration-300 shadow-xl hover:shadow-[#d35400]/30">
-            <div className="text-5xl mb-4">✈️</div>
-            <h3 className="text-xl font-bold text-white mb-3">Voyageurs Standard</h3>
-            <p className="text-white/80 mb-6 text-sm leading-relaxed">
-              Protection flexible pour tous vos voyages. Choisissez 1 ou 3 bagages avec une durée adaptée à vos besoins.
-            </p>
-            <Link href="/voyageurs-standard">
-              <Button className="w-full bg-white/20 hover:bg-white/30 text-white border border-white/30">
-                En savoir plus <ArrowRight className="w-4 h-4 ml-2" />
-              </Button>
-            </Link>
-          </div>
+                  {/* Title */}
+                  <h3 className="text-xl font-bold text-slate-900 mb-3">{sol.title}</h3>
 
-          {/* Security Card */}
-          <div className="group bg-[#0a0f2c] rounded-2xl p-6 border border-[#1a2238] hover:scale-105 hover:border-[#ff2a6d]/30 transition-all duration-300 shadow-xl">
-            <div className="text-5xl mb-4">🔒</div>
-            <h3 className="text-xl font-bold text-white mb-3">100% Sécurisé</h3>
-            <p className="text-[#a0a8b8] mb-6 text-sm leading-relaxed">
-              Vos données personnelles sont protégées et cryptées. Aucune information sensible n&apos;est exposée publiquement.
-            </p>
-            <div className="flex items-center gap-2 text-[#ff2a6d]">
-              <Shield className="w-5 h-5" />
-              <span className="text-sm font-medium">Certifié RGPD</span>
-            </div>
-          </div>
+                  {/* Description */}
+                  <p className="text-sm text-slate-500 leading-relaxed mb-6 flex-1">{sol.description}</p>
+
+                  {/* Button */}
+                  <Link href={sol.href}>
+                    <Button variant="ghost" className={`w-full ${c.iconColor} hover:${c.bg} hover:${c.btnText} font-medium text-sm rounded-full border border-slate-200 hover:border-transparent transition-all gap-2 group/btn`}>
+                      En savoir plus
+                      <ChevronRight className="w-4 h-4 group-hover/btn:translate-x-0.5 transition-transform" />
+                    </Button>
+                  </Link>
+                </div>
+              </FadeIn>
+            );
+          })}
         </div>
       </div>
     </section>
   );
 }
 
-// How It Works Section
+/* ══════════════════════════════════════════════
+   HOW IT WORKS
+   ══════════════════════════════════════════════ */
 function HowItWorksSection() {
   const steps = [
     {
-      number: "01",
-      title: "Recevez votre QR",
-      icon: "📱",
-      description: "Commandez vos QR codes via notre formulaire B2B ou auprès de votre agence partenaire."
+      number: '01',
+      title: 'Recevez votre QR',
+      description: 'Commandez vos QR codes via notre formulaire B2B ou auprès de votre agence partenaire.',
+      icon: <QrCode className="w-6 h-6" />,
     },
     {
-      number: "02",
-      title: "Activez en 30s",
-      icon: "⚡",
-      description: "Scannez le QR code et remplissez le formulaire avec vos informations de voyage."
+      number: '02',
+      title: 'Activez en 30s',
+      description: 'Scannez le QR code et remplissez le formulaire avec vos informations de voyage.',
+      icon: <Zap className="w-6 h-6" />,
     },
     {
-      number: "03",
-      title: "Voyagez serein",
-      icon: "✈️",
-      description: "Vos bagages sont protégés. Collez simplement l'autocollant bien visible."
+      number: '03',
+      title: 'Voyagez serein',
+      description: 'Vos bagages sont protégés. Collez simplement l\'autocollant bien visible.',
+      icon: <Plane className="w-6 h-6" />,
     },
     {
-      number: "04",
-      title: "Soyez notifié",
-      icon: "🔔",
-      description: "Si quelqu'un trouve votre bagage, vous recevez une alerte instantanée via WhatsApp."
-    }
+      number: '04',
+      title: 'Soyez notifié',
+      description: 'Si quelqu\'un trouve votre bagage, vous recevez une alerte instantanée via WhatsApp.',
+      icon: <Bell className="w-6 h-6" />,
+    },
   ];
 
   return (
-    <section id="comment" className="py-20 px-4 bg-[#080c1a]">
+    <section id="comment" className="py-24 px-4 bg-slate-50">
       <div className="max-w-6xl mx-auto">
         {/* Title */}
-        <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-[#ff2a6d] to-[#d35400] bg-clip-text text-transparent mb-4">
+        <FadeIn className="text-center mb-16">
+          <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4 tracking-tight">
             Comment ça marche ?
           </h2>
-          <p className="text-[#a0a8b8] text-lg">
+          <p className="text-lg text-slate-500">
             Une protection en 4 étapes simples
           </p>
-        </div>
+        </FadeIn>
 
-        {/* Steps Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {steps.map((step, index) => (
-            <div
-              key={index}
-              className="relative bg-[#0d1220] rounded-xl p-6 border border-[#1a2238] hover:border-[#ff2a6d]/30 transition-all group"
-            >
-              {/* Step Number */}
-              <div className="absolute -top-3 -left-3 w-10 h-10 bg-gradient-to-r from-[#ff2a6d] to-[#d35400] rounded-full flex items-center justify-center text-white font-bold text-sm shadow-lg shadow-[#ff2a6d]/30">
-                {step.number}
+        {/* Steps */}
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 relative">
+          {/* Connecting line (desktop) */}
+          <div className="hidden lg:block absolute top-[3.5rem] left-[12.5%] right-[12.5%] h-px bg-gradient-to-r from-orange-200 via-purple-200 to-orange-200" />
+
+          {steps.map((step, i) => (
+            <FadeIn key={step.number} delay={i * 0.1}>
+              <div className="relative bg-white rounded-2xl p-7 border border-slate-100 shadow-sm hover:shadow-md transition-all text-center">
+                {/* Step number circle */}
+                <div className="w-14 h-14 bg-gradient-to-br from-orange-500 to-orange-600 rounded-full flex items-center justify-center mx-auto mb-5 shadow-lg shadow-orange-500/20 relative z-10">
+                  <span className="text-white font-bold text-lg">{step.number}</span>
+                </div>
+
+                {/* Icon */}
+                <div className="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center mx-auto mb-4 text-slate-600">
+                  {step.icon}
+                </div>
+
+                <h3 className="font-semibold text-slate-900 mb-2">{step.title}</h3>
+                <p className="text-sm text-slate-500 leading-relaxed">{step.description}</p>
               </div>
-
-              {/* Icon */}
-              <div className="text-4xl mb-4 mt-2">{step.icon}</div>
-
-              {/* Title */}
-              <h3 className="text-lg font-bold text-white mb-2">{step.title}</h3>
-
-              {/* Description */}
-              <p className="text-[#a0a8b8] text-sm leading-relaxed">{step.description}</p>
-            </div>
+            </FadeIn>
           ))}
         </div>
 
-        {/* Demo Link */}
-        <div className="mt-16 text-center">
+        {/* Demo CTA */}
+        <FadeIn delay={0.3} className="mt-14 text-center">
           <Link href="/demo">
-            <Button className="bg-[#ff2a6d] hover:bg-[#e01e5a] text-white px-8 py-6 rounded-lg font-bold text-lg shadow-xl shadow-[#ff2a6d]/30 transition-all hover:scale-105">
-              <Play className="w-5 h-5 mr-2" />
+            <Button className="bg-orange-500 hover:bg-orange-600 text-white px-7 py-3.5 rounded-full font-semibold text-sm shadow-lg shadow-orange-500/25 transition-all hover:shadow-orange-500/40 hover:scale-[1.02] gap-2">
+              <Play className="w-4 h-4" />
               Voir la démo interactive
             </Button>
           </Link>
-        </div>
+        </FadeIn>
       </div>
     </section>
   );
 }
 
-// Testimonials Section
+/* ══════════════════════════════════════════════
+   TESTIMONIALS
+   ══════════════════════════════════════════════ */
 function TestimonialsSection() {
   const testimonials = [
     {
-      name: "Mamadou Diallo",
-      role: "Pèlerin Hajj 2025",
-      content: "Grâce à QRBag, j'ai retrouvé ma valise perdue à l'aéroport de Djeddah en moins de 2 heures. Une invention géniale !",
-      avatar: "👴🏾"
+      name: 'Mamadou Diallo',
+      role: 'Pèlerin Hajj 2025',
+      content: 'Grâce à QRBag, j\'ai retrouvé ma valise perdue à l\'aéroport de Djeddah en moins de 2 heures. Une invention géniale !',
+      initials: 'MD',
     },
     {
-      name: "Sophie Martin",
-      role: "Voyageuse fréquente",
-      content: "Simple, efficace et pas cher. J'ai utilisé QRBag pour tous mes voyages cette année. Plus de stress !",
-      avatar: "👩🏻"
-    }
+      name: 'Sophie Martin',
+      role: 'Voyageuse fréquente',
+      content: 'Simple, efficace et pas cher. J\'ai utilisé QRBag pour tous mes voyages cette année. Plus de stress !',
+      initials: 'SM',
+    },
   ];
 
   return (
-    <section className="py-20 px-4 bg-[#0d1220]">
+    <section className="py-24 px-4 bg-white">
       <div className="max-w-4xl mx-auto">
         {/* Title */}
-        <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-[#ff2a6d] to-[#d35400] bg-clip-text text-transparent mb-4">
+        <FadeIn className="text-center mb-14">
+          <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4 tracking-tight">
             Ils nous font confiance
           </h2>
-        </div>
+          <p className="text-slate-500 text-lg">Des milliers de voyageurs et pèlerins déjà protégés</p>
+        </FadeIn>
 
-        {/* Testimonials */}
-        <div className="grid md:grid-cols-2 gap-6">
-          {testimonials.map((testimonial, index) => (
-            <div
-              key={index}
-              className="bg-[#0a0f2c] rounded-xl p-6 border border-[#1a2238] hover:border-[#ff2a6d]/30 transition-colors"
-            >
-              {/* Stars */}
-              <div className="flex gap-1 mb-4">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-5 h-5 text-[#ff2a6d] fill-[#ff2a6d]" />
-                ))}
-              </div>
-
-              {/* Content */}
-              <p className="text-[#e0e6f0] mb-6 leading-relaxed">
-                &ldquo;{testimonial.content}&rdquo;
-              </p>
-
-              {/* Author */}
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-[#1a2238] rounded-full flex items-center justify-center text-2xl">
-                  {testimonial.avatar}
+        {/* Cards */}
+        <div className="grid md:grid-cols-2 gap-5">
+          {testimonials.map((t, i) => (
+            <FadeIn key={t.name} delay={i * 0.1}>
+              <div className="bg-slate-50 rounded-2xl p-7 border border-slate-100 hover:shadow-md transition-all h-full flex flex-col">
+                {/* Stars */}
+                <div className="flex gap-0.5 mb-5">
+                  {[...Array(5)].map((_, j) => (
+                    <Star key={j} className="w-4 h-4 text-orange-400 fill-orange-400" />
+                  ))}
                 </div>
-                <div>
-                  <p className="font-semibold text-white">{testimonial.name}</p>
-                  <p className="text-[#a0a8b8] text-sm">{testimonial.role}</p>
+
+                {/* Quote */}
+                <p className="text-slate-700 leading-relaxed mb-6 flex-1">
+                  &ldquo;{t.content}&rdquo;
+                </p>
+
+                {/* Author */}
+                <div className="flex items-center gap-3 pt-4 border-t border-slate-200">
+                  <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-orange-600 rounded-full flex items-center justify-center text-white text-sm font-bold shadow-sm">
+                    {t.initials}
+                  </div>
+                  <div>
+                    <p className="font-semibold text-slate-900 text-sm">{t.name}</p>
+                    <p className="text-xs text-slate-400">{t.role}</p>
+                  </div>
                 </div>
               </div>
-            </div>
+            </FadeIn>
           ))}
         </div>
       </div>
@@ -453,90 +577,89 @@ function TestimonialsSection() {
   );
 }
 
-// Pricing Section
+/* ══════════════════════════════════════════════
+   PRICING
+   ══════════════════════════════════════════════ */
 function PricingSection() {
   const plans = [
     {
-      title: "Pour 1 voyage",
-      price: "4 €",
-      duration: "7 jours de protection",
+      title: 'Pour 1 voyage',
+      price: '4 €',
+      duration: '7 jours de protection',
       features: [
-        "3 étiquettes QR incluses",
-        "Support WhatsApp",
-        "Notification email",
-        "Activation instantanée"
+        '3 étiquettes QR incluses',
+        'Support WhatsApp',
+        'Notification email',
+        'Activation instantanée',
       ],
-      color: "#d35400"
+      btnClass: 'bg-orange-500 hover:bg-orange-600 text-white shadow-lg shadow-orange-500/25 hover:shadow-orange-500/40',
+      popular: false,
     },
     {
-      title: "Pour plusieurs voyages",
-      price: "7 €",
-      duration: "1 an de protection",
+      title: 'Pour plusieurs voyages',
+      price: '7 €',
+      duration: '1 an de protection',
       features: [
-        "3 étiquettes QR incluses",
-        "Support prioritaire",
-        "Renouvellement facile",
-        "Statistiques de scans"
+        '3 étiquettes QR incluses',
+        'Support prioritaire 24/7',
+        'Renouvellement facile',
+        'Statistiques de scans',
       ],
-      color: "#ff2a6d",
-      popular: true
-    }
+      btnClass: 'bg-gradient-to-r from-rose-500 to-pink-600 text-white shadow-lg shadow-rose-500/25 hover:shadow-rose-500/40',
+      popular: true,
+    },
   ];
 
   return (
-    <section id="tarifs" className="py-20 px-4 bg-[#080c1a]">
+    <section id="tarifs" className="py-24 px-4 bg-slate-50">
       <div className="max-w-4xl mx-auto">
         {/* Title */}
-        <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-[#ff2a6d] to-[#d35400] bg-clip-text text-transparent mb-4">
+        <FadeIn className="text-center mb-14">
+          <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4 tracking-tight">
             Tarifs simples
           </h2>
-          <p className="text-[#a0a8b8] text-lg">
+          <p className="text-lg text-slate-500">
             Choisissez la formule adaptée à vos besoins
           </p>
-        </div>
+        </FadeIn>
 
         {/* Pricing Cards */}
-        <div className="grid md:grid-cols-2 gap-6">
-          {plans.map((plan, index) => (
-            <div
-              key={index}
-              className={`relative bg-[#0d1220] rounded-xl p-6 border ${
-                plan.popular ? 'border-[#ff2a6d] shadow-lg shadow-[#ff2a6d]/20' : 'border-[#1a2238]'
-              }`}
-            >
-              {plan.popular && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#ff2a6d] text-white text-xs font-bold px-4 py-1 rounded-full">
-                  POPULAIRE
-                </div>
-              )}
-
-              <h3 className="text-xl font-bold text-white mb-2">{plan.title}</h3>
-
-              <div className="flex items-baseline gap-1 mb-1">
-                <span className="text-4xl font-bold bg-gradient-to-r from-[#ff2a6d] to-[#d35400] bg-clip-text text-transparent">{plan.price}</span>
-              </div>
-
-              <p className="text-[#a0a8b8] text-sm mb-6">{plan.duration}</p>
-
-              <div className="space-y-3 mb-6">
-                {plan.features.map((feature, i) => (
-                  <div key={i} className="flex items-center gap-2 text-[#e0e6f0]">
-                    <CheckCircle className="w-5 h-5 text-[#1e3a2e]" />
-                    <span>{feature}</span>
+        <div className="grid md:grid-cols-2 gap-5 items-start">
+          {plans.map((plan, i) => (
+            <FadeIn key={plan.title} delay={i * 0.1}>
+              <div className={`relative bg-white rounded-2xl p-8 border ${plan.popular ? 'border-rose-200 shadow-xl shadow-rose-100/50' : 'border-slate-100 shadow-sm'} hover:shadow-lg transition-all`}>
+                {plan.popular && (
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-rose-500 to-pink-600 text-white text-xs font-bold px-4 py-1 rounded-full shadow-md">
+                    Populaire
                   </div>
-                ))}
-              </div>
+                )}
 
-              <Link href="/contact">
-                <Button
-                  className="w-full text-white font-bold py-6 hover:scale-105 transition-transform"
-                  style={{ backgroundColor: plan.color }}
-                >
-                  Commander
-                </Button>
-              </Link>
-            </div>
+                <h3 className="font-bold text-slate-900 text-lg mb-1">{plan.title}</h3>
+                <p className="text-sm text-slate-400 mb-5">{plan.duration}</p>
+
+                <div className="flex items-baseline gap-1 mb-7">
+                  <span className="text-5xl font-bold text-slate-900 tracking-tight">{plan.price}</span>
+                </div>
+
+                <div className="space-y-3 mb-8">
+                  {plan.features.map((f, j) => (
+                    <div key={j} className="flex items-center gap-3 text-sm text-slate-600">
+                      <div className="w-5 h-5 bg-emerald-50 rounded-full flex items-center justify-center flex-shrink-0">
+                        <CheckCircle className="w-3.5 h-3.5 text-emerald-500" />
+                      </div>
+                      <span>{f}</span>
+                    </div>
+                  ))}
+                </div>
+
+                <Link href="/contact">
+                  <Button className={`w-full rounded-full font-semibold text-sm py-3.5 transition-all hover:scale-[1.02] ${plan.btnClass}`}>
+                    Commander
+                    <ArrowRight className="w-4 h-4 ml-1" />
+                  </Button>
+                </Link>
+              </div>
+            </FadeIn>
           ))}
         </div>
       </div>
@@ -544,149 +667,176 @@ function PricingSection() {
   );
 }
 
-// Final CTA Section
+/* ══════════════════════════════════════════════
+   FINAL CTA
+   ══════════════════════════════════════════════ */
 function FinalCTASection() {
   return (
-    <section className="py-20 px-4 bg-gradient-to-r from-[#d35400] to-[#ff2a6d]">
-      <div className="max-w-4xl mx-auto text-center">
-        <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-          Commencez dès maintenant
-        </h2>
-        <p className="text-white/90 max-w-2xl mx-auto mb-8 text-lg">
-          Rejoignez les milliers de voyageurs qui protègent leurs bagages avec QRBag. Commandez vos QR codes en quelques clics.
-        </p>
+    <section className="py-24 px-4 bg-white">
+      <div className="max-w-4xl mx-auto">
+        <FadeIn>
+          <div className="relative rounded-3xl overflow-hidden">
+            {/* Background */}
+            <div className="absolute inset-0 bg-gradient-to-br from-orange-500 via-orange-600 to-rose-600" />
+            <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 20% 80%, white 1px, transparent 1px), radial-gradient(circle at 80% 20%, white 1px, transparent 1px)', backgroundSize: '60px 60px' }} />
 
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Link href="/contact">
-            <Button className="bg-white text-[#ff2a6d] px-8 py-6 rounded-lg font-bold text-lg hover:bg-gray-100 transition-all shadow-xl hover:scale-105">
-              📦 Commander mes QR
-            </Button>
-          </Link>
-          <Link href="/demo">
-            <Button className="bg-transparent border-2 border-white text-white px-8 py-6 rounded-lg font-bold text-lg hover:bg-white/10 transition-all hover:scale-105">
-              <Play className="w-5 h-5 mr-2" />
-              Voir la démo
-            </Button>
-          </Link>
-        </div>
+            {/* Content */}
+            <div className="relative px-8 py-16 sm:px-16 sm:py-20 text-center">
+              <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4 tracking-tight">
+                Commencez dès maintenant
+              </h2>
+              <p className="text-white/85 max-w-xl mx-auto mb-10 text-lg leading-relaxed">
+                Rejoignez les milliers de voyageurs qui protègent leurs bagages avec QRBag.
+              </p>
+
+              <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                <Link href="/contact">
+                  <Button className="bg-white text-orange-600 hover:bg-orange-50 px-7 py-3.5 rounded-full font-semibold text-sm shadow-lg transition-all hover:scale-[1.02] gap-2">
+                    Commander mes QR
+                    <ArrowRight className="w-4 h-4" />
+                  </Button>
+                </Link>
+                <Link href="/demo">
+                  <Button className="bg-white/15 hover:bg-white/25 text-white border border-white/30 backdrop-blur-sm px-7 py-3.5 rounded-full font-semibold text-sm gap-2 transition-all">
+                    <Play className="w-4 h-4" />
+                    Voir la démo
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          </div>
+        </FadeIn>
       </div>
     </section>
   );
 }
 
-// Contact CTA Section
+/* ══════════════════════════════════════════════
+   CONTACT CTA
+   ══════════════════════════════════════════════ */
 function ContactCTASection() {
   return (
-    <section className="py-20 px-4 bg-[#0d1220]">
+    <section className="py-20 px-4 bg-slate-50 border-t border-slate-100">
       <div className="max-w-4xl mx-auto text-center">
-        <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-          Une question ? Contactez-nous
-        </h2>
-        <p className="text-[#a0a8b8] text-lg mb-8 max-w-2xl mx-auto">
-          Notre équipe est disponible pour répondre à toutes vos questions et vous accompagner dans votre projet.
-        </p>
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Link href="/contact">
-            <Button className="bg-[#ff2a6d] hover:bg-[#e01e5a] text-white px-8 py-4 rounded-lg font-bold text-lg shadow-xl shadow-[#ff2a6d]/30 transition-all hover:scale-105">
-              <Mail className="w-5 h-5 mr-2" />
-              Nous contacter
-            </Button>
-          </Link>
-          <a
-            href="https://wa.me/33745349339"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Button className="bg-[#25D366] hover:bg-[#20bd5a] text-white px-8 py-4 rounded-lg font-bold text-lg transition-all hover:scale-105">
-              <MessageCircle className="w-5 h-5 mr-2" />
-              WhatsApp
-            </Button>
-          </a>
-        </div>
+        <FadeIn>
+          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-3">
+            Une question ? Contactez-nous
+          </h2>
+          <p className="text-slate-500 mb-8 max-w-xl mx-auto">
+            Notre équipe est disponible pour répondre à toutes vos questions et vous accompagner.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <Link href="/contact">
+              <Button variant="ghost" className="text-slate-700 border border-slate-200 hover:border-orange-300 hover:text-orange-600 px-7 py-3.5 rounded-full font-semibold text-sm gap-2 bg-white">
+                <Mail className="w-4 h-4" />
+                Nous contacter
+              </Button>
+            </Link>
+            <a href="https://wa.me/33745349339" target="_blank" rel="noopener noreferrer">
+              <Button className="bg-emerald-500 hover:bg-emerald-600 text-white px-7 py-3.5 rounded-full font-semibold text-sm shadow-lg shadow-emerald-500/25 transition-all hover:scale-[1.02] gap-2">
+                <MessageCircle className="w-4 h-4" />
+                WhatsApp
+              </Button>
+            </a>
+          </div>
+        </FadeIn>
       </div>
     </section>
   );
 }
 
-// Footer
+/* ══════════════════════════════════════════════
+   FOOTER
+   ══════════════════════════════════════════════ */
 function Footer() {
+  const columns = [
+    {
+      title: 'Produit',
+      links: [
+        { label: 'Solutions', href: '/#solutions' },
+        { label: 'Comment ça marche', href: '/#comment' },
+        { label: 'Tarifs', href: '/#tarifs' },
+        { label: 'Démo', href: '/demo' },
+      ],
+    },
+    {
+      title: 'Entreprise',
+      links: [
+        { label: 'Contact', href: '/contact' },
+        { label: 'Devenir Partenaire', href: '/devenir-partenaire' },
+      ],
+    },
+    {
+      title: 'Légal',
+      links: [
+        { label: 'Mentions légales', href: '/mentions-legales' },
+        { label: 'Confidentialité', href: '/confidentialite' },
+        { label: 'CGU', href: '/cgu' },
+      ],
+    },
+  ];
+
   return (
-    <footer className="border-t border-[#1a2238] py-12 px-4 bg-[#080c1a]">
-      <div className="max-w-6xl mx-auto">
-        <div className="grid md:grid-cols-4 gap-8 mb-8">
-          {/* Logo */}
-          <div>
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-10 h-10 bg-gradient-to-br from-[#ff2a6d] to-[#d35400] rounded-lg flex items-center justify-center">
-                <QrCode className="w-6 h-6 text-white" />
+    <footer className="bg-slate-900 text-slate-400">
+      <div className="max-w-6xl mx-auto px-4 py-16">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-10">
+          {/* Brand */}
+          <div className="lg:col-span-2">
+            <div className="flex items-center gap-2.5 mb-4">
+              <div className="w-9 h-9 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl flex items-center justify-center shadow-md shadow-orange-500/20">
+                <QrCode className="w-5 h-5 text-white" />
               </div>
-              <span className="text-xl font-bold bg-gradient-to-r from-[#ff2a6d] to-[#d35400] bg-clip-text text-transparent">QRBag</span>
+              <span className="text-xl font-bold text-white tracking-tight">QRBag</span>
             </div>
-            <p className="text-[#a0a8b8] text-sm">
+            <p className="text-sm leading-relaxed max-w-xs">
               Protection intelligente des bagages pour voyageurs et pèlerins.
             </p>
+            {/* Social */}
+            <div className="flex items-center gap-3 mt-6">
+              <a href="https://facebook.com/qrbag" target="_blank" rel="noopener noreferrer" className="w-9 h-9 bg-slate-800 rounded-full flex items-center justify-center hover:bg-slate-700 transition-colors" aria-label="Facebook">
+                <Facebook className="w-4 h-4" />
+              </a>
+              <a href="https://instagram.com/qrbag" target="_blank" rel="noopener noreferrer" className="w-9 h-9 bg-slate-800 rounded-full flex items-center justify-center hover:bg-slate-700 transition-colors" aria-label="Instagram">
+                <Instagram className="w-4 h-4" />
+              </a>
+              <a href="https://twitter.com/qrbag" target="_blank" rel="noopener noreferrer" className="w-9 h-9 bg-slate-800 rounded-full flex items-center justify-center hover:bg-slate-700 transition-colors" aria-label="Twitter">
+                <Twitter className="w-4 h-4" />
+              </a>
+            </div>
           </div>
 
-          {/* Produit */}
-          <div>
-            <h4 className="font-semibold mb-4 text-white">Produit</h4>
-            <ul className="space-y-2 text-[#a0a8b8] text-sm">
-              <li><a href="/#solutions" className="hover:text-[#ff2a6d] transition-colors">Solutions</a></li>
-              <li><a href="/#comment" className="hover:text-[#ff2a6d] transition-colors">Comment ça marche</a></li>
-              <li><a href="/#tarifs" className="hover:text-[#ff2a6d] transition-colors">Tarifs</a></li>
-              <li><Link href="/demo" className="hover:text-[#ff2a6d] transition-colors">Démo</Link></li>
-            </ul>
-          </div>
-
-          {/* Entreprise */}
-          <div>
-            <h4 className="font-semibold mb-4 text-white">Entreprise</h4>
-            <ul className="space-y-2 text-[#a0a8b8] text-sm">
-              <li><Link href="/contact" className="hover:text-[#ff2a6d] transition-colors">Contact</Link></li>
-              <li><Link href="/a-propos" className="hover:text-[#ff2a6d] transition-colors">À propos</Link></li>
-              <li><Link href="/devenir-partenaire" className="hover:text-[#ff2a6d] transition-colors">Partenaires</Link></li>
-            </ul>
-          </div>
-
-          {/* Légal */}
-          <div>
-            <h4 className="font-semibold mb-4 text-white">Légal</h4>
-            <ul className="space-y-2 text-[#a0a8b8] text-sm">
-              <li><Link href="/mentions-legales" className="hover:text-[#ff2a6d] transition-colors">Mentions légales</Link></li>
-              <li><Link href="/confidentialite" className="hover:text-[#ff2a6d] transition-colors">Politique de confidentialité</Link></li>
-              <li><Link href="/cgu" className="hover:text-[#ff2a6d] transition-colors">CGU</Link></li>
-            </ul>
-          </div>
+          {/* Link Columns */}
+          {columns.map(col => (
+            <div key={col.title}>
+              <h4 className="font-semibold text-white text-sm mb-4">{col.title}</h4>
+              <ul className="space-y-2.5">
+                {col.links.map(link => (
+                  <li key={link.label}>
+                    {'href' in link && link.href.startsWith('/') ? (
+                      <Link href={link.href} className="text-sm hover:text-white transition-colors duration-200">{link.label}</Link>
+                    ) : (
+                      <a href={link.href} className="text-sm hover:text-white transition-colors duration-200">{link.label}</a>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
         </div>
 
-        {/* Bottom Bar */}
-        <div className="border-t border-[#1a2238] pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-[#a0a8b8] text-sm">
-            © {new Date().getFullYear()} QRBag. Tous droits réservés.
+        {/* Bottom */}
+        <div className="border-t border-slate-800 mt-12 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4">
+          <p className="text-xs text-slate-500">
+            &copy; {new Date().getFullYear()} QRBag. Tous droits réservés.
           </p>
-
-          {/* Social Icons */}
-          <div className="flex items-center gap-4">
-            <a href="https://facebook.com/qrbag" target="_blank" rel="noopener noreferrer" className="text-[#a0a8b8] hover:text-[#ff2a6d] transition-colors" aria-label="Facebook">
-              <Facebook className="w-5 h-5" aria-hidden="true" />
-            </a>
-            <a href="https://instagram.com/qrbag" target="_blank" rel="noopener noreferrer" className="text-[#a0a8b8] hover:text-[#ff2a6d] transition-colors" aria-label="Instagram">
-              <Instagram className="w-5 h-5" aria-hidden="true" />
-            </a>
-            <a href="https://twitter.com/qrbag" target="_blank" rel="noopener noreferrer" className="text-[#a0a8b8] hover:text-[#ff2a6d] transition-colors" aria-label="Twitter">
-              <Twitter className="w-5 h-5" aria-hidden="true" />
-            </a>
-          </div>
-
-          {/* Map Link */}
           <a
             href="https://maps.google.com/?q=Poissy+France"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-[#a0a8b8] hover:text-[#ff2a6d] text-sm flex items-center gap-1 transition-colors"
+            className="text-xs text-slate-500 hover:text-slate-300 flex items-center gap-1.5 transition-colors"
           >
-            <MapPin className="w-4 h-4" />
-            Nous trouver
+            <MapPin className="w-3.5 h-3.5" />
+            Poissy, France
           </a>
         </div>
       </div>
@@ -694,10 +844,12 @@ function Footer() {
   );
 }
 
-// Main Page Component
+/* ══════════════════════════════════════════════
+   MAIN PAGE
+   ══════════════════════════════════════════════ */
 export default function Home() {
   return (
-    <main className="min-h-screen bg-[#080c1a]">
+    <main className="min-h-screen bg-white flex flex-col">
       <Navigation />
       <HeroSection />
       <StatsSection />
@@ -711,4 +863,3 @@ export default function Home() {
     </main>
   );
 }
-
