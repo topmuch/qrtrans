@@ -17,6 +17,7 @@ import {
   AlertOctagon
 } from "lucide-react";
 import { useAgency } from '../layout';
+import { isActive, isPending } from '@/lib/status';
 
 interface Baggage {
   id: string;
@@ -216,14 +217,14 @@ export default function BaggagesPage() {
           <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center mb-3">
             <CheckCircle className="w-5 h-5 text-white" />
           </div>
-          <p className="text-2xl font-bold text-white">{baggages.filter(b => b.status === 'active' || b.status === 'scanned').length}</p>
+          <p className="text-2xl font-bold text-white">{baggages.filter(b => isActive(b.status)).length}</p>
           <p className="text-sm text-white/80">Actifs</p>
         </div>
         <div className="kpi-card kpi-card-orange p-5">
           <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center mb-3">
             <Clock className="w-5 h-5 text-white" />
           </div>
-          <p className="text-2xl font-bold text-white">{baggages.filter(b => b.status === 'pending_activation').length}</p>
+          <p className="text-2xl font-bold text-white">{baggages.filter(b => isPending(b.status)).length}</p>
           <p className="text-sm text-white/80">En attente</p>
         </div>
         <div className="kpi-card kpi-card-red p-5">
@@ -336,7 +337,7 @@ export default function BaggagesPage() {
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2">
                         {/* Declare Lost Button - for active/scanned */}
-                        {(baggage.status === 'active' || baggage.status === 'scanned') && (
+                        {isActive(baggage.status) && (
                           <button
                             onClick={() => handleDeclareLost(baggage.id)}
                             disabled={actionLoading === baggage.id}
@@ -456,7 +457,7 @@ export default function BaggagesPage() {
 
               <div className="pt-4 border-t border-slate-200 dark:border-slate-800 space-y-3">
                 {/* Action Buttons based on status */}
-                {(selectedBaggage.status === 'active' || selectedBaggage.status === 'scanned') && (
+                {isActive(selectedBaggage.status) && (
                   <button
                     onClick={() => handleDeclareLost(selectedBaggage.id)}
                     disabled={actionLoading === selectedBaggage.id}

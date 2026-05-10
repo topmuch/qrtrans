@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
+import { isActive } from '@/lib/status';
 
 // GET - Fetch dashboard statistics
 export async function GET() {
@@ -22,8 +23,8 @@ export async function GET() {
 
     // Calculate statistics
     const totalQR = baggages.length;
-    const qrActivatedHajj = baggages.filter(b => b.type === 'hajj' && b.status === 'active').length;
-    const qrActivatedVoyageur = baggages.filter(b => b.type === 'voyageur' && b.status === 'active').length;
+    const qrActivatedHajj = baggages.filter(b => b.type === 'hajj' && isActive(b.status)).length;
+    const qrActivatedVoyageur = baggages.filter(b => b.type === 'voyageur' && isActive(b.status)).length;
 
     // Count unique pilgrims (Hajj) - group by name
     const hajjBaggages = baggages.filter(b => b.type === 'hajj' && b.travelerFirstName);
@@ -112,7 +113,7 @@ export async function GET() {
     // If no scans, add some placeholder activities from activations
     if (recentActivities.length === 0) {
       const recentActivations: ActivityType[] = baggages
-        .filter(b => b.status === 'active' && b.travelerFirstName)
+        .filter(b => isActive(b.status) && b.travelerFirstName)
         .slice(0, 5)
         .map((b, index) => ({
           id: `activation-${index}`,

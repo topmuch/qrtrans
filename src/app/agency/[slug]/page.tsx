@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 import prisma from '@/lib/prisma';
+import { isActive } from '@/lib/status';
 import { Luggage, MapPin, Clock, CheckCircle, QrCode, Phone, Mail, Globe, Search } from 'lucide-react';
 
 // Page params type
@@ -39,7 +40,7 @@ export default async function PublicAgencyPage({ params }: PageProps) {
 
   // Stats - include all protected baggages
   const totalBaggages = agency.baggages.length;
-  const activeBaggages = agency.baggages.filter(b => b.status === 'active' || b.status === 'scanned').length;
+  const activeBaggages = agency.baggages.filter(b => isActive(b.status)).length;
   const foundBaggages = agency.baggages.filter(b => b.status === 'found').length;
   const scannedBaggages = agency.baggages.filter(b => b.status === 'scanned').length;
 

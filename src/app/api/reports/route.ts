@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
+import { isPending, isActive } from '@/lib/status';
 
 // GET - Fetch report statistics
 export async function GET(request: NextRequest) {
@@ -56,8 +57,8 @@ export async function GET(request: NextRequest) {
     // Calculate statistics
     const stats = {
       total: baggages.length,
-      pending_activation: baggages.filter(b => b.status === 'pending_activation').length,
-      active: baggages.filter(b => b.status === 'active').length,
+      pending_activation: baggages.filter(b => isPending(b.status)).length,
+      active: baggages.filter(b => isActive(b.status)).length,
       scanned: baggages.filter(b => b.status === 'scanned').length,
       lost: baggages.filter(b => b.status === 'lost').length,
       found: baggages.filter(b => b.status === 'found').length,
