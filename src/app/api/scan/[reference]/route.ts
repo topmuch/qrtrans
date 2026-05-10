@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { generateWhatsAppMessage } from '@/lib/groq';
+import { generateWhatsAppMessage, analyzeScanSuspicion } from '@/lib/groq';
+import { GROQ_AI_ENABLED, GROQ_SCAN_GUARD_ENABLED, GROQ_AUTO_TRANSLATE_ENABLED } from '@/lib/config';
+import { isFeatureEnabled } from '@/lib/features';
 import { logMetric } from '@/lib/logger';
+import { detectLocaleFromHeaders, LANGUAGE_COOKIE_NAME, LANGUAGE_COOKIE_MAX_AGE_DAYS } from '@/lib/i18n';
+import type { Language } from '@/lib/i18n';
 
 // GET - Retrieve baggage info for scan page
 export async function GET(
@@ -60,6 +64,19 @@ export async function GET(
     // Check if baggage is declared lost (but not yet found)
     const isDeclaredLost = baggage.declaredLostAt && !baggage.foundAt;
 
+    // AI-FEATURE: Feature #3 — Detect locale and set cookie for server-side i18n
+    let detectedLocale: Language = 'fr';
+    try {
+      if (GROQ_AI_ENABLED && GROQ_AUTO_TRANSLATE_ENABLED) {
+        const autoTranslateEnabled = await isFeatureEnabled('auto_translate').catch(() => false);
+        if (autoTranslateEnabled) {
+          detectedLocale = detectLocaleFromHeaders(request.headers);
+        }
+      }
+    } catch {
+      // Silent fallback to 'fr'
+    }
+
     // Return baggage info
     let theme;
     if (isDeclaredLost) {
@@ -70,7 +87,7 @@ export async function GET(
         : (baggage.status === 'lost' ? 'lost-voyageur' : 'voyageur');
     }
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       status: isDeclaredLost ? 'lost' : 'active',
       theme,
       type: baggage.type,
@@ -92,6 +109,20 @@ export async function GET(
         departureTime: baggage.departureTime || null,
       }
     });
+
+    // AI-FEATURE: Set qrbag_locale cookie (7 days) so server can detect language on next request
+    try {
+      response.cookies.set(LANGUAGE_COOKIE_NAME, detectedLocale, {
+        path: '/',
+        maxAge: LANGUAGE_COOKIE_MAX_AGE_DAYS * 24 * 60 * 60,
+        sameSite: 'lax',
+        httpOnly: false, // Client needs to read it for localStorage sync
+      });
+    } catch {
+      // Cookie setting can fail in some environments — silent
+    }
+
+    return response;
 
   } catch (error) {
     console.error('Scan error:', error);
@@ -124,49 +155,141 @@ export async function POST(
       );
     }
 
+    // AI-FEATURE: Feature #2 — Scan Guard (Anti-Doublon)
+    let isFlagged = false;
+    let scanGuardAnalysis: Record<string, unknown> | undefined;
+
+    try {
+      if (GROQ_AI_ENABLED && GROQ_SCAN_GUARD_ENABLED) {
+        const scanGuardEnabled = await isFeatureEnabled('scan_guard').catch(() => false);
+        if (scanGuardEnabled) {
+          // Fetch recent scans for this baggage (last 30 min)
+          const thirtyMinAgo = new Date(Date.now() - 30 * 60 * 1000);
+          const recentScans = await db.scanLog.findMany({
+            where: {
+              baggageId: baggage.id,
+              createdAt: { gte: thirtyMinAgo },
+            },
+            select: {
+              ipAddress: true,
+              city: true,
+              country: true,
+              createdAt: true,
+            },
+            orderBy: { createdAt: 'desc' },
+            take: 5,
+          });
+
+          const scannerIp = ipAddress ||
+            request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+            request.headers.get('x-real-ip')?.trim() ||
+            'unknown';
+
+          const guardResult = await analyzeScanSuspicion({
+            reference: baggage.reference,
+            scannerIp,
+            userAgent: request.headers.get('user-agent') || undefined,
+            city: city || undefined,
+            country: country || undefined,
+            recentScans: recentScans.map((s) => ({
+              ip: s.ipAddress || 'unknown',
+              city: s.city || undefined,
+              country: s.country || undefined,
+              createdAt: s.createdAt.toISOString(),
+            })),
+          });
+
+          // Store analysis for ALL analyzed scans (not just flagged) for audit trail
+          if (guardResult.analyzed && guardResult.analysis) {
+            scanGuardAnalysis = {
+              feature: 'scan_guard',
+              isSuspicious: guardResult.analysis.isSuspicious,
+              reason: guardResult.analysis.reason,
+              confidence: guardResult.analysis.confidence,
+              analyzedAt: guardResult.analysis.analyzedAt,
+              latencyMs: guardResult.latencyMs,
+            };
+
+            logMetric('groq', 'scan_guard', guardResult.latencyMs, true, {
+              key: reference,
+              details: `flagged=${guardResult.analysis.isSuspicious}, confidence=${guardResult.analysis.confidence}, reason=${guardResult.analysis.reason.substring(0, 50)}`,
+            });
+
+            if (guardResult.analysis.isSuspicious) {
+              isFlagged = true;
+
+              // Return discreet message — don't reveal that it was flagged
+              return NextResponse.json({
+                success: true,
+                flagged: true,
+                message: 'Votre signalement est en cours de vérification.',
+              });
+            }
+          } else {
+            logMetric('groq', 'scan_guard', guardResult.latencyMs, false, {
+              key: reference,
+              details: 'analysis_failed',
+            });
+          }
+        }
+      }
+    } catch (error) {
+      // Scan guard failure = fail-open, never blocks the scan
+      console.warn('[Groq/ScanGuard] Error → fail-open:', error instanceof Error ? error.message : 'unknown');
+    }
+
     // ─── IA: Générer le message WhatsApp via Groq (si activé) ───
     let aiMessageContent: string | null = null;
     let aiGenerated = false;
     let aiLatencyMs: number | null = null;
 
     try {
-      // Vérifier si le feature flag groq_api est activé en DB
-      const groqFlag = await db.featureFlag.findUnique({
-        where: { key: 'groq_api' },
-        select: { enabled: true },
-      });
-
-      if (groqFlag?.enabled) {
-        const scanTime = new Date().toLocaleTimeString('fr-FR', {
-          hour: '2-digit',
-          minute: '2-digit',
+      // ─── Double check: env var (kill switch) + DB feature flag ───
+      if (!GROQ_AI_ENABLED) {
+        console.log('[Groq/WhatsApp] Désactivé via GROQ_AI_ENABLED=false (env var)');
+      } else {
+        const groqFlag = await db.featureFlag.findUnique({
+          where: { key: 'groq_api' },
+          select: { enabled: true },
         });
 
-        const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://qrbags.com';
+        if (groqFlag?.enabled) {
+          // AI-FEATURE: Feature #3 — Detect locale for message language
+          const detectedLocale = detectLocaleFromHeaders(request.headers);
+          const localeMap: Record<string, string> = { fr: 'fr-FR', en: 'en-US', ar: 'ar-SA' };
+          const localeStr = localeMap[detectedLocale] || 'fr-FR';
 
-        const aiResult = await generateWhatsAppMessage({
-          reference: baggage.reference,
-          location: {
-            city: city || baggage.destination || 'Inconnue',
-            country: country || '',
-          },
-          time: scanTime,
-          link: `${appUrl}/suivi/${baggage.reference}`,
-          language: 'fr',
-        });
+          const scanTime = new Date().toLocaleTimeString(localeStr, {
+            hour: '2-digit',
+            minute: '2-digit',
+          });
 
-        if (aiResult.generated && aiResult.message) {
-          aiMessageContent = aiResult.message;
-          aiGenerated = true;
-          aiLatencyMs = aiResult.latencyMs;
-          logMetric('groq', 'generate_message', aiResult.latencyMs, true, {
-            key: baggage.reference,
+          const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://qrbags.com';
+
+          const aiResult = await generateWhatsAppMessage({
+            reference: baggage.reference,
+            location: {
+              city: city || baggage.destination || 'Inconnue',
+              country: country || '',
+            },
+            time: scanTime,
+            link: `${appUrl}/suivi/${baggage.reference}`,
+            language: detectedLocale,
           });
-        } else {
-          logMetric('groq', 'generate_message', aiResult.latencyMs, false, {
-            key: baggage.reference,
-            details: 'fallback',
-          });
+
+          if (aiResult.generated && aiResult.message) {
+            aiMessageContent = aiResult.message;
+            aiGenerated = true;
+            aiLatencyMs = aiResult.latencyMs;
+            logMetric('groq', 'generate_message', aiResult.latencyMs, true, {
+              key: baggage.reference,
+            });
+          } else {
+            logMetric('groq', 'generate_message', aiResult.latencyMs, false, {
+              key: baggage.reference,
+              details: 'fallback',
+            });
+          }
         }
       }
     } catch (error) {
@@ -189,7 +312,10 @@ export async function POST(
         city,
         ipAddress,
         aiMessageUsed: aiGenerated,
+        groqUsed: aiGenerated || !!scanGuardAnalysis,
         groqLatencyMs: aiLatencyMs,
+        // AI-FEATURE: Store scan guard analysis in aiAnalysis JSON
+        aiAnalysis: scanGuardAnalysis ?? undefined,
       }
     });
 

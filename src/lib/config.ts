@@ -47,6 +47,36 @@ export const GROQ_TIMEOUT_MS =
 
 export const GROQ_ENABLED = GROQ_API_KEY.length > 0;
 
+/**
+ * Master kill switch pour toutes les fonctionnalités IA Groq.
+ * Par défaut activé ('true'). Passer à 'false' dans .env pour désactiver
+ * complètement l'IA, quelle que soit la valeur du flag DB.
+ * Priorité: env var (kill switch) > DB feature flag > API key présente.
+ */
+export const GROQ_AI_ENABLED = process.env.GROQ_AI_ENABLED !== 'false';
+
+// ═══════════════════════════════════════════════════════
+//  AI-FEATURE: Kill switches individuels par fonctionnalité
+// ═══════════════════════════════════════════════════════
+
+/**
+ * Active/désactive le chatbot trouveur (Feature #1).
+ * Priorité: env var > DB FeatureFlag 'chatbot_finder'.
+ */
+export const GROQ_CHAT_ENABLED = process.env.GROQ_CHAT_ENABLED !== 'false';
+
+/**
+ * Active/désactive l'analyse anti-doublon (Feature #2).
+ * Priorité: env var > DB FeatureFlag 'scan_guard'.
+ */
+export const GROQ_SCAN_GUARD_ENABLED = process.env.GROQ_SCAN_GUARD_ENABLED !== 'false';
+
+/**
+ * Active/désactive la traduction automatique IA (Feature #3).
+ * Priorité: env var > DB FeatureFlag 'auto_translate'.
+ */
+export const GROQ_AUTO_TRANSLATE_ENABLED = process.env.GROQ_AUTO_TRANSLATE_ENABLED !== 'false';
+
 // ═══════════════════════════════════════════════════════
 //  TIMEOUTS & FALLBACK
 // ═══════════════════════════════════════════════════════

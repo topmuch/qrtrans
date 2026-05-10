@@ -122,6 +122,8 @@ model ScanLog {
   groqUsed        Boolean   @default(false) // true si Groq a été utilisé pour ce scan
   groqLatencyMs   Int?      // Temps de réponse Groq en ms
   aiMessageUsed   Boolean   @default(false) // true si le message WhatsApp a été généré par IA
+  groqModelUsed   String?   // Modèle Groq utilisé (ex: "llama-3.3-70b-versatile")
+  wakitMessageId  String?   // ID de retour Wakit pour tracking croisé
 }
 
 // Settings model - system configuration

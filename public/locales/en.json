@@ -75,5 +75,22 @@
     "contact": "📱 *Contact*:",
     "pickup_message": "👉 Please pick it up quickly.",
     "signature": "*QRBag – Protect your luggage with peace of mind.*"
+  },
+  "chatbot": {
+    "title": "QRBag Assistant",
+    "placeholder": "Ask your question...",
+    "send": "Send",
+    "close": "Close",
+    "thinking": "Assistant is thinking...",
+    "error": "Connection error. Please try again.",
+    "error_fallback": "Sorry, I can't answer right now. Please contact the owner directly via WhatsApp.",
+    "suggestion_1": "What should I do with this baggage?",
+    "suggestion_2": "How to contact the agency?",
+    "suggestion_3": "Is it urgent?",
+    "suggestion_4": "How does QRBag work?",
+    "welcome": "Hello! 👋 I'm the QRBag assistant. How can I help you with this baggage?",
+    "aria_open": "Open chat",
+    "aria_close": "Close chat",
+    "aria_message": "Chat message"
   }
 }

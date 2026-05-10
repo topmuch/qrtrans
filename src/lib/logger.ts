@@ -2,7 +2,7 @@
  * Logger structuré pour les métriques IA et services externes.
  *
  * Usage:
- *   logMetric('groq', 'generate', 245, true);
+ *   logMetric('groq', 'generate_message', 245, true, { key: 'VOL26-ABC' });
  *   logMetric('wakit', 'send', 1200, false);
  */
 
@@ -31,16 +31,4 @@ export function logMetric(
   console.log(
     `[${service}/${action}] ${icon} ${latencyMs}ms${keyPart}${detailsPart}`
   );
-}
-
-/**
- * Loggue une métrique Groq avec les détails pertinents.
- */
-export function logGroqMetric(
-  action: 'generate_message' | 'call' | 'test',
-  latencyMs: number,
-  success: boolean,
-  options?: MetricOptions
-): void {
-  logMetric('groq', action, latencyMs, success, options);
 }

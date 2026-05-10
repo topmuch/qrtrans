@@ -30,7 +30,7 @@ export function useTranslation(): UseTranslationReturn {
   // Detect language on mount
   useEffect(() => {
     const detectLanguage = async () => {
-      // Check localStorage first for saved preference
+      // 1. Check localStorage first for explicit user preference
       if (typeof localStorage !== 'undefined') {
         const savedLang = localStorage.getItem('qrbag_lang') as Language | null;
         if (savedLang && ['fr', 'en', 'ar'].includes(savedLang)) {
@@ -39,8 +39,20 @@ export function useTranslation(): UseTranslationReturn {
         }
       }
 
+      // 2. Check server-set cookie (qrbag_locale) — set by /api/scan GET route
+      if (typeof document !== 'undefined') {
+        const cookieMatch = document.cookie.match(/qrbag_locale=(fr|en|ar)/);
+        if (cookieMatch?.[1]) {
+          const cookieLang = cookieMatch[1] as Language;
+          setLangState(cookieLang);
+          // Sync to localStorage for persistence across sessions
+          localStorage.setItem('qrbag_lang', cookieLang);
+          return;
+        }
+      }
+
+      // 3. Try IP-based country detection
       try {
-        // Try IP detection first
         const response = await fetch('/api/detect-country');
         if (response.ok) {
           const data = await response.json();
@@ -54,7 +66,7 @@ export function useTranslation(): UseTranslationReturn {
         console.log('IP detection failed, falling back to browser detection');
       }
 
-      // Fallback to browser detection
+      // 4. Fallback to browser language
       const browserLang = detectLanguageFromBrowser();
       setLangState(browserLang);
     };

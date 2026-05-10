@@ -140,6 +140,45 @@ export function detectLanguageFromCountry(countryCode: string): Language {
   return COUNTRY_LANGUAGE_MAP[countryCode.toUpperCase()] || 'fr';
 }
 
+// AI-FEATURE: Cookie name for locale persistence (server-side)
+export const LANGUAGE_COOKIE_NAME = 'qrbag_locale';
+export const LANGUAGE_COOKIE_MAX_AGE_DAYS = 7;
+
+/**
+ * AI-FEATURE: Detect language from HTTP headers (server-side).
+ * Used by API routes that don't have access to the client-side useTranslation() hook.
+ *
+ * Detection order:
+ *   1. Cookie 'qrbag_locale' (previously detected)
+ *   2. Accept-Language header
+ *   3. Fallback: 'fr'
+ *
+ * @param headers - HTTP Headers object (from NextRequest or Response)
+ * @returns Detected language ('fr' | 'en' | 'ar')
+ */
+export function detectLocaleFromHeaders(headers: Headers): Language {
+  // 1. Check cookie first (previously detected language)
+  const cookieHeader = headers.get('cookie');
+  if (cookieHeader) {
+    const localeMatch = cookieHeader.match(/qrbag_locale=(fr|en|ar)/);
+    if (localeMatch?.[1]) {
+      return localeMatch[1] as Language;
+    }
+  }
+
+  // 2. Check Accept-Language header
+  const acceptLanguage = headers.get('accept-language');
+  if (acceptLanguage) {
+    const lang = acceptLanguage.split(',')[0]?.split('-')[0]?.trim().toLowerCase();
+    if (lang === 'fr' || lang === 'en' || lang === 'ar') {
+      return lang;
+    }
+  }
+
+  // 3. Fallback
+  return 'fr';
+}
+
 // Translation cache
 const translationCache: Record<Language, Record<string, string> | null> = {
   fr: null,

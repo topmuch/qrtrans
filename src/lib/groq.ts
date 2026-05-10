@@ -9,9 +9,11 @@
  */
 
 import type { GroqRequest, GroqResult } from '@/types/ai';
+import type { ScanSuspicionAnalysis } from '@/types/ai';
 import {
   API_RETRY_COUNT,
   FALLBACK_MESSAGES,
+  GROQ_AI_ENABLED,
   getServiceConfig,
 } from './config';
 import type { GroqServiceConfig } from './config';
@@ -23,6 +25,9 @@ import { fetchWithRetry } from './fetch-util';
 
 /** Timeout max pour la génération de message WhatsApp (3s) */
 const WHATSAPP_MSG_TIMEOUT_MS = 3000;
+
+// ─── AI-FEATURE: Timeout pour l'analyse anti-doublon (Feature #2) ───
+const SCAN_GUARD_TIMEOUT_MS = 2000;
 
 // ═══════════════════════════════════════════════════════
 //  FONCTION PRINCIPALE
@@ -37,6 +42,17 @@ const WHATSAPP_MSG_TIMEOUT_MS = 3000;
  */
 export async function callGroqAI(request: GroqRequest): Promise<GroqResult> {
   const startTime = Date.now();
+
+  // ─── Kill switch master: GROQ_AI_ENABLED (env var) ───
+  if (!GROQ_AI_ENABLED) {
+    console.log('[Groq] IA désactivée via GROQ_AI_ENABLED=false (env var) → fallback.');
+    return {
+      success: false,
+      error: 'IA désactivée par kill switch (GROQ_AI_ENABLED).',
+      fallback: true,
+      latencyMs: Date.now() - startTime,
+    };
+  }
 
   // ─── Charger la config (DB + env) ───
   let config: GroqServiceConfig;
@@ -321,5 +337,161 @@ export async function generateWhatsAppMessage(
       generated: false,
       latencyMs,
     };
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+//  AI-FEATURE: SCAN GUARD — Analyse Anti-Doublon (Feature #2)
+// ═══════════════════════════════════════════════════════
+
+/** Paramètres pour l'analyse anti-doublon */
+export interface ScanSuspicionParams {
+  /** Référence du bagage */
+  reference: string;
+  /** IP du scanner */
+  scannerIp: string;
+  /** User-Agent du scanner */
+  userAgent?: string;
+  /** Ville du scan */
+  city?: string;
+  /** Pays du scan */
+  country?: string;
+  /** Historique récent des scans du même bagage (dernières 30 min) */
+  recentScans: Array<{
+    ip: string;
+    city?: string;
+    country?: string;
+    createdAt: string;
+  }>;
+}
+
+/** Résultat de l'analyse anti-doublon */
+export interface ScanSuspicionResult {
+  /** Analyse complétée avec succès */
+  analyzed: boolean;
+  /** Analyse de suspicion (si analyzed=true) */
+  analysis?: ScanSuspicionAnalysis;
+  /** Temps de réponse en ms */
+  latencyMs: number;
+}
+
+/** Prompt système pour l'analyse anti-doublon */
+const SCAN_GUARD_SYSTEM_PROMPT = `Tu es un détecteur de fraude QRBag. Analyse ces données de scan et retourne UNIQUEMENT un JSON valide sans backticks ni commentaires.
+{
+  "isSuspicious": boolean,
+  "reason": string (courte, max 100 caractères),
+  "confidence": number (0.0 à 1.0)
+}
+Règles strictes :
+- Même IP + même bagage + < 5 min entre 2 scans = probablement un doublon (isSuspicious: true, confidence >= 0.85)
+- Localisation incohérente (ex: pays africain puis europe en < 30 min) = suspect
+- User-Agent contenant "bot", "crawler", "spider", "scraper" = suspect
+- 1 seul scan récent avec IP différente = normal (isSuspicious: false)
+- En cas de doute = isSuspicious: false (fail-open)`;
+
+/**
+ * AI-FEATURE: Analyse un scan pour détecter les doublons/suspicious via Groq.
+ * Timeout 2s — fail-open si Groq indisponible ou timeout.
+ * Ne bloque JAMAIS le flux de scan.
+ *
+ * @param params - Données du scan + historique récent
+ * @returns ScanSuspicionResult — analyzed=false si échec (fail-open)
+ *
+ * @example
+ * ```ts
+ * const result = await analyzeScanSuspicion(params);
+ * if (result.analysis?.isSuspicious) return;
+ * ```
+ */
+export async function analyzeScanSuspicion(
+  params: ScanSuspicionParams
+): Promise<ScanSuspicionResult> {
+  const startTime = Date.now();
+
+  try {
+    const recentScansText = params.recentScans.length > 0
+      ? params.recentScans.map((s, i) =>
+          `Scan ${i + 1}: IP=${s.ip}, Ville=${s.city || '?'}, Pays=${s.country || '?'}, Date=${s.createdAt}`
+        ).join('\n')
+      : 'Aucun scan récent.';
+
+    const scanContext = [
+      `Référence bagage: ${params.reference}`,
+      `IP actuelle: ${params.scannerIp}`,
+      `User-Agent: ${params.userAgent || 'inconnu'}`,
+      `Ville: ${params.city || 'inconnue'}`,
+      `Pays: ${params.country || 'inconnu'}`,
+      `Dernier scan: ${new Date().toISOString()}`,
+      `--- Historique récent (30 min) ---`,
+      recentScansText,
+    ].join('\n');
+
+    const result = await Promise.race([
+      callGroqAI({
+        model: 'llama-3.1-8b-instant', // Modèle rapide pour analyse courte
+        messages: [
+          { role: 'system', content: SCAN_GUARD_SYSTEM_PROMPT },
+          { role: 'user', content: scanContext },
+        ],
+        temperature: 0.1, // Très déterministe pour l'analyse
+        max_tokens: 150,
+      }),
+      new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error('TIMEOUT')), SCAN_GUARD_TIMEOUT_MS)
+      ),
+    ]);
+
+    const latencyMs = Date.now() - startTime;
+
+    if (result.success && result.content) {
+      // Extraire le JSON de la réponse
+      const cleaned = result.content
+        .replace(/```json\n?/g, '')
+        .replace(/```\n?/g, '')
+        .trim();
+
+      // Parse with specific error handling for malformed JSON
+      let parsed: Record<string, unknown>;
+      try {
+        parsed = JSON.parse(cleaned);
+      } catch {
+        console.warn(`[Groq/ScanGuard] ${params.reference} → JSON invalide → fail-open (${latencyMs}ms)`);
+        return { analyzed: false, latencyMs };
+      }
+
+      if (
+        typeof parsed.isSuspicious === 'boolean' &&
+        typeof parsed.confidence === 'number'
+      ) {
+        const analysis: ScanSuspicionAnalysis = {
+          isSuspicious: parsed.isSuspicious,
+          reason: String(parsed.reason || '').substring(0, 100),
+          confidence: Math.min(Math.max(parsed.confidence, 0), 1),
+          analyzedAt: new Date().toISOString(),
+        };
+
+        console.log(
+          `[Groq/ScanGuard] ${params.reference} → ${analysis.isSuspicious ? 'FLAGGED' : 'OK'} (confidence=${analysis.confidence}, ${latencyMs}ms)`
+        );
+
+        return { analyzed: true, analysis, latencyMs };
+      }
+    }
+
+    // Réponse invalide → fail-open
+    console.warn(`[Groq/ScanGuard] ${params.reference} → réponse invalide → fail-open (${latencyMs}ms)`);
+    return { analyzed: false, latencyMs };
+
+  } catch (error) {
+    const latencyMs = Date.now() - startTime;
+
+    if (error instanceof Error && error.message === 'TIMEOUT') {
+      console.warn(`[Groq/ScanGuard] ${params.reference} → TIMEOUT ${SCAN_GUARD_TIMEOUT_MS}ms → fail-open`);
+    } else {
+      console.warn(`[Groq/ScanGuard] ${params.reference} → erreur → fail-open`);
+    }
+
+    // Fail-open: ne bloque jamais le scan
+    return { analyzed: false, latencyMs };
   }
 }

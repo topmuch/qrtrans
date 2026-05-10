@@ -99,6 +99,33 @@ export const FEATURE_DEFINITIONS = [
     icon: 'Brain',
     enabled: true,
   },
+  // ─── AI-FEATURE: Chatbot Trouveur (Feature #1) ───
+  {
+    key: 'chatbot_finder',
+    label: 'Chatbot IA Trouveur',
+    description: '🤖 Widget chat sur la page scan permettant au trouveur de poser des questions contextuelles sur le bagage. Utilise Groq llama-3.3-70b.',
+    category: 'ai',
+    icon: 'MessageSquare',
+    enabled: true,
+  },
+  // ─── AI-FEATURE: Analyse Anti-Doublon (Feature #2) ───
+  {
+    key: 'scan_guard',
+    label: 'Analyse Anti-Doublon IA',
+    description: '🤖 Détecte les scans suspects ou redondants via Groq avant notification. Timeout 2s, fail-open si indisponible.',
+    category: 'ai',
+    icon: 'ShieldAlert',
+    enabled: true,
+  },
+  // ─── AI-FEATURE: Traduction Auto (Feature #3) ───
+  {
+    key: 'auto_translate',
+    label: 'Traduction Auto (langue trouveur)',
+    description: '🌍 Détecte la langue du trouveur (Accept-Language + géoloc IP) et adapte l\'interface + notifications automatiquement.',
+    category: 'ai',
+    icon: 'Globe',
+    enabled: true,
+  },
 ] as const;
 
 export type FeatureKey = typeof FEATURE_DEFINITIONS[number]['key'];

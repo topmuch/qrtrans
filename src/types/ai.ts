@@ -139,6 +139,20 @@ export interface ScanAIAnalysis {
   analyzedAt: string;
 }
 
+// ─── AI-FEATURE: Scan Suspicion Analysis (Feature #2) ───
+
+/** Résultat de l'analyse anti-doublon Groq */
+export interface ScanSuspicionAnalysis {
+  /** true si le scan est suspect (doublon, bot, incohérence géographique) */
+  isSuspicious: boolean;
+  /** Raison de la suspicion (stocké dans aiAnalysis JSON) */
+  reason: string;
+  /** Score de confiance (0.0 - 1.0) */
+  confidence: number;
+  /** Timestamp de l'analyse */
+  analyzedAt: string;
+}
+
 // ═══════════════════════════════════════════════════════
 //  SERVICE RESULT — Type générique pour les résultats
 // ═══════════════════════════════════════════════════════

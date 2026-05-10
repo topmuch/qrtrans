@@ -21,6 +21,13 @@ import {
 } from "lucide-react";
 import { useTranslation } from '@/hooks/useTranslation';
 import { Language, LANGUAGE_NAMES } from '@/lib/i18n';
+import dynamic from 'next/dynamic';
+
+// AI-FEATURE: Lazy-load ChatbotWidget (Feature #1) — doesn't block page render
+const ChatbotWidget = dynamic(() => import('@/components/finder/ChatbotWidget'), {
+  ssr: false,
+  loading: () => null,
+});
 
 const FALLBACK_PHONE = '33745349339';
 
@@ -807,6 +814,22 @@ export default function ScanPage() {
           </div>
         </div>
       </div>
+
+      {/* AI-FEATURE: Chatbot Widget (Feature #1) — only on active/lost baggage */}
+      {baggage && (baggageData?.status === 'active' || baggageData?.status === 'lost') && (
+        <ChatbotWidget
+          reference={reference}
+          baggageContext={{
+            destination: baggage.destination || undefined,
+            city: locationText || undefined,
+            agency: baggage.agency || undefined,
+            status: baggage.status,
+          }}
+          locale={lang}
+          t={t}
+          dir={dir}
+        />
+      )}
     </main>
   );
 }

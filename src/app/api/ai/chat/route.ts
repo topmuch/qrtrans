@@ -20,7 +20,7 @@
 import { NextResponse } from 'next/server';
 import { getSession } from '@/lib/session';
 import { callGroqAI } from '@/lib/groq';
-import { isServiceEnabledAsync } from '@/lib/config';
+import { GROQ_AI_ENABLED, isServiceEnabledAsync } from '@/lib/config';
 import type { GroqMessage } from '@/types/ai';
 
 export const dynamic = 'force-dynamic';
@@ -163,7 +163,17 @@ export async function POST(request: Request): Promise<NextResponse> {
       `[AI Chat API] POST — ${messages.length} messages, model="${model ?? 'default'}", user="${user.role}:${user.name}", lastMsg="${lastUserMsg?.content.substring(0, 50) ?? 'N/A'}..."`
     );
 
-    // ─── Check si Groq est configuré (DB + env) ───
+    // ─── Check si Groq est configuré (kill switch env + DB + env vars) ───
+    if (!GROQ_AI_ENABLED) {
+      console.log('[AI Chat API] IA désactivée via GROQ_AI_ENABLED=false (env var) → fallback.');
+      return NextResponse.json({
+        success: true,
+        fallback: true,
+        content: null,
+        latencyMs: Date.now() - startTime,
+      });
+    }
+
     if (!await isServiceEnabledAsync('groq')) {
       console.log('[AI Chat API] Groq non configuré → fallback silencieux.');
       return NextResponse.json({
