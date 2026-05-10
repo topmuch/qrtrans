@@ -1,16 +1,28 @@
 /**
- * AI-FEATURE: API Route — Chatbot Trouveur (Feature #1)
+ * CHATBOT-KB: API Route — Chatbot Trouveur (Feature #1)
+ * Agent de support intelligent avec Base de Connaissances QRBag.
  *
  * POST /api/scan/chat
  *
  * Route publique (sans auth) permettant au trouveur de poser des questions
- * contextuelles sur un bagage via Groq AI.
+ * contextuelles sur un bagage via Groq AI, enrichi d'une KB structurée.
  *
  * Sécurité:
  *   - Rate limiting: 10 req/min par IP
  *   - Validation stricte de la référence et de la question
  *   - Kill switch: GROQ_AI_ENABLED + GROQ_CHAT_ENABLED + DB FeatureFlag 'chatbot_finder'
- *   - Ne bloque jamais: fallback si Groq échoue
+ *   - Sanitization HTML de la question utilisateur
+ *   - Ne bloque jamais: fallback SAV si Groq échoue/timeout
+ *
+ * CHATBOT-KB: Modifications depuis la version initiale:
+ *   - System prompts enrichis avec KB complète (tarifs, SAV, FAQ, pages, confidentialité)
+ *   - Temperature 0.5 → 0.7, max_tokens 200 → 300
+ *   - Timeout Groq 3s strict via Promise.race
+ *   - Sanitization HTML de la question
+ *   - transportMode dans le contexte bagage
+ *   - Réponse format: answer (au lieu de content)
+ *   - Fallback orienté SAV (au lieu de "contactez le propriétaire")
+ *   - Logging [Groq/Chat] sur succès
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -21,10 +33,18 @@ import { isFeatureEnabled } from '@/lib/features';
 import { detectLocaleFromHeaders } from '@/lib/i18n';
 import { logMetric } from '@/lib/logger';
 import { rateLimit } from '@/lib/rate-limit';
+import { safeTransportMode } from '@/lib/transport';
 import type { Language } from '@/lib/i18n';
-import type { GroqMessage } from '@/types/ai';
+import type { GroqMessage, GroqResult } from '@/types/ai';
 
 export const dynamic = 'force-dynamic';
+
+// ═══════════════════════════════════════════════════════
+//  CONSTANTS
+// ═══════════════════════════════════════════════════════
+
+/** CHATBOT-KB: Timeout strict pour la réponse Groq chatbot (3s) */
+const CHATBOT_TIMEOUT_MS = 3000;
 
 // ═══════════════════════════════════════════════════════
 //  TYPES
@@ -39,59 +59,169 @@ interface ChatRequestBody {
     city?: string;
     agency?: string;
     status?: string;
+    // CHATBOT-KB: transportMode added for multi-transport KB context
+    transportMode?: string;
   };
 }
 
-interface ChatHistoryMessage {
-  role: 'user' | 'assistant';
-  content: string;
+interface ChatResponse {
+  success: boolean;
+  fallback: boolean;
+  // CHATBOT-KB: renamed from 'content' to 'answer' per spec
+  answer: string;
+  latencyMs: number;
+  error?: string;
 }
 
 // ═══════════════════════════════════════════════════════
-//  FALLBACK RESPONSES (par langue)
+//  CHATBOT-KB: FALLBACK RESPONSES (orienté SAV)
 // ═══════════════════════════════════════════════════════
 
 const FALLBACK_RESPONSES: Record<Language, string> = {
-  fr: "Désolé, je ne peux pas répondre pour le moment. Veuillez contacter le propriétaire directement via WhatsApp.",
-  en: "Sorry, I can't answer right now. Please contact the owner directly via WhatsApp.",
-  ar: "عذراً، لا أستطيع الإجابة حالياً. يرجى الاتصال بالمالك مباشرة عبر واتساب.",
+  // CHATBOT-KB: Fallback orienté SAV (pas "contactez le propriétaire")
+  fr: 'Je rencontre un problème technique. Veuillez contacter le SAV : support@qrbags.com',
+  en: 'I am experiencing a technical issue. Please contact support: support@qrbags.com',
+  ar: 'أواجه مشكلة تقنية. يرجى التواصل مع الدعم: support@qrbags.com',
 };
 
 // ═══════════════════════════════════════════════════════
-//  SYSTEM PROMPTS (par langue)
+//  CHATBOT-KB: SYSTEM PROMPTS (KB QRBag enrichie)
+//
+//  Structure identique FR/EN/AR — mêmes sections, même ordre.
+//  Tarifs en € non convertis. Numéro SAV au format international.
+//  Liens URL bruts non traduits.
 // ═══════════════════════════════════════════════════════
 
-const CHATBOT_SYSTEM_PROMPTS: Record<Language, (ctx: string) => string> = {
-  fr: (ctx) =>
-    `Tu es l'assistant QRBag. Réponds en français, de façon concise et rassurante (max 3 phrases).
-Contexte : ${ctx}
-Règles :
-- Ne jamais inventer de localisation ou d'information non présente dans le contexte.
-- Si le bagage est actif, encourager à patienter et à contacter le propriétaire.
-- Proposer un contact WhatsApp si besoin.
-- Si question hors sujet, rediriger poliment vers le sujet du bagage.
-- Ne jamais donner de conseil juridique ou médical.`,
+/**
+ * CHATBOT-KB: Fonction pour construire le prompt dynamique avec KB + contexte bagage.
+ * @param locale - Langue de réponse
+ * @param contextStr - Chaîne de contexte bagage dynamique (injectée à la fin)
+ */
+function buildSystemPrompt(locale: Language, contextStr: string): string {
+  const prompts: Record<Language, string> = {
+    fr: `Tu es l'assistant QRBag, un agent de support intelligent. Réponds en français, de façon concise (max 3 phrases) et empathique.
 
-  en: (ctx) =>
-    `You are the QRBag assistant. Respond in English, concisely and reassuringly (max 3 sentences).
-Context: ${ctx}
-Rules:
-- Never invent location or information not present in context.
-- If baggage is active, encourage patience and contacting the owner.
-- Suggest WhatsApp contact if needed.
-- If off-topic, politely redirect to the baggage subject.
-- Never give legal or medical advice.`,
+CONNAISSANCES QRBag :
+• Service de protection de bagages via QR codes uniques. Multi-contextes (✈️🚢🚌).
+• Pages : /inscrire (activation), /scan/[ref] (trouveur), /suivi/[ref] (propriétaire).
+• Confidentialité stricte : numéros/emails jamais affichés en clair. Mise en relation sécurisée via boutons.
+• Modèle B2C : vente de packs QR aux voyageurs. Pas de consigne/stockage.
 
-  ar: (ctx) =>
-    `أنت مساعد QRBag. أجب باللغة العربية، بطريقة موجزة ومطمئنة (بحد أقصى 3 جمل).
-السياق: ${ctx}
-القواعد:
-- لا تخترع أبداً موقعاً أو معلومات غير موجودة في السياق.
-- إذا كانت الأمتعة نشطة، شجع على الصبر والتواصل مع المالك.
-- اقترح التواصل عبر واتساب إذا لزم الأمر.
-- إذا كان السؤال خارج الموضوع، أعد التوجيه بلباقة إلى موضوع الأمتعة.
-- لا تقدم أبداً نصيحة قانونية أو طبية.`,
-};
+💰 TARIFS :
+• Pack 3 QR : 9,90€ | Pack 10 QR : 24,90€ | Pack 30 QR : 59,90€
+• Livraison digitale immédiate. Paiement : Carte, Mobile Money.
+• Achat : qrbags.com/inscrire
+
+🆘 CONTACT SAV :
+• Email : support@qrbags.com | WhatsApp : +221 78 XXX XX XX | Lun-Ven 9h-18h GMT
+• Délai réponse : <2h. Orientations empathiques vers le SAV si hors scope ou sensible.
+
+FAQ TOP 5 :
+• Activation ? → qrbags.com/inscrire + référence QR
+• Bagage perdu ? → Alerte WhatsApp + suivi si scan par trouveur
+• Données sécurisées ? → Oui, jamais en clair, boutons de contact uniquement
+• QR unique ? → Oui, 1 QR = 1 bagage pour sécurité
+• Trouveur injoignable ? → Contacter l'agence ou le SAV
+
+CONTEXTE BAGAGE ACTUEL :
+${contextStr}
+
+RÈGLES :
+- Réponds UNIQUEMENT sur QRBag, les bagages, le voyage, la protection.
+- Si question sensible/hors scope → oriente empathiquement vers le SAV.
+- Ne jamais inventer d'info non présente dans la KB ou le contexte.
+- Ne jamais donner de conseil juridique ou médical.
+- Pour contacter le propriétaire : utiliser les boutons WhatsApp/Phone de la page.`,
+
+    en: `You are the QRBag assistant, an intelligent support agent. Respond in English, concisely (max 3 sentences) and empathetically.
+
+QRBag KNOWLEDGE:
+• Baggage protection service via unique QR codes. Multi-context (✈️🚢🚌).
+• Pages: /inscrire (activation), /scan/[ref] (finder), /suivi/[ref] (owner).
+• Strict confidentiality: phone/email never shown in plain text. Secure connection via buttons.
+• B2C model: selling QR packs to travelers. No luggage storage/consignment.
+
+💰 PRICING:
+• Pack 3 QR: 9.90€ | Pack 10 QR: 24.90€ | Pack 30 QR: 59.90€
+• Instant digital delivery. Payment: Card, Mobile Money.
+• Purchase: qrbags.com/inscrire
+
+🆘 SUPPORT CONTACT:
+• Email: support@qrbags.com | WhatsApp: +221 78 XXX XX XX | Mon-Fri 9am-6pm GMT
+• Response time: <2h. Empathetic redirection to support if off-scope or sensitive.
+
+TOP 5 FAQ:
+• Activation? → qrbags.com/inscrire + QR reference
+• Lost baggage? → WhatsApp alert + tracking if scanned by finder
+• Data secure? → Yes, never in plain text, buttons only
+• Unique QR? → Yes, 1 QR = 1 baggage for security
+• Finder unreachable? → Contact the agency or support
+
+CURRENT BAGGAGE CONTEXT:
+${contextStr}
+
+RULES:
+- Respond ONLY about QRBag, baggage, travel, protection.
+- If sensitive/off-topic question → empathetically redirect to support.
+- Never invent info not in the KB or context.
+- Never give legal or medical advice.
+- To contact the owner: use the WhatsApp/Phone buttons on the page.`,
+
+    ar: `أنت مساعد QRBag، وكيل دعم ذكي. أجب باللغة العربية، بطريقة موجزة (بحد أقصى 3 جمل) وبلطف.
+
+معرفة QRBag :
+• خدمة حماية الأمتعة عبر رموز QR فريدة. متعددة السياقات (✈️🚢🚌).
+• الصفحات: /inscrire (التفعيل)، /scan/[ref] (لمن يجدها)، /suivi/[ref] (للمالك).
+• سرية صارمة: الأرقام/البريد لا تُعرض أبداً. تواصل آمن عبر أزرار.
+• نموذج B2C: بيع باقات QR للمسافرين. لا تخزين/حفظ أمتعة.
+
+💰 الأسعار :
+• باقة 3 QR : 9.90€ | باقة 10 QR : 24.90€ | باقة 30 QR : 59.90€
+• تسليم رقمي فوري. الدفع: بطاقة، أموال محمولة.
+• الشراء: qrbags.com/inscrire
+
+🆘 اتصل بالدعم :
+• البريد: support@qrbags.com | واتساب: +221 78 XXX XX XX | الاثنين-الجمعة 9ص-6م GMT
+• وقت الرد: <2 ساعة. توجيه بلطف إلى الدعم إذا خارج النطاق أو حساس.
+
+الأسئلة الأكثر شيوعاً :
+• التفعيل؟ → qrbags.com/inscrire + مرجع QR
+• أمتعة مفقودة؟ → تنبيه واتساب + تتبع إذا مسحها من وجدها
+• البيانات آمنة؟ → نعم، أبداً بشكل واضح، أزرار فقط
+• QR فريد؟ → نعم، 1 QR = 1 حقيبة للأمان
+• لم يتم العثور على من وجدها؟ → اتصل بالوكالة أو الدعم
+
+سياق الأمتعة الحالي :
+${contextStr}
+
+القواعد :
+• أجب فقط عن QRBag، الأمتعة، السفر، الحماية.
+• إذا كان السؤال حساساً/خارج النطاق → وجّه بلطف إلى الدعم.
+• لا تخترع أبداً معلومات غير موجودة في المعرفة أو السياق.
+• لا تقدم أبداً نصيحة قانونية أو طبية.
+• للتواصل مع المالك: استخدم أزرار واتساب/الهاتف في الصفحة.`,
+  };
+
+  return prompts[locale] || prompts.fr;
+}
+
+// ═══════════════════════════════════════════════════════
+//  CHATBOT-KB: SANITIZATION
+// ═══════════════════════════════════════════════════════
+
+/**
+ * CHATBOT-KB: Nettoie la question utilisateur pour éviter les injections de prompt basiques.
+ * - Supprime les balises HTML
+ * - Supprime les backticks (markdown)
+ * // TEST: Sanitization → <script>alert('xss')</script> nettoyé
+ */
+function sanitizeQuestion(input: string): string {
+  return input
+    .replace(/<[^>]*>/g, '')       // Strip HTML tags
+    .replace(/`{3}[\s\S]*?`{3}/g, '') // Strip code blocks
+    .replace(/`[^`]*`/g, '')        // Strip inline code
+    .trim();
+}
 
 // ═══════════════════════════════════════════════════════
 //  VALIDATION
@@ -116,6 +246,10 @@ function validateBody(body: unknown): { valid: true; data: ChatRequestBody } | {
     return { valid: false, error: 'Question too long (max 500 characters).' };
   }
 
+  // CHATBOT-KB: Parse baggageContext with transportMode support
+  const rawCtx = data.baggageContext;
+  const ctx = typeof rawCtx === 'object' && rawCtx !== null ? rawCtx as Record<string, unknown> : null;
+
   return {
     valid: true,
     data: {
@@ -124,20 +258,31 @@ function validateBody(body: unknown): { valid: true; data: ChatRequestBody } | {
       locale: typeof data.locale === 'string' && ['fr', 'en', 'ar'].includes(data.locale)
         ? (data.locale as Language)
         : undefined,
-      baggageContext: typeof data.baggageContext === 'object' && data.baggageContext !== null
-        ? {
-            destination: typeof (data.baggageContext as Record<string, unknown>).destination === 'string'
-              ? (data.baggageContext as Record<string, unknown>).destination as string : undefined,
-            city: typeof (data.baggageContext as Record<string, unknown>).city === 'string'
-              ? (data.baggageContext as Record<string, unknown>).city as string : undefined,
-            agency: typeof (data.baggageContext as Record<string, unknown>).agency === 'string'
-              ? (data.baggageContext as Record<string, unknown>).agency as string : undefined,
-            status: typeof (data.baggageContext as Record<string, unknown>).status === 'string'
-              ? (data.baggageContext as Record<string, unknown>).status as string : undefined,
-          }
-        : undefined,
+      baggageContext: ctx ? {
+        destination: typeof ctx.destination === 'string' ? ctx.destination : undefined,
+        city: typeof ctx.city === 'string' ? ctx.city : undefined,
+        agency: typeof ctx.agency === 'string' ? ctx.agency : undefined,
+        status: typeof ctx.status === 'string' ? ctx.status : undefined,
+        // CHATBOT-KB: transportMode added
+        transportMode: typeof ctx.transportMode === 'string' ? ctx.transportMode : undefined,
+      } : undefined,
     },
   };
+}
+
+// ═══════════════════════════════════════════════════════
+//  CHATBOT-KB: TIMEOUT WRAPPER
+//  Même pattern que generateWhatsAppMessage() dans groq.ts
+// // TEST: Timeout 3s → fallback silencieux si Groq lent
+// ═══════════════════════════════════════════════════════
+
+function withTimeout<T>(promise: Promise<T>, ms: number, fallback: T): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<T>((resolve) =>
+      setTimeout(() => resolve(fallback), ms)
+    ),
+  ]);
 }
 
 // ═══════════════════════════════════════════════════════
@@ -169,9 +314,10 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
     const { reference, question, baggageContext } = validation.data;
 
+    // CHATBOT-KB: Sanitize question to prevent prompt injection
+    const sanitizedQuestion = sanitizeQuestion(question);
+
     // ─── 1. Rate limiting (10 req/min par IP) ───
-    // NOTE: x-forwarded-for is trusted here because the app runs behind
-    // Caddy/Vercel reverse proxy which overwrites this header.
     const forwarded = request.headers.get('x-forwarded-for');
     const clientIp = forwarded ? forwarded.split(',')[0].trim() : request.headers.get('x-real-ip') || 'unknown';
 
@@ -182,15 +328,15 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       );
     }
 
-    // ─── 2. Kill switch triple check ───
+    // ─── 2. Kill switch triple check (GROQ_AI_ENABLED + GROQ_CHAT_ENABLED + DB FeatureFlag) ───
     if (!GROQ_AI_ENABLED || !GROQ_CHAT_ENABLED) {
       const locale = validation.data.locale || detectLocaleFromHeaders(request.headers);
       return NextResponse.json({
         success: true,
         fallback: true,
-        content: FALLBACK_RESPONSES[locale],
+        answer: FALLBACK_RESPONSES[locale],
         latencyMs: Date.now() - startTime,
-      });
+      } satisfies ChatResponse);
     }
 
     const chatbotEnabled = await isFeatureEnabled('chatbot_finder').catch(() => false);
@@ -199,27 +345,37 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       return NextResponse.json({
         success: true,
         fallback: true,
-        content: FALLBACK_RESPONSES[locale],
+        answer: FALLBACK_RESPONSES[locale],
         latencyMs: Date.now() - startTime,
-      });
+      } satisfies ChatResponse);
     }
 
-    // ─── 3. Fetch baggage (optionnel — pour enrichir le contexte) ───
+    // ─── 3. Fetch baggage (pour enrichir le contexte si manquant) ───
     let destination = baggageContext?.destination || '';
     let city = baggageContext?.city || '';
     let agency = baggageContext?.agency || '';
     let baggageStatus = baggageContext?.status || '';
+    // CHATBOT-KB: transportMode with safe fallback
+    let transportMode = baggageContext?.transportMode || '';
 
-    if (!destination || !agency) {
+    if (!destination || !agency || !transportMode) {
       try {
         const baggage = await db.baggage.findUnique({
           where: { reference },
-          select: { destination: true, agency: { select: { name: true } }, status: true },
+          select: {
+            destination: true,
+            agency: { select: { name: true } },
+            status: true,
+            // CHATBOT-KB: Fetch transportMode from DB
+            transportMode: true,
+          },
         });
         if (baggage) {
           destination = destination || baggage.destination || '';
           agency = agency || baggage.agency?.name || '';
           baggageStatus = baggageStatus || baggage.status || '';
+          // CHATBOT-KB: safeTransportMode fallback for legacy data
+          transportMode = transportMode || safeTransportMode(baggage.transportMode);
         }
       } catch {
         // Continue without baggage context
@@ -229,18 +385,30 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     // ─── 4. Detect locale ───
     const locale = validation.data.locale || detectLocaleFromHeaders(request.headers);
 
-    // ─── 5. Build context + call Groq ───
+    // ─── 5. Build dynamic context string ───
+    const transportLabels: Record<string, string> = {
+      flight: '✈️ Avion',
+      train: '🚆 Train',
+      boat: '🚢 Bateau',
+      bus: '🚌 Bus',
+    };
+    const safeMode = safeTransportMode(transportMode);
+
     const contextParts = [
-      `Baggage ${reference}`,
-      destination ? `destination ${destination}` : '',
-      city ? `last scan at ${city}` : '',
-      agency ? `agency: ${agency}` : '',
-      baggageStatus ? `status: ${baggageStatus}` : '',
+      `Bagage ${reference}`,
+      transportMode ? `Mode de transport: ${transportLabels[safeMode] || safeMode}` : '',
+      destination ? `Destination: ${destination}` : '',
+      city ? `Dernier scan: ${city}` : '',
+      agency ? `Agence: ${agency}` : '',
+      baggageStatus ? `Statut: ${baggageStatus}` : '',
     ].filter(Boolean).join(', ');
 
+    // ─── 6. Build messages with KB-enriched system prompt ───
+    const systemPrompt = buildSystemPrompt(locale, contextParts);
+
     const messages: GroqMessage[] = [
-      { role: 'system', content: CHATBOT_SYSTEM_PROMPTS[locale](contextParts) },
-      { role: 'user', content: question },
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: sanitizedQuestion },
     ];
 
     // Add history if provided — validate each entry to prevent prompt injection
@@ -254,25 +422,45 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
           typeof m.content === 'string' && m.content.length <= 500
         )
         .slice(-10)
-        .map((m) => ({ role: m.role as 'user' | 'assistant', content: (m.content as string).substring(0, 500) }));
+        .map((m) => ({
+          role: m.role as 'user' | 'assistant',
+          content: sanitizeQuestion(m.content as string).substring(0, 500),
+        }));
       if (validHistory.length > 0) {
         messages.splice(1, 0, ...validHistory);
       }
     }
 
-    const result = await callGroqAI({
-      model: 'llama-3.3-70b-versatile',
-      messages,
-      temperature: 0.5,
-      max_tokens: 200,
-    });
+    // ─── 7. Call Groq with timeout 3s ───
+    const timeoutFallback: GroqResult = {
+      success: false,
+      error: 'Chatbot timeout (3s)',
+      fallback: true,
+      latencyMs: CHATBOT_TIMEOUT_MS,
+    };
+
+    // CHATBOT-KB: Temperature 0.7, max_tokens 300, timeout 3s
+    const result = await withTimeout(
+      callGroqAI({
+        model: 'llama-3.3-70b-versatile',
+        messages,
+        temperature: 0.7,
+        max_tokens: 300,
+      }),
+      CHATBOT_TIMEOUT_MS,
+      timeoutFallback,
+    );
 
     const latencyMs = Date.now() - startTime;
 
+    // ─── 8. Process result ───
     if (result.success && result.content) {
       const cleaned = result.content
         .replace(/^["'`]+|["'`]+$/g, '')
         .trim();
+
+      // CHATBOT-KB: Logging [Groq/Chat] on success
+      console.log(`[Groq/Chat] ${reference} → ${latencyMs}ms`);
 
       logMetric('groq', 'chatbot_response', latencyMs, true, {
         key: reference,
@@ -282,9 +470,9 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       return NextResponse.json({
         success: true,
         fallback: false,
-        content: cleaned,
+        answer: cleaned,
         latencyMs,
-      });
+      } satisfies ChatResponse);
     }
 
     // Fallback
@@ -296,13 +484,13 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     return NextResponse.json({
       success: true,
       fallback: true,
-      content: FALLBACK_RESPONSES[locale],
+      answer: FALLBACK_RESPONSES[locale],
       latencyMs,
-    });
+    } satisfies ChatResponse);
 
   } catch (error) {
     const latencyMs = Date.now() - startTime;
-    console.error(`[Groq/Chatbot] ✗ Error:`, error);
+    console.error(`[Groq/Chat] ✗ Error:`, error);
 
     logMetric('groq', 'chatbot_response', latencyMs, false, {
       details: error instanceof Error ? error.message : 'unknown',

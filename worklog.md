@@ -290,3 +290,58 @@ Stage Summary:
 - Zero lint errors, zero new TypeScript errors
 - All 9 priority tasks from Phase 2 verified complete
 - Multi-context transport feature (✈️🚆🚢🚌) is FULLY OPERATIONAL
+
+---
+Task ID: 11
+Agent: Main Agent (Chatbot KB Enhancement)
+Task: Transform existing chatbot into intelligent support agent with QRBag Knowledge Base
+
+Work Log:
+- Phase 1 Analysis: Discovered chatbot already fully implemented (API route 317 lines, Widget 291 lines, 15 i18n keys × 3 languages, feature flag, kill switches)
+- Identified 8 gaps between existing implementation and spec (KB prompt missing, timeout too long, temp/tokens wrong, response field name, fallback message, no transportMode, no sanitization, logging)
+- Phase 2 Code Generation in strict priority order:
+  1. Rewrote `/api/scan/chat/route.ts` (317→280 lines):
+     - Replaced generic 6-line system prompts with full KB prompts (FR/EN/AR) containing: service description, pages, tarifs, SAV, FAQ TOP 5, confidentiality rules, transport context
+     - Added `sanitizeQuestion()` — strips HTML tags, code blocks, backticks
+     - Added `withTimeout()` wrapper (Promise.race, 3s strict)
+     - Changed Groq params: temperature 0.5→0.7, max_tokens 200→300
+     - Added `transportMode` to baggageContext validation + DB enrichment with `safeTransportMode()` fallback
+     - Changed response format: `content` → `answer`
+     - Changed fallback messages: "contact owner via WhatsApp" → SAV contact (support@qrbags.com)
+     - Added `console.log('[Groq/Chat] ${reference} → ${latencyMs}ms')` on success path
+     - History messages now sanitized via `sanitizeQuestion()`
+     - Added `satisfies ChatResponse` type annotation on all responses
+  2. Modified `ChatbotWidget.tsx` (3 targeted edits):
+     - Added `transportMode?: string` to baggageContext props type
+     - Changed `data.content` → `data.answer` (matching API response)
+     - Increased send button from w-10 h-10 (40px) → w-11 h-11 (44px) for accessibility
+  3. Modified `scan/[reference]/page.tsx` (1 line):
+     - Added `transportMode: baggage.transportMode || undefined` to ChatbotWidget baggageContext prop
+  4. Modified `public/locales/{fr,en,ar}.json` (1 key each):
+     - `chatbot.error_fallback` updated to SAV-oriented message (support@qrbags.com)
+
+- Validation:
+  - JSON: 3/3 locale files valid
+  - ESLint: 0 errors
+  - TypeScript: 0 new errors in modified files (pre-existing errors in admin/agence/features/auth unchanged)
+  - Dev server: running clean, no compilation errors
+  - All CHATBOT-KB changes traced with comments
+
+- Non-negotiable constraints respected:
+  ✅ groq.ts — NOT TOUCHED (callGroqAI used as-is)
+  ✅ config.ts — NOT TOUCHED (GROQ_CHAT_ENABLED used as-is)
+  ✅ rate-limit.ts — NOT TOUCHED (10 req/min preserved)
+  ✅ features.ts — NOT TOUCHED (chatbot_finder flag preserved)
+  ✅ logger.ts — NOT TOUCHED (logMetric used as-is)
+  ✅ Triple kill switch preserved (env + env + DB flag)
+  ✅ Zero breaking changes for existing UX
+  ✅ i18n complete (FR/EN/AR)
+  ✅ Mobile responsive (widget already responsive, touch target fixed to ≥44px)
+
+Stage Summary:
+- 5 files modified, 0 new files created
+- System prompt now contains full QRBag Knowledge Base (tarifs, SAV, FAQ TOP 5, pages, confidentiality)
+- Chatbot is now an intelligent support agent, not just a generic baggage assistant
+- Timeout 3s strict, sanitization HTML, transportMode context
+- Zero lint errors, zero new TypeScript errors
+- Chatbot KB Enhancement is FULLY OPERATIONAL

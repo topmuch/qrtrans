@@ -96,7 +96,7 @@
     "close": "Fermer",
     "thinking": "L'assistant réfléchit...",
     "error": "Erreur de connexion. Réessayez.",
-    "error_fallback": "Désolé, je ne peux pas répondre pour le moment. Veuillez contacter le propriétaire directement via WhatsApp.",
+    "error_fallback": "Je rencontre un problème technique. Veuillez contacter le SAV : support@qrbags.com",
     "suggestion_1": "Que faire avec ce bagage ?",
     "suggestion_2": "Comment contacter l'agence ?",
     "suggestion_3": "Est-ce urgent ?",

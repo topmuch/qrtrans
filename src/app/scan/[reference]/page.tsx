@@ -968,6 +968,8 @@ export default function ScanPage() {
             city: locationText || undefined,
             agency: baggage.agency || undefined,
             status: baggage.status,
+            // CHATBOT-KB: Pass transportMode for KB context enrichment
+            transportMode: baggage.transportMode || undefined,
           }}
           locale={lang}
           t={t}

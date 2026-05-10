@@ -31,6 +31,8 @@ interface ChatbotWidgetProps {
     city?: string;
     agency?: string;
     status?: string;
+    // CHATBOT-KB: transportMode added for KB context enrichment
+    transportMode?: string;
   };
   locale: 'fr' | 'en' | 'ar';
   t: (key: string) => string;
@@ -124,10 +126,12 @@ export default function ChatbotWidget({
 
       const data = await response.json();
 
-      if (data.success && data.content) {
+      // CHATBOT-KB: API now returns 'answer' field (renamed from 'content')
+      // TEST: Widget → lit data.answer, bouton send ≥44px, ARIA OK
+      if (data.success && data.answer) {
         setMessages((prev) => [
           ...prev,
-          { role: 'assistant', content: data.content },
+          { role: 'assistant', content: data.answer },
         ]);
       } else {
         setMessages((prev) => [
@@ -279,7 +283,8 @@ export default function ChatbotWidget({
               type="submit"
               disabled={isLoading || !input.trim()}
               aria-label={t('chatbot.send')}
-              className="w-10 h-10 bg-orange-500 hover:bg-orange-600 disabled:bg-slate-600 disabled:cursor-not-allowed text-white rounded-xl flex items-center justify-center transition-colors flex-shrink-0"
+              // CHATBOT-KB: Touch target increased from 40px to 44px for accessibility
+              className="w-11 h-11 bg-orange-500 hover:bg-orange-600 disabled:bg-slate-600 disabled:cursor-not-allowed text-white rounded-xl flex items-center justify-center transition-colors flex-shrink-0"
             >
               <Send className="w-4 h-4" />
             </button>

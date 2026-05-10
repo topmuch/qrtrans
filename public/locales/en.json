@@ -96,7 +96,7 @@
     "close": "Close",
     "thinking": "Assistant is thinking...",
     "error": "Connection error. Please try again.",
-    "error_fallback": "Sorry, I can't answer right now. Please contact the owner directly via WhatsApp.",
+    "error_fallback": "I am experiencing a technical issue. Please contact support: support@qrbags.com",
     "suggestion_1": "What should I do with this baggage?",
     "suggestion_2": "How to contact the agency?",
     "suggestion_3": "Is it urgent?",
