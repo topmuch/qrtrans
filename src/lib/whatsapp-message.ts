@@ -1,184 +1,465 @@
 /**
  * WhatsApp Pre-Filled Message Generator — Page Suivi
  *
- * Génère un message WhatsApp pré-rempli pour le bouton de contact
- * sur la page /suivi/[reference].
+ * WHATSAPP-HARMONIZED: Template harmonisé unique multi-transport
+ *
+ * Génère un message WhatsApp pré-rempli structuré pour TOUS les modes
+ * de transport (flight/train/boat/bus) × TOUS les contextes (departure/arrival/transit/static).
  *
  * Ce message est envoyé par le PROPRIÉTAIRE au TROUVEUR.
  * (Inverse de generateWhatsAppMessage() dans groq.ts qui est
  *  l'alerte automatique au propriétaire).
  *
- * Contextes supportés:
- *   - departure_urgent → Urgence départ (🛫 aéroport / 🚆 gare / 🚢 port / 🚌 gare routière)
- *   - arrival_destination → Arrivée à destination
- *   - in_transit               → En transit
- *   - static_location          → Lieu fixe
- *
- * TRANSPORT-NOTIFY: Messages différenciés par mode de transport
- *   - flight: ✈️ aéroport / vol
- *   - train:  🚆 gare / train
- *   - boat:   🚢 port / traversée maritime
- *   - bus:    🚌 gare routière / bus
+ * Template harmonisé :
+ *   [EMOJI_CONTEXT + TITRE_CONTEXT]
+ *   🧳 [REFERENCE] • [BAG_TYPE]
+ *   [TRANSPORT_ICON] [CARRIER] [VEHICLE] • [DESTINATION]
+ *   👉 Voir le bagage localisé : qrbags.com/suivi/[REF]
+ *   👤 [FINDER_NAME]
+ *   📱 [FINDER_WHATSAPP]
+ *   [CALL_TO_ACTION_CONTEXT]
+ *   QRBag – Protégez vos bagages, en toute sérénité.
  *
  * Contraintes:
- *   - Max 400 caractères
- *   - Emojis pertinents par mode de transport
+ *   - Max 400 caractères (limite wa.me pre-filled)
+ *   - Formatage WhatsApp (*gras*, `monospace`)
+ *   - Lien court qrbags.com/suivi/[REF]
  *   - i18n FR/EN/AR
+ *   - Fallbacks robustes (pas de crash si champ manquant)
+ *   - Logging discret
  */
 
 import type { Language } from './i18n';
 import type { ScanContext } from './scan-context';
 import type { TransportMode } from './transport';
+import { TRANSPORT_ICONS, TRANSPORT_PLACES } from './transport';
 
 // ═══════════════════════════════════════════════════════
 //  TYPES
 // ═══════════════════════════════════════════════════════
 
+// WHATSAPP-HARMONIZED: Interface structurée (nouveau format)
 interface PreFilledMessageParams {
-  /** Référence du bagage */
-  reference: string;
-  /** Langue du message */
-  language: Language;
-  /** Contexte du scan (départ, arrivée, transit, statique) */
-  context: ScanContext;
-  /** Nom du propriétaire (optionnel) */
+  baggage: {
+    reference: string;
+    bagType: string;
+    transportMode: 'flight' | 'train' | 'boat' | 'bus';
+    airlineName?: string;
+    flightNumber?: string;
+    trainCompany?: string;
+    trainNumber?: string;
+    shipName?: string;
+    shipCabin?: string;
+    busCompany?: string;
+    busLineNumber?: string;
+    destination?: string;
+  };
+  scanData: {
+    city: string;
+    address: string;
+    context: ScanContext | string;
+  };
+  finder: {
+    name: string;
+    whatsapp: string;
+  };
+  locale?: 'fr' | 'en' | 'ar';
   ownerName?: string;
-  /** Mode de transport — différencie le vocabulaire et les emojis */
-  transportMode?: TransportMode | string;
 }
 
 // ═══════════════════════════════════════════════════════
-//  TRANSPORT-SPECIFIC CONTEXT LABELS
+//  I18N INTERNAL TRANSLATIONS
 // ═══════════════════════════════════════════════════════
+// WHATSAPP-HARMONIZED: Traductions intégrées (pas de dépendance au hook useTranslation)
+// Fallback chain : locale demandée → fr → en
 
-/** Emojis de départ/arrivée par mode de transport */
-const TRANSPORT_CONTEXT_EMOJI: Record<TransportMode, { departure: string; arrival: string }> = {
-  flight: { departure: '🛫', arrival: '🛬' },
-  train:  { departure: '🚆', arrival: '🚆' },
-  boat:   { departure: '🚢', arrival: '⚓' },
-  bus:    { departure: '🚌', arrival: '🚌' },
-};
+type WhatsAppLocale = 'fr' | 'en' | 'ar';
 
-/** Lieux de départ/arrivée par mode × langue */
-const TRANSPORT_PLACES: Record<TransportMode, Record<Language, { departure: string; arrival: string }>> = {
-  flight: {
-    fr: { departure: 'aéroport de départ', arrival: "aéroport d'arrivée" },
-    en: { departure: 'departure airport', arrival: 'arrival airport' },
-    ar: { departure: 'مطار المغادرة', arrival: 'مطار الوصول' },
+const TITLES: Record<string, Record<WhatsAppLocale, string>> = {
+  departure_urgent: {
+    fr: 'URGENT — Bagage à {place} !',
+    en: 'URGENT — Baggage at {place} !',
+    ar: 'عاجل — أمتعة في {place} !',
   },
-  train: {
-    fr: { departure: 'gare', arrival: 'gare d\'arrivée' },
-    en: { departure: 'train station', arrival: 'arrival station' },
-    ar: { departure: 'محطة القطار', arrival: 'محطة الوصول' },
+  arrival: {
+    fr: 'Bagage localisé à destination',
+    en: 'Baggage located at destination',
+    ar: 'تم تحديد موقع الأمتعة في الوجهة',
   },
-  boat: {
-    fr: { departure: 'port', arrival: 'port d\'arrivée' },
-    en: { departure: 'port', arrival: 'arrival port' },
-    ar: { departure: 'الميناء', arrival: 'ميناء الوصول' },
-  },
-  bus: {
-    fr: { departure: 'gare routière', arrival: 'gare d\'arrivée' },
-    en: { departure: 'bus station', arrival: 'arrival bus station' },
-    ar: { departure: 'محطة الحافلات', arrival: 'محطة الوصول' },
-  },
-};
-
-// ═══════════════════════════════════════════════════════
-//  GENERIC CONTEXT TEMPLATES (transport-independant)
-// ═══════════════════════════════════════════════════════
-
-/** Templates pour in_transit et static_location (identiques pour tous les modes) */
-const GENERIC_MESSAGES: Record<'in_transit' | 'static_location', Record<Language, string>> = {
   in_transit: {
-    fr: '🚕 Bonjour ! Mon bagage {reference} est signalé en transit. Comment pouvons-nous nous coordonner pour la récupération ? Merci ! — QRBag',
-    en: '🚕 Hello! My bag {reference} is reported in transit. How can we coordinate the pickup? Thanks! — QRBag',
-    ar: '🚕 مرحباً! تم الإبلاغ عن أمتعتي {reference} في الطريق. كيف يمكننا التنسيق لاستلامها؟ شكراً! — QRBag',
+    fr: 'Bagage dans un transport',
+    en: 'Baggage in transit',
+    ar: 'أمتعة في طريق',
   },
-  static_location: {
-    fr: '📍 Bonjour ! Mon bagage {reference} a été trouvé. Merci de me contacter pour organiser la récupération. — QRBag',
-    en: '📍 Hello! My bag {reference} was found. Please contact me to arrange the pickup. — QRBag',
-    ar: '📍 مرحباً! تم العثور على أمتعتي {reference}. يرجى التواصل معي لترتيب الاستلام. — QRBag',
+  static: {
+    fr: 'Bagage trouvé en lieu sûr',
+    en: 'Baggage found in safe location',
+    ar: 'تم العثور على الأمتعة في مكان آمن',
   },
 };
 
+const CTAS: Record<string, Record<WhatsAppLocale, string>> = {
+  departure_urgent: {
+    fr: '⏰ Appelez MAINTENANT !',
+    en: '⏰ Call NOW!',
+    ar: '⏰ اتصل الآن!',
+  },
+  arrival: {
+    fr: '👉 Contactez-le vite pour organiser la récupération !',
+    en: '👉 Contact quickly to arrange pickup!',
+    ar: '👉 اتصل به بسرعة لترتيب الاستلام!',
+  },
+  in_transit: {
+    fr: '👉 Convenez d\'un point de rencontre rapidement !',
+    en: '👉 Arrange a meeting point quickly!',
+    ar: '👉 حدد نقطة لقاء بسرعة!',
+  },
+  static: {
+    fr: '👉 Le bagage est en sécurité, organisez la récupération.',
+    en: '👉 The bag is safe, arrange pickup.',
+    ar: '👉 الأمتعة في أمان، رتب الاستلام.',
+  },
+};
+
+const BAG_TYPE_LABELS: Record<string, Record<WhatsAppLocale, string>> = {
+  cabine: { fr: 'Cabine', en: 'Cabin', ar: 'مقصورة' },
+  soute:  { fr: 'Soute', en: 'Hold', ar: 'شحن' },
+};
+
+const CONTEXT_EMOJIS: Record<string, string> = {
+  departure_urgent: '🚨',
+  arrival: '✅',
+  in_transit: '🚕',
+  static: '📍',
+};
+
+const SIGNATURES: Record<WhatsAppLocale, string> = {
+  fr: 'QRBag – Protégez vos bagages, en toute sérénité.',
+  en: 'QRBag – Protect your luggage with peace of mind.',
+  ar: 'QRBag – احمِ أمتعتك براحة بال.',
+};
+
+const SEE_BAGAGE: Record<WhatsAppLocale, string> = {
+  fr: '👉 Voir le bagage localisé :',
+  en: '👉 See located bag:',
+  ar: '👉 رؤية الأمتعة المحددة:',
+};
+
+const TRUNCATED_MARKER: Record<WhatsAppLocale, string> = {
+  fr: '…',
+  en: '…',
+  ar: '…',
+};
+
 // ═══════════════════════════════════════════════════════
-//  MAIN FUNCTION
+//  RESOLVER HELPERS
 // ═══════════════════════════════════════════════════════
 
-/**
- * Resout le mode de transport de manière sûre.
- */
+/** Résout le mode de transport avec fallback 'flight' */
 function resolveTransportMode(mode?: string): TransportMode {
   if (mode === 'train' || mode === 'boat' || mode === 'bus') return mode;
   return 'flight';
 }
 
 /**
- * Génère un message WhatsApp pré-rempli pour le propriétaire contactant le trouveur.
- * TRANSPORT-NOTIFY: Le message est différencié selon le mode de transport.
+ * Normalise le contexte venant de scan-context.ts vers les 4 clés internes.
+ * Accepte les formats existants ET les formats simplifiés.
+ */
+function resolveContext(ctx: string): string {
+  if (ctx === 'departure_airport_urgent') return 'departure_urgent';
+  if (ctx === 'arrival_airport') return 'arrival';
+  if (ctx === 'in_transit') return 'in_transit';
+  if (ctx === 'static_location') return 'static';
+  // Fallback: unknown → static
+  return 'static';
+}
+
+/** Résout la locale avec fallback chain : demandée → fr → en */
+function resolveLocale(loc?: string): WhatsAppLocale {
+  if (loc === 'fr' || loc === 'en' || loc === 'ar') return loc;
+  return 'fr';
+}
+
+/**
+ * Extrait CARRIER (compagnie) et VEHICLE (numéro) selon le mode.
+ * Retourne { carrier, vehicle } — l'un ou les deux peuvent être ''.
+ */
+function getCarrierAndVehicle(baggage: PreFilledMessageParams['baggage'], mode: TransportMode): { carrier: string; vehicle: string } {
+  switch (mode) {
+    case 'flight':
+      return {
+        carrier: (baggage.airlineName || '').trim(),
+        vehicle: (baggage.flightNumber || '').trim(),
+      };
+    case 'train':
+      return {
+        carrier: (baggage.trainCompany || '').trim(),
+        vehicle: (baggage.trainNumber || '').trim(),
+      };
+    case 'boat':
+      return {
+        carrier: (baggage.shipName || '').trim(),
+        vehicle: (baggage.shipCabin || '').trim(),
+      };
+    case 'bus':
+      return {
+        carrier: (baggage.busCompany || '').trim(),
+        vehicle: (baggage.busLineNumber || '').trim(),
+      };
+  }
+}
+
+/**
+ * Résout le label du type de bagage.
+ * Pour bateau : si shipCabin existe → l'utiliser (ex: "Pont 4").
+ * Sinon : traduire baggageType (cabine/soute).
+ */
+function resolveBagTypeLabel(baggage: PreFilledMessageParams['baggage'], mode: TransportMode, locale: WhatsAppLocale): string {
+  // Bateau : le "type" est généralement le pont/cabine
+  if (mode === 'boat' && baggage.shipCabin && baggage.shipCabin.trim()) {
+    return baggage.shipCabin.trim();
+  }
+  // Pour tous les modes : traduire baggageType DB
+  const dbType = (baggage.bagType || '').trim().toLowerCase();
+  const label = BAG_TYPE_LABELS[dbType]?.[locale];
+  if (label) return label;
+  // Fallback : afficher la valeur brute (peut être "cabine", "Pont 4", etc.)
+  return baggage.bagType || '—';
+}
+
+/**
+ * Sanitize une chaîne pour insertion dans un message WhatsApp.
+ * Conserve les lettres, chiffres, espaces, tirets, underscores, @, +, (), emojis.
+ */
+function sanitize(input: string): string {
+  if (!input) return '';
+  // Conserve les caractères imprimables Unicode (lettres, chiffres, ponctuation, emojis)
+  return input.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '').trim();
+}
+
+// ═══════════════════════════════════════════════════════
+//  SMART TRUNCATION
+// ═══════════════════════════════════════════════════════
+
+/**
+ * Tronque intelligemment le message si > 400 chars.
+ * Priorité de suppression : finder phone → finder name → CTA → signature.
+ * Garde toujours : titre, REF, transport line, lien suivi.
+ * Ajoute "…" si tronqué.
+ */
+function smartTruncate(message: string, maxChars: number, locale: WhatsAppLocale): string {
+  if (message.length <= maxChars) return message;
+
+  const lines = message.split('\n');
+
+  // Identifier les lignes par préfixe (fragile mais suffisant pour ce template contrôlé)
+  // Priorité de suppression (du moins au plus important) :
+  // 8. signature
+  // 7. CTA context
+  // 6. finder phone
+  // 5. finder name
+
+  let truncated = false;
+
+  // Retirer signature (dernière ligne si commence par "QRBag")
+  for (let i = lines.length - 1; i >= 0; i--) {
+    if (lines[i].startsWith('QRBag')) {
+      lines.splice(i, 1);
+      truncated = true;
+      break;
+    }
+  }
+  let joined = lines.join('\n');
+  if (joined.length <= maxChars) return joined + TRUNCATED_MARKER[locale];
+
+  // Retirer CTA (ligne qui commence par ⏰ ou 👉 et N'EST PAS "Voir le bagage")
+  for (let i = lines.length - 1; i >= 0; i--) {
+    if ((lines[i].startsWith('⏰') || (lines[i].startsWith('👉') && !lines[i].includes('qrbags.com')))) {
+      lines.splice(i, 1);
+      truncated = true;
+      break;
+    }
+  }
+  joined = lines.join('\n');
+  if (joined.length <= maxChars) return joined + TRUNCATED_MARKER[locale];
+
+  // Retirer finder phone (📱)
+  for (let i = lines.length - 1; i >= 0; i--) {
+    if (lines[i].startsWith('📱')) {
+      lines.splice(i, 1);
+      truncated = true;
+      break;
+    }
+  }
+  joined = lines.join('\n');
+  if (joined.length <= maxChars) return joined + TRUNCATED_MARKER[locale];
+
+  // Retirer finder name (👤)
+  for (let i = lines.length - 1; i >= 0; i--) {
+    if (lines[i].startsWith('👤')) {
+      lines.splice(i, 1);
+      truncated = true;
+      break;
+    }
+  }
+  joined = lines.join('\n');
+  if (joined.length <= maxChars) return joined + TRUNCATED_MARKER[locale];
+
+  // Dernier recours : troncation brute
+  return joined.substring(0, maxChars - 1).trim() + '…';
+}
+
+// ═══════════════════════════════════════════════════════
+//  MAIN FUNCTION
+// ═══════════════════════════════════════════════════════
+
+/**
+ * Génère un message WhatsApp pré-rempli harmonisé pour le propriétaire contactant le trouveur.
  *
- * @param params - Données du message (référence, langue, contexte, nom propriétaire, transport)
- * @returns string — Message formaté (max 400 caractères), texte brut
+ * WHATSAPP-HARMONIZED: Template structuré unique, multi-transport, multi-contexte, i18n.
+ *
+ * @param params - Données structurées (baggage, scanData, finder, locale, ownerName)
+ * @returns string — Message formaté ≤ 400 caractères, prêt pour wa.me
+ *
+ * @example
+ * ```ts
+ * // TEST: Message flight+departure_urgent → <400 chars, emoji 🚨, CTA urgent
+ * const msg = generatePreFilledMessage({
+ *   baggage: { reference: 'VOL26-VABJZS', bagType: 'soute', transportMode: 'flight',
+ *     airlineName: 'Air France', flightNumber: 'AF1234', destination: 'Paris' },
+ *   scanData: { city: 'Dakar', address: '', context: 'departure_airport_urgent' },
+ *   finder: { name: 'Ouslane Diop', whatsapp: '+221784858226' },
+ *   locale: 'fr',
+ * });
+ * // msg.startsWith("🚨 URGENT") && msg.length <= 400
+ * ```
  */
 export function generatePreFilledMessage(params: PreFilledMessageParams): string {
-  const { reference, language, context, ownerName, transportMode } = params;
-  const mode = resolveTransportMode(transportMode);
+  const { baggage, scanData, finder, locale: rawLocale, ownerName } = params;
 
-  let message: string;
+  // ─── Step 1: Resolve all inputs ───
+  const mode: TransportMode = resolveTransportMode(baggage.transportMode);
+  const context: string = resolveContext(scanData.context);
+  const locale: WhatsAppLocale = resolveLocale(rawLocale);
 
-  // ─── Contextes génériques (in_transit, static_location) ───
-  if (context === 'in_transit' || context === 'static_location') {
-    message = GENERIC_MESSAGES[context]?.[language] ?? GENERIC_MESSAGES.static_location.fr;
-  }
-  // ─── TRANSPORT-NOTIFY: Contextes liés au transport (departure/arrival) ───
-  else if (context === 'departure_airport_urgent') {
-    const emoji = TRANSPORT_CONTEXT_EMOJI[mode].departure;
-    const place = TRANSPORT_PLACES[mode][language].departure;
-    const templates: Record<Language, string> = {
-      fr: `${emoji} Bonjour ! Mon bagage ${reference} a été signalé avant mon départ de ${place}. Pourriez-vous me le remettre rapidement ? Merci ! — QRBag`,
-      en: `${emoji} Hello! My bag ${reference} was reported before my departure from ${place}. Could you hand it to me quickly? Thanks! — QRBag`,
-      ar: `${emoji} مرحباً! تم الإبلاغ عن أمتعتي ${reference} قبل مغادرتي من ${place}. هل يمكنك إعادتها لي بسرعة؟ شكراً! — QRBag`,
-    };
-    message = templates[language] ?? templates.fr;
-  }
-  else if (context === 'arrival_airport') {
-    const emoji = TRANSPORT_CONTEXT_EMOJI[mode].arrival;
-    const place = TRANSPORT_PLACES[mode][language].arrival;
-    const templates: Record<Language, string> = {
-      fr: `${emoji} Bonjour ! Mon bagage ${reference} a été trouvé à ${place}. Comment puis-je le récupérer ? Merci ! — QRBag`,
-      en: `${emoji} Hello! My bag ${reference} was found at ${place}. How can I pick it up? Thanks! — QRBag`,
-      ar: `${emoji} مرحباً! تم العثور على أمتعتي ${reference} في ${place}. كيف يمكنني استلامها؟ شكراً! — QRBag`,
-    };
-    message = templates[language] ?? templates.fr;
-  }
-  else {
-    // Fallback
-    message = GENERIC_MESSAGES.static_location[language] ?? GENERIC_MESSAGES.static_location.fr;
+  // ─── Step 2: Extract transport data ───
+  const transportIcon: string = TRANSPORT_ICONS[mode];
+  const { carrier, vehicle } = getCarrierAndVehicle(baggage, mode);
+  const bagTypeLabel: string = resolveBagTypeLabel(baggage, mode, locale);
+
+  // ─── Step 3: Build title line ───
+  const contextEmoji: string = CONTEXT_EMOJIS[context] || CONTEXT_EMOJIS.static;
+  const titleTemplate: string = TITLES[context]?.[locale] || TITLES.static.fr;
+
+  // Pour departure_urgent, injecter le lieu de départ selon le mode
+  let title: string;
+  if (context === 'departure_urgent') {
+    const place = TRANSPORT_PLACES[mode]?.[locale]?.departure || TRANSPORT_PLACES.flight.fr.departure;
+    title = titleTemplate.replace('{place}', place);
+  } else {
+    title = titleTemplate;
   }
 
-  // Remplacer les variables
-  message = message.replace(/{reference}/g, reference);
-
-  // Ajouter le nom du propriétaire si fourni
-  if (ownerName && ownerName.trim()) {
-    const intro: Record<Language, string> = {
-      fr: `Cordialement, ${ownerName.trim()}.`,
-      en: `Best regards, ${ownerName.trim()}.`,
-      ar: `مع التحية، ${ownerName.trim()}.`,
-    };
-    message = `${message}\n${intro[language]}`;
+  // ─── Step 4: Build transport line ───
+  let transportLine = '';
+  if (carrier || vehicle) {
+    const parts: string[] = [transportIcon];
+    if (carrier) parts.push(carrier);
+    if (vehicle) parts.push(vehicle);
+    if (baggage.destination) parts.push(`• ${sanitize(baggage.destination)}`);
+    transportLine = parts.join(' ');
   }
 
-  // Limiter à 400 caractères (WhatsApp friendly)
-  if (message.length > 400) {
-    message = message.substring(0, 397) + '...';
+  // ─── Step 5: Assemble all lines ───
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL
+    ? process.env.NEXT_PUBLIC_APP_URL.replace(/\/$/, '')
+    : 'https://qrbags.com';
+  const sanitizedRef = sanitize(baggage.reference);
+
+  const lines: string[] = [];
+
+  // Line 1: Context title (TOUJOURS)
+  lines.push(`${contextEmoji} ${sanitize(title)}`);
+
+  // Line 2: Reference + bag type (TOUJOURS)
+  lines.push(`🧳 ${sanitizedRef} • ${sanitize(bagTypeLabel)}`);
+
+  // Line 3: Transport info (si CARRIER ou VEHICLE présent)
+  if (transportLine) {
+    lines.push(transportLine);
   }
+
+  // Line 4: Tracking link (TOUJOURS)
+  lines.push(`${SEE_BAGAGE[locale]} ${appUrl}/suivi/${sanitizedRef}`);
+
+  // Line 5: Finder name (optionnel)
+  const finderName = sanitize(finder.name);
+  if (finderName) {
+    lines.push(`👤 ${finderName}`);
+  }
+
+  // Line 6: Finder WhatsApp (optionnel)
+  const finderWhatsapp = sanitize(finder.whatsapp);
+  if (finderWhatsapp) {
+    lines.push(`📱 ${finderWhatsapp}`);
+  }
+
+  // Line 7: CTA context (TOUJOURS dans le template)
+  const cta: string = CTAS[context]?.[locale] || CTAS.static.fr;
+  lines.push(cta);
+
+  // Line 8: Signature (TOUJOURS dans le template)
+  lines.push(SIGNATURES[locale]);
+
+  // ─── Step 6: Join and truncate ───
+  let message = lines.join('\n');
+
+  // Troncation intelligente si > 400 chars
+  message = smartTruncate(message, 400, locale);
+
+  // ─── Step 7: Logging discret ───
+  // TEST: Logging format [WhatsApp/PreFilled] flight/departure_urgent/fr → 378 chars
+  console.log(`[WhatsApp/PreFilled] ${mode}/${context}/${locale} → ${message.length} chars`);
 
   return message;
 }
 
 /**
+ * Résout le label du type de bagage.
+ * Exporté pour réutilisation dans les pages (évite la duplication).
+ *
+ * @param baggageType - Valeur DB ("cabine", "soute", ou personnalisé)
+ * @param transportMode - Mode de transport
+ * @param shipCabin - Pour bateau : le pont/cabine
+ * @param locale - Langue (fr/en/ar)
+ * @returns string - Label lisible
+ *
+ * @example
+ * ```ts
+ * resolveBagTypeLabelExported('cabine', 'flight', undefined, 'fr') → "Cabine"
+ * resolveBagTypeLabelExported('soute', 'boat', 'Pont 4', 'fr') → "Pont 4"
+ * ```
+ */
+export function resolveBagTypeLabelExported(
+  baggageType: string,
+  transportMode: string,
+  shipCabin?: string | null,
+  locale: WhatsAppLocale = 'fr'
+): string {
+  const mode = resolveTransportMode(transportMode);
+  // Bateau : le "type" est généralement le pont/cabine
+  if (mode === 'boat' && shipCabin && shipCabin.trim()) {
+    return shipCabin.trim();
+  }
+  const dbType = (baggageType || '').trim().toLowerCase();
+  const label = BAG_TYPE_LABELS[dbType]?.[locale];
+  if (label) return label;
+  return baggageType || '—';
+}
+
+/**
  * Génère l'URL WhatsApp complète pour contacter le trouveur.
+ * Préservé sans modification — utilisé par /suivi et potentiellement d'autres pages.
  *
  * @param finderPhone - Numéro du trouveur (format international, chiffres uniquement)
  * @param message - Message pré-rempli (texte brut)

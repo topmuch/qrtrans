@@ -338,19 +338,37 @@ export default function SuiviPage() {
     setTimeout(() => setRefreshToast(false), 2000);
   }, [fetchSuivi]);
 
-  // WhatsApp handler — owner contacts finder
+  // WHATSAPP-HARMONIZED: WhatsApp handler — owner contacts finder (template harmonisé multi-transport)
   const handleWhatsApp = useCallback(() => {
     if (!data?.lastFinder?.phone) return;
 
     const lastScan = data.scans[0];
-    const context = (lastScan?.context || 'static_location') as ScanContext;
-    // TRANSPORT-NOTIFY: Passer le mode de transport pour différencier le message
     const message = generatePreFilledMessage({
-      reference,
-      language: lang,
-      context,
+      baggage: {
+        reference: data.baggage.reference,
+        bagType: data.baggage.baggageType || 'cabine',
+        transportMode: (data.baggage.transportMode || 'flight') as 'flight' | 'train' | 'boat' | 'bus',
+        airlineName: data.baggage.airlineName || undefined,
+        flightNumber: data.baggage.flightNumber || undefined,
+        trainCompany: data.baggage.trainCompany || undefined,
+        trainNumber: data.baggage.trainNumber || undefined,
+        shipName: data.baggage.shipName || undefined,
+        shipCabin: data.baggage.shipCabin || undefined,
+        busCompany: data.baggage.busCompany || undefined,
+        busLineNumber: data.baggage.busLineNumber || undefined,
+        destination: data.baggage.destination || undefined,
+      },
+      scanData: {
+        city: data.lastPosition?.address || data.baggage?.lastLocation || '',
+        address: data.lastPosition?.address || '',
+        context: (lastScan?.context || 'static_location') as ScanContext,
+      },
+      finder: {
+        name: data.lastFinder?.name || '',
+        whatsapp: data.lastFinder?.phone || '',
+      },
+      locale: lang,
       ownerName: data.baggage?.travelerName || undefined,
-      transportMode: data.baggage?.transportMode || undefined,
     });
 
     const url = buildWhatsAppUrl(data.lastFinder.phone, message);

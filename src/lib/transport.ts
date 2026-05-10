@@ -85,6 +85,30 @@ export const TRANSPORT_BLOCK_HEADERS: Record<TransportMode, Record<Language, str
   bus:    { fr: 'DÉTAILS DU VOYAGE', en: 'TRIP DETAILS', ar: 'تفاصيل الرحلة' },
 };
 
+// WHATSAPP-HARMONIZED: Lieux de départ/arrivée par mode × langue (réutilisable pour notifications)
+export const TRANSPORT_PLACES: Record<TransportMode, Record<Language, { departure: string; arrival: string }>> = {
+  flight: {
+    fr: { departure: "l'aéroport de départ", arrival: "l'aéroport d'arrivée" },
+    en: { departure: 'the departure airport', arrival: 'the arrival airport' },
+    ar: { departure: 'مطار المغادرة', arrival: 'مطار الوصول' },
+  },
+  train: {
+    fr: { departure: 'la gare', arrival: 'la gare d\'arrivée' },
+    en: { departure: 'the train station', arrival: 'the arrival station' },
+    ar: { departure: 'محطة القطار', arrival: 'محطة الوصول' },
+  },
+  boat: {
+    fr: { departure: 'le port', arrival: 'le port d\'arrivée' },
+    en: { departure: 'the port', arrival: 'the arrival port' },
+    ar: { departure: 'الميناء', arrival: 'ميناء الوصول' },
+  },
+  bus: {
+    fr: { departure: 'la gare routière', arrival: 'la gare d\'arrivée' },
+    en: { departure: 'the bus station', arrival: 'the arrival bus station' },
+    ar: { departure: 'محطة الحافلات', arrival: 'محطة الوصول' },
+  },
+};
+
 // ═══════════════════════════════════════════════════════
 //  FIELD DEFINITIONS (Formulaire dynamique)
 // ═══════════════════════════════════════════════════════

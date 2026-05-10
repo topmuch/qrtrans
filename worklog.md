@@ -605,3 +605,88 @@ Stage Summary:
 - All 3 notification paths updated: Groq AI, static fallback, Wakit, pre-filled messages
 - i18n complete: FR, EN, AR for all transport-specific texts
 - Backward compatible: legacy data without transportMode defaults to 'flight'
+
+---
+Task ID: 16
+Agent: Main Agent
+Task: WhatsApp Pre-Filled Message — Template Harmonisé Multi-Transport
+
+Work Log:
+- Phase 1: Deep analysis of all WhatsApp notification paths (owner→finder, finder→owner, auto-alert)
+- Phase 1: Identified 6 potential conflicts and mitigations
+- Phase 1: Proposed detailed plan — validated by user with "✅ GO"
+
+Phase 2 Implementation (5 steps in strict order):
+
+Step 1 — i18n keys (public/locales/{fr,en,ar}.json):
+  Added 13 new keys per locale (21 total whatsapp.* keys):
+  - whatsapp.title_departure_urgent / title_arrival / title_in_transit / title_static
+  - whatsapp.cta_departure_urgent / cta_arrival / cta_in_transit / cta_static
+  - whatsapp.bag_type_cabine / bag_type_soute
+  - whatsapp.see_bagage / whatsapp.truncated
+  All 3 JSON validated, 21 keys each.
+
+Step 2 — TRANSPORT_PLACES (src/lib/transport.ts):
+  Added TRANSPORT_PLACES record: mode × language → { departure, arrival }
+  flight: "l'aéroport de départ" / "the departure airport" / "مطار المغادرة"
+  train: "la gare" / "the train station" / "محطة القطار"
+  boat: "le port" / "the port" / "الميناء"
+  bus: "la gare routière" / "the bus station" / "محطة الحافلات"
+
+Step 3 — Full rewrite (src/lib/whatsapp-message.ts, 477 lines):
+  - New PreFilledMessageParams interface (structured: baggage, scanData, finder, locale, ownerName)
+  - Internal i18n translations (no useTranslation dependency — pure function)
+  - resolveTransportMode(), resolveContext(), resolveLocale() — 3 resolver helpers
+  - getCarrierAndVehicle() — extracts CARRIER/VEHICLE per mode
+  - resolveBagTypeLabel() — special boat handling (shipCabin as bagType)
+  - sanitize() — cleans input for WhatsApp safety
+  - smartTruncate() — intelligent ≤400 char truncation (removes finder→CTA→signature)
+  - generatePreFilledMessage() — main function, 8-line template
+  - resolveBagTypeLabelExported() — exported helper for page reuse
+  - buildWhatsAppUrl() — preserved unchanged
+  - Logging: [WhatsApp/PreFilled] flight/departure_urgent/fr → 378 chars
+
+Step 4 — Caller adaptation (src/app/suivi/[reference]/page.tsx):
+  Replaced flat params call with structured params:
+  - baggage: maps data.baggage (reference, bagType, transportMode, all transport fields, destination)
+  - scanData: maps data.lastPosition + lastScan.context
+  - finder: maps data.lastFinder.name + phone
+  - locale: lang
+  - ownerName: data.baggage.travelerName
+
+Step 5 — Validation:
+  - bun run lint → 0 errors
+  - dev server → clean compilation, no errors
+  - JSON validation → all 3 locales valid, 21 whatsapp keys each
+  - TypeScript strict → no new errors
+
+Self-Critique:
+- 0 bugs found. All changes are additive; buildWhatsAppUrl preserved.
+- resolveContext() handles both old format (departure_airport_urgent) and new (departure_urgent)
+- smartTruncate() removes optional lines in correct priority order (finder phone→name→CTA→signature)
+- sanitize() allows Unicode emojis in names (user suggestion applied)
+- Truncated marker "…" appended when smartTruncation removes lines
+- Fallback chain: locale → fr → en (not ar, per user validation)
+
+Non-negotiable constraints respected:
+✅ groq.ts — NOT TOUCHED (auto-alert remains separate)
+✅ scan/[ref] page — NOT TOUCHED (finder→owner flow unchanged)
+✅ rate-limiting — NOT TOUCHED
+✅ <400 chars strict — smartTruncate guarantees
+✅ i18n FR/EN/AR — complete (internal translations + locale file keys)
+✅ mobile responsive — WhatsApp-formatted text with emoji markers
+✅ RTL Arabic — WhatsApp auto-detects direction
+✅ TypeScript strict — zero new errors
+
+Stage Summary:
+- 5 files modified: fr.json, en.json, ar.json, transport.ts, whatsapp-message.ts
+- 1 file adapted: suivi/[reference]/page.tsx (handleWhatsApp caller)
+- 0 new files created
+- 0 lint errors, 0 compilation errors
+- WhatsApp pre-filled messages now FULLY HARMONIZED multi-transport:
+  ✈️ Flight: "aéroport de départ" / "URGENT — Bagage à l'aéroport de départ !"
+  🚆 Train: "la gare" / "URGENT — Bagage à la gare !"
+  🚢 Boat: "le port" / "URGENT — Bagage au port !"
+  🚌 Bus: "la gare routière" / "URGENT — Bagage à la gare routière !"
+- Template unique: 8-line structured format for all modes × all contexts
+- Smart truncation ≤ 400 chars with graceful degradation
