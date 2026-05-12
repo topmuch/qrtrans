@@ -283,7 +283,7 @@ function HeroSection() {
           quality={90}
         />
         {/* Strong overlay for text readability */}
-        <div className="absolute inset-0 bg-gradient-to-b from-white/85 via-white/80 to-white" />
+        <div className="absolute inset-0 bg-gradient-to-b from-white/92 via-white/88 to-white" />
       </div>
 
       {/* Floating particles */}
