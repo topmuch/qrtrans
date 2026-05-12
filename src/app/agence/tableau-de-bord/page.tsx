@@ -747,7 +747,7 @@ export default function AgencyDashboardPage() {
                       <tr
                         key={baggage.id}
                         className={`border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors ${
-                          baggage.status === 'lost' || isLost(b.status) ? 'bg-rose-50/50 dark:bg-rose-500/5' : ''
+                          isLost(baggage.status) ? 'bg-rose-50/50 dark:bg-rose-500/5' : ''
                         }`}
                       >
                         <td className="px-6 py-4">
