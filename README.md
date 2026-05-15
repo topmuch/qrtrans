@@ -1,8 +1,8 @@
-# QRBag 🎒
+# QRTrans 🎒
 
 **Protection intelligente des bagages avec QR codes**
 
-QRBag est une application web moderne permettant de protéger vos bagages grâce à des étiquettes QR intelligentes. Sans application, sans batterie, sans GPS - un simple scan suffit pour retrouver vos effets.
+QRTrans est une application web moderne permettant de protéger vos bagages grâce à des étiquettes QR intelligentes. Sans application, sans batterie, sans GPS - un simple scan suffit pour retrouver vos effets.
 
 ## ✨ Fonctionnalités
 
@@ -27,8 +27,8 @@ QRBag est une application web moderne permettant de protéger vos bagages grâce
 #### 1. Fork ou cloner ce repository
 
 ```bash
-git clone https://github.com/VOTRE-USERNAME/qrbag.git
-cd qrbag
+git clone https://github.com/VOTRE-USERNAME/qrtrans.git
+cd qrtrans
 ```
 
 #### 2. Sur Coolify
@@ -72,8 +72,8 @@ ENCRYPTION_KEY=votre-cle-encryption-32chars
 
 ```bash
 # Cloner le repository
-git clone https://github.com/VOTRE-USERNAME/qrbag.git
-cd qrbag
+git clone https://github.com/VOTRE-USERNAME/qrtrans.git
+cd qrtrans
 
 # Installer les dépendances
 bun install
@@ -92,13 +92,13 @@ bun run dev
 
 ### Identifiants de démonstration
 
-- **Admin:** `admin@qrbag.com` / `admin123`
-- **Agence:** `agency@qrbag.com` / `agency123`
+- **Admin:** `admin@qrtrans.com` / `admin123`
+- **Agence:** `agency@qrtrans.com` / `agency123`
 
 ## 📁 Structure du projet
 
 ```
-qrbag/
+qrtrans/
 ├── prisma/           # Schéma et seed de la base de données
 ├── public/           # Assets statiques
 ├── src/
@@ -128,8 +128,8 @@ Ce projet est sous licence privée. Tous droits réservés.
 
 ## 👥 Auteurs
 
-Développé par l'équipe QRBag
+Développé par l'équipe QRTrans
 
 ---
 
-**Besoin d'aide ?** Ouvrez une issue sur GitHub ou contactez-nous à contact@qrbag.com
+**Besoin d'aide ?** Ouvrez une issue sur GitHub ou contactez-nous à contact@qrtrans.com

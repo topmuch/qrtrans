@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e
 
-echo "🚀 Starting QRBag..."
+echo "🚀 Starting QRTrans..."
 
 # Create data directory if it doesn't exist
 mkdir -p /app/data

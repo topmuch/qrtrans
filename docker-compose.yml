@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  qrbag:
+  qrtrans:
     build:
       context: .
       dockerfile: Dockerfile
@@ -16,8 +16,8 @@ services:
       - PAYPAL_CLIENT_SECRET=${PAYPAL_CLIENT_SECRET:-}
       - ENCRYPTION_KEY=${ENCRYPTION_KEY:-}
     volumes:
-      - qrbag_data:/app/data
-      - qrbag_uploads:/app/public/uploads
+      - qrtrans_data:/app/data
+      - qrtrans_uploads:/app/public/uploads
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api"]
@@ -27,5 +27,5 @@ services:
       start_period: 40s
 
 volumes:
-  qrbag_data:
-  qrbag_uploads:
+  qrtrans_data:
+  qrtrans_uploads:

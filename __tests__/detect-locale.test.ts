@@ -19,23 +19,23 @@ function assert(condition: boolean, name: string) {
 
 console.log('=== detect-locale.test.ts ===\n');
 
-// Test 1: Cookie qrbag_locale=en → should return 'en'
+// Test 1: Cookie qrtrans_locale=en → should return 'en'
 console.log('--- Cookie detection ---');
 assert(
-  detectLocaleFromHeaders(new Headers({ cookie: 'qrbag_locale=en' })) === 'en',
-  'Cookie qrbag_locale=en → en'
+  detectLocaleFromHeaders(new Headers({ cookie: 'qrtrans_locale=en' })) === 'en',
+  'Cookie qrtrans_locale=en → en'
 );
 
-// Test 2: Cookie qrbag_locale=ar → should return 'ar'
+// Test 2: Cookie qrtrans_locale=ar → should return 'ar'
 assert(
-  detectLocaleFromHeaders(new Headers({ cookie: 'qrbag_locale=ar' })) === 'ar',
-  'Cookie qrbag_locale=ar → ar'
+  detectLocaleFromHeaders(new Headers({ cookie: 'qrtrans_locale=ar' })) === 'ar',
+  'Cookie qrtrans_locale=ar → ar'
 );
 
-// Test 3: Cookie qrbag_locale=fr → should return 'fr'
+// Test 3: Cookie qrtrans_locale=fr → should return 'fr'
 assert(
-  detectLocaleFromHeaders(new Headers({ cookie: 'qrbag_locale=fr' })) === 'fr',
-  'Cookie qrbag_locale=fr → fr'
+  detectLocaleFromHeaders(new Headers({ cookie: 'qrtrans_locale=fr' })) === 'fr',
+  'Cookie qrtrans_locale=fr → fr'
 );
 
 // Test 4: Accept-Language fr-FR → should return 'fr'
@@ -74,7 +74,7 @@ assert(
 console.log('\n--- Cookie priority ---');
 assert(
   detectLocaleFromHeaders(new Headers({
-    cookie: 'qrbag_locale=en',
+    cookie: 'qrtrans_locale=en',
     'accept-language': 'ar-SA,ar;q=0.9',
   })) === 'en',
   'Cookie en + Accept-Language ar → en (cookie wins)'
@@ -82,7 +82,7 @@ assert(
 
 assert(
   detectLocaleFromHeaders(new Headers({
-    cookie: 'qrbag_locale=ar',
+    cookie: 'qrtrans_locale=ar',
     'accept-language': 'fr-FR,fr;q=0.9',
   })) === 'ar',
   'Cookie ar + Accept-Language fr → ar (cookie wins)'
@@ -92,15 +92,15 @@ assert(
 console.log('\n--- Cookie parsing edge cases ---');
 assert(
   detectLocaleFromHeaders(new Headers({
-    cookie: 'session=abc123; qrbag_locale=en; theme=dark',
+    cookie: 'session=abc123; qrtrans_locale=en; theme=dark',
   })) === 'en',
-  'Cookie qrbag_locale=en among other cookies → en'
+  'Cookie qrtrans_locale=en among other cookies → en'
 );
 
 // Test 11: Invalid cookie value → fallback to Accept-Language
 assert(
   detectLocaleFromHeaders(new Headers({
-    cookie: 'qrbag_locale=de',
+    cookie: 'qrtrans_locale=de',
     'accept-language': 'ar-SA,ar;q=0.9',
   })) === 'ar',
   'Invalid cookie value (de) + Accept-Language ar → ar'

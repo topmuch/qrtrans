@@ -432,7 +432,7 @@ export default function ScanPage() {
 
   // Generate WhatsApp message (i18n-ready)
   const generateWhatsAppMessage = useCallback((finderName: string, finderPhone: string, locationText: string, mapLink: string) => {
-    const trackingUrl = `${typeof window !== 'undefined' ? window.location.origin : 'https://qrbags.com'}/suivi/${reference}`;
+    const trackingUrl = `${typeof window !== 'undefined' ? window.location.origin : 'https://qrtrans.com'}/suivi/${reference}`;
     return encodeURIComponent(
       `${t('whatsapp.baggage_found')}\n\n` +
       `${t('whatsapp.reference')} ${reference}\n` +

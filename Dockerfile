@@ -1,4 +1,4 @@
-# QRBag - Dockerfile for Coolify Deployment
+# QRTrans - Dockerfile for Coolify Deployment
 FROM node:20-alpine AS base
 
 # Install dependencies only when needed
@@ -67,7 +67,7 @@ RUN mkdir -p /app/data && chown -R nextjs:nodejs /app/data
 # Create startup script
 RUN echo '#!/bin/sh' > /app/start.sh && \
     echo 'set -e' >> /app/start.sh && \
-    echo 'echo "🚀 Starting QRBag..."' >> /app/start.sh && \
+    echo 'echo "🚀 Starting QRTrans..."' >> /app/start.sh && \
     echo 'mkdir -p /app/data' >> /app/start.sh && \
     echo 'export DATABASE_URL=file:/app/data/custom.db' >> /app/start.sh && \
     echo 'cd /app' >> /app/start.sh && \

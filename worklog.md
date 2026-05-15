@@ -4,7 +4,7 @@ Agent: Main Agent
 Task: Create /suivi/[reference] public tracking page + API + scan context detection + WhatsApp pre-filled message generator
 
 Work Log:
-- Cloned qrbags repo from GitHub to restore previous session's work
+- Cloned qrtrans repo from GitHub to restore previous session's work
 - Updated Prisma schema: added `context`, `finderName`, `finderPhone` fields to ScanLog model
 - Pushed schema with `bunx --bun prisma db push`
 - Created `src/lib/scan-context.ts` with `detectScanContext()` — 4 contexts (departure/arrival/transit/static)
@@ -294,7 +294,7 @@ Stage Summary:
 ---
 Task ID: 11
 Agent: Main Agent (Chatbot KB Enhancement)
-Task: Transform existing chatbot into intelligent support agent with QRBag Knowledge Base
+Task: Transform existing chatbot into intelligent support agent with QRTrans Knowledge Base
 
 Work Log:
 - Phase 1 Analysis: Discovered chatbot already fully implemented (API route 317 lines, Widget 291 lines, 15 i18n keys × 3 languages, feature flag, kill switches)
@@ -307,7 +307,7 @@ Work Log:
      - Changed Groq params: temperature 0.5→0.7, max_tokens 200→300
      - Added `transportMode` to baggageContext validation + DB enrichment with `safeTransportMode()` fallback
      - Changed response format: `content` → `answer`
-     - Changed fallback messages: "contact owner via WhatsApp" → SAV contact (support@qrbags.com)
+     - Changed fallback messages: "contact owner via WhatsApp" → SAV contact (support@qrtrans.com)
      - Added `console.log('[Groq/Chat] ${reference} → ${latencyMs}ms')` on success path
      - History messages now sanitized via `sanitizeQuestion()`
      - Added `satisfies ChatResponse` type annotation on all responses
@@ -318,7 +318,7 @@ Work Log:
   3. Modified `scan/[reference]/page.tsx` (1 line):
      - Added `transportMode: baggage.transportMode || undefined` to ChatbotWidget baggageContext prop
   4. Modified `public/locales/{fr,en,ar}.json` (1 key each):
-     - `chatbot.error_fallback` updated to SAV-oriented message (support@qrbags.com)
+     - `chatbot.error_fallback` updated to SAV-oriented message (support@qrtrans.com)
 
 - Validation:
   - JSON: 3/3 locale files valid
@@ -340,7 +340,7 @@ Work Log:
 
 Stage Summary:
 - 5 files modified, 0 new files created
-- System prompt now contains full QRBag Knowledge Base (tarifs, SAV, FAQ TOP 5, pages, confidentiality)
+- System prompt now contains full QRTrans Knowledge Base (tarifs, SAV, FAQ TOP 5, pages, confidentiality)
 - Chatbot is now an intelligent support agent, not just a generic baggage assistant
 - Timeout 3s strict, sanitization HTML, transportMode context
 - Zero lint errors, zero new TypeScript errors
@@ -373,7 +373,7 @@ Autocritique détaillée — Vérification point par point du spec:
 **PRIORITY 1: route.ts**
 ✅ KB system prompts (FR/EN/AR) — ~800 tokens each, identical structure, euros, international SAV, raw URLs
 ✅ Tarifs: 9.90€/24.90€/59.90€
-✅ SAV: support@qrbags.com, +221 78 XXX XX XX, Lun-Ven 9h-18h GMT
+✅ SAV: support@qrtrans.com, +221 78 XXX XX XX, Lun-Ven 9h-18h GMT
 ✅ FAQ TOP 5: activation, bagage perdu, données sécurisées, QR unique, trouveur injoignable
 ✅ Règles de confidentialité + hors scope → oriente vers SAV
 ✅ sanitizeQuestion() — strips HTML tags, code blocks, backticks
@@ -381,7 +381,7 @@ Autocritique détaillée — Vérification point par point du spec:
 ✅ Temperature 0.5→0.7
 ✅ max_tokens 200→300
 ✅ Response: answer (instead of content) — both API output and ChatResponse interface
-✅ Fallback: SAV messages (support@qrbags.com) in FR/EN/AR
+✅ Fallback: SAV messages (support@qrtrans.com) in FR/EN/AR
 ✅ transportMode in baggageContext validation + DB select
 ✅ safeTransportMode() fallback for legacy data
 ✅ console.log('[Groq/Chat]') on success
@@ -405,9 +405,9 @@ Autocritique détaillée — Vérification point par point du spec:
 ✅ transportMode: baggage.transportMode || undefined passed to ChatbotWidget
 
 **PRIORITY 4: Locale files**
-✅ FR: "Je rencontre un problème technique. Veuillez contacter le SAV : support@qrbags.com"
-✅ EN: "I am experiencing a technical issue. Please contact support: support@qrbags.com"
-✅ AR: "أواجه مشكلة تقنية. يرجى التواصل مع الدعم: support@qrbags.com"
+✅ FR: "Je rencontre un problème technique. Veuillez contacter le SAV : support@qrtrans.com"
+✅ EN: "I am experiencing a technical issue. Please contact support: support@qrtrans.com"
+✅ AR: "أواجه مشكلة تقنية. يرجى التواصل مع الدعم: support@qrtrans.com"
 
 **Non-negotiable constraints:**
 ✅ groq.ts — NOT TOUCHED
@@ -572,7 +572,7 @@ Work Log:
   1. Added imports: `safeTransportMode`, `TRANSPORT_ICONS` from @/lib/transport
   2. Extract `transportMode` from baggage DB record (after null check)
   3. Pass `transportMode` to `generateWhatsAppMessage()` call
-  4. Replaced hardcoded `🚨 Alerte QRBag` fallback with transport-specific emoji + label
+  4. Replaced hardcoded `🚨 Alerte QRTrans` fallback with transport-specific emoji + label
   5. Added `transport_mode` variable to Wakit template call (emoji + localized label)
 - Fixed `src/lib/whatsapp-message.ts`:
   1. Added `transportMode?` to `PreFilledMessageParams` interface
@@ -590,7 +590,7 @@ Work Log:
 - Validation: Dev server clean compilation, no errors
 
 Self-Critique:
-- Root cause: The original implementation was flight-only (QRBag was originally for flights only). When multi-transport was added, notifications were never updated.
+- Root cause: The original implementation was flight-only (QRTrans was originally for flights only). When multi-transport was added, notifications were never updated.
 - This was NOT a bug fix — it was a MISSING FEATURE that was never implemented despite the transport mode selection being available in the UI.
 - The fix covers all 3 notification paths: AI-generated (Groq), static fallback, and pre-filled owner-to-finder messages.
 
@@ -701,7 +701,7 @@ Work Log:
 - Problem 1 (HIGH): No WhatsApp formatting (*gras*, `monospace`) in generatePreFilledMessage()
   - Fixed: Added `*...*` bold around title, CTA, and signature
   - Fixed: Added `` `...` `` monospace around reference
-  - Fixed: Updated smartTruncate signature check to match `*QRBag`
+  - Fixed: Updated smartTruncate signature check to match `*QRTrans`
 - Problem 2 (MEDIUM): 12 dead i18n keys in locale files (duplicated in whatsapp-message.ts internal constants)
   - Fixed: Removed all 12 dead keys from fr.json, en.json, ar.json
   - Keys removed: title_×4, cta_×4, bag_type_×2, see_bagage, truncated
@@ -713,10 +713,10 @@ Work Log:
     2. Length ≤ 400 chars
     3. *bold* formatting present
     4. `monospace` formatting present
-    5. Tracking link qrbags.com/suivi/[REF] present
+    5. Tracking link qrtrans.com/suivi/[REF] present
     6. Transport icon (✈️🚆🚢🚌) present
     7. Context emoji (🚨✅🚕📍) present
-    8. QRBag signature present
+    8. QRTrans signature present
     9. buildWhatsAppUrl produces valid URL
     10. Carrier info present (Air France/SNCF/MSC Fantasia/CTM)
   - Result: ALL 48 TESTS PASSED
@@ -745,11 +745,11 @@ Stage Summary:
   🚨 *URGENT — Bagage à l'aéroport de départ !*
   🧳 `VOL26-TEST99` • Soute
   ✈️ Air France AF1234 • Paris
-  👉 Voir le bagage localisé : https://qrbags.com/suivi/VOL26-TEST99
+  👉 Voir le bagage localisé : https://qrtrans.com/suivi/VOL26-TEST99
   👤 Ousmane Diallo
   📱 +221784858226
   *⏰ Appelez MAINTENANT !*
-  *QRBag – Protégez vos bagages, en toute sérénité.*
+  *QRTrans – Protégez vos bagages, en toute sérénité.*
   (278 chars, all formatting correct)
 
 ---
@@ -789,7 +789,7 @@ Work Log:
   - Auto-uppercase input, Enter key support, aria accessibility
   - Dark theme design consistent with landing page cards
   - Full i18n support via useTranslation hook
-- Modified src/app/page.tsx: added import + section between Hero and WhyQRBag
+- Modified src/app/page.tsx: added import + section between Hero and WhyQRTrans
 - Added i18n keys "home.tracking_*" to fr.json, en.json, ar.json
 - Build: 0 errors, 0 warnings
 - TypeScript: 0 new errors (pre-existing errors in other files unchanged)
@@ -797,11 +797,11 @@ Work Log:
 Stage Summary:
 - 5 files touched: 1 created, 4 modified
 - TrackingWidget is a standalone client component, zero fetch, zero dependencies
-- Positioned between Hero and WhyQRBag sections with FadeIn animation
+- Positioned between Hero and WhyQRTrans sections with FadeIn animation
 ---
 Task ID: 1
 Agent: Main Agent
-Task: Deep verification of entire qrbags project — 100% functional code test
+Task: Deep verification of entire qrtrans project — 100% functional code test
 
 Work Log:
 - Built project with `bun run build` → 0 errors, all pages and API routes compile

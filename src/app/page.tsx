@@ -192,7 +192,7 @@ function Navigation() {
             <div className="w-9 h-9 bg-gradient-to-br from-[#FF6B35] to-[#D4AF37] rounded-xl flex items-center justify-center shadow-lg shadow-orange-500/20 group-hover:shadow-orange-500/40 transition-shadow">
               <QrCode className="w-5 h-5 text-white" />
             </div>
-            <span className="text-xl font-bold text-slate-900 tracking-tight">QRBag</span>
+            <span className="text-xl font-bold text-slate-900 tracking-tight">QRTrans</span>
           </Link>
 
           <div className="hidden md:flex items-center gap-8">
@@ -275,8 +275,8 @@ function HeroSection() {
       {/* Background Image */}
       <div className="absolute inset-0">
         <Image
-          src="/hero-qrbags.png"
-          alt="Voyageuse scannant un bagage QRBag à l'aéroport"
+          src="/hero-qrtrans.png"
+          alt="Voyageuse scannant un bagage QRTrans à l'aéroport"
           fill
           className="object-cover scale-105"
           priority
@@ -330,7 +330,7 @@ function HeroSection() {
 
         <FadeIn delay={0.3}>
           <p className="text-lg sm:text-xl md:text-2xl text-white max-w-3xl mx-auto mt-6 leading-relaxed font-light drop-shadow-[0_1px_6px_rgba(0,0,0,0.5)]">
-            QRBag transforme la perte en opportunité — grâce à la technologie, la confiance, et le respect.
+            QRTrans transforme la perte en opportunité — grâce à la technologie, la confiance, et le respect.
           </p>
         </FadeIn>
 
@@ -386,9 +386,9 @@ function HeroSection() {
 }
 
 /* ══════════════════════════════════════════════
-   QRBag EN ACTION SECTION (NEW)
+   QRTrans EN ACTION SECTION (NEW)
    ══════════════════════════════════════════════ */
-function QRBagEnActionSection() {
+function QRTransEnActionSection() {
   const features = [
     'Scan instantané du QR code',
     'Notification WhatsApp en temps réel',
@@ -407,7 +407,7 @@ function QRBagEnActionSection() {
               <div className="relative rounded-2xl overflow-hidden shadow-2xl shadow-slate-200/80 border border-slate-200">
                 <Image
                   src="/images/landing-v2/qrcode-reel.jpg"
-                  alt="QR Code QRBag apposé sur un bagage"
+                  alt="QR Code QRTrans apposé sur un bagage"
                   width={1024}
                   height={1024}
                   className="w-full h-auto object-cover"
@@ -427,9 +427,9 @@ function QRBagEnActionSection() {
           {/* Right - Content */}
           <FadeIn direction="left" delay={0.2}>
             <div>
-              <span className="text-sm font-semibold tracking-[0.2em] uppercase text-orange-500 mb-4 block">QRBag en action</span>
+              <span className="text-sm font-semibold tracking-[0.2em] uppercase text-orange-500 mb-4 block">QRTrans en action</span>
               <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900 mb-6 tracking-tight leading-tight">
-                QRBag en action <span className="inline-block">🎯</span>
+                QRTrans en action <span className="inline-block">🎯</span>
               </h2>
               <p className="text-lg text-slate-600 leading-relaxed mb-8">
                 Scannez, activez, voyagez. Notre technologie QR code brevetée permet à n&apos;importe qui de signaler un bagage trouvé en un seul geste. Vous recevez instantanément une notification avec la localisation exacte de votre valise.
@@ -490,7 +490,7 @@ function TransportModesSection() {
     },
     {
       title: 'Bateau',
-      description: 'Croisières et ferrys — QRBag protège vos bagages sur tous les mers du monde.',
+      description: 'Croisières et ferrys — QRTrans protège vos bagages sur tous les mers du monde.',
       image: '/images/landing-v2/transport-bateau.jpg',
       stat: '30M croisiéristes',
       icon: Ship,
@@ -513,7 +513,7 @@ function TransportModesSection() {
             Une protection pour tous vos voyages
           </h2>
           <p className="text-lg text-slate-600 max-w-2xl mx-auto leading-relaxed">
-            Avion, train, bateau, bus — QRBag vous suit partout.
+            Avion, train, bateau, bus — QRTrans vous suit partout.
           </p>
         </FadeIn>
 
@@ -554,14 +554,14 @@ function TransportModesSection() {
 }
 
 /* ══════════════════════════════════════════════
-   POURQUOI QRBAG (LIGHT THEME)
+   POURQUOI QRTRANS (LIGHT THEME)
    ══════════════════════════════════════════════ */
-function WhyQRBagSection() {
+function WhyQRTransSection() {
   const cards = [
     {
       icon: Globe,
       title: 'Ancré en Afrique, pensé pour le monde',
-      description: 'Né à Dakar, déployé dans 15 pays. QRBag comprend les réalités du voyage africain et international avec une solution adaptée à chaque contexte.',
+      description: 'Né à Dakar, déployé dans 15 pays. QRTrans comprend les réalités du voyage africain et international avec une solution adaptée à chaque contexte.',
     },
     {
       icon: Shield,
@@ -579,7 +579,7 @@ function WhyQRBagSection() {
     <section className="relative py-24 lg:py-32 px-4 bg-white">
       <div className="max-w-6xl mx-auto relative z-10">
         <FadeIn className="text-center mb-16">
-          <span className="text-sm font-semibold tracking-[0.2em] uppercase text-[#D4AF37] mb-4 block">Pourquoi QRBag</span>
+          <span className="text-sm font-semibold tracking-[0.2em] uppercase text-[#D4AF37] mb-4 block">Pourquoi QRTrans</span>
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900 mb-5 tracking-tight leading-tight">
             La confiance, au-delà<br className="hidden sm:block" /> des frontières
           </h2>
@@ -659,7 +659,7 @@ function SolutionsSection() {
             Deux solutions, une protection
           </h2>
           <p className="text-lg text-slate-600 max-w-2xl mx-auto leading-relaxed">
-            Que vous soyez pèlerin ou voyageur, QRBag s&apos;adapte à vos besoins avec des solutions sur mesure.
+            Que vous soyez pèlerin ou voyageur, QRTrans s&apos;adapte à vos besoins avec des solutions sur mesure.
           </p>
         </FadeIn>
 
@@ -819,14 +819,14 @@ function TestimonialsSection() {
     {
       name: 'Mamadou Diallo',
       role: 'Pèlerin Hajj 2025',
-      content: 'Grâce à QRBag, j\'ai retrouvé ma valise à Djeddah en moins de 2 heures. Une invention géniale qui devrait être obligatoire pour tous les pèlerins.',
+      content: 'Grâce à QRTrans, j\'ai retrouvé ma valise à Djeddah en moins de 2 heures. Une invention géniale qui devrait être obligatoire pour tous les pèlerins.',
       image: '/images/testimonial-1.png',
       initials: 'MD',
     },
     {
       name: 'Sophie Martin',
       role: 'Voyageuse fréquente',
-      content: 'Simple, efficace et pas cher. J\'ai utilisé QRBag pour tous mes voyages cette année. Plus de stress à l\'aéroport, enfin !',
+      content: 'Simple, efficace et pas cher. J\'ai utilisé QRTrans pour tous mes voyages cette année. Plus de stress à l\'aéroport, enfin !',
       image: '/images/testimonial-2.png',
       initials: 'SM',
     },
@@ -1011,7 +1011,7 @@ function FinalCTASection() {
             Ne laissez pas un bagage<br className="hidden sm:block" /> gâcher un voyage.
           </h2>
           <p className="text-lg text-slate-600 max-w-2xl mx-auto mb-10 leading-relaxed">
-            Rejoignez 10 000+ voyageurs qui protègent leurs bagages avec QRBag. Activation en 30 secondes, tranquillité pour tous vos voyages.
+            Rejoignez 10 000+ voyageurs qui protègent leurs bagages avec QRTrans. Activation en 30 secondes, tranquillité pour tous vos voyages.
           </p>
 
           <Link href="/contact">
@@ -1109,20 +1109,20 @@ function Footer() {
               <div className="w-9 h-9 bg-gradient-to-br from-[#FF6B35] to-[#D4AF37] rounded-xl flex items-center justify-center shadow-lg shadow-orange-500/15">
                 <QrCode className="w-5 h-5 text-white" />
               </div>
-              <span className="text-xl font-bold text-white tracking-tight">QRBag</span>
+              <span className="text-xl font-bold text-white tracking-tight">QRTrans</span>
             </div>
             <p className="text-sm leading-relaxed max-w-xs text-slate-400 mb-6">
               Protection intelligente des bagages pour voyageurs et pèlerins.
             </p>
             {/* Social */}
             <div className="flex items-center gap-3">
-              <a href="https://facebook.com/qrbag" target="_blank" rel="noopener noreferrer" className="w-9 h-9 bg-slate-800 border border-slate-700 rounded-full flex items-center justify-center hover:bg-[#D4AF37]/10 hover:border-[#D4AF37]/30 transition-all duration-300" aria-label="Facebook">
+              <a href="https://facebook.com/qrtrans" target="_blank" rel="noopener noreferrer" className="w-9 h-9 bg-slate-800 border border-slate-700 rounded-full flex items-center justify-center hover:bg-[#D4AF37]/10 hover:border-[#D4AF37]/30 transition-all duration-300" aria-label="Facebook">
                 <Facebook className="w-4 h-4 text-slate-400 hover:text-[#D4AF37]" />
               </a>
-              <a href="https://instagram.com/qrbag" target="_blank" rel="noopener noreferrer" className="w-9 h-9 bg-slate-800 border border-slate-700 rounded-full flex items-center justify-center hover:bg-[#D4AF37]/10 hover:border-[#D4AF37]/30 transition-all duration-300" aria-label="Instagram">
+              <a href="https://instagram.com/qrtrans" target="_blank" rel="noopener noreferrer" className="w-9 h-9 bg-slate-800 border border-slate-700 rounded-full flex items-center justify-center hover:bg-[#D4AF37]/10 hover:border-[#D4AF37]/30 transition-all duration-300" aria-label="Instagram">
                 <Instagram className="w-4 h-4 text-slate-400 hover:text-[#D4AF37]" />
               </a>
-              <a href="https://twitter.com/qrbag" target="_blank" rel="noopener noreferrer" className="w-9 h-9 bg-slate-800 border border-slate-700 rounded-full flex items-center justify-center hover:bg-[#D4AF37]/10 hover:border-[#D4AF37]/30 transition-all duration-300" aria-label="Twitter">
+              <a href="https://twitter.com/qrtrans" target="_blank" rel="noopener noreferrer" className="w-9 h-9 bg-slate-800 border border-slate-700 rounded-full flex items-center justify-center hover:bg-[#D4AF37]/10 hover:border-[#D4AF37]/30 transition-all duration-300" aria-label="Twitter">
                 <Twitter className="w-4 h-4 text-slate-400 hover:text-[#D4AF37]" />
               </a>
             </div>
@@ -1150,7 +1150,7 @@ function Footer() {
         {/* Bottom */}
         <div className="border-t border-slate-700 mt-12 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4">
           <p className="text-xs text-slate-500">
-            &copy; {new Date().getFullYear()} QRBag. Tous droits réservés.
+            &copy; {new Date().getFullYear()} QRTrans. Tous droits réservés.
           </p>
           <a
             href="https://maps.google.com/?q=Poissy+France"
@@ -1177,7 +1177,7 @@ export default function Home() {
       <StickySearchBar />
       <HeroSection />
 
-      <QRBagEnActionSection />
+      <QRTransEnActionSection />
       <TransportModesSection />
 
       {/* ══════════════════════════════════════════════
@@ -1189,7 +1189,7 @@ export default function Home() {
         </FadeIn>
       </section>
 
-      <WhyQRBagSection />
+      <WhyQRTransSection />
       <SolutionsSection />
       <StatsSection />
       <HowItWorksSection />

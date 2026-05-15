@@ -127,9 +127,9 @@ function SuccessContent() {
       ctx.textAlign = 'center';
       ctx.fillText('✓ Activation Réussie', canvas.width / 2, 100);
 
-      // Draw QRBag logo text
+      // Draw QRTrans logo text
       ctx.font = 'bold 24px Arial';
-      ctx.fillText('QRBag', canvas.width / 2, 150);
+      ctx.fillText('QRTrans', canvas.width / 2, 150);
 
       // Draw QR code area (white background)
       ctx.fillStyle = '#ffffff';
@@ -206,12 +206,12 @@ function SuccessContent() {
         // Footer
         ctx.font = '14px Arial';
         ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
-        ctx.fillText('QRBag - Protégez vos bagages, en toute sérénité', canvas.width / 2, 850);
-        ctx.fillText('www.qrbag.com', canvas.width / 2, 880);
+        ctx.fillText('QRTrans - Protégez vos bagages, en toute sérénité', canvas.width / 2, 850);
+        ctx.fillText('www.qrtrans.com', canvas.width / 2, 880);
 
         // Download
         const link = document.createElement('a');
-        link.download = `QRBag-${activationData.reference}.png`;
+        link.download = `QRTrans-${activationData.reference}.png`;
         link.href = canvas.toDataURL('image/png');
         link.click();
 
@@ -246,8 +246,8 @@ function SuccessContent() {
 
     const trackingUrl = typeof window !== 'undefined' ? `${window.location.origin}/suivi/${activationData.reference}` : '';
     const shareData = {
-      title: 'QRBag - Preuve d\'activation',
-      text: `Mon bagage ${activationData.reference} est protégé par QRBag. Voici votre lien de suivi :`,
+      title: 'QRTrans - Preuve d\'activation',
+      text: `Mon bagage ${activationData.reference} est protégé par QRTrans. Voici votre lien de suivi :`,
       url: trackingUrl,
     };
 
@@ -509,7 +509,7 @@ function SuccessContent() {
 
         {/* Footer */}
         <div className="text-center mt-6 text-white/50 text-sm">
-          <p>Un problème ? <a href="mailto:contact@qrbag.com" className="underline">contact@qrbag.com</a></p>
+          <p>Un problème ? <a href="mailto:contact@qrtrans.com" className="underline">contact@qrtrans.com</a></p>
         </div>
       </div>
     </main>

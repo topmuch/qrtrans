@@ -28,13 +28,13 @@ async function main() {
 
   // Créer l'utilisateur SuperAdmin
   const admin = await prisma.user.upsert({
-    where: { email: 'admin@qrbag.com' },
+    where: { email: 'admin@qrtrans.com' },
     update: {
       password: adminPassword,
       role: 'superadmin',
     },
     create: {
-      email: 'admin@qrbag.com',
+      email: 'admin@qrtrans.com',
       name: 'Super Admin',
       password: adminPassword,
       role: 'superadmin',
@@ -45,14 +45,14 @@ async function main() {
 
   // Créer l'utilisateur Agence
   const agencyUser = await prisma.user.upsert({
-    where: { email: 'agence@qrbag.com' },
+    where: { email: 'agence@qrtrans.com' },
     update: {
       password: agencyPassword,
       role: 'agency',
       agencyId: agency.id,
     },
     create: {
-      email: 'agence@qrbag.com',
+      email: 'agence@qrtrans.com',
       name: 'Admin Agence Test',
       password: agencyPassword,
       role: 'agency',
@@ -64,8 +64,8 @@ async function main() {
 
   console.log('\n🎉 Comptes de test prêts !');
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-  console.log('🔐 Admin: admin@qrbag.com / admin123');
-  console.log('🏢 Agence: agence@qrbag.com / agence123');
+  console.log('🔐 Admin: admin@qrtrans.com / admin123');
+  console.log('🏢 Agence: agence@qrtrans.com / agence123');
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
 }
 

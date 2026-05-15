@@ -48,7 +48,7 @@ const CONFIGS: Record<LoginVariant, LoginConfig> = {
     type: 'agence',
     title: 'Espace Agence',
     subtitle: 'Connectez-vous à votre dashboard sécurisé',
-    demoEmail: 'agence@qrbag.com',
+    demoEmail: 'agence@qrtrans.com',
     demoPassword: 'agence123',
     demoLabel: 'Agence',
     role: 'agency',
@@ -58,7 +58,7 @@ const CONFIGS: Record<LoginVariant, LoginConfig> = {
     accentHoverClass: 'hover:text-orange-600',
     accentFocusRing: 'focus:ring-orange-500',
     badgeText: 'Agence',
-    leftTitle: 'QRBag pour les professionnels du voyage',
+    leftTitle: 'QRTrans pour les professionnels du voyage',
     leftSubtitle: 'Gérez vos bagages, vos clients, vos QR — depuis un seul tableau de bord.',
     switchText: 'Vous êtes administrateur ?',
     switchLink: 'Connexion SuperAdmin',
@@ -74,7 +74,7 @@ const CONFIGS: Record<LoginVariant, LoginConfig> = {
     type: 'superadmin',
     title: 'Espace Administrateur',
     subtitle: 'Connexion sécurisée réservée aux administrateurs',
-    demoEmail: 'admin@qrbag.com',
+    demoEmail: 'admin@qrtrans.com',
     demoPassword: 'admin123',
     demoLabel: 'SuperAdmin',
     role: 'superadmin',
@@ -84,7 +84,7 @@ const CONFIGS: Record<LoginVariant, LoginConfig> = {
     accentHoverClass: 'hover:text-purple-700',
     accentFocusRing: 'focus:ring-purple-500',
     badgeText: 'Admin',
-    leftTitle: 'QRBag — Contrôle centralisé',
+    leftTitle: 'QRTrans — Contrôle centralisé',
     leftSubtitle: 'Gérez agences, QR codes, utilisateurs et API — tout depuis un seul tableau de bord.',
     switchText: 'Vous êtes une agence ?',
     switchLink: 'Connexion Agence',
@@ -163,7 +163,7 @@ export default function LoginPage({ variant }: { variant: LoginVariant }) {
         {/* Background Image */}
         <Image
           src={config.bgImage}
-          alt="QRBag"
+          alt="QRTrans"
           fill
           className="object-cover"
           priority
@@ -181,7 +181,7 @@ export default function LoginPage({ variant }: { variant: LoginVariant }) {
               <div className="w-10 h-10 bg-white/15 backdrop-blur-md rounded-xl flex items-center justify-center border border-white/20">
                 <QrCode className="w-5 h-5 text-white" />
               </div>
-              <span className="text-xl font-bold text-white tracking-tight">QRBag</span>
+              <span className="text-xl font-bold text-white tracking-tight">QRTrans</span>
             </Link>
           </div>
 
@@ -229,7 +229,7 @@ export default function LoginPage({ variant }: { variant: LoginVariant }) {
             }`}>
               <QrCode className="w-5 h-5 text-white" />
             </div>
-            <span className="text-xl font-bold text-slate-800 tracking-tight">QRBag</span>
+            <span className="text-xl font-bold text-slate-800 tracking-tight">QRTrans</span>
           </div>
 
           {/* Mobile badge */}
@@ -273,7 +273,7 @@ export default function LoginPage({ variant }: { variant: LoginVariant }) {
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full px-4 py-3 rounded-lg border border-slate-200 bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:border-transparent transition text-sm"
                 style={{ '--tw-ring-color': isAgence ? '#f97316' : '#7e22ce' } as React.CSSProperties}
-                placeholder={variant === 'agence' ? 'vous@agence.com' : 'admin@qrbag.com'}
+                placeholder={variant === 'agence' ? 'vous@agence.com' : 'admin@qrtrans.com'}
                 required
               />
             </div>

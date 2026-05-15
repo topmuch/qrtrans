@@ -120,7 +120,7 @@ export async function GET(
       }
     });
 
-    // AI-FEATURE: Set qrbag_locale cookie (7 days) so server can detect language on next request
+    // AI-FEATURE: Set qrtrans_locale cookie (7 days) so server can detect language on next request
     try {
       response.cookies.set(LANGUAGE_COOKIE_NAME, detectedLocale, {
         path: '/',
@@ -274,7 +274,7 @@ export async function POST(
             minute: '2-digit',
           });
 
-          const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://qrbags.com';
+          const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://qrtrans.com';
 
           const aiResult = await generateWhatsAppMessage({
             reference: baggage.reference,
@@ -402,7 +402,7 @@ export async function POST(
 
       const urgencyPrefix = isDeclaredLost
         ? '🚨 URGENT - Bagage perdu retrouvé !'
-        : '🔍 QRBag - Bagage trouvé !';
+        : '🔍 QRTrans - Bagage trouvé !';
 
       whatsappText = `${urgencyPrefix}\n\n📦 Référence: ${reference}\n${locationText}\n${finderText}\n${finderPhoneText}\n${messageText}\n\nMerci de contacter la personne qui a trouvé votre bagage.`;
     }

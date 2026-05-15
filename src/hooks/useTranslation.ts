@@ -32,21 +32,21 @@ export function useTranslation(): UseTranslationReturn {
     const detectLanguage = async () => {
       // 1. Check localStorage first for explicit user preference
       if (typeof localStorage !== 'undefined') {
-        const savedLang = localStorage.getItem('qrbag_lang') as Language | null;
+        const savedLang = localStorage.getItem('qrtrans_lang') as Language | null;
         if (savedLang && ['fr', 'en', 'ar'].includes(savedLang)) {
           setLangState(savedLang);
           return;
         }
       }
 
-      // 2. Check server-set cookie (qrbag_locale) — set by /api/scan GET route
+      // 2. Check server-set cookie (qrtrans_locale) — set by /api/scan GET route
       if (typeof document !== 'undefined') {
-        const cookieMatch = document.cookie.match(/qrbag_locale=(fr|en|ar)/);
+        const cookieMatch = document.cookie.match(/qrtrans_locale=(fr|en|ar)/);
         if (cookieMatch?.[1]) {
           const cookieLang = cookieMatch[1] as Language;
           setLangState(cookieLang);
           // Sync to localStorage for persistence across sessions
-          localStorage.setItem('qrbag_lang', cookieLang);
+          localStorage.setItem('qrtrans_lang', cookieLang);
           return;
         }
       }
@@ -111,7 +111,7 @@ export function useTranslation(): UseTranslationReturn {
   const setLang = useCallback((newLang: Language) => {
     setLangState(newLang);
     if (typeof localStorage !== 'undefined') {
-      localStorage.setItem('qrbag_lang', newLang);
+      localStorage.setItem('qrtrans_lang', newLang);
     }
   }, []);
 
