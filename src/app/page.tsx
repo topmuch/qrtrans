@@ -8,10 +8,6 @@ import { Button } from "@/components/ui/button";
 import Image from 'next/image';
 import { motion, useInView } from 'framer-motion';
 
-const LandingChatbotWidget = dynamic(
-  () => import('@/components/finder/LandingChatbotWidget'),
-  { ssr: false, loading: () => null }
-);
 import TrackingWidget from '@/components/home/TrackingWidget';
 import {
   Plane,
@@ -1198,7 +1194,6 @@ export default function Home() {
       <FinalCTASection />
       <ContactCTASection />
       <Footer />
-      <LandingChatbotWidget />
     </main>
   );
 }
