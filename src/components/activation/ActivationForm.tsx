@@ -20,19 +20,33 @@ export default function ActivationForm({ qrCode, lang }: ActivationFormProps) {
   const [errorCode, setErrorCode] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState('');
 
-  // Voyage
+  // Voyage (Card 1)
   const [transportType, setTransportType] = useState('');
   const [company, setCompany] = useState('');
   const [departureCity, setDepartureCity] = useState('');
   const [arrivalCity, setArrivalCity] = useState('');
   const [departureDate, setDepartureDate] = useState('');
   const [departureTime, setDepartureTime] = useState('');
+  const [pickupAddress, setPickupAddress] = useState('');
+  const [estimatedArrival, setEstimatedArrival] = useState('');
+  const [paymentStatus, setPaymentStatus] = useState('');
 
-  // Sender
+  // Sender (Card 2)
   const [senderName, setSenderName] = useState('');
   const [senderPhone, setSenderPhone] = useState('');
 
-  // Receiver
+  // Baggage (Card 2)
+  const [baggageType, setBaggageType] = useState('');
+  const [baggageTypeOther, setBaggageTypeOther] = useState('');
+  const [baggageWeight, setBaggageWeight] = useState('');
+  const [baggageDimensions, setBaggageDimensions] = useState('');
+  const [baggageColor, setBaggageColor] = useState('');
+  const [contentCategory, setContentCategory] = useState('');
+  const [declaredValue, setDeclaredValue] = useState('');
+  const [isFragile, setIsFragile] = useState(false);
+  const [hasProhibited, setHasProhibited] = useState(false);
+
+  // Receiver (Card 3)
   const [receiverName, setReceiverName] = useState('');
   const [receiverPhone, setReceiverPhone] = useState('');
 
@@ -54,6 +68,7 @@ export default function ActivationForm({ qrCode, lang }: ActivationFormProps) {
   };
 
   const validateAll = (): string | null => {
+    // Card 1: Itinerary
     if (!transportType) return t('Sélectionnez le type de transport.', 'Select the transport type.');
     if (!company.trim()) return t('Saisissez la compagnie.', 'Enter the transport company.');
     if (!departureCity.trim()) return t('Saisissez la ville de départ.', 'Enter the departure city.');
@@ -67,10 +82,20 @@ export default function ActivationForm({ qrCode, lang }: ActivationFormProps) {
       return t('La date ne peut pas être dans le passé.', 'Date cannot be in the past.');
     }
 
+    if (!paymentStatus) return t('Sélectionnez le statut de paiement.', 'Select the payment status.');
+
+    // Card 2: Sender & Baggage
     if (!senderName.trim()) return t("Saisissez le nom de l'expéditeur.", "Enter the sender's name.");
     const sErr = validatePhone(senderPhone);
     if (sErr) { setSenderPhoneError(sErr); return sErr; }
 
+    if (!baggageType) return t('Sélectionnez le type de bagage.', 'Select the baggage type.');
+    if (baggageType === 'OTHER' && !baggageTypeOther.trim()) return t('Précisez le type de bagage.', 'Specify the baggage type.');
+
+    // Prohibited items block
+    if (hasProhibited) return t("Les produits interdits (inflammables, liquides >100ml, armes) ne sont pas acceptés. Veuillez modifier.", 'Prohibited items (flammables, liquids >100ml, weapons) are not accepted. Please modify.');
+
+    // Card 3: Receiver
     if (!receiverName.trim()) return t('Saisissez le nom du destinataire.', "Enter the receiver's name.");
     const rErr = validatePhone(receiverPhone);
     if (rErr) { setReceiverPhoneError(rErr); return rErr; }
@@ -104,6 +129,9 @@ export default function ActivationForm({ qrCode, lang }: ActivationFormProps) {
         departure_city: departureCity.trim(),
         arrival_city: arrivalCity.trim(),
         departure_datetime: departureDatetime,
+        pickup_address: pickupAddress.trim() || undefined,
+        estimated_arrival: estimatedArrival || undefined,
+        payment_status: paymentStatus as 'SENDER_PAID' | 'RECEIVER_PAY',
         sender: {
           name: senderName.trim(),
           phone: senderPhone.replace(/\s/g, ''),
@@ -111,6 +139,17 @@ export default function ActivationForm({ qrCode, lang }: ActivationFormProps) {
         receiver: {
           name: receiverName.trim(),
           phone: receiverPhone.replace(/\s/g, ''),
+        },
+        baggage: {
+          type: baggageType,
+          typeOther: baggageType === 'OTHER' ? baggageTypeOther.trim() : undefined,
+          weight: baggageWeight ? parseFloat(baggageWeight) : undefined,
+          dimensions: baggageDimensions.trim() || undefined,
+          color: baggageColor.trim() || undefined,
+          contentCategory: contentCategory || undefined,
+          declaredValue: declaredValue ? parseFloat(declaredValue) : undefined,
+          isFragile,
+          hasProhibited,
         },
       };
 
@@ -161,8 +200,20 @@ export default function ActivationForm({ qrCode, lang }: ActivationFormProps) {
     setArrivalCity('');
     setDepartureDate('');
     setDepartureTime('');
+    setPickupAddress('');
+    setEstimatedArrival('');
+    setPaymentStatus('');
     setSenderName('');
     setSenderPhone('');
+    setBaggageType('');
+    setBaggageTypeOther('');
+    setBaggageWeight('');
+    setBaggageDimensions('');
+    setBaggageColor('');
+    setContentCategory('');
+    setDeclaredValue('');
+    setIsFragile(false);
+    setHasProhibited(false);
     setReceiverName('');
     setReceiverPhone('');
     setWaSenderUrl('');
@@ -191,6 +242,13 @@ export default function ActivationForm({ qrCode, lang }: ActivationFormProps) {
         waReceiverUrl={waReceiverUrl}
         lang={lang}
         onReset={handleReset}
+        // New baggage fields
+        baggageType={baggageType}
+        baggageTypeOther={baggageTypeOther}
+        baggageWeight={baggageWeight}
+        isFragile={isFragile}
+        paymentStatus={paymentStatus}
+        pickupAddress={pickupAddress}
       />
     );
   }
@@ -257,7 +315,7 @@ export default function ActivationForm({ qrCode, lang }: ActivationFormProps) {
         </div>
       )}
 
-      {/* PARTIE 1 : LE VOYAGE */}
+      {/* CARTE 1 : ITINÉRAIRE & RETRAIT */}
       <VoyageSection
         transportType={transportType} setTransportType={setTransportType}
         company={company} setCompany={setCompany}
@@ -265,18 +323,30 @@ export default function ActivationForm({ qrCode, lang }: ActivationFormProps) {
         arrivalCity={arrivalCity} setArrivalCity={setArrivalCity}
         departureDate={departureDate} setDepartureDate={setDepartureDate}
         departureTime={departureTime} setDepartureTime={setDepartureTime}
+        pickupAddress={pickupAddress} setPickupAddress={setPickupAddress}
+        estimatedArrival={estimatedArrival} setEstimatedArrival={setEstimatedArrival}
+        paymentStatus={paymentStatus} setPaymentStatus={setPaymentStatus}
         lang={lang}
       />
 
-      {/* PARTIE 2 : L'ENVOYEUR */}
+      {/* CARTE 2 : EXPÉDITEUR & COLIS */}
       <SenderSection
         senderName={senderName} setSenderName={setSenderName}
         senderPhone={senderPhone} setSenderPhone={setSenderPhone}
         phoneError={senderPhoneError}
         lang={lang}
+        baggageType={baggageType} setBaggageType={setBaggageType}
+        baggageTypeOther={baggageTypeOther} setBaggageTypeOther={setBaggageTypeOther}
+        baggageWeight={baggageWeight} setBaggageWeight={setBaggageWeight}
+        baggageDimensions={baggageDimensions} setBaggageDimensions={setBaggageDimensions}
+        baggageColor={baggageColor} setBaggageColor={setBaggageColor}
+        contentCategory={contentCategory} setContentCategory={setContentCategory}
+        declaredValue={declaredValue} setDeclaredValue={setDeclaredValue}
+        isFragile={isFragile} setIsFragile={setIsFragile}
+        hasProhibited={hasProhibited} setHasProhibited={setHasProhibited}
       />
 
-      {/* PARTIE 3 : LE RECEVEUR */}
+      {/* CARTE 3 : DESTINATAIRE */}
       <ReceiverSection
         receiverName={receiverName} setReceiverName={setReceiverName}
         receiverPhone={receiverPhone} setReceiverPhone={setReceiverPhone}
@@ -297,7 +367,7 @@ export default function ActivationForm({ qrCode, lang }: ActivationFormProps) {
               {t('Enregistrement...', 'Registering...')}
             </>
           ) : (
-            <>✅ {t('VALIDER ET ACTIVER LE COLIS', 'VALIDATE AND ACTIVATE PACKAGE')}</>
+            <>✅ {t('ACTIVER LE COLIS & GÉNÉRER LES NOTIFICATIONS', 'ACTIVATE PACKAGE & SEND NOTIFICATIONS')}</>
           )}
         </button>
 

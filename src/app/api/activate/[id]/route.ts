@@ -15,14 +15,36 @@ const receiverSchema = z.object({
   phone: z.string().regex(WHATSAPP_REGEX, 'Format WhatsApp invalide (ex: +221761234567)'),
 });
 
+const baggageSchema = z.object({
+  type: z.enum(['VALISE', 'SAC', 'CARTON', 'BACKPACK', 'CABIN', 'OTHER']),
+  typeOther: z.string().optional(),
+  weight: z.number().min(0.1, 'Le poids doit être positif').optional(),
+  dimensions: z.string().optional(),
+  color: z.string().optional(),
+  contentCategory: z.enum(['CLOTHES', 'DOCS', 'ELECTRONICS', 'FOOD', 'GIFTS', 'OTHER']).optional(),
+  declaredValue: z.number().min(0).optional(),
+  isFragile: z.boolean().default(false),
+  hasProhibited: z.boolean().default(false),
+}).refine(
+  (data) => !(data.type === 'OTHER' && (!data.typeOther || data.typeOther.trim().length === 0)),
+  { message: 'Veuillez préciser le type de bagage', path: ['typeOther'] }
+).refine(
+  (data) => data.hasProhibited === false,
+  { message: "Les produits interdits (inflammables, liquides >100ml, armes) ne sont pas acceptés.", path: ['hasProhibited'] }
+);
+
 const activateSchema = z.object({
   transport_type: z.enum(['GP', 'BUS'], { message: 'Le type de transport est obligatoire' }),
   company_name: z.string().min(1, 'La compagnie est obligatoire'),
   departure_city: z.string().min(1, 'La ville de départ est obligatoire'),
   arrival_city: z.string().min(1, "La ville d'arrivée est obligatoire"),
   departure_datetime: z.string().min(1, 'La date/heure de départ est obligatoire'),
+  pickup_address: z.string().optional(),
+  estimated_arrival: z.string().optional(),
+  payment_status: z.enum(['SENDER_PAID', 'RECEIVER_PAY'], { message: 'Le statut de paiement est obligatoire' }),
   sender: senderSchema,
   receiver: receiverSchema,
+  baggage: baggageSchema,
 });
 
 export async function POST(
@@ -102,12 +124,25 @@ export async function POST(
     const depDate = depDateTime.toISOString().split('T')[0];
     const depTime = depDateTime.toTimeString().slice(0, 5);
 
+    // Baggage type label for display
+    const baggageTypeLabels: Record<string, string> = {
+      VALISE: 'Valise', SAC: 'Sac', CARTON: 'Carton',
+      BACKPACK: 'Sac à dos', CABIN: 'Bagage cabine', OTHER: data.baggage.typeOther || 'Autre',
+    };
+    const baggageTypeLabel = baggageTypeLabels[data.baggage.type] || data.baggage.type;
+
+    // Payment status labels
+    const paymentLabels: Record<string, string> = {
+      SENDER_PAID: '✅ Payé par l\'expéditeur',
+      RECEIVER_PAY: '💸 À payer par le destinataire',
+    };
+
     // Update colis in DB — status → in_transit
     const updated = await db.baggage.update({
       where: { id: colis.id },
       data: {
         status: 'in_transit',
-        transportMode: data.transport_type === 'GP' ? 'bus' : 'bus',
+        transportMode: 'bus',
         busCompany: data.company_name,
         departureCity: data.departure_city,
         destination: data.arrival_city,
@@ -118,6 +153,20 @@ export async function POST(
         receiverName: data.receiver.name,
         receiverWhatsapp: data.receiver.phone,
         expiresAt,
+        // New logistics fields
+        pickupAddress: data.pickup_address || null,
+        estimatedArrival: data.estimated_arrival || null,
+        paymentStatus: data.payment_status,
+        // New baggage fields
+        colisType: data.baggage.type,
+        colisTypeOther: data.baggage.type === 'OTHER' ? (data.baggage.typeOther || null) : null,
+        colisWeight: data.baggage.weight ?? null,
+        colisDimensions: data.baggage.dimensions || null,
+        colisColor: data.baggage.color || null,
+        contentCategory: data.baggage.contentCategory || null,
+        declaredValue: data.baggage.declaredValue ?? null,
+        isFragile: data.baggage.isFragile,
+        hasProhibited: data.baggage.hasProhibited,
       },
     });
 
@@ -142,22 +191,55 @@ export async function POST(
     });
     const formattedTime = depTime;
 
+    // Build baggage description line
+    const baggageDesc = `${baggageTypeLabel}${data.baggage.weight ? ` (${data.baggage.weight}kg)` : ''}${data.baggage.isFragile ? ' ⚠️ Fragile' : ''}`;
+
+    // Build pickup line
+    const pickupLine = data.pickup_address ? `\n📍 Retrait : ${data.pickup_address}` : '';
+
+    // Build ETA line
+    const etaLine = data.estimated_arrival ? `\n🕐 Arrivée estimée : ${data.estimated_arrival}` : '';
+
+    // Build payment line
+    const paymentLine = `\n💰 Paiement : ${paymentLabels[data.payment_status]}`;
+
     // Sender wa.me message (no PIN)
     const senderMessage = `🟢 *QRTrans — Colis en Partance*
 
 Bonjour *${data.sender.name}*,
-Votre colis ${updated.reference} pour ${data.arrival_city} est en route avec ${data.company_name}.
-🚌 Départ : ${formattedDate} à ${formattedTime}
-🔗 Suivi : ${trackingUrl}`;
+Votre colis a été pris en charge et est en cours de route.
+
+📦 Référence : *${updated.reference}*
+🧳 Colis : ${baggageDesc}
+🚌 Compagnie : ${data.company_name}
+📍 Trajet : ${data.departure_city} → ${data.arrival_city}
+🕐 Départ : ${formattedDate} à ${formattedTime}${etaLine}${pickupLine}${paymentLine}
+
+Vous recevrez une confirmation à l'arrivée.
+Merci d'avoir utilisé QRTrans. 🙏
+
+────────
+🔗 Suivre : ${trackingUrl}`;
 
     // Receiver wa.me message (WITH PIN)
     const receiverMessage = `🔵 *QRTrans — Colis en Transit*
 
-Bonjour *${data.receiver.name}*,
-Un colis de ${data.sender.name} arrive à ${data.arrival_city}.
-🔐 *Code de retrait à présenter au chauffeur : ${pin}*
+Bonjour *${data.receiver_name}*,
+Un colis vous étant destiné est en route.
+
+📦 Référence : *${updated.reference}*
+🧳 Colis : ${baggageDesc}
+👤 Expéditeur : ${data.sender.name}
+🚌 Compagnie : ${data.company_name}
+📍 Destination : ${data.arrival_city}${etaLine}${pickupLine}${paymentLine}
+🔐 *Code de retrait : ${pin}*
 Conservez ce code. Il sera exigé à l'arrivée.
-🔗 Suivi : ${trackingUrl}`;
+
+Vous serez notifié dès l'arrivée pour le retrait.
+À très bientôt ! 🤝
+
+────────
+🔗 Suivre : ${trackingUrl}`;
 
     const wa_sender = generateWaMeLink(cleanPhone(data.sender.phone), senderMessage);
     const wa_receiver = generateWaMeLink(cleanPhone(data.receiver.phone), receiverMessage);

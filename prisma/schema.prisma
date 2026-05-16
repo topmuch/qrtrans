@@ -120,6 +120,24 @@ model Baggage {
   deliveryNotes     String?   // Notes du chauffeur à l'arrivée
   deliveredAt       DateTime? // Date/heure de livraison confirmée (PIN validé)
 
+  // LOGISTICS: Itinerary & Payment
+  pickupAddress     String?   // Adresse de récupération précise
+  estimatedArrival  String?   // Heure d'arrivée estimée (HH:mm)
+  paymentStatus     String    @default("SENDER_PAID") // "SENDER_PAID" | "RECEIVER_PAY"
+
+  // BAGGAGE: Type & Physical description
+  colisType         String?   // "VALISE" | "SAC" | "CARTON" | "BACKPACK" | "CABIN" | "OTHER"
+  colisTypeOther    String?   // Description libre si OTHER
+  colisWeight       Float?    // Poids en kg
+  colisDimensions   String?   // "Lxlxh" en cm
+  colisColor        String?   // Couleur dominante
+
+  // BAGGAGE: Content & Value
+  contentCategory   String?   // "CLOTHES" | "DOCS" | "ELECTRONICS" | "FOOD" | "GIFTS" | "OTHER"
+  declaredValue     Float?    // Valeur déclarée en FCFA
+  isFragile         Boolean   @default(false)
+  hasProhibited     Boolean   @default(false)
+
   // PIN-FEATURE: Secure retrieval PIN
   retrievalPin      String?   // PIN à 6 chiffres pour le retrait du colis
   pinVerified       Boolean   @default(false) // true quand le PIN a été validé

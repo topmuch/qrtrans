@@ -21,7 +21,19 @@ interface SuccessScreenProps {
   waReceiverUrl?: string;
   lang: 'fr' | 'en';
   onReset: () => void;
+  // New baggage fields
+  baggageType: string;
+  baggageTypeOther?: string;
+  baggageWeight?: string;
+  isFragile?: boolean;
+  paymentStatus?: string;
+  pickupAddress?: string;
 }
+
+const BAGGAGE_TYPE_LABELS: Record<string, string> = {
+  VALISE: '🧳 Valise', SAC: '👜 Sac', CARTON: '📦 Carton',
+  BACKPACK: '🎒 Sac à dos', CABIN: '✈️ Bagage cabine', OTHER: '📦 Autre',
+};
 
 export default function SuccessScreen({
   reference,
@@ -39,6 +51,12 @@ export default function SuccessScreen({
   waReceiverUrl,
   lang,
   onReset,
+  baggageType,
+  baggageTypeOther,
+  baggageWeight,
+  isFragile,
+  paymentStatus,
+  pickupAddress,
 }: SuccessScreenProps) {
   const t = (fr: string, en: string) => lang === 'fr' ? fr : en;
 
@@ -46,7 +64,6 @@ export default function SuccessScreen({
     ? `${window.location.origin}/activate/${reference}`
     : `/activate/${reference}`;
 
-  // Build vars for wame.ts
   const formattedDate = formatDateFR(departureDate);
   const formattedTime = formatTime(departureTime);
 
@@ -65,8 +82,6 @@ export default function SuccessScreen({
   };
 
   const links = createDepartureLinks(vars);
-
-  // Use API-provided wa.me links if available, otherwise fallback to client-side generated links
   const senderLink = waSenderUrl || links.sender;
   const receiverLink = waReceiverUrl || links.receiver;
 
@@ -88,6 +103,17 @@ export default function SuccessScreen({
       setTimeout(() => setCopied(false), 2000);
     }
   };
+
+  // Baggage description
+  const baggageLabel = baggageType === 'OTHER'
+    ? (baggageTypeOther || 'Autre')
+    : (BAGGAGE_TYPE_LABELS[baggageType] || baggageType);
+  const baggageDesc = `${baggageLabel}${baggageWeight ? ` — ${baggageWeight}kg` : ''}${isFragile ? ' ⚠️' : ''}`;
+
+  // Payment label
+  const paymentLabel = paymentStatus === 'SENDER_PAID'
+    ? t('✅ Payé par l\'expéditeur', '✅ Paid by sender')
+    : t('💸 À payer par le destinataire', '💸 Pay on delivery');
 
   return (
     <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -120,6 +146,7 @@ export default function SuccessScreen({
           {t('Résumé', 'Summary')}
         </h3>
 
+        {/* Route */}
         <div className="flex items-center gap-3 bg-[#F8FAFC] rounded-lg p-3">
           <div className="flex-1">
             <p className="text-xs text-gray-400">{t('Trajet', 'Route')}</p>
@@ -131,6 +158,7 @@ export default function SuccessScreen({
           </div>
         </div>
 
+        {/* Departure */}
         <div className="flex items-center gap-3 bg-[#F8FAFC] rounded-lg p-3">
           <div className="flex-1">
             <p className="text-xs text-gray-400">{t('Départ', 'Departure')}</p>
@@ -138,6 +166,27 @@ export default function SuccessScreen({
           </div>
         </div>
 
+        {/* Baggage */}
+        <div className="bg-[#F8FAFC] rounded-lg p-3">
+          <p className="text-xs text-gray-400">{t('Colis', 'Package')}</p>
+          <p className="font-semibold text-gray-900 text-sm">{baggageDesc}</p>
+        </div>
+
+        {/* Payment */}
+        <div className="bg-[#F8FAFC] rounded-lg p-3">
+          <p className="text-xs text-gray-400">{t('Paiement', 'Payment')}</p>
+          <p className="font-semibold text-gray-900 text-sm">{paymentLabel}</p>
+        </div>
+
+        {/* Pickup address if provided */}
+        {pickupAddress && (
+          <div className="bg-[#F8FAFC] rounded-lg p-3">
+            <p className="text-xs text-gray-400">{t('Point de retrait', 'Pickup point')}</p>
+            <p className="font-semibold text-gray-900 text-sm">📍 {pickupAddress}</p>
+          </div>
+        )}
+
+        {/* Sender & Receiver */}
         <div className="grid grid-cols-2 gap-3">
           <div className="bg-[#F8FAFC] rounded-lg p-3">
             <p className="text-xs text-gray-400">{t('Expéditeur', 'Sender')}</p>
@@ -185,7 +234,7 @@ export default function SuccessScreen({
         </a>
       </div>
 
-      {/* === TRANSITION CRITIQUE : Vers page d'arrivée === */}
+      {/* Transition to retrieval */}
       <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-xl p-5 space-y-3">
         <div className="flex items-center gap-2 text-amber-800">
           <Truck className="w-5 h-5" />
