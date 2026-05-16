@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useRequireAuth } from '@/contexts/AuthContext';
+import { fetchWithAuth } from '@/lib/fetchWithAuth';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -117,6 +119,7 @@ function statusBadgeLabel(status: string): string {
    Main Page Component
    ══════════════════════════════════════════════ */
 export default function MarketingPage() {
+  const { loading: authLoading } = useRequireAuth(['superadmin']);
   const [data, setData] = useState<MarketingData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -142,15 +145,14 @@ export default function MarketingPage() {
         page: String(page),
         limit: String(limit),
       });
-      const res = await fetch(`/api/admin/marketing?${params}`);
-      if (!res.ok) {
-        const errData = await res.json().catch(() => null);
-        throw new Error(errData?.error || `Erreur serveur (${res.status})`);
+      const result = await fetchWithAuth<MarketingData>(`/api/admin/marketing?${params}`);
+      if (!result.ok || !result.data) {
+        setError(result.error || 'Erreur lors du chargement');
+        return;
       }
-      const json = await res.json();
-      setData(json);
+      setData(result.data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Erreur inconnue');
+      if (err instanceof Error) setError(err.message);
     } finally {
       setLoading(false);
     }
@@ -356,7 +358,14 @@ export default function MarketingPage() {
       </div>
 
       {/* ─── Loading ─── */}
-      {loading && (
+      {authLoading && (
+        <div className="flex items-center justify-center py-16">
+          <div className="w-8 h-8 border-2 border-[#FF1D8D]/30 border-t-[#FF1D8D] rounded-full animate-spin" />
+          <span className="ml-3 text-slate-500">Vérification des permissions...</span>
+        </div>
+      )}
+
+      {!authLoading && loading && (
         <div className="flex items-center justify-center py-16">
           <div className="w-8 h-8 border-2 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin" />
         </div>
