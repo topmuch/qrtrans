@@ -54,11 +54,21 @@ export default function SecurityAuditPage() {
     setError(null);
     try {
       // Fetch login logs
-      const logsRes = await fetch('/api/admin/security/logs');
+      const logsRes = await fetch('/api/admin/security/logs', { credentials: 'same-origin' });
+      
+      if (logsRes.status === 401 || logsRes.status === 403) {
+        setError('Session expirée ou non autorisé — Veuillez vous reconnecter');
+        return;
+      }
       const logsData = await logsRes.json();
 
       // Fetch active sessions
-      const sessionsRes = await fetch('/api/admin/security/sessions');
+      const sessionsRes = await fetch('/api/admin/security/sessions', { credentials: 'same-origin' });
+      
+      if (sessionsRes.status === 401 || sessionsRes.status === 403) {
+        setError('Session expirée ou non autorisé — Veuillez vous reconnecter');
+        return;
+      }
       const sessionsData = await sessionsRes.json();
 
       if (logsData.logs) setLoginLogs(logsData.logs);

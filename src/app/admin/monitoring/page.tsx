@@ -46,8 +46,12 @@ export default function MonitoringPage() {
     setLoading(true);
     setDiagnosticError(null);
     try {
-      const res = await fetch('/api/admin/diagnostic');
+      const res = await fetch('/api/admin/diagnostic', { credentials: 'same-origin' });
       if (!res.ok) {
+        if (res.status === 401 || res.status === 403) {
+          setDiagnosticError('Session expirée ou non autorisé — Veuillez vous reconnecter');
+          return;
+        }
         const err = await res.json().catch(() => ({}));
         setDiagnosticError(err.error || `Erreur HTTP ${res.status}`);
         return;
@@ -70,7 +74,10 @@ export default function MonitoringPage() {
       const params = new URLSearchParams({ page: String(page), limit: '50' });
       if (filterLevel) params.set('level', filterLevel);
       if (filterSource) params.set('source', filterSource);
-      const res = await fetch(`/api/admin/system-logs?${params}`);
+      const res = await fetch(`/api/admin/system-logs?${params}`, { credentials: 'same-origin' });
+      
+      if (res.status === 401 || res.status === 403) return;
+      
       const data = await res.json();
       setLogs(data.logs || []);
       setTotalLogs(data.pagination?.total || 0);
@@ -82,7 +89,7 @@ export default function MonitoringPage() {
   const purgeLogs = async () => {
     if (!confirm('Supprimer tous les logs de plus de 30 jours ?')) return;
     try {
-      const res = await fetch('/api/admin/system-logs', { method: 'DELETE' });
+      const res = await fetch('/api/admin/system-logs', { method: 'DELETE', credentials: 'same-origin' });
       const data = await res.json();
       alert(data.message);
       fetchLogs();

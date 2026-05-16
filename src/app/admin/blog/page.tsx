@@ -80,6 +80,7 @@ const CATEGORY_LABELS: Record<string, string> = {
 export default function BlogAdminPage() {
   const [data, setData] = useState<ApiResponse | null>(null);
   const [loading, setLoading] = useState(true);
+  const [authError, setAuthError] = useState<string | null>(null);
   
   // Filters
   const [statusFilter, setStatusFilter] = useState('all');
@@ -108,6 +109,7 @@ export default function BlogAdminPage() {
 
   const fetchPosts = async () => {
     setLoading(true);
+    setAuthError(null);
     try {
       const params = new URLSearchParams();
       if (statusFilter !== 'all') params.append('status', statusFilter);
@@ -115,14 +117,28 @@ export default function BlogAdminPage() {
       params.append('page', String(page));
       params.append('limit', '10');
 
-      const response = await fetch(`/api/admin/blog?${params}`);
+      const response = await fetch(`/api/admin/blog?${params}`, { credentials: 'same-origin' });
+      
+      if (response.status === 401) {
+        setAuthError('Session expirée — Veuillez vous reconnecter');
+        return;
+      }
+      if (response.status === 403) {
+        setAuthError('Accès non autorisé — Permissions insuffisantes');
+        return;
+      }
+      
       const result = await response.json();
       
       if (result.posts) {
         setData(result);
       }
+      if (result.error) {
+        setAuthError(result.error);
+      }
     } catch (error) {
       console.error('Error fetching posts:', error);
+      setAuthError('Erreur de connexion — Vérifiez votre réseau');
     } finally {
       setLoading(false);
     }
@@ -173,6 +189,7 @@ export default function BlogAdminPage() {
       const response = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
         body: JSON.stringify(body)
       });
 
@@ -199,7 +216,8 @@ export default function BlogAdminPage() {
 
     try {
       const response = await fetch(`/api/admin/blog?id=${id}`, {
-        method: 'DELETE'
+        method: 'DELETE',
+        credentials: 'same-origin',
       });
 
       if (response.ok) {
@@ -217,6 +235,7 @@ export default function BlogAdminPage() {
       const response = await fetch('/api/admin/blog', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
         body: JSON.stringify({
           id: post.id,
           ...post,
@@ -326,6 +345,13 @@ export default function BlogAdminPage() {
           Nouvel article
         </Button>
       </div>
+
+      {/* Auth Error Banner */}
+      {authError && (
+        <div className="mb-6 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-800 rounded-xl p-4">
+          <p className="text-red-600 dark:text-red-400 text-sm font-medium">{authError}</p>
+        </div>
+      )}
 
       {/* Stats Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">

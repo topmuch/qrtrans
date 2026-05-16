@@ -1,25 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { cookies } from 'next/headers';
+import { getSession } from '@/lib/session';
 
 // GET - Get advertisement statistics (SuperAdmin only)
 export async function GET(request: NextRequest) {
   try {
-    // Check authentication
-    const cookieStore = await cookies();
-    const sessionToken = cookieStore.get('session')?.value;
+    // Check authentication using the shared session helper
+    const user = await getSession();
 
-    if (!sessionToken) {
+    if (!user || user.role !== 'superadmin') {
       return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
-    }
-
-    const session = await db.session.findUnique({
-      where: { id: sessionToken },
-      include: { user: true }
-    });
-
-    if (!session || session.user.role !== 'superadmin') {
-      return NextResponse.json({ error: 'Accès refusé' }, { status: 403 });
     }
 
     const { searchParams } = new URL(request.url);

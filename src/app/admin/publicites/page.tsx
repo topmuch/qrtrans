@@ -87,6 +87,7 @@ interface TopAd {
 export default function PublicitesPage() {
   const [data, setData] = useState<ApiResponse | null>(null);
   const [loading, setLoading] = useState(true);
+  const [authError, setAuthError] = useState<string | null>(null);
   const [agencies, setAgencies] = useState<Agency[]>([]);
   
   // Filters
@@ -128,6 +129,7 @@ export default function PublicitesPage() {
 
   const fetchAdvertisements = async () => {
     setLoading(true);
+    setAuthError(null);
     try {
       const params = new URLSearchParams();
       if (statusFilter !== 'all') params.append('status', statusFilter);
@@ -135,15 +137,29 @@ export default function PublicitesPage() {
       params.append('page', String(page));
       params.append('limit', '10');
 
-      const response = await fetch(`/api/admin/advertisements?${params}`);
+      const response = await fetch(`/api/admin/advertisements?${params}`, { credentials: 'same-origin' });
+      
+      if (response.status === 401) {
+        setAuthError('Session expirée — Veuillez vous reconnecter');
+        return;
+      }
+      if (response.status === 403) {
+        setAuthError('Accès non autorisé — Permissions insuffisantes');
+        return;
+      }
+      
       const result = await response.json();
       
       if (result.advertisements) {
         setData(result);
         setAgencies(result.agencies || []);
       }
+      if (result.error) {
+        setAuthError(result.error);
+      }
     } catch (error) {
       console.error('Error fetching advertisements:', error);
+      setAuthError('Erreur de connexion — Vérifiez votre réseau');
     } finally {
       setLoading(false);
     }
@@ -151,7 +167,12 @@ export default function PublicitesPage() {
 
   const fetchStats = async () => {
     try {
-      const response = await fetch('/api/admin/advertisements/stats');
+      const response = await fetch('/api/admin/advertisements/stats', { credentials: 'same-origin' });
+      
+      if (response.status === 401 || response.status === 403) {
+        return; // Stats are non-critical, don't show auth error
+      }
+      
       const result = await response.json();
       if (result.summary) {
         setStats(result.summary);
@@ -219,6 +240,7 @@ export default function PublicitesPage() {
       const response = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
         body: JSON.stringify(body)
       });
 
@@ -245,7 +267,8 @@ export default function PublicitesPage() {
 
     try {
       const response = await fetch(`/api/admin/advertisements?id=${id}`, {
-        method: 'DELETE'
+        method: 'DELETE',
+        credentials: 'same-origin',
       });
 
       if (response.ok) {
@@ -264,6 +287,7 @@ export default function PublicitesPage() {
       const response = await fetch('/api/admin/advertisements', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
         body: JSON.stringify({
           id: ad.id,
           ...ad,
@@ -365,6 +389,13 @@ export default function PublicitesPage() {
           </Button>
         </div>
       </div>
+
+      {/* Auth Error Banner */}
+      {authError && (
+        <div className="mb-6 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-800 rounded-xl p-4">
+          <p className="text-red-600 dark:text-red-400 text-sm font-medium">{authError}</p>
+        </div>
+      )}
 
       {/* Stats Overview */}
       {stats && (
