@@ -130,6 +130,27 @@ export async function POST(
       },
     });
 
+    // Log arrival event
+    const maskPhone = (phone: string) => {
+      const clean = phone.replace(/[^0-9+]/g, '').replace(/^0+/, '');
+      if (clean.length <= 4) return '***';
+      return clean.slice(0, 4) + '***' + clean.slice(-2);
+    };
+
+    const arrivedDate = arrivedAt.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    const arrivedTime = arrivedAt.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+
+    await db.colisEvent.create({
+      data: {
+        baggageId: colis.id,
+        eventType: 'arrival',
+        recipientType: 'system',
+        messageTitle: '📍 Arrivée confirmée',
+        messageContent: `Le chauffeur a confirmé l'arrivée du colis ${colis.reference} à ${data.delivery_location} le ${arrivedDate} à ${arrivedTime}.`,
+        metadata: JSON.stringify({ delivery_location: data.delivery_location, arrived_date: arrivedDate, arrived_time: arrivedTime, notes: data.notes }),
+      },
+    });
+
     return NextResponse.json({
       success: true,
       colis: {

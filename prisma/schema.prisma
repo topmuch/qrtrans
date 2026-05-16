@@ -154,8 +154,9 @@ model Baggage {
   founderName       String?   // Name of the finder
   founderPhone      String?   // WhatsApp number of the finder
   founderAt         DateTime? // Timestamp when founder info was submitted
-  agency            Agency?   @relation(fields: [agencyId], references: [id], onDelete: SetNull)
+  agency            Agency?       @relation(fields: [agencyId], references: [id], onDelete: SetNull)
   scanLogs          ScanLog[]
+  events            ColisEvent[]
 }
 
 // ScanLog model - tracks all scans for audit
@@ -486,6 +487,26 @@ model BlogView {
   userAgent   String?
   
   createdAt   DateTime @default(now())
+}
+
+// ColisEvent model - tracks WhatsApp messages and events for each colis
+model ColisEvent {
+  id              String   @id @default(cuid())
+  baggageId       String
+  baggage         Baggage  @relation(fields: [baggageId], references: [id], onDelete: Cascade)
+  eventType       String   // "activation" | "arrival" | "delivery" | "pin_generated"
+  recipientType   String   // "sender" | "receiver" | "system"
+  recipientName   String?  // Name of the recipient
+  recipientPhone  String?  // Phone of the recipient (masked)
+  messageTitle    String   // Short title for display (ex: "Colis en Partance")
+  messageContent  String   // Full WhatsApp message content
+  waLink          String?  // The wa.me link generated
+  metadata        String?  // JSON with extra data (pin, location, etc.)
+  createdAt       DateTime @default(now())
+
+  @@index([baggageId])
+  @@index([eventType])
+  @@index([createdAt])
 }
 
 // SystemLog model - centralized system logging for monitoring

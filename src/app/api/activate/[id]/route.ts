@@ -244,6 +244,48 @@ Vous serez notifié dès l'arrivée pour le retrait.
     const wa_sender = generateWaMeLink(cleanPhone(data.sender.phone), senderMessage);
     const wa_receiver = generateWaMeLink(cleanPhone(data.receiver.phone), receiverMessage);
 
+    // Log activation events to ColisEvent table
+    const maskPhone = (phone: string) => {
+      const clean = cleanPhone(phone);
+      if (clean.length <= 4) return '***';
+      return clean.slice(0, 4) + '***' + clean.slice(-2);
+    };
+
+    await db.colisEvent.createMany({
+      data: [
+        {
+          baggageId: updated.id,
+          eventType: 'activation',
+          recipientType: 'sender',
+          recipientName: data.sender.name,
+          recipientPhone: maskPhone(data.sender.phone),
+          messageTitle: '🟢 Colis en Partance — Expéditeur',
+          messageContent: senderMessage,
+          waLink: wa_sender,
+          metadata: JSON.stringify({ departure_city: data.departure_city, arrival_city: data.arrival_city, company: data.company_name, departure_date: formattedDate, departure_time: formattedTime }),
+        },
+        {
+          baggageId: updated.id,
+          eventType: 'activation',
+          recipientType: 'receiver',
+          recipientName: data.receiver.name,
+          recipientPhone: maskPhone(data.receiver.phone),
+          messageTitle: '🔵 Colis en Transit — Destinataire (avec PIN)',
+          messageContent: receiverMessage,
+          waLink: wa_receiver,
+          metadata: JSON.stringify({ departure_city: data.departure_city, arrival_city: data.arrival_city, company: data.company_name, pin: '***' + pin.slice(-3) }),
+        },
+        {
+          baggageId: updated.id,
+          eventType: 'pin_generated',
+          recipientType: 'system',
+          messageTitle: '🔐 Code PIN généré',
+          messageContent: `Code de retrait à 6 chiffres généré pour le destinataire.`,
+          metadata: JSON.stringify({ pin_masked: '***' + pin.slice(-3), generated_at: new Date().toISOString() }),
+        },
+      ],
+    });
+
     return NextResponse.json({
       success: true,
       colis: {

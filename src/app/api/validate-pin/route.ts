@@ -116,6 +116,42 @@ Merci !`;
       receiverMessage
     );
 
+    // Log delivery events
+    const maskPhone = (phone: string) => {
+      const clean = cleanPhone(phone);
+      if (clean.length <= 4) return '***';
+      return clean.slice(0, 4) + '***' + clean.slice(-2);
+    };
+
+    const deliveryTime = now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+
+    await db.colisEvent.createMany({
+      data: [
+        {
+          baggageId: updated.id,
+          eventType: 'delivery',
+          recipientType: 'sender',
+          recipientName: updated.travelerFirstName || 'Expéditeur',
+          recipientPhone: maskPhone(updated.whatsappOwner || ''),
+          messageTitle: '🟢 Colis Livré — Notification Expéditeur',
+          messageContent: senderMessage,
+          waLink: wa_sender,
+          metadata: JSON.stringify({ delivered_date: today, delivered_time: deliveryTime }),
+        },
+        {
+          baggageId: updated.id,
+          eventType: 'delivery',
+          recipientType: 'receiver',
+          recipientName: updated.receiverName || 'Destinataire',
+          recipientPhone: maskPhone(updated.receiverWhatsapp || ''),
+          messageTitle: '🔵 Retrait Confirmé — Notification Destinataire',
+          messageContent: receiverMessage,
+          waLink: wa_receiver,
+          metadata: JSON.stringify({ delivered_date: today, delivered_time: deliveryTime }),
+        },
+      ],
+    });
+
     return NextResponse.json({
       success: true,
       colis: {
