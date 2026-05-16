@@ -1,13 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import { use } from 'react';
+import { useParams } from 'next/navigation';
 import ActivationHeader from '@/components/activation/ActivationHeader';
 import ActivationForm from '@/components/activation/ActivationForm';
 
-export default function ActivatePage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = use(params);
-  const qrCode = (id || '').toUpperCase().trim();
+export default function ActivatePage() {
+  const params = useParams();
+  const qrCode = ((params?.id as string) || '').toUpperCase().trim();
   const [lang, setLang] = useState<'fr' | 'en'>('fr');
 
   return (

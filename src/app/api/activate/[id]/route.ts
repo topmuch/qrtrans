@@ -4,17 +4,24 @@ import { z } from 'zod';
 
 const WHATSAPP_REGEX = /^\+[1-9]\d{1,14}$/;
 
+const senderSchema = z.object({
+  name: z.string().min(1, "Le nom de l'expéditeur est obligatoire"),
+  phone: z.string().regex(WHATSAPP_REGEX, 'Format WhatsApp invalide (ex: +221771234567)'),
+});
+
+const receiverSchema = z.object({
+  name: z.string().min(1, 'Le nom du destinataire est obligatoire'),
+  phone: z.string().regex(WHATSAPP_REGEX, 'Format WhatsApp invalide (ex: +221761234567)'),
+});
+
 const activateSchema = z.object({
   transport_type: z.enum(['GP', 'BUS'], { required_error: 'Le type de transport est obligatoire' }),
-  company_name: z.string().min(1, 'La compagnie de transport est obligatoire'),
+  company_name: z.string().min(1, 'La compagnie est obligatoire'),
   departure_city: z.string().min(1, 'La ville de départ est obligatoire'),
   arrival_city: z.string().min(1, "La ville d'arrivée est obligatoire"),
-  departure_date: z.string().min(1, 'La date de départ est obligatoire'),
-  departure_time: z.string().min(1, "L'heure de départ est obligatoire"),
-  sender_name: z.string().min(1, "Le nom de l'expéditeur est obligatoire"),
-  sender_whatsapp: z.string().regex(WHATSAPP_REGEX, 'Format WhatsApp invalide (ex: +221771234567)'),
-  receiver_name: z.string().min(1, 'Le nom du destinataire est obligatoire'),
-  receiver_whatsapp: z.string().regex(WHATSAPP_REGEX, 'Format WhatsApp invalide (ex: +221761234567)'),
+  departure_datetime: z.string().min(1, 'La date/heure de départ est obligatoire'),
+  sender: senderSchema,
+  receiver: receiverSchema,
 });
 
 export async function POST(
@@ -26,9 +33,9 @@ export async function POST(
     const body = await request.json();
     const data = activateSchema.parse(body);
 
-    const reference = id.toUpperCase().trim();
+    const reference = (id || '').toUpperCase().trim();
 
-    // Find the colis by reference
+    // Find colis by reference
     const colis = await db.baggage.findUnique({
       where: { reference },
       include: { agency: true },
@@ -41,64 +48,60 @@ export async function POST(
       );
     }
 
-    // Handle already activated / in transit / delivered
+    // Handle special statuses
     if (colis.status === 'in_transit') {
       return NextResponse.json({
         error: 'already_in_transit',
         message: 'Ce colis est déjà en transit.',
         reference: colis.reference,
-        status: colis.status,
       });
     }
-
     if (colis.status === 'delivered' || colis.status === 'found') {
       return NextResponse.json({
         error: 'already_delivered',
         message: 'Ce colis a déjà été livré.',
         reference: colis.reference,
-        status: colis.status,
       });
     }
-
     if (colis.status === 'active' || colis.status === 'scanned') {
       return NextResponse.json({
         error: 'already_active',
         message: 'Ce colis a déjà été activé.',
         reference: colis.reference,
-        status: colis.status,
       });
     }
-
     if (colis.status === 'blocked') {
       return NextResponse.json(
         { error: 'blocked', message: 'Ce colis a été bloqué. Contactez le support.' },
         { status: 403 }
       );
     }
-
     if (colis.status !== 'pending_activation') {
       return NextResponse.json(
-        { error: 'invalid_status', message: `Statut invalide: ${colis.status}` },
+        { error: 'invalid_status', message: `Statut invalide : ${colis.status}` },
         { status: 400 }
       );
     }
 
-    // Validate departure date is not in the past
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const depDate = new Date(data.departure_date + 'T00:00:00');
-    if (depDate < today) {
+    // Validate departure_datetime is not in the past
+    const depDateTime = new Date(data.departure_datetime);
+    const now = new Date();
+    if (depDateTime < now) {
       return NextResponse.json(
-        { error: 'invalid_date', message: 'La date de départ ne peut pas être antérieure à aujourd\'hui.' },
+        { error: 'invalid_date', message: 'La date de départ ne peut pas être antérieure à maintenant.' },
         { status: 400 }
       );
     }
 
-    // Calculate expiration (90 days from now for inter-city logistics)
+    // Expiration: 90 days
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + 90);
 
-    // Update the colis in DB
+    // Parse datetime for separate date/time fields
+    const depDate = depDateTime.toISOString().split('T')[0];
+    const depTime = depDateTime.toTimeString().slice(0, 5);
+
+    // Update colis in DB — status → in_transit
     const updated = await db.baggage.update({
       where: { id: colis.id },
       data: {
@@ -106,10 +109,12 @@ export async function POST(
         transportMode: 'bus',
         busCompany: data.company_name,
         destination: data.arrival_city,
-        departureDate: depDate,
-        departureTime: data.departure_time,
-        travelerFirstName: data.sender_name,
-        whatsappOwner: data.sender_whatsapp,
+        departureDate: depDateTime,
+        departureTime: depTime,
+        travelerFirstName: data.sender.name,
+        whatsappOwner: data.sender.phone,
+        receiverName: data.receiver.name,
+        receiverWhatsapp: data.receiver.phone,
         expiresAt,
       },
     });
@@ -120,7 +125,6 @@ export async function POST(
         id: updated.id,
         reference: updated.reference,
         status: updated.status,
-        activated_at: updated.updatedAt,
       },
     });
 

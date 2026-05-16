@@ -108,6 +108,10 @@ model Baggage {
   destination       String?
   departureDate     DateTime? // Date de départ saisie lors de l'activation
   departureTime     String?   // Heure de départ saisie lors de l'activation (ex: "08:30")
+
+  // COLIS-FEATURE: Receiver / Sender fields for inter-city logistics
+  receiverName      String?   // Nom du destinataire du colis
+  receiverWhatsapp  String?   // Numéro WhatsApp du destinataire
   createdAt         DateTime  @default(now())
   expiresAt         DateTime?
   lastScanDate      DateTime?

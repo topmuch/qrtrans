@@ -32,17 +32,16 @@ export default function VoyageSection({
   const t = (fr: string, en: string) => lang === 'fr' ? fr : en;
 
   return (
-    <div className="bg-white rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.05)] p-5 border-t-[3px] border-t-[#FF6B35]">
+    <div className="bg-white rounded-xl shadow-[0_2px_8px_rgba(0,0,0,0.06)] p-5 border-l-4 border-l-[#FF6B35]">
       <h2 className="text-base font-bold text-gray-900 mb-4 flex items-center gap-2">
-        <span className="text-lg">🚚</span>
-        {t('ITINÉRAIRE', 'ROUTE')}
+        🚌 {t('LE VOYAGE', 'THE TRIP')}
       </h2>
 
       <div className="space-y-4">
-        {/* Transport Type */}
+        {/* Transport Type Toggle */}
         <div className="space-y-1.5">
-          <Label htmlFor="transport_type" className="text-sm font-medium text-[#4B5563]">
-            {t('Type de transport', 'Transport type')} <span className="text-red-500">*</span>
+          <Label className="text-sm font-medium text-[#4B5563]">
+            {t('Type de Transport', 'Transport Type')} <span className="text-red-500">*</span>
           </Label>
           <div className="grid grid-cols-2 gap-3">
             <button
@@ -51,8 +50,8 @@ export default function VoyageSection({
               aria-pressed={transportType === 'GP'}
               className={`flex items-center justify-center gap-2 h-12 rounded-lg border-2 text-sm font-semibold transition-all ${
                 transportType === 'GP'
-                  ? 'border-[#FF6B35] bg-[#FF6B35]/5 text-[#FF6B35]'
-                  : 'border-[#E5E7EB] text-gray-500 hover:border-gray-300'
+                  ? 'border-[#FF6B35] bg-[#FF6B35]/5 text-[#FF6B35] shadow-sm shadow-orange-200'
+                  : 'border-[#E5E7EB] text-gray-400 hover:border-gray-300 hover:text-gray-600'
               }`}
             >
               <Truck className="w-4 h-4" />
@@ -64,8 +63,8 @@ export default function VoyageSection({
               aria-pressed={transportType === 'BUS'}
               className={`flex items-center justify-center gap-2 h-12 rounded-lg border-2 text-sm font-semibold transition-all ${
                 transportType === 'BUS'
-                  ? 'border-[#FF6B35] bg-[#FF6B35]/5 text-[#FF6B35]'
-                  : 'border-[#E5E7EB] text-gray-500 hover:border-gray-300'
+                  ? 'border-[#FF6B35] bg-[#FF6B35]/5 text-[#FF6B35] shadow-sm shadow-orange-200'
+                  : 'border-[#E5E7EB] text-gray-400 hover:border-gray-300 hover:text-gray-600'
               }`}
             >
               <Bus className="w-4 h-4" />
@@ -77,13 +76,13 @@ export default function VoyageSection({
         {/* Company */}
         <div className="space-y-1.5">
           <Label htmlFor="company_name" className="text-sm font-medium text-[#4B5563]">
-            {t('Compagnie de transport', 'Transport company')} <span className="text-red-500">*</span>
+            {t('Compagnie de Transport', 'Transport Company')} <span className="text-red-500">*</span>
           </Label>
           <Input
             id="company_name"
             value={company}
             onChange={(e) => setCompany(e.target.value)}
-            placeholder={t('Ex: Salam, Aline, Fatick Express...', 'Ex: Salam, Aline, Fatick Express...')}
+            placeholder="Ex: Salam, Aline, Fatick Express..."
             className="h-12 border-[#E5E7EB] focus-visible:ring-[#25D366] focus-visible:border-[#25D366] text-sm"
             aria-required="true"
           />
@@ -93,7 +92,7 @@ export default function VoyageSection({
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1.5">
             <Label htmlFor="departure_city" className="text-sm font-medium text-[#4B5563]">
-              {t('Ville de départ', 'Departure city')} <span className="text-red-500">*</span>
+              {t('Ville de Départ', 'Departure City')} <span className="text-red-500">*</span>
             </Label>
             <Input
               id="departure_city"
@@ -106,7 +105,7 @@ export default function VoyageSection({
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="arrival_city" className="text-sm font-medium text-[#4B5563]">
-              {t("Ville d'arrivée", 'Arrival city')} <span className="text-red-500">*</span>
+              {t("Ville d'Arrivée", 'Arrival City')} <span className="text-red-500">*</span>
             </Label>
             <Input
               id="arrival_city"
@@ -123,7 +122,7 @@ export default function VoyageSection({
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1.5">
             <Label htmlFor="departure_date" className="text-sm font-medium text-[#4B5563]">
-              {t('Date de départ', 'Departure date')} <span className="text-red-500">*</span>
+              {t('Date de Départ', 'Departure Date')} <span className="text-red-500">*</span>
             </Label>
             <Input
               id="departure_date"
@@ -137,7 +136,7 @@ export default function VoyageSection({
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="departure_time" className="text-sm font-medium text-[#4B5563]">
-              {t('Heure de départ', 'Departure time')} <span className="text-red-500">*</span>
+              {t('Heure de Départ', 'Departure Time')} <span className="text-red-500">*</span>
             </Label>
             <Input
               id="departure_time"

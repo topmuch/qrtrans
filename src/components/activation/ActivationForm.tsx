@@ -30,73 +30,59 @@ export default function ActivationForm({ qrCode, lang }: ActivationFormProps) {
 
   // Sender
   const [senderName, setSenderName] = useState('');
-  const [senderWhatsapp, setSenderWhatsapp] = useState('');
+  const [senderPhone, setSenderPhone] = useState('');
 
   // Receiver
   const [receiverName, setReceiverName] = useState('');
-  const [receiverWhatsapp, setReceiverWhatsapp] = useState('');
+  const [receiverPhone, setReceiverPhone] = useState('');
 
-  // WhatsApp validation
-  const [senderWaError, setSenderWaError] = useState<string | null>(null);
-  const [receiverWaError, setReceiverWaError] = useState<string | null>(null);
+  // Validation errors
+  const [senderPhoneError, setSenderPhoneError] = useState<string | null>(null);
+  const [receiverPhoneError, setReceiverPhoneError] = useState<string | null>(null);
 
-  // Validate a single whatsapp
-  const validateWhatsapp = (value: string): string | null => {
-    if (!value) return lang === 'fr' ? 'Numéro requis' : 'Number required';
+  const t = (fr: string, en: string) => lang === 'fr' ? fr : en;
+
+  const validatePhone = (value: string): string | null => {
     const cleaned = value.replace(/\s/g, '');
-    if (!WHATSAPP_REGEX.test(cleaned)) {
-      return lang === 'fr'
-        ? 'Format invalide. Ex: +221771234567'
-        : 'Invalid format. Ex: +221771234567';
-    }
+    if (!cleaned) return t('Numéro requis', 'Number required');
+    if (!WHATSAPP_REGEX.test(cleaned)) return t('Format invalide. Ex: +221771234567', 'Invalid format. Ex: +221771234567');
     return null;
   };
 
-  const handleSenderWaBlur = () => {
-    setSenderWaError(validateWhatsapp(senderWhatsapp.replace(/\s/g, '')));
-  };
-
-  const handleReceiverWaBlur = () => {
-    setReceiverWaError(validateWhatsapp(receiverWhatsapp.replace(/\s/g, '')));
-  };
-
-  // Full form validation
   const validateAll = (): string | null => {
-    const t = (fr: string, en: string) => lang === 'fr' ? fr : en;
-
     if (!transportType) return t('Sélectionnez le type de transport.', 'Select the transport type.');
     if (!company.trim()) return t('Saisissez la compagnie.', 'Enter the transport company.');
     if (!departureCity.trim()) return t('Saisissez la ville de départ.', 'Enter the departure city.');
     if (!arrivalCity.trim()) return t("Saisissez la ville d'arrivée.", 'Enter the arrival city.');
     if (!departureDate) return t('Saisissez la date de départ.', 'Enter the departure date.');
+    if (!departureTime) return t("Saisissez l'heure de départ.", 'Enter the departure time.');
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    if (new Date(departureDate + 'T00:00:00') < today) {
+    if (new Date(departureDate) < today) {
       return t('La date ne peut pas être dans le passé.', 'Date cannot be in the past.');
     }
 
-    if (!departureTime) return t("Saisissez l'heure de départ.", 'Enter the departure time.');
     if (!senderName.trim()) return t("Saisissez le nom de l'expéditeur.", "Enter the sender's name.");
-
-    const sErr = validateWhatsapp(senderWhatsapp.replace(/\s/g, ''));
-    if (sErr) return sErr;
+    const sErr = validatePhone(senderPhone);
+    if (sErr) { setSenderPhoneError(sErr); return sErr; }
 
     if (!receiverName.trim()) return t('Saisissez le nom du destinataire.', "Enter the receiver's name.");
-
-    const rErr = validateWhatsapp(receiverWhatsapp.replace(/\s/g, ''));
-    if (rErr) return rErr;
+    const rErr = validatePhone(receiverPhone);
+    if (rErr) { setReceiverPhoneError(rErr); return rErr; }
 
     return null;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSenderPhoneError(null);
+    setReceiverPhoneError(null);
 
-    const validationError = validateAll();
-    if (validationError) {
+    const err = validateAll();
+    if (err) {
       setErrorCode('validation');
-      setErrorMessage(validationError);
+      setErrorMessage(err);
       return;
     }
 
@@ -105,17 +91,23 @@ export default function ActivationForm({ qrCode, lang }: ActivationFormProps) {
     setLoading(true);
 
     try {
+      // Build departure_datetime: "2026-05-15T08:00:00Z"
+      const departureDatetime = `${departureDate}T${departureTime}:00Z`;
+
       const payload = {
         transport_type: transportType as 'GP' | 'BUS',
         company_name: company.trim(),
         departure_city: departureCity.trim(),
         arrival_city: arrivalCity.trim(),
-        departure_date: departureDate,
-        departure_time: departureTime,
-        sender_name: senderName.trim(),
-        sender_whatsapp: senderWhatsapp.replace(/\s/g, ''),
-        receiver_name: receiverName.trim(),
-        receiver_whatsapp: receiverWhatsapp.replace(/\s/g, ''),
+        departure_datetime: departureDatetime,
+        sender: {
+          name: senderName.trim(),
+          phone: senderPhone.replace(/\s/g, ''),
+        },
+        receiver: {
+          name: receiverName.trim(),
+          phone: receiverPhone.replace(/\s/g, ''),
+        },
       };
 
       const res = await fetch(`/api/activate/${encodeURIComponent(qrCode)}`, {
@@ -129,7 +121,7 @@ export default function ActivationForm({ qrCode, lang }: ActivationFormProps) {
       if (res.ok && data.success) {
         setSuccess(true);
         window.scrollTo({ top: 0, behavior: 'smooth' });
-      } else if (data.error === 'already_in_transit' || data.error === 'already_delivered' || data.error === 'already_active') {
+      } else if (['already_in_transit', 'already_delivered', 'already_active'].includes(data.error)) {
         setErrorCode(data.error);
         setErrorMessage(data.message);
       } else if (data.error === 'not_found') {
@@ -138,13 +130,16 @@ export default function ActivationForm({ qrCode, lang }: ActivationFormProps) {
       } else if (data.error === 'blocked') {
         setErrorCode('blocked');
         setErrorMessage(data.message);
+      } else if (data.error === 'invalid_date') {
+        setErrorCode('validation');
+        setErrorMessage(data.message);
       } else {
         setErrorCode('server_error');
-        setErrorMessage(data.message || "Échec de l'activation. Vérifiez votre connexion et réessayez.");
+        setErrorMessage(data.message || t("Échec. Vérifiez votre connexion et réessayez.", 'Failed. Check your connection and retry.'));
       }
     } catch {
       setErrorCode('network');
-      setErrorMessage("Échec de l'activation. Vérifiez votre connexion et réessayez.");
+      setErrorMessage(t("Échec de l'activation. Vérifiez votre connexion et réessayez.", 'Activation failed. Check your connection and retry.'));
     } finally {
       setLoading(false);
     }
@@ -161,15 +156,13 @@ export default function ActivationForm({ qrCode, lang }: ActivationFormProps) {
     setDepartureDate('');
     setDepartureTime('');
     setSenderName('');
-    setSenderWhatsapp('');
+    setSenderPhone('');
     setReceiverName('');
-    setReceiverWhatsapp('');
-    setSenderWaError(null);
-    setReceiverWaError(null);
+    setReceiverPhone('');
+    setSenderPhoneError(null);
+    setReceiverPhoneError(null);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
-
-  const t = (fr: string, en: string) => lang === 'fr' ? fr : en;
 
   // Success state
   if (success) {
@@ -180,27 +173,25 @@ export default function ActivationForm({ qrCode, lang }: ActivationFormProps) {
         company={company}
         departureCity={departureCity}
         arrivalCity={arrivalCity}
-        departureDate={departureDate}
-        departureTime={departureTime}
         senderName={senderName}
-        senderWhatsapp={senderWhatsapp.replace(/\s/g, '')}
+        senderPhone={senderPhone.replace(/\s/g, '')}
         receiverName={receiverName}
-        receiverWhatsapp={receiverWhatsapp.replace(/\s/g, '')}
-        onReset={handleReset}
+        receiverPhone={receiverPhone.replace(/\s/g, '')}
         lang={lang}
+        onReset={handleReset}
       />
     );
   }
 
-  // Already active/delivered state
-  if (errorCode === 'already_in_transit' || errorCode === 'already_delivered' || errorCode === 'already_active') {
+  // Already active/delivered
+  if (['already_in_transit', 'already_delivered', 'already_active'].includes(errorCode || '')) {
     return (
       <div className="text-center py-12 space-y-4 animate-in fade-in duration-300">
-        <div className="inline-flex items-center justify-center w-16 h-16 bg-amber-100 rounded-full">
+        <div className="inline-flex items-center justify-center w-16 h-16 bg-amber-50 rounded-full">
           <span className="text-3xl">⚠️</span>
         </div>
         <h2 className="text-lg font-bold text-gray-900">{errorMessage}</h2>
-        <p className="text-sm text-gray-500 font-mono">{qrCode}</p>
+        <p className="text-sm text-gray-400 font-mono">#{qrCode}</p>
         <a
           href={`/suivi/${qrCode}`}
           className="inline-flex items-center gap-2 px-6 h-12 bg-gray-900 hover:bg-gray-800 text-white rounded-xl font-semibold text-sm transition-colors no-underline"
@@ -225,11 +216,18 @@ export default function ActivationForm({ qrCode, lang }: ActivationFormProps) {
             </p>
             <p className="text-sm text-red-600 mt-0.5">{errorMessage}</p>
           </div>
-          <button type="button" onClick={() => { setErrorCode(null); setErrorMessage(''); }} className="text-red-400 hover:text-red-600 text-lg leading-none" aria-label="Fermer">&times;</button>
+          <button
+            type="button"
+            onClick={() => { setErrorCode(null); setErrorMessage(''); }}
+            className="text-red-400 hover:text-red-600 text-xl leading-none"
+            aria-label={t('Fermer', 'Close')}
+          >
+            &times;
+          </button>
         </div>
       )}
 
-      {/* Voyage */}
+      {/* PARTIE 1 : LE VOYAGE */}
       <VoyageSection
         transportType={transportType} setTransportType={setTransportType}
         company={company} setCompany={setCompany}
@@ -240,38 +238,36 @@ export default function ActivationForm({ qrCode, lang }: ActivationFormProps) {
         lang={lang}
       />
 
-      {/* Sender */}
+      {/* PARTIE 2 : L'ENVOYEUR */}
       <SenderSection
         senderName={senderName} setSenderName={setSenderName}
-        senderWhatsapp={senderWhatsapp} setSenderWhatsapp={setSenderWhatsapp}
-        whatsappError={senderWaError}
+        senderPhone={senderPhone} setSenderPhone={setSenderPhone}
+        phoneError={senderPhoneError}
         lang={lang}
       />
 
-      {/* Receiver */}
+      {/* PARTIE 3 : LE RECEVEUR */}
       <ReceiverSection
         receiverName={receiverName} setReceiverName={setReceiverName}
-        receiverWhatsapp={receiverWhatsapp} setReceiverWhatsapp={setReceiverWhatsapp}
-        whatsappError={receiverWaError}
+        receiverPhone={receiverPhone} setReceiverPhone={setReceiverPhone}
+        phoneError={receiverPhoneError}
         lang={lang}
       />
 
-      {/* Action buttons */}
-      <div className="space-y-3 pt-2">
+      {/* Buttons */}
+      <div className="space-y-3 pt-2 pb-4">
         <button
           type="submit"
           disabled={loading}
-          className="flex items-center justify-center gap-2 w-full h-14 bg-[#25D366] hover:bg-[#1fb855] active:bg-[#1a9e49] disabled:opacity-60 disabled:cursor-not-allowed text-white rounded-xl font-bold text-base shadow-lg shadow-green-500/20 transition-all"
+          className="flex items-center justify-center gap-2 w-full h-14 bg-[#25D366] hover:bg-[#1fb855] active:bg-[#1a9e49] disabled:opacity-60 disabled:cursor-not-allowed text-white rounded-xl font-bold text-base shadow-lg shadow-green-500/25 transition-all"
         >
           {loading ? (
             <>
               <Loader2 className="w-5 h-5 animate-spin" />
-              {t('Activation en cours...', 'Activating...')}
+              {t('Enregistrement...', 'Registering...')}
             </>
           ) : (
-            <>
-              ✅ {t('Valider & Activer le Colis', 'Validate & Activate Package')}
-            </>
+            <>✅ {t('VALIDER ET ACTIVER LE COLIS', 'VALIDATE AND ACTIVATE PACKAGE')}</>
           )}
         </button>
 
