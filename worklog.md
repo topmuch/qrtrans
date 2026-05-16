@@ -1439,3 +1439,41 @@ Stage Summary:
 - 17 files changed, 32 insertions, 1096 deletions
 - All public tracking links now point to /activate/ (universal entry point)
 - /activate/ handles all statuses: pending_activation → form, in_transit → /retrieve/, delivered → /retrieve/
+
+---
+Task ID: 18
+Agent: Main Agent
+Task: Complete redesign of QRTrans landing page (/) — 12 sections, transport-focused marketing
+
+Work Log:
+- Read worklog.md (first 30 lines) for project context
+- Read existing page.tsx (~950 lines) — previous design was flight/luggage-focused
+- Complete rewrite of `/src/app/page.tsx` with 12 sections:
+  1. StickySearchBar — appears on scrollY > 80, navigates to /activate/${ref}
+  2. Navigation — QRTrans logo, 4 nav links, 2 CTA buttons, mobile hamburger with AnimatePresence
+  3. HeroSection — gradient background (#FFF5F0 → #FFF), organic blurred circles, badge "🇸🇳 Solution de traçabilité N°1 au Sénégal", H1 "Transportez vos colis en toute confiance, de ville en ville", inline tracking bar with auto-uppercase pattern /^[A-Z]{2,4}\d{2}-[A-Z0-9]{4,8}$/, two CTAs (chauffeur green → /inscrire, agence orange outline → /agence/connexion), 3 trust badges
+  4. WhyQRTransSection — 3 glassmorphism cards (bg-white/70 backdrop-blur-lg), green/orange/blue accents
+  5. HowItWorksSection — 3-step timeline (horizontal desktop, vertical mobile), colored circles, badges
+  6. ChauffeurSection — split 50/50, checklist with animated checkmarks, SVG truck illustration
+  7. AgenceSection — split reverse 50/50, 2x3 feature grid, SVG dashboard illustration
+  8. TechFeaturesSection — 8-card grid (2 mobile, 4 desktop), hover icon rotate+scale
+  9. TestimonialsSection — 2 cards with orange/blue left borders, stars, quote marks
+  10. CtaSection — gradient #FF6B35 → #FFD23F, two buttons (devenir-partenaire + WhatsApp)
+  11. Footer — 5 columns, dark #0F172A bg, social icons, nav links
+  12. FloatingWhatsApp — fixed bottom-right, green #25D366, pulse animation
+- FadeIn component with useInView, once:true, margin:-40px, duration 0.7s, ease [0.22,1,0.36,1]
+- All text in French, mobile-first responsive design
+- TrackingWidget import kept but NOT used (new hero has inline tracking bar)
+- Removed unused imports: Image, dynamic, Plane, Luggage, Twitter, Heart, Headphones, Ship, Bus, CheckCircle2
+- Design system: #FF6B35 orange, #25D366 green, #0077B6 blue, #0F172A dark, #F8FAFC light bg
+
+Validation:
+- `bun run lint` → 0 errors ✅
+- Dev server compiles clean (verified via dev.log) ✅
+
+Stage Summary:
+- 1 file completely rewritten: src/app/page.tsx (~900 lines, 12 sections + utility components)
+- Zero lint errors, zero compilation errors
+- Landing page now focused on Senegal inter-city transport (chauffeurs + agences)
+- All navigation links functional: #solutions, #comment, #tarifs, /contact, /agence/connexion, /devenir-partenaire, /inscrire
+- Mobile-first responsive: vertical timeline, stacked CTAs, hamburger menu
