@@ -46,22 +46,14 @@ ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 ENV DATABASE_URL=file:/app/data/qrtrans.db
 
-# Start command: sync DB schema → generate client → seed → start server
-# Strategy: try migrate deploy first, fall back to db push (handles both fresh & existing DBs)
+# Start command: sync DB schema → generate client → start server
+# Seed is skipped at runtime (non-critical, only needed for fresh DBs)
 CMD sh -c "\
   mkdir -p /app/data /app/public/uploads && \
   export DATABASE_URL=file:/app/data/qrtrans.db && \
-  echo '>>> [1/4] Syncing DB schema...' && \
-  (npx prisma migrate deploy 2>&1 && echo '>>> [1/4] Migrations applied OK') || \
-    (echo '>>> [1/4] No migration history, using db push...' && \
-     npx prisma db push --skip-generate --accept-data-loss 2>&1 && \
-     echo '>>> [1/4] DB push OK') ; \
-  echo '>>> [2/4] Regenerating Prisma client...' && \
-  npx prisma generate 2>&1 && \
-  cp -r node_modules/.prisma .next/standalone/node_modules/.prisma && \
-  echo '>>> [2/4] Prisma client regenerated + copied to standalone' ; \
-  echo '>>> [3/4] Running seed...' && \
-  (bun run prisma/seed.ts 2>&1 && echo '>>> [3/4] Seed OK') || echo '>>> [3/4] Seed skipped (non-critical)' ; \
-  echo '>>> [4/4] Starting server...' && \
-  HOSTNAME=0.0.0.0 node .next/standalone/server.js \
+  echo '>>> [1/2] Syncing DB schema...' && \
+  (npx prisma migrate deploy 2>&1 && echo '>>> Migrations OK') || \
+    (npx prisma db push --skip-generate --accept-data-loss 2>&1 && echo '>>> DB push OK') ; \
+  echo '>>> [2/2] Starting server...' && \
+  HOSTNAME=0.0.0.0 PORT=3000 node .next/standalone/server.js \
 "
