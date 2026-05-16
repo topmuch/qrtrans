@@ -1401,3 +1401,22 @@ Stage Summary:
 - The complete activation/retrieval flow is now working: /activate/[id] (3-card form) → /retrieve/[id] (PIN validation) with WhatsApp notifications
 - Key fixes: departure city now properly saved and displayed, "bagage" errors replaced with "colis", IP detection defaults to Senegal
 - Pushed to GitHub: commit a6c4a09
+
+---
+Task ID: colored-quick-actions
+Agent: Main Agent
+Task: Add colored gradient backgrounds to Quick Actions cards (Générer QR, Hajj 2026, Commandes, Agences)
+
+Work Log:
+- Read admin tableau-de-bord page and identified QuickActions component with plain white background cards
+- Redesigned QuickActions with full gradient backgrounds, decorative patterns, and hover effects
+- Each card now has: gradient background, radial pattern overlay, decorative circle, backdrop-blur icon container, description subtitle
+- Colors: Générer QR (emerald), Hajj 2026 (sky/blue), Commandes (amber/orange), Agences (violet/purple)
+- Added hover: -translate-y-1, shadow-xl, and icon scale animation
+- All text in white with opacity variants for hierarchy
+- Ran bun run lint — 0 errors
+
+Stage Summary:
+- 1 file modified: src/app/admin/tableau-de-bord/page.tsx (QuickActions component)
+- Quick Actions cards now have vibrant gradient colored backgrounds matching the KPI card design language
+- Zero lint errors

@@ -131,13 +131,45 @@ function KPICard({
   );
 }
 
-// Quick Actions Component
+// Quick Actions Component - Colored Gradient Cards
 function QuickActions() {
   const actions = [
-    { label: "Générer QR", icon: <QrCode className="w-5 h-5" />, href: "/admin/generer", color: "bg-emerald-500" },
-    { label: "Hajj 2026", icon: <Users className="w-5 h-5" />, href: "/admin/hajj", color: "bg-blue-500" },
-    { label: "Commandes", icon: <ShoppingCart className="w-5 h-5" />, href: "/admin/messages", color: "bg-orange-500" },
-    { label: "Agences", icon: <Building className="w-5 h-5" />, href: "/admin/agences", color: "bg-purple-500" },
+    { 
+      label: "Générer QR", 
+      description: "Créer des codes",
+      icon: <QrCode className="w-7 h-7" />, 
+      href: "/admin/generer",
+      gradient: "from-emerald-500 to-emerald-700",
+      hoverShadow: "hover:shadow-emerald-500/25",
+      bgPattern: "bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.15),transparent_60%)]"
+    },
+    { 
+      label: "Hajj 2026", 
+      description: "Pèlerins",
+      icon: <Users className="w-7 h-7" />, 
+      href: "/admin/hajj",
+      gradient: "from-sky-500 to-blue-700",
+      hoverShadow: "hover:shadow-sky-500/25",
+      bgPattern: "bg-[radial-gradient(circle_at_70%_30%,rgba(255,255,255,0.15),transparent_60%)]"
+    },
+    { 
+      label: "Commandes", 
+      description: "Demandes",
+      icon: <ShoppingCart className="w-7 h-7" />, 
+      href: "/admin/messages",
+      gradient: "from-amber-500 to-orange-600",
+      hoverShadow: "hover:shadow-orange-500/25",
+      bgPattern: "bg-[radial-gradient(circle_at_20%_80%,rgba(255,255,255,0.15),transparent_60%)]"
+    },
+    { 
+      label: "Agences", 
+      description: "Partenaires",
+      icon: <Building className="w-7 h-7" />, 
+      href: "/admin/agences",
+      gradient: "from-violet-500 to-purple-700",
+      hoverShadow: "hover:shadow-purple-500/25",
+      bgPattern: "bg-[radial-gradient(circle_at_80%_70%,rgba(255,255,255,0.15),transparent_60%)]"
+    },
   ];
 
   return (
@@ -146,12 +178,21 @@ function QuickActions() {
         <Link
           key={index}
           href={action.href}
-          className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 hover:shadow-lg hover:border-emerald-200 dark:hover:border-emerald-800/50 transition-all duration-300 group"
+          className={`relative overflow-hidden rounded-2xl p-5 bg-gradient-to-br ${action.gradient} ${action.hoverShadow} hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group`}
         >
-          <div className={`w-10 h-10 rounded-xl ${action.color} flex items-center justify-center text-white mb-3 group-hover:scale-110 transition-transform`}>
-            {action.icon}
+          {/* Decorative pattern overlay */}
+          <div className={`absolute inset-0 ${action.bgPattern} pointer-events-none`} />
+          
+          {/* Decorative circle */}
+          <div className="absolute -right-4 -bottom-4 w-20 h-20 rounded-full bg-white/10 pointer-events-none" />
+          
+          <div className="relative z-10">
+            <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center text-white mb-3 group-hover:scale-110 group-hover:bg-white/30 transition-all duration-300">
+              {action.icon}
+            </div>
+            <p className="font-bold text-white text-lg leading-tight">{action.label}</p>
+            <p className="text-white/70 text-sm mt-0.5">{action.description}</p>
           </div>
-          <span className="font-medium text-slate-700 dark:text-slate-200">{action.label}</span>
         </Link>
       ))}
     </div>
