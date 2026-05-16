@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { CheckCircle, Copy, ExternalLink, RotateCcw } from 'lucide-react';
+import Link from 'next/link';
+import { CheckCircle, Copy, ExternalLink, RotateCcw, ArrowRight, Truck } from 'lucide-react';
 
 interface SuccessScreenProps {
   reference: string;
@@ -132,6 +133,30 @@ export default function SuccessScreen({
           🔵 {t('NOTIFIER LE RECEVEUR', 'NOTIFY RECEIVER')}
           <ExternalLink className="w-3.5 h-3.5 opacity-50" />
         </a>
+      </div>
+
+      {/* === TRANSITION CRITIQUE : Vers page d'arrivée === */}
+      <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-xl p-5 space-y-3">
+        <div className="flex items-center gap-2 text-amber-800">
+          <Truck className="w-5 h-5" />
+          <p className="text-sm font-bold">
+            {t('Colis en route — Prêt pour la livraison', 'Package in transit — Ready for delivery')}
+          </p>
+        </div>
+        <p className="text-xs text-amber-700">
+          {t(
+            'À l\'arrivée, rescannez ce QR code ou cliquez ci-dessous pour confirmer la livraison.',
+            'On arrival, rescan this QR code or click below to confirm delivery.'
+          )}
+        </p>
+        <Link
+          href={`/arrivee/${reference}`}
+          className="flex items-center justify-center gap-2 w-full h-14 bg-[#FF6B35] hover:bg-[#e65a28] active:bg-[#d35400] text-white rounded-xl font-bold text-base shadow-lg shadow-orange-500/25 transition-all no-underline"
+        >
+          <Truck className="w-5 h-5" />
+          {t('Accéder à la Page de Livraison', 'Go to Delivery Page')}
+          <ArrowRight className="w-4 h-4" />
+        </Link>
       </div>
 
       {/* Copy tracking link */}

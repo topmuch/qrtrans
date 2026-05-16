@@ -183,8 +183,26 @@ export default function ActivationForm({ qrCode, lang }: ActivationFormProps) {
     );
   }
 
-  // Already active/delivered
-  if (['already_in_transit', 'already_delivered', 'already_active'].includes(errorCode || '')) {
+  // Already active/delivered/in_transit → redirect appropriately
+  if (errorCode === 'already_in_transit') {
+    return (
+      <div className="text-center py-12 space-y-4 animate-in fade-in duration-300">
+        <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-50 rounded-full">
+          <span className="text-3xl">🚚</span>
+        </div>
+        <h2 className="text-lg font-bold text-gray-900">{errorMessage}</h2>
+        <p className="text-sm text-gray-400 font-mono">#{qrCode}</p>
+        <a
+          href={`/arrivee/${qrCode}`}
+          className="inline-flex items-center gap-2 px-6 h-12 bg-[#FF6B35] hover:bg-[#e65a28] text-white rounded-xl font-semibold text-sm transition-colors no-underline shadow-lg shadow-orange-500/20"
+        >
+          📦 {t('Confirmer la livraison', 'Confirm delivery')}
+        </a>
+      </div>
+    );
+  }
+
+  if (['already_delivered', 'already_active'].includes(errorCode || '')) {
     return (
       <div className="text-center py-12 space-y-4 animate-in fade-in duration-300">
         <div className="inline-flex items-center justify-center w-16 h-16 bg-amber-50 rounded-full">
