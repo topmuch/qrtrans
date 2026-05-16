@@ -168,11 +168,13 @@ function ErrorScreen({
   t,
   lang,
   setLang,
+  reference,
 }: {
   type: string;
   t: (key: string) => string;
   lang: Language;
   setLang: (l: Language) => void;
+  reference?: string;
 }) {
   const errorConfig = {
     not_found: {
@@ -192,8 +194,8 @@ function ErrorScreen({
     },
     pending_activation: {
       icon: <AlertCircle className="w-12 h-12 text-orange-500" />,
-      title: t('tracking.baggage_not_found'),
-      message: t('tracking.baggage_pending_desc'),
+      title: 'Colis en attente d\'activation',
+      message: 'Ce code QR est valide mais n\'a pas encore été activé. Cliquez ci-dessous pour activer votre protection.',
     },
   };
 
@@ -214,6 +216,16 @@ function ErrorScreen({
         <div className="w-full py-4 px-6 bg-white/10 border border-white/20 text-white rounded-xl text-center text-base font-medium min-h-[56px]">
           {t('tracking.trust_note')}
         </div>
+
+        {/* Activation button for pending baggages */}
+        {type === 'pending_activation' && reference && (
+          <a
+            href={`/inscrire?qr=${encodeURIComponent(reference)}`}
+            className="mt-6 w-full py-4 px-6 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-bold text-lg transition-colors flex items-center justify-center gap-2 min-h-[56px] shadow-lg shadow-orange-500/30"
+          >
+            ✨ Activer mon colis
+          </a>
+        )}
       </div>
     </main>
   );
@@ -428,7 +440,7 @@ export default function SuiviPage() {
     return <ErrorScreen type="expired" t={t} lang={lang} setLang={setLang} />;
   }
   if (data.status === 'pending_activation') {
-    return <ErrorScreen type="pending_activation" t={t} lang={lang} setLang={setLang} />;
+    return <ErrorScreen type="pending_activation" t={t} lang={lang} setLang={setLang} reference={reference} />;
   }
 
   const baggage = data.baggage;

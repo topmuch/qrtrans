@@ -5,31 +5,47 @@ import { z } from 'zod';
 
 const WHATSAPP_REGEX = /^\+[1-9]\d{1,14}$/;
 
+// Schema accepts both old fields (sender/receiver) and new fields (traveler)
 const activateSchema = z.object({
   reference: z.string().min(1, 'La référence est obligatoire'),
-  // Itinéraire
-  transportMode: z.enum(['bus', 'gp']),
-  company: z.string().min(1, 'La compagnie de transport est obligatoire'),
-  departureCity: z.string().min(1, 'La ville de départ est obligatoire'),
-  arrivalCity: z.string().min(1, "La ville d'arrivée est obligatoire"),
-  departureDate: z.string().min(1, 'La date de départ est obligatoire'),
-  departureTime: z.string().min(1, "L'heure de départ est obligatoire"),
-  // Expéditeur
-  senderName: z.string().min(1, "Le nom de l'expéditeur est obligatoire"),
-  senderWhatsapp: z.string().regex(WHATSAPP_REGEX, 'Format WhatsApp invalide (ex: +221771234567)'),
-  // Destinataire
-  receiverName: z.string().min(1, 'Le nom du destinataire est obligatoire'),
-  receiverWhatsapp: z.string().regex(WHATSAPP_REGEX, 'Format WhatsApp invalide (ex: +221761234567)'),
+  // Transport mode (optional, defaults to flight)
+  transportMode: z.enum(['flight', 'train', 'boat', 'bus']).optional().default('flight'),
+  // Traveler info (new format from /inscrire)
+  travelerFirstName: z.string().optional(),
+  travelerLastName: z.string().optional(),
+  whatsappOwner: z.string().optional(),
+  // Sender/Receiver info (old format)
+  senderName: z.string().optional(),
+  senderWhatsapp: z.string().optional(),
+  receiverName: z.string().optional(),
+  receiverWhatsapp: z.string().optional(),
+  // Transport details
+  airlineName: z.string().optional(),
+  flightNumber: z.string().optional(),
+  trainCompany: z.string().optional(),
+  trainNumber: z.string().optional(),
+  shipName: z.string().optional(),
+  shipCabin: z.string().optional(),
+  busCompany: z.string().optional(),
+  busLineNumber: z.string().optional(),
+  company: z.string().optional(),
+  departureCity: z.string().optional(),
+  arrivalCity: z.string().optional(),
+  // Date/time
+  departureDate: z.string().optional(),
+  departureTime: z.string().optional(),
+  // Destination
+  destination: z.string().optional(),
 });
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const validatedData = activateSchema.parse(body);
+    const data = activateSchema.parse(body);
 
     // Find baggage by reference
     const baggage = await db.baggage.findUnique({
-      where: { reference: validatedData.reference.toUpperCase() },
+      where: { reference: (data.reference || '').toUpperCase() },
       include: { agency: true },
     });
 
@@ -47,28 +63,58 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Normalize fields: prefer new format, fall back to old format
+    const firstName = data.travelerFirstName || data.senderName || '';
+    const lastName = data.travelerLastName || '';
+    const whatsapp = data.whatsappOwner || data.senderWhatsapp || '';
+    const receiverName = data.receiverName || '';
+    const receiverWhatsapp = data.receiverWhatsapp || '';
+    const transportMode = data.transportMode || 'flight';
+    const dest = data.destination || data.arrivalCity || '';
+    const departDate = data.departureDate || '';
+
     // Calculate expiration
     const expiresAt = calculateExpirationDate('voyageur', 'sticker');
 
-    // Map transport mode to DB field
-    const dbTransportMode = validatedData.transportMode === 'gp' ? 'bus' : 'bus';
-    const dbCompany = validatedData.company;
+    // Build update data
+    const updateData: Record<string, unknown> = {
+      status: 'active',
+      expiresAt,
+    };
+
+    if (firstName) updateData.travelerFirstName = firstName;
+    if (lastName) updateData.travelerLastName = lastName;
+    if (whatsapp) updateData.whatsappOwner = whatsapp;
+    if (receiverName) updateData.receiverName = receiverName;
+    if (receiverWhatsapp) updateData.receiverWhatsapp = receiverWhatsapp;
+    updateData.transportMode = transportMode;
+
+    // Transport-specific fields
+    if (transportMode === 'flight') {
+      if (data.airlineName || data.company) updateData.airlineName = data.airlineName || data.company;
+      if (data.flightNumber) updateData.flightNumber = data.flightNumber;
+    } else if (transportMode === 'train') {
+      if (data.trainCompany || data.company) updateData.trainCompany = data.trainCompany || data.company;
+      if (data.trainNumber) updateData.trainNumber = data.trainNumber;
+    } else if (transportMode === 'boat') {
+      if (data.shipName || data.company) updateData.shipName = data.shipName || data.company;
+      if (data.shipCabin) updateData.shipCabin = data.shipCabin;
+    } else if (transportMode === 'bus') {
+      if (data.busCompany || data.company) {
+        updateData.busCompany = data.busCompany || data.company;
+        updateData.airlineName = data.busCompany || data.company; // fallback for display
+      }
+      if (data.busLineNumber) updateData.busLineNumber = data.busLineNumber;
+    }
+
+    if (dest) updateData.destination = dest;
+    if (departDate) updateData.departureDate = new Date(departDate + 'T00:00:00');
+    if (data.departureTime) updateData.departureTime = data.departureTime;
 
     // Update baggage
     const updatedBaggage = await db.baggage.update({
       where: { id: baggage.id },
-      data: {
-        travelerFirstName: validatedData.senderName,
-        whatsappOwner: validatedData.senderWhatsapp,
-        airlineName: dbCompany,
-        destination: validatedData.arrivalCity,
-        departureDate: new Date(validatedData.departureDate + 'T00:00:00'),
-        departureTime: validatedData.departureTime,
-        transportMode: dbTransportMode,
-        busCompany: dbCompany,
-        status: 'active',
-        expiresAt,
-      },
+      data: updateData,
     });
 
     return NextResponse.json({
@@ -82,16 +128,13 @@ export async function POST(request: NextRequest) {
       },
       activation: {
         reference: updatedBaggage.reference,
-        transportMode: validatedData.transportMode,
-        company: validatedData.company,
-        departureCity: validatedData.departureCity,
-        arrivalCity: validatedData.arrivalCity,
-        departureDate: validatedData.departureDate,
-        departureTime: validatedData.departureTime,
-        senderName: validatedData.senderName,
-        senderWhatsapp: validatedData.senderWhatsapp,
-        receiverName: validatedData.receiverName,
-        receiverWhatsapp: validatedData.receiverWhatsapp,
+        transportMode,
+        firstName,
+        lastName,
+        whatsapp,
+        destination: dest,
+        departureDate: departDate,
+        departureTime: data.departureTime || '',
       },
     });
   } catch (error) {
