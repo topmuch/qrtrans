@@ -439,6 +439,10 @@ export default function AgencyDashboardPage() {
   }, [baggages, search, statusFilter]);
 
   const fetchBaggages = async () => {
+    if (!agencyId) {
+      setLoading(false);
+      return;
+    }
     try {
       const params = new URLSearchParams({
         agencyId: agencyId,
@@ -447,17 +451,25 @@ export default function AgencyDashboardPage() {
       const response = await fetch(`/api/agency/baggages?${params}`);
       const data = await response.json();
 
-      setBaggages(data.baggages);
-      setStats(data.stats);
+      if (response.ok && data.baggages) {
+        setBaggages(Array.isArray(data.baggages) ? data.baggages : []);
+        setStats(data.stats || { total: 0, pending: 0, active: 0, scanned: 0, lost: 0, found: 0 });
+      } else {
+        console.error('API error:', data.error || 'Unknown error');
+        setBaggages([]);
+        setStats({ total: 0, pending: 0, active: 0, scanned: 0, lost: 0, found: 0 });
+      }
     } catch (error) {
       console.error('Error fetching baggages:', error);
+      setBaggages([]);
+      setStats({ total: 0, pending: 0, active: 0, scanned: 0, lost: 0, found: 0 });
     } finally {
       setLoading(false);
     }
   };
 
   const filterBaggages = () => {
-    let filtered = [...baggages];
+    let filtered = Array.isArray(baggages) ? [...baggages] : [];
 
     if (statusFilter !== 'all') {
       filtered = filtered.filter(b => b.status === statusFilter);
