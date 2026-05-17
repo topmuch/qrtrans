@@ -168,68 +168,67 @@ export default function VoyageSection({
           </div>
         </div>
 
-        {/* Separator */}
-        <div className="border-t border-white/20 pt-4">
+        {/* ─── Récupération & Paiement ─── */}
+        <div className="border-2 border-dashed border-white/60 rounded-xl p-3 sm:p-4">
           <p className="text-xs sm:text-sm font-bold text-white uppercase tracking-wider mb-3 sm:mb-4 flex items-center gap-1.5 sm:gap-2">
             <MapPin className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             {t('Récupération & Paiement', 'Pickup & Payment')}
           </p>
+
+          {/* Pickup Address */}
+          <div className="space-y-1.5">
+            <Label htmlFor="pickup_address" className="text-sm sm:text-base font-semibold text-white">
+              📍 {t('Adresse de récupération précise', 'Precise pickup address')}
+            </Label>
+            <TextareaAutosize
+              id="pickup_address"
+              value={pickupAddress}
+              onChange={(e) => setPickupAddress(e.target.value)}
+              placeholder={t('Ex: Gare routière, Boutique X, N° de porte...', 'Ex: Bus station, Shop X, Door number...')}
+              className="w-full min-h-[56px] sm:min-h-[70px] px-3 py-2.5 sm:py-3 bg-white border-white/30 focus-visible:ring-white/50 focus-visible:border-white/60 rounded-lg text-sm sm:text-base text-gray-900 placeholder:text-gray-500 resize-none"
+              minRows={2}
+            />
+          </div>
+
+          {/* Estimated Arrival */}
+          <div className="space-y-1.5 mt-3">
+            <Label htmlFor="estimated_arrival" className="text-sm sm:text-base font-semibold text-white">
+              <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4 inline mr-1" />
+              {t("Heure d'arrivée estimée", 'Estimated arrival time')}
+            </Label>
+            <Input
+              id="estimated_arrival"
+              type="time"
+              value={estimatedArrival}
+              onChange={(e) => setEstimatedArrival(e.target.value)}
+              className="h-12 sm:h-14 bg-white border-white/30 focus-visible:ring-white/50 focus-visible:border-white/60 text-sm sm:text-base text-gray-900 [color-scheme:light]"
+            />
+          </div>
         </div>
 
-        {/* Pickup Address */}
-        <div className="space-y-1.5">
-          <Label htmlFor="pickup_address" className="text-sm sm:text-base font-semibold text-white">
-            📍 {t('Adresse de récupération précise', 'Precise pickup address')}
-          </Label>
-          <TextareaAutosize
-            id="pickup_address"
-            value={pickupAddress}
-            onChange={(e) => setPickupAddress(e.target.value)}
-            placeholder={t('Ex: Gare routière, Boutique X, N° de porte...', 'Ex: Bus station, Shop X, Door number...')}
-            className="w-full min-h-[56px] sm:min-h-[70px] px-3 py-2.5 sm:py-3 bg-white border-white/30 focus-visible:ring-white/50 focus-visible:border-white/60 rounded-lg text-sm sm:text-base text-gray-900 placeholder:text-gray-500 resize-none"
-            minRows={2}
-          />
-        </div>
-
-        {/* Estimated Arrival */}
-        <div className="space-y-1.5">
-          <Label htmlFor="estimated_arrival" className="text-sm sm:text-base font-semibold text-white">
-            <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4 inline mr-1" />
-            {t("Heure d'arrivée estimée", 'Estimated arrival time')}
-          </Label>
-          <Input
-            id="estimated_arrival"
-            type="time"
-            value={estimatedArrival}
-            onChange={(e) => setEstimatedArrival(e.target.value)}
-            className="h-12 sm:h-14 bg-white border-white/30 focus-visible:ring-white/50 focus-visible:border-white/60 text-sm sm:text-base text-gray-900 [color-scheme:light]"
-          />
-        </div>
-
-        {/* Driver Phone Section */}
-        <div className="border-t border-white/20 pt-4">
+        {/* ─── Chauffeur / Transporteur ─── */}
+        <div className="border-2 border-dashed border-white/60 rounded-xl p-3 sm:p-4">
           <p className="text-xs sm:text-sm font-bold text-white uppercase tracking-wider mb-3 sm:mb-4 flex items-center gap-1.5 sm:gap-2">
             <Phone className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             {t('Chauffeur / Transporteur', 'Driver / Transporter')}
           </p>
-        </div>
 
-        <div className="space-y-1.5">
-          <SmartPhoneInput
-            label={t('Numéro du Chauffeur', 'Driver Number')}
-            value={driverPhone}
-            onChange={(v) => setDriverPhone(v)}
-            hint={t('Numéro WhatsApp du chauffeur ou transporteur.', 'WhatsApp number of the driver or transporter.')}
-            error={driverPhoneError}
-            name="driver_phone"
-            optional
-            labelClassName="text-white"
-            hintClassName="text-white"
-          />
-        </div>
+          <div className="space-y-1.5">
+            <SmartPhoneInput
+              label={t('Numéro du Chauffeur', 'Driver Number')}
+              value={driverPhone}
+              onChange={(v) => setDriverPhone(v)}
+              hint={t('Numéro WhatsApp du chauffeur ou transporteur.', 'WhatsApp number of the driver or transporter.')}
+              error={driverPhoneError}
+              name="driver_phone"
+              optional
+              labelClassName="text-white"
+              hintClassName="text-white"
+            />
+          </div>
 
-        {/* Share Toggle — stacked on mobile */}
-        <div className="p-3 sm:p-3.5 bg-white/10 rounded-xl border-2 border-dashed border-white/60">
+          {/* Share Toggle — stacked on mobile */}
+          <div className="p-3 sm:p-3.5 bg-white/10 rounded-xl border-2 border-dashed border-white/60 mt-3">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex-1 min-w-0">
               <Label className="text-sm sm:text-base font-semibold text-white cursor-pointer leading-snug">
@@ -257,14 +256,15 @@ export default function VoyageSection({
             </button>
           </div>
         </div>
+        </div>
 
-        {/* Payment Status — responsive button text */}
-        <div className="space-y-1.5">
+        {/* ─── Statut & Paiement ─── */}
+        <div className="border-2 border-dashed border-white/60 rounded-xl p-3 sm:p-4">
           <Label className="text-sm sm:text-base font-semibold text-white">
             <CreditCard className="w-3.5 h-3.5 sm:w-4 sm:h-4 inline mr-1" />
             {t('Statut Paiement', 'Payment Status')} <span className="text-yellow-300">*</span>
           </Label>
-          <div className="grid grid-cols-2 gap-2 sm:gap-3">
+          <div className="grid grid-cols-2 gap-2 sm:gap-3 mt-1.5">
             <button
               type="button"
               onClick={() => setPaymentStatus('SENDER_PAID')}

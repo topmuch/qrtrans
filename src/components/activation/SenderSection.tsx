@@ -74,7 +74,7 @@ export default function SenderSection({
 
       <div className="space-y-4 sm:space-y-6">
         {/* ─── Section A: Coordonnées Expéditeur ─── */}
-        <div>
+        <div className="border-2 border-dashed border-white/60 rounded-xl p-3 sm:p-4">
           <p className="text-xs sm:text-sm font-bold text-white uppercase tracking-wider mb-2 sm:mb-3">
             👤 {t('Coordonnées Expéditeur', 'Sender Details')}
           </p>
@@ -106,11 +106,8 @@ export default function SenderSection({
           </div>
         </div>
 
-        {/* Separator */}
-        <div className="border-t border-white/20" />
-
         {/* ─── Section B: Type & Physique du Bagage ─── */}
-        <div>
+        <div className="border-2 border-dashed border-white/60 rounded-xl p-3 sm:p-4">
           <p className="text-xs sm:text-sm font-bold text-white uppercase tracking-wider mb-2 sm:mb-3">
             📦 {t('Type & Physique du Bagage', 'Baggage Type & Physical')}
           </p>
@@ -197,11 +194,8 @@ export default function SenderSection({
           </div>
         </div>
 
-        {/* Separator */}
-        <div className="border-t border-white/20" />
-
         {/* ─── Section C: Contenu & Valeur ─── */}
-        <div>
+        <div className="border-2 border-dashed border-white/60 rounded-xl p-3 sm:p-4">
           <p className="text-xs sm:text-sm font-bold text-white uppercase tracking-wider mb-2 sm:mb-3">
             📋 {t('Contenu & Valeur', 'Content & Value')}
           </p>
