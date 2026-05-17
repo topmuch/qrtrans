@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { useParams } from 'next/navigation';
+import { useState, useEffect, useRef, useCallback, Suspense } from 'react';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import {
   QrCode,
   Loader2,
@@ -266,9 +266,15 @@ function ColisSummaryCard({ colis, lang }: { colis: ColisData; lang: 'fr' | 'en'
 //  MAIN PAGE
 // ═══════════════════════════════════════════════════
 
-export default function RetrievePage() {
+function RetrieveContent() {
   const params = useParams();
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const reference = ((params?.id as string) || '').toUpperCase().trim();
+
+  // Check if returning from /sending after notification
+  const notifiedParam = searchParams.get('notified'); // 'sender' | 'receiver'
+  const isReturningFromNotify = notifiedParam === 'sender' || notifiedParam === 'receiver';
 
   // ─── States ───
   const [currentLang, setCurrentLang] = useState<'fr' | 'en'>('fr');
@@ -352,6 +358,10 @@ export default function RetrievePage() {
       if (data.success) {
         setConfirmed(true);
         setSuccessData({ wa_sender: data.wa_sender, wa_receiver: data.wa_receiver });
+        // Store WhatsApp links in sessionStorage for returning from /sending
+        try {
+          sessionStorage.setItem(`wa_${reference}`, JSON.stringify({ wa_sender: data.wa_sender, wa_receiver: data.wa_receiver }));
+        } catch { /* noop */ }
       } else if (data.blocked) {
         setPinBlocked(true);
         setPinError(tFn('Code bloqué après 3 tentatives. Contactez l\'agence.', 'Code blocked after 3 attempts. Contact the agency.'));
@@ -396,14 +406,27 @@ export default function RetrievePage() {
     }
   };
 
+  // ─── Restore WhatsApp links from sessionStorage when returning from /sending ───
+  useEffect(() => {
+    if (isReturningFromNotify && !successData) {
+      try {
+        const stored = sessionStorage.getItem(`wa_${reference}`);
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          setSuccessData(parsed);
+        }
+      } catch { /* noop */ }
+    }
+  }, [isReturningFromNotify, reference, successData]);
+
   // ─── Determine status ───
   const isAlreadyDelivered = colis?.status === 'delivered';
-  const isNormal = colis && colis.status === 'in_transit' && !confirmed;
+  const isNormal = colis && colis.status === 'in_transit' && !confirmed && !isReturningFromNotify;
 
   // ═══════════════════════════════════════════════════
   //  RENDER — Loading
   // ═══════════════════════════════════════════════════
-  if (loadingData) {
+  if (loadingData && !isReturningFromNotify) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-[#F8FAFC] to-white">
         <RetrieveHeader
@@ -452,8 +475,8 @@ export default function RetrievePage() {
           </div>
         )}
 
-        {/* ─── ALREADY DELIVERED ─── */}
-        {colis && isAlreadyDelivered && (
+        {/* ─── ALREADY DELIVERED (not returning from notify) ─── */}
+        {colis && isAlreadyDelivered && !isReturningFromNotify && (
           <div className="space-y-4">
             <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-5 text-center animate-in fade-in">
               <div className="inline-flex items-center justify-center w-12 h-12 bg-emerald-100 rounded-full mb-3">
@@ -604,12 +627,20 @@ export default function RetrievePage() {
                 {tFn('Notifier par WhatsApp', 'Notify via WhatsApp')}
               </h3>
 
-              {colis.senderPhone && (
-                <a
-                  href={successData.wa_sender}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-center gap-3 w-full h-16 bg-[#FF6B35] hover:bg-[#e55a28] active:bg-[#d04e1f] text-white rounded-2xl font-bold text-base shadow-lg shadow-orange-500/30 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] no-underline"
+              {colis.senderPhone && successData?.wa_sender && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    const p = new URLSearchParams({
+                      waLink: successData.wa_sender,
+                      to: colis.senderName,
+                      type: 'sender',
+                      callback: `/retrieve/${reference}?notified=sender`,
+                      suivi: `/suivi/${reference}`,
+                    });
+                    router.push(`/sending?${p.toString()}`);
+                  }}
+                  className="flex items-center justify-center gap-3 w-full h-16 bg-[#FF6B35] hover:bg-[#e55a28] active:bg-[#d04e1f] text-white rounded-2xl font-bold text-base shadow-lg shadow-orange-500/30 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
                 >
                   <span className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0">
                     <svg viewBox="0 0 24 24" className="w-5 h-5 text-white" fill="currentColor">
@@ -618,16 +649,23 @@ export default function RetrievePage() {
                   </span>
                   {tFn('NOTIFIER L\'EXPÉDITEUR', 'NOTIFY SENDER')}
                   <span className="text-xs text-white/70 truncate max-w-[120px]">{colis.senderName}</span>
-                  <ExternalLink className="w-4 h-4 opacity-60" />
-                </a>
+                </button>
               )}
 
-              {colis.receiverPhone && (
-                <a
-                  href={successData.wa_receiver}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-center gap-3 w-full h-16 bg-[#25D366] hover:bg-[#1fb855] active:bg-[#1a9e49] text-white rounded-2xl font-bold text-base shadow-lg shadow-green-500/30 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] no-underline"
+              {colis.receiverPhone && successData?.wa_receiver && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    const p = new URLSearchParams({
+                      waLink: successData.wa_receiver,
+                      to: colis.receiverName,
+                      type: 'receiver',
+                      callback: `/retrieve/${reference}?notified=receiver`,
+                      suivi: `/suivi/${reference}`,
+                    });
+                    router.push(`/sending?${p.toString()}`);
+                  }}
+                  className="flex items-center justify-center gap-3 w-full h-16 bg-[#25D366] hover:bg-[#1fb855] active:bg-[#1a9e49] text-white rounded-2xl font-bold text-base shadow-lg shadow-green-500/30 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
                 >
                   <span className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0">
                     <svg viewBox="0 0 24 24" className="w-5 h-5 text-white" fill="currentColor">
@@ -636,8 +674,7 @@ export default function RetrievePage() {
                   </span>
                   {tFn('NOTIFIER LE DESTINATAIRE', 'NOTIFY RECEIVER')}
                   <span className="text-xs text-white/70 truncate max-w-[120px]">{colis.receiverName}</span>
-                  <ExternalLink className="w-4 h-4 opacity-60" />
-                </a>
+                </button>
               )}
             </div>
 
@@ -665,8 +702,76 @@ export default function RetrievePage() {
           </div>
         )}
 
+        {/* ─── RETURNING FROM /SENDING (show remaining notification) ─── */}
+        {isReturningFromNotify && colis && successData && (
+          <div className="space-y-5">
+            {/* Success banner */}
+            <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-6 text-center animate-in fade-in">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-emerald-100 rounded-full mb-3">
+                <CheckCircle className="w-8 h-8 text-emerald-600" />
+              </div>
+              <h2 className="text-xl font-bold text-emerald-800">
+                {tFn('LIVRAISON CONFIRMÉE !', 'DELIVERY CONFIRMED!')}
+              </h2>
+            </div>
+
+            {/* Delivery summary */}
+            <div className="bg-gray-50 rounded-xl p-5 space-y-3">
+              <h3 className="text-sm font-semibold text-gray-700 mb-2">{tFn('Résumé de la livraison', 'Delivery summary')}</h3>
+              <div className="grid grid-cols-2 gap-3">
+                <div><p className="text-xs text-gray-500">{tFn('Référence', 'Reference')}</p><p className="text-sm font-mono font-bold text-gray-900">{colis.reference}</p></div>
+                <div><p className="text-xs text-gray-500">{tFn('Destinataire', 'Receiver')}</p><p className="text-sm font-semibold text-gray-900 truncate">{colis.receiverName || '—'}</p></div>
+                <div><p className="text-xs text-gray-500">{tFn('Expéditeur', 'Sender')}</p><p className="text-sm font-semibold text-gray-900 truncate">{colis.senderName || '—'}</p></div>
+                <div><p className="text-xs text-gray-500">{tFn('Destination', 'Destination')}</p><p className="text-sm font-semibold text-gray-900 truncate">{colis.arrivalCity || '—'}</p></div>
+              </div>
+            </div>
+
+            {/* WhatsApp notification buttons */}
+            <div className="space-y-3">
+              <h3 className="text-sm font-semibold text-gray-700">{tFn('Notifier par WhatsApp', 'Notify via WhatsApp')}</h3>
+
+              {/* Sender button */}
+              {notifiedParam === 'sender' ? (
+                <div className="flex items-center justify-center gap-3 w-full h-16 bg-gray-100 border border-gray-200 rounded-2xl text-gray-400">
+                  <span className="w-8 h-8 bg-gray-200 rounded-lg flex items-center justify-center"><CheckCircle className="w-5 h-5" /></span>
+                  <span className="font-bold text-base">✅ {tFn('EXPÉDITEUR NOTIFIÉ', 'SENDER NOTIFIED')}</span>
+                </div>
+              ) : colis.senderPhone && successData.wa_sender ? (
+                <button type="button" onClick={() => { const p = new URLSearchParams({ waLink: successData.wa_sender, to: colis.senderName, type: 'sender', callback: `/retrieve/${reference}?notified=sender`, suivi: `/suivi/${reference}` }); router.push(`/sending?${p.toString()}`); }} className="flex items-center justify-center gap-3 w-full h-16 bg-[#FF6B35] hover:bg-[#e55a28] active:bg-[#d04e1f] text-white rounded-2xl font-bold text-base shadow-lg shadow-orange-500/30 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]">
+                  <span className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0"><svg viewBox="0 0 24 24" className="w-5 h-5 text-white" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></span>
+                  {tFn('NOTIFIER L\'EXPÉDITEUR', 'NOTIFY SENDER')}
+                </button>
+              ) : null}
+
+              {/* Receiver button */}
+              {notifiedParam === 'receiver' ? (
+                <div className="flex items-center justify-center gap-3 w-full h-16 bg-gray-100 border border-gray-200 rounded-2xl text-gray-400">
+                  <span className="w-8 h-8 bg-gray-200 rounded-lg flex items-center justify-center"><CheckCircle className="w-5 h-5" /></span>
+                  <span className="font-bold text-base">✅ {tFn('DESTINATAIRE NOTIFIÉ', 'RECEIVER NOTIFIED')}</span>
+                </div>
+              ) : colis.receiverPhone && successData.wa_receiver ? (
+                <button type="button" onClick={() => { const p = new URLSearchParams({ waLink: successData.wa_receiver, to: colis.receiverName, type: 'receiver', callback: `/retrieve/${reference}?notified=receiver`, suivi: `/suivi/${reference}` }); router.push(`/sending?${p.toString()}`); }} className="flex items-center justify-center gap-3 w-full h-16 bg-[#25D366] hover:bg-[#1fb855] active:bg-[#1a9e49] text-white rounded-2xl font-bold text-base shadow-lg shadow-green-500/30 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]">
+                  <span className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0"><svg viewBox="0 0 24 24" className="w-5 h-5 text-white" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></span>
+                  {tFn('NOTIFIER LE DESTINATAIRE', 'NOTIFY RECEIVER')}
+                </button>
+              ) : null}
+            </div>
+
+            {/* Copy tracking link */}
+            <button type="button" onClick={handleCopyLink} className="flex items-center justify-center gap-2 w-full h-12 bg-gray-100 hover:bg-gray-200 border border-gray-200 rounded-xl text-sm font-semibold text-gray-700 transition-colors">
+              <Copy className="w-4 h-4" />
+              {copied ? tFn('✅ Lien copié !', '✅ Link copied!') : tFn('Copier le lien de suivi', 'Copy tracking link')}
+            </button>
+
+            {/* Back home */}
+            <div className="text-center pt-2">
+              <Link href="/" className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-gray-900 transition-colors no-underline"><Home className="w-4 h-4" />{tFn("Retour à l'accueil", 'Back to home')}</Link>
+            </div>
+          </div>
+        )}
+
         {/* ─── Status is neither in_transit nor delivered (e.g. pending_activation) ─── */}
-        {colis && !isAlreadyDelivered && !isNormal && !confirmed && (
+        {colis && !isAlreadyDelivered && !isNormal && !confirmed && !isReturningFromNotify && (
           <div className="text-center py-16 space-y-4">
             <div className="inline-flex items-center justify-center w-16 h-16 bg-amber-50 rounded-full">
               <ShieldAlert className="w-8 h-8 text-amber-500" />
@@ -694,5 +799,28 @@ export default function RetrievePage() {
         )}
       </main>
     </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════
+//  PAGE EXPORT (with Suspense for useSearchParams)
+// ═══════════════════════════════════════════════════
+
+export default function RetrievePage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-gradient-to-b from-[#F8FAFC] to-white">
+          <div className="max-w-[600px] mx-auto px-4 h-16 flex items-center justify-center">
+            <Loader2 className="w-6 h-6 text-white animate-spin" />
+          </div>
+          <div className="flex items-center justify-center py-32">
+            <Loader2 className="w-8 h-8 text-gray-400 animate-spin" />
+          </div>
+        </div>
+      }
+    >
+      <RetrieveContent />
+    </Suspense>
   );
 }
