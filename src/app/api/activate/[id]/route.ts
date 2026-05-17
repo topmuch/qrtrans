@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { z } from 'zod';
 import { cleanPhone, generateWaMeLink } from '@/lib/wame';
+import { sendEmail, getEmailSettings, getColisActivatedEmailTemplate } from '@/lib/email';
 
 const WHATSAPP_REGEX = /^\+[1-9]\d{1,14}$/;
 
@@ -251,6 +252,48 @@ Vous serez notifié immédiatement dès l'arrivée du colis.
 
     const wa_sender = generateWaMeLink(cleanPhone(data.sender.phone), senderMessage);
     const wa_receiver = generateWaMeLink(cleanPhone(data.receiver.phone), receiverMessage);
+
+    // 📧 Send email notification for colis activation
+    try {
+      const emailSettings = await getEmailSettings();
+      if (emailSettings) {
+        const template = getColisActivatedEmailTemplate({
+          reference: updated.reference,
+          agencyName: colis.agency?.name || undefined,
+          senderName: data.sender.name,
+          senderPhone: data.sender.phone,
+          receiverName: data.receiver.name,
+          receiverPhone: data.receiver.phone,
+          companyName: data.company_name,
+          departureCity: data.departure_city,
+          arrivalCity: data.arrival_city,
+          departureDate: formattedDate,
+          departureTime: formattedTime,
+          colisType: baggageTypeLabel,
+          transportMode: 'bus',
+          paymentStatus: data.payment_status,
+        });
+
+        const recipients: string[] = [];
+        if (emailSettings.recipientEmail) recipients.push(emailSettings.recipientEmail);
+        if (colis.agency?.email && !recipients.includes(colis.agency.email)) recipients.push(colis.agency.email);
+
+        if (recipients.length > 0) {
+          await sendEmail({
+            to: recipients,
+            subject: `🚌 Colis activé — ${updated.reference}`,
+            html: template.html,
+            text: template.text,
+            type: 'colis_activated',
+            agencyId: colis.agencyId || undefined,
+            data: { reference: updated.reference, baggageId: updated.id },
+          });
+          console.log(`📧 Activation email sent for ${updated.reference} to ${recipients.join(', ')}`);
+        }
+      }
+    } catch (emailError) {
+      console.error('Failed to send activation email:', emailError);
+    }
 
     // Log activation events to ColisEvent table
     const maskPhone = (phone: string) => {

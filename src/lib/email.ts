@@ -692,6 +692,167 @@ export function getNewLeadEmailTemplate(data: {
   };
 }
 
+// ============ COLIS TRACKING EMAIL TEMPLATES ============
+
+export function getColisActivatedEmailTemplate(data: {
+  reference: string;
+  agencyName?: string;
+  senderName?: string;
+  senderPhone?: string;
+  receiverName?: string;
+  receiverPhone?: string;
+  companyName?: string;
+  departureCity?: string;
+  arrivalCity?: string;
+  departureDate?: string;
+  departureTime?: string;
+  colisType?: string;
+  transportMode?: string;
+  paymentStatus?: string;
+}): { html: string; text: string } {
+  const now = new Date().toLocaleString('fr-FR');
+  const transportIcon = data.transportMode === 'flight' ? '✈️' : data.transportMode === 'train' ? '🚆' : data.transportMode === 'boat' ? '🚢' : '🚌';
+  return {
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <div style="text-align: center; margin-bottom: 30px;">
+          <h1 style="color: #ff7f00; margin: 0;">QRTrans</h1>
+        </div>
+        <div style="background: #fffbeb; border: 2px solid #f59e0b; border-radius: 10px; padding: 30px;">
+          <h2 style="color: #d97706; margin-top: 0;">${transportIcon} Colis activé — En transit</h2>
+          <p style="color: #666;">Un nouveau colis a été activé et est actuellement en route. Voici les détails :</p>
+          <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+            <tr>
+              <td style="padding: 8px 0; color: #999; font-size: 14px; border-bottom: 1px solid #eee; width: 40%;">Référence</td>
+              <td style="padding: 8px 0; font-weight: bold; color: #333; border-bottom: 1px solid #eee;">${data.reference}</td>
+            </tr>
+            ${data.agencyName ? `
+            <tr>
+              <td style="padding: 8px 0; color: #999; font-size: 14px; border-bottom: 1px solid #eee;">Agence</td>
+              <td style="padding: 8px 0; font-weight: bold; color: #333; border-bottom: 1px solid #eee;">${data.agencyName}</td>
+            </tr>` : ''}
+            <tr>
+              <td style="padding: 8px 0; color: #999; font-size: 14px; border-bottom: 1px solid #eee;">Expéditeur</td>
+              <td style="padding: 8px 0; font-weight: bold; color: #333; border-bottom: 1px solid #eee;">${data.senderName || 'Non renseigné'} ${data.senderPhone ? `<span style="color:#999;font-weight:normal;font-size:12px;">(${data.senderPhone})</span>` : ''}</td>
+            </tr>
+            <tr>
+              <td style="padding: 8px 0; color: #999; font-size: 14px; border-bottom: 1px solid #eee;">Destinataire</td>
+              <td style="padding: 8px 0; font-weight: bold; color: #333; border-bottom: 1px solid #eee;">${data.receiverName || 'Non renseigné'} ${data.receiverPhone ? `<span style="color:#999;font-weight:normal;font-size:12px;">(${data.receiverPhone})</span>` : ''}</td>
+            </tr>
+            ${data.companyName ? `
+            <tr>
+              <td style="padding: 8px 0; color: #999; font-size: 14px; border-bottom: 1px solid #eee;">Compagnie</td>
+              <td style="padding: 8px 0; font-weight: bold; color: #333; border-bottom: 1px solid #eee;">${data.companyName}</td>
+            </tr>` : ''}
+            <tr>
+              <td style="padding: 8px 0; color: #999; font-size: 14px; border-bottom: 1px solid #eee;">Trajet</td>
+              <td style="padding: 8px 0; font-weight: bold; color: #333; border-bottom: 1px solid #eee;">${data.departureCity || '—'} → ${data.arrivalCity || '—'}</td>
+            </tr>
+            ${data.departureDate ? `
+            <tr>
+              <td style="padding: 8px 0; color: #999; font-size: 14px; border-bottom: 1px solid #eee;">Départ</td>
+              <td style="padding: 8px 0; font-weight: bold; color: #333; border-bottom: 1px solid #eee;">${data.departureDate}${data.departureTime ? ' à ' + data.departureTime : ''}</td>
+            </tr>` : ''}
+            ${data.colisType ? `
+            <tr>
+              <td style="padding: 8px 0; color: #999; font-size: 14px; border-bottom: 1px solid #eee;">Type de colis</td>
+              <td style="padding: 8px 0; font-weight: bold; color: #333; border-bottom: 1px solid #eee;">${data.colisType}</td>
+            </tr>` : ''}
+            ${data.paymentStatus ? `
+            <tr>
+              <td style="padding: 8px 0; color: #999; font-size: 14px;">Paiement</td>
+              <td style="padding: 8px 0; font-weight: bold; color: #333;">${data.paymentStatus === 'SENDER_PAID' ? '✅ Payé par l\'expéditeur' : '💸 À payer par le destinataire'}</td>
+            </tr>` : ''}
+          </table>
+        </div>
+        <p style="color: #999; font-size: 12px; text-align: center; margin-top: 20px;">Notification automatique QRTrans — ${now}</p>
+        <div style="text-align: center; color: #999; font-size: 12px;">
+          <p>© QRTrans - Tous droits réservés</p>
+        </div>
+      </div>
+    `,
+    text: `${transportIcon} QRTrans — Colis activé (En transit)\n\nRéférence: ${data.reference}\nAgence: ${data.agencyName || 'Non renseignée'}\nExpéditeur: ${data.senderName || 'Non renseigné'}${data.senderPhone ? ' (' + data.senderPhone + ')' : ''}\nDestinataire: ${data.receiverName || 'Non renseigné'}${data.receiverPhone ? ' (' + data.receiverPhone + ')' : ''}\nCompagnie: ${data.companyName || 'Non renseignée'}\nTrajet: ${data.departureCity || '—'} → ${data.arrivalCity || '—'}\n${data.departureDate ? `Départ: ${data.departureDate}${data.departureTime ? ' à ' + data.departureTime : ''}\n` : ''}${data.colisType ? `Type: ${data.colisType}\n` : ''}${data.paymentStatus ? `Paiement: ${data.paymentStatus === 'SENDER_PAID' ? 'Payé par l\'expéditeur' : 'À payer par le destinataire'}\n` : ''}\nNotification automatique QRTrans — ${now}\n© QRTrans`,
+  };
+}
+
+export function getColisDeliveredEmailTemplate(data: {
+  reference: string;
+  agencyName?: string;
+  senderName?: string;
+  receiverName?: string;
+  deliveryLocation?: string;
+  deliveryDate?: string;
+  deliveryTime?: string;
+  deliveryMethod?: 'driver' | 'pin';
+  companyName?: string;
+  departureCity?: string;
+  arrivalCity?: string;
+}): { html: string; text: string } {
+  const now = new Date().toLocaleString('fr-FR');
+  const methodLabel = data.deliveryMethod === 'pin' ? '🔐 Code PIN validé par le destinataire' : '📍 Confirmation par le chauffeur';
+  return {
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <div style="text-align: center; margin-bottom: 30px;">
+          <h1 style="color: #ff7f00; margin: 0;">QRTrans</h1>
+        </div>
+        <div style="background: #e8f5e9; border: 2px solid #22c55e; border-radius: 10px; padding: 30px;">
+          <h2 style="color: #16a34a; margin-top: 0;">✅ Colis livré avec succès !</h2>
+          <p style="color: #666;">Un colis a été marqué comme livré. Voici les détails :</p>
+          <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 10px 15px; margin: 15px 0;">
+            <p style="color: #16a34a; margin: 0; font-size: 14px; font-weight: bold;">${methodLabel}</p>
+          </div>
+          <table style="width: 100%; border-collapse: collapse; margin-top: 15px;">
+            <tr>
+              <td style="padding: 8px 0; color: #999; font-size: 14px; border-bottom: 1px solid #eee; width: 40%;">Référence</td>
+              <td style="padding: 8px 0; font-weight: bold; color: #333; border-bottom: 1px solid #eee;">${data.reference}</td>
+            </tr>
+            ${data.agencyName ? `
+            <tr>
+              <td style="padding: 8px 0; color: #999; font-size: 14px; border-bottom: 1px solid #eee;">Agence</td>
+              <td style="padding: 8px 0; font-weight: bold; color: #333; border-bottom: 1px solid #eee;">${data.agencyName}</td>
+            </tr>` : ''}
+            <tr>
+              <td style="padding: 8px 0; color: #999; font-size: 14px; border-bottom: 1px solid #eee;">Expéditeur</td>
+              <td style="padding: 8px 0; font-weight: bold; color: #333; border-bottom: 1px solid #eee;">${data.senderName || 'Non renseigné'}</td>
+            </tr>
+            <tr>
+              <td style="padding: 8px 0; color: #999; font-size: 14px; border-bottom: 1px solid #eee;">Destinataire</td>
+              <td style="padding: 8px 0; font-weight: bold; color: #333; border-bottom: 1px solid #eee;">${data.receiverName || 'Non renseigné'}</td>
+            </tr>
+            ${data.departureCity && data.arrivalCity ? `
+            <tr>
+              <td style="padding: 8px 0; color: #999; font-size: 14px; border-bottom: 1px solid #eee;">Trajet</td>
+              <td style="padding: 8px 0; font-weight: bold; color: #333; border-bottom: 1px solid #eee;">${data.departureCity} → ${data.arrivalCity}</td>
+            </tr>` : ''}
+            ${data.companyName ? `
+            <tr>
+              <td style="padding: 8px 0; color: #999; font-size: 14px; border-bottom: 1px solid #eee;">Compagnie</td>
+              <td style="padding: 8px 0; font-weight: bold; color: #333; border-bottom: 1px solid #eee;">${data.companyName}</td>
+            </tr>` : ''}
+            <tr>
+              <td style="padding: 8px 0; color: #999; font-size: 14px; border-bottom: 1px solid #eee;">Lieu de livraison</td>
+              <td style="padding: 8px 0; font-weight: bold; color: #333; border-bottom: 1px solid #eee;">${data.deliveryLocation || 'Non renseigné'}</td>
+            </tr>
+            ${data.deliveryDate ? `
+            <tr>
+              <td style="padding: 8px 0; color: #999; font-size: 14px;">Date de livraison</td>
+              <td style="padding: 8px 0; font-weight: bold; color: #16a34a;">${data.deliveryDate}${data.deliveryTime ? ' à ' + data.deliveryTime : ''}</td>
+            </tr>` : ''}
+          </table>
+        </div>
+        <p style="color: #999; font-size: 12px; text-align: center; margin-top: 20px;">Notification automatique QRTrans — ${now}</p>
+        <div style="text-align: center; color: #999; font-size: 12px;">
+          <p>© QRTrans - Tous droits réservés</p>
+        </div>
+      </div>
+    `,
+    text: `✅ QRTrans — Colis livré avec succès !\n\n${methodLabel}\n\nRéférence: ${data.reference}\nAgence: ${data.agencyName || 'Non renseignée'}\nExpéditeur: ${data.senderName || 'Non renseigné'}\nDestinataire: ${data.receiverName || 'Non renseigné'}\n${data.departureCity && data.arrivalCity ? `Trajet: ${data.departureCity} → ${data.arrivalCity}\n` : ''}${data.companyName ? `Compagnie: ${data.companyName}\n` : ''}Lieu: ${data.deliveryLocation || 'Non renseigné'}\n${data.deliveryDate ? `Date: ${data.deliveryDate}${data.deliveryTime ? ' à ' + data.deliveryTime : ''}\n` : ''}\nNotification automatique QRTrans — ${now}\n© QRTrans`,
+  };
+}
+
+// ============ EMAIL CODE VERIFICATION ============
+
 export async function verifyEmailCode(code: string, email: string, type: 'email_verification' | 'password_reset'): Promise<{ valid: boolean; error?: string }> {
   const emailToken = await prisma.emailToken.findFirst({
     where: {

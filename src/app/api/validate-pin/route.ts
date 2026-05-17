@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { z } from 'zod';
 import { cleanPhone, generateWaMeLink } from '@/lib/wame';
+import { sendEmail, getEmailSettings, getColisDeliveredEmailTemplate } from '@/lib/email';
 
 // PIN-FEATURE: Zod schema for PIN validation
 const validatePinSchema = z.object({
@@ -95,6 +96,51 @@ export async function POST(request: NextRequest) {
 
     // Company name for assistance
     const companyName = updated.busCompany || updated.airlineName || updated.trainCompany || '';
+
+    // 📧 Send email notification for delivery (PIN validated)
+    try {
+      const emailSettings = await getEmailSettings();
+      if (emailSettings) {
+        // Re-fetch colis with agency info for the email
+        const colisWithAgency = await db.baggage.findUnique({
+          where: { id: colis.id },
+          include: { agency: true },
+        });
+
+        const template = getColisDeliveredEmailTemplate({
+          reference: updated.reference,
+          agencyName: colisWithAgency?.agency?.name || undefined,
+          senderName: updated.travelerFirstName || undefined,
+          receiverName: updated.receiverName || undefined,
+          deliveryLocation: updated.deliveryLocation || undefined,
+          deliveryDate: today,
+          deliveryTime: deliveryTime,
+          deliveryMethod: 'pin',
+          companyName,
+          departureCity: updated.departureCity || undefined,
+          arrivalCity: updated.destination || undefined,
+        });
+
+        const recipients: string[] = [];
+        if (emailSettings.recipientEmail) recipients.push(emailSettings.recipientEmail);
+        if (colisWithAgency?.agency?.email && !recipients.includes(colisWithAgency.agency.email)) recipients.push(colisWithAgency.agency.email);
+
+        if (recipients.length > 0) {
+          await sendEmail({
+            to: recipients,
+            subject: `✅ Colis livré (PIN) — ${updated.reference}`,
+            html: template.html,
+            text: template.text,
+            type: 'colis_delivered',
+            agencyId: colis.agencyId || undefined,
+            data: { reference: updated.reference, baggageId: updated.id, method: 'pin' },
+          });
+          console.log(`📧 PIN delivery email sent for ${updated.reference} to ${recipients.join(', ')}`);
+        }
+      }
+    } catch (emailError) {
+      console.error('Failed to send PIN delivery email:', emailError);
+    }
 
     // Driver phone line (conditional — security: never expose if consent = false)
     const driverLine = updated.shareDriverPhone && updated.driverPhone

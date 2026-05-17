@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { z } from 'zod';
 import { cleanPhone, generateWaMeLink } from '@/lib/wame';
+import { sendEmail, getEmailSettings, getColisDeliveredEmailTemplate } from '@/lib/email';
 
 const confirmArrivalSchema = z.object({
   arrival_datetime: z.string().min(1, "La date/heure d'arrivée est obligatoire"),
@@ -147,6 +148,45 @@ export async function POST(
     const driverLine = updated.shareDriverPhone && updated.driverPhone
       ? `📞 Contacter le transporteur : ${updated.driverPhone}`
       : `📞 Assistance : ${companyName}`;
+
+    // 📧 Send email notification for delivery (driver confirmed)
+    try {
+      const emailSettings = await getEmailSettings();
+      if (emailSettings) {
+        const template = getColisDeliveredEmailTemplate({
+          reference: updated.reference,
+          agencyName: colis.agency?.name || undefined,
+          senderName: updated.travelerFirstName || undefined,
+          receiverName: updated.receiverName || undefined,
+          deliveryLocation: data.delivery_location,
+          deliveryDate: arrivedDate,
+          deliveryTime: arrivedTime,
+          deliveryMethod: 'driver',
+          companyName,
+          departureCity: updated.departureCity || undefined,
+          arrivalCity: updated.destination || undefined,
+        });
+
+        const recipients: string[] = [];
+        if (emailSettings.recipientEmail) recipients.push(emailSettings.recipientEmail);
+        if (colis.agency?.email && !recipients.includes(colis.agency.email)) recipients.push(colis.agency.email);
+
+        if (recipients.length > 0) {
+          await sendEmail({
+            to: recipients,
+            subject: `✅ Colis livré — ${updated.reference}`,
+            html: template.html,
+            text: template.text,
+            type: 'colis_delivered',
+            agencyId: colis.agencyId || undefined,
+            data: { reference: updated.reference, baggageId: updated.id, method: 'driver' },
+          });
+          console.log(`📧 Delivery email sent for ${updated.reference} to ${recipients.join(', ')}`);
+        }
+      }
+    } catch (emailError) {
+      console.error('Failed to send delivery email:', emailError);
+    }
 
     // ─── 🟢 SENDER MESSAGE (Arrival confirmed) ───
     const senderArrivalMessage = `🟢 *QRTrans — Colis Livré ✅*
