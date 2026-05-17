@@ -84,8 +84,8 @@ export async function PUT(
         // Build recipients list
         const recipients: string[] = [];
         // Add admin recipient email
-        if (emailSettings.recipientEmail) {
-          recipients.push(emailSettings.recipientEmail);
+        if (emailSettings.recipientColisEmail) {
+          recipients.push(emailSettings.recipientColisEmail);
         }
         // Add agency email
         if (baggage.agency?.email && !recipients.includes(baggage.agency.email)) {

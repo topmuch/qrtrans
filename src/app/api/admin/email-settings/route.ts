@@ -60,7 +60,8 @@ export async function PUT(request: NextRequest) {
       provider?: string;
       fromEmail?: string;
       fromName?: string;
-      recipientEmail?: string | null;
+      recipientColisEmail?: string | null;
+      recipientSystemEmail?: string | null;
       smtpHost?: string | null;
       smtpPort?: number | null;
       smtpUser?: string | null;
@@ -71,7 +72,8 @@ export async function PUT(request: NextRequest) {
     if (body.provider) settingsData.provider = body.provider;
     if (body.fromEmail) settingsData.fromEmail = body.fromEmail;
     if (body.fromName) settingsData.fromName = body.fromName;
-    if (body.recipientEmail !== undefined) settingsData.recipientEmail = body.recipientEmail || null;
+    if (body.recipientColisEmail !== undefined) settingsData.recipientColisEmail = body.recipientColisEmail || null;
+    if (body.recipientSystemEmail !== undefined) settingsData.recipientSystemEmail = body.recipientSystemEmail || null;
     
     // SMTP settings
     if (body.smtpHost !== undefined) settingsData.smtpHost = body.smtpHost || null;

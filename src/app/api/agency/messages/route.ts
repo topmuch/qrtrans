@@ -104,7 +104,7 @@ export async function POST(request: NextRequest) {
     try {
       const emailSettings = await getEmailSettings();
       if (emailSettings) {
-        const recipientEmail = emailSettings.recipientEmail || emailSettings.fromEmail;
+        const recipientEmail = emailSettings.recipientSystemEmail || emailSettings.fromEmail;
         if (recipientEmail) {
           const contentObj = typeof content === 'string' ? {} : content;
           const template = getAgencyMessageEmailTemplate({

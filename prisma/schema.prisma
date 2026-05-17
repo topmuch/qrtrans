@@ -282,7 +282,8 @@ model EmailSettings {
   provider        String   @default("console") // "console" or "smtp"
   fromEmail       String   @default("noreply@qrtrans.com")
   fromName        String   @default("QRTrans")
-  recipientEmail  String?  // Destination for admin notification emails
+  recipientColisEmail  String?  // Destination for package tracking notifications (activated, delivered, lost, found)
+  recipientSystemEmail String?  // Destination for system notifications (leads, agencies, contact messages)
   // SMTP settings
   smtpHost        String?
   smtpPort        Int?

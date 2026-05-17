@@ -2175,3 +2175,64 @@ Stage Summary:
   - Retrieval (/retrieve) → /sending → back to retrieval success (already worked)
 - Each flow shows "NOTIFIED" state for completed contacts
 - After both contacts notified, redirects to /retrieve page
+---
+Task ID: 19
+Agent: Main Agent
+Task: Separate email notification destinations into 2 categories (recipientColisEmail + recipientSystemEmail)
+
+Work Log:
+- Read worklog.md for context, prisma/schema.prisma, src/lib/email.ts, src/app/api/admin/email-settings/route.ts
+- Read all 9 notification API routes to find recipientEmail usage
+- Read admin settings UI page (parametres/page.tsx) for the form
+
+Step 1 — Prisma Schema (prisma/schema.prisma):
+  - Renamed `recipientEmail` to `recipientColisEmail` (String? — package tracking notifications)
+  - Added `recipientSystemEmail` (String? — system/admin notifications)
+  - Pushed schema with `bun run db:push`
+
+Step 2 — Email Library (src/lib/email.ts):
+  - Updated `EmailConfig` interface: `recipientEmail` → `recipientColisEmail` + `recipientSystemEmail`
+  - Updated `getEmailSettings()`: maps both new fields from DB
+  - Updated `saveEmailSettings()`: handles both fields in update and create paths
+
+Step 3 — Email Settings API (src/app/api/admin/email-settings/route.ts):
+  - Updated `settingsData` type: replaced `recipientEmail` with `recipientColisEmail` + `recipientSystemEmail`
+  - Updated PUT handler: reads both fields from request body
+
+Step 4 — Package Notification Routes (5 files, use `recipientColisEmail`):
+  - src/app/api/activate/[id]/route.ts — L278: `recipientEmail` → `recipientColisEmail`
+  - src/app/api/arrivee/[id]/route.ts — L171: same change
+  - src/app/api/validate-pin/route.ts — L125: same change
+  - src/app/api/baggage/[id]/declare-lost/route.ts — L77-78: same change
+  - src/app/api/baggage/[id]/mark-found/route.ts — L87-88: same change
+
+Step 5 — System Notification Routes (4 files, use `recipientSystemEmail`):
+  - src/app/api/admin/crm/leads/route.ts — L95: `recipientEmail` → `recipientSystemEmail`
+  - src/app/api/admin/agencies/route.ts — L89: same change
+  - src/app/api/messages/route.ts — L72: same change
+  - src/app/api/agency/messages/route.ts — L107: same change
+
+Step 6 — Admin Settings UI (src/app/admin/parametres/page.tsx):
+  - Updated `EmailSettingsData` interface: replaced `recipientEmail` with `recipientColisEmail` + `recipientSystemEmail`
+  - Updated initial state: both fields set to `null`
+  - Replaced single "Email de destination des notifications" input with TWO inputs:
+    1. 📧 Email notifications Colis (orange accent) — for package tracking notifications
+    2. ⚙️ Email notifications Système (blue accent) — for system/admin notifications
+
+Validation:
+- `bun run lint` → 0 errors
+- Dev server → clean compilation (✓ Compiled in 464ms)
+- Grep verification: no remaining `emailSettings.recipientEmail` references (only local `recipientEmail` variables using `emailSettings.recipientSystemEmail`)
+
+Self-Critique:
+- 0 bugs found. All changes are targeted field renames/splits.
+- The `sendEmail()` function itself was NOT changed — only callers now read different fields.
+- `fetchEmailSettings()` in the UI doesn't need changes — it spreads the full API response into state.
+- Fallback chain preserved: `recipientColisEmail || recipientSystemEmail || fromEmail`
+
+Stage Summary:
+- 11 files modified: 1 schema, 1 lib, 1 admin API, 5 package routes, 4 system routes, 1 admin UI
+- Zero lint errors, zero compilation errors
+- Email notifications now separated into 2 categories:
+  - 📧 recipientColisEmail: colis activé, livré, perdu, retrouvé
+  - ⚙️ recipientSystemEmail: nouveaux leads, agences, messages de contact, inscriptions

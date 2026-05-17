@@ -51,7 +51,8 @@ interface EmailSettingsData {
   provider: string;
   fromEmail: string;
   fromName: string;
-  recipientEmail: string | null;
+  recipientColisEmail: string | null;
+  recipientSystemEmail: string | null;
   smtpHost: string | null;
   smtpPort: number | null;
   smtpUser: string | null;
@@ -255,7 +256,8 @@ export default function ParametresPage() {
     provider: 'console',
     fromEmail: 'noreply@qrtrans.com',
     fromName: 'QRTrans',
-    recipientEmail: null,
+    recipientColisEmail: null,
+    recipientSystemEmail: null,
     smtpHost: null,
     smtpPort: null,
     smtpUser: null,
@@ -844,17 +846,32 @@ export default function ParametresPage() {
                 </div>
                 <div className="md:col-span-2">
                   <label className="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-2">
-                    Email de destination des notifications
+                    📧 Email notifications Colis
                   </label>
                   <input
                     type="email"
-                    value={emailSettings.recipientEmail || ''}
-                    onChange={(e) => setEmailSettings({ ...emailSettings, recipientEmail: e.target.value || null })}
-                    placeholder="admin@votredomaine.com — L'email qui reçoit les notifications (colis perdus/trouvés, messages de contact...)"
-                    className="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-[#ff7f00]"
+                    value={emailSettings.recipientColisEmail || ''}
+                    onChange={(e) => setEmailSettings({ ...emailSettings, recipientColisEmail: e.target.value || null })}
+                    placeholder="colis@votredomaine.com"
+                    className="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-orange-300 dark:border-orange-700 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-orange-500"
                   />
-                  <p className="mt-1.5 text-xs text-slate-400">
-                    Si vide, les notifications seront envoyées à l'email expéditeur ({emailSettings.fromEmail})
+                  <p className="mt-1.5 text-xs text-orange-500">
+                    Reçoit les notifications : colis activé, livré, perdu, retrouvé, scan
+                  </p>
+                </div>
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-2">
+                    ⚙️ Email notifications Système
+                  </label>
+                  <input
+                    type="email"
+                    value={emailSettings.recipientSystemEmail || ''}
+                    onChange={(e) => setEmailSettings({ ...emailSettings, recipientSystemEmail: e.target.value || null })}
+                    placeholder="admin@votredomaine.com"
+                    className="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-blue-300 dark:border-blue-700 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-blue-500"
+                  />
+                  <p className="mt-1.5 text-xs text-blue-500">
+                    Reçoit les notifications : nouveaux leads, agences, messages de contact, inscriptions
                   </p>
                 </div>
               </div>

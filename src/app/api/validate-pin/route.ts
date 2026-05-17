@@ -122,7 +122,7 @@ export async function POST(request: NextRequest) {
         });
 
         const recipients: string[] = [];
-        if (emailSettings.recipientEmail) recipients.push(emailSettings.recipientEmail);
+        if (emailSettings.recipientColisEmail) recipients.push(emailSettings.recipientColisEmail);
         if (colisWithAgency?.agency?.email && !recipients.includes(colisWithAgency.agency.email)) recipients.push(colisWithAgency.agency.email);
 
         if (recipients.length > 0) {

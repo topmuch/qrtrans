@@ -168,7 +168,7 @@ export async function POST(
         });
 
         const recipients: string[] = [];
-        if (emailSettings.recipientEmail) recipients.push(emailSettings.recipientEmail);
+        if (emailSettings.recipientColisEmail) recipients.push(emailSettings.recipientColisEmail);
         if (colis.agency?.email && !recipients.includes(colis.agency.email)) recipients.push(colis.agency.email);
 
         if (recipients.length > 0) {
