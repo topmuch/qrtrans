@@ -17,7 +17,7 @@ import {
   AlertOctagon
 } from "lucide-react";
 import { useAgency } from '../layout';
-import { isActive, isPending } from '@/lib/status';
+import { isActive, isPending, isLost, isInTransit, isDelivered } from '@/lib/status';
 
 interface Baggage {
   id: string;
@@ -26,9 +26,22 @@ interface Baggage {
   travelerFirstName: string | null;
   travelerLastName: string | null;
   whatsappOwner: string | null;
+  receiverName: string | null;
+  receiverWhatsapp: string | null;
   baggageIndex: number;
   baggageType: string;
+  colisType: string | null;
   status: string;
+  transportMode: string;
+  busCompany: string | null;
+  airlineName: string | null;
+  departureCity: string | null;
+  destination: string | null;
+  departureDate: string | null;
+  departureTime: string | null;
+  deliveryLocation: string | null;
+  arrivedAt: string | null;
+  deliveredAt: string | null;
   createdAt: string;
   expiresAt: string | null;
   lastScanDate: string | null;
@@ -88,12 +101,16 @@ export default function BaggagesPage() {
     setFilteredBaggages(filtered);
   };
 
-  // AGENCY-FIX: Split filtered baggages into activated and pending sections
-  // FIX: Include lost/found/blocked in activated so NO baggage vanishes from UI
-  const activatedBaggages = filteredBaggages.filter(b =>
-    isActive(b.status) || b.travelerFirstName !== null || b.status === 'lost' || b.status === 'found' || b.status === 'blocked'
+  // AGENCY-FIX: Split filtered baggages into in_transit/delivered, activated, and pending sections
+  // Include lost/found/blocked/in_transit/delivered in activated so NO baggage vanishes from UI
+  const transitBaggages = filteredBaggages.filter(b =>
+    isInTransit(b.status) || isDelivered(b.status)
   );
-  // FIX: Check BOTH travelerFirstName AND travelerLastName for null
+  const activatedBaggages = filteredBaggages.filter(b =>
+    (isActive(b.status) || b.travelerFirstName !== null || b.status === 'lost' || b.status === 'found' || b.status === 'blocked')
+    && !isInTransit(b.status) && !isDelivered(b.status)
+  );
+  // Check BOTH travelerFirstName AND travelerLastName for null
   const pendingBaggages = filteredBaggages.filter(b =>
     isPending(b.status) && b.travelerFirstName === null && b.travelerLastName === null
   );
@@ -184,6 +201,8 @@ export default function BaggagesPage() {
       pending_activation: { label: 'En attente', className: 'bg-amber-100 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400' },
       active: { label: 'Actif', className: 'bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400' },
       scanned: { label: 'Scanné', className: 'bg-blue-100 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400' },
+      in_transit: { label: 'En transit', className: 'bg-orange-100 dark:bg-orange-500/10 text-orange-700 dark:text-orange-400' },
+      delivered: { label: 'Livré', className: 'bg-green-100 dark:bg-green-500/10 text-green-700 dark:text-green-400' },
       lost: { label: 'Perdu', className: 'bg-rose-100 dark:bg-rose-500/10 text-rose-700 dark:text-rose-400' },
       found: { label: 'Retrouvé', className: 'bg-green-100 dark:bg-green-500/10 text-green-700 dark:text-green-400' },
       blocked: { label: 'Bloqué', className: 'bg-slate-100 dark:bg-slate-500/10 text-slate-600 dark:text-slate-400' },
@@ -200,7 +219,8 @@ export default function BaggagesPage() {
 
   const filterButtons = [
     { id: 'all', label: 'Tous' },
-    { id: 'scanned', label: 'Scannés' },
+    { id: 'in_transit', label: 'En transit' },
+    { id: 'delivered', label: 'Livrés' },
     { id: 'pending_activation', label: 'En attente' },
     { id: 'lost', label: 'Perdus' },
     { id: 'found', label: 'Retrouvés' },
@@ -215,7 +235,7 @@ export default function BaggagesPage() {
       </div>
 
       {/* Stats Cards - Multicolored */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
         <div className="kpi-card kpi-card-green p-5">
           <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center mb-3">
             <Luggage className="w-5 h-5 text-white" />
@@ -223,14 +243,21 @@ export default function BaggagesPage() {
           <p className="text-2xl font-bold text-white">{baggages.length}</p>
           <p className="text-sm text-white/80">Total colis</p>
         </div>
+        <div className="kpi-card kpi-card-orange p-5">
+          <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center mb-3">
+            <MapPin className="w-5 h-5 text-white" />
+          </div>
+          <p className="text-2xl font-bold text-white">{baggages.filter(b => isInTransit(b.status)).length}</p>
+          <p className="text-sm text-white/80">En transit</p>
+        </div>
         <div className="kpi-card kpi-card-blue p-5">
           <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center mb-3">
             <CheckCircle className="w-5 h-5 text-white" />
           </div>
-          <p className="text-2xl font-bold text-white">{baggages.filter(b => isActive(b.status)).length}</p>
-          <p className="text-sm text-white/80">Actifs</p>
+          <p className="text-2xl font-bold text-white">{baggages.filter(b => isDelivered(b.status)).length}</p>
+          <p className="text-sm text-white/80">Livrés</p>
         </div>
-        <div className="kpi-card kpi-card-orange p-5">
+        <div className="kpi-card kpi-card-purple p-5">
           <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center mb-3">
             <Clock className="w-5 h-5 text-white" />
           </div>
@@ -241,7 +268,7 @@ export default function BaggagesPage() {
           <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center mb-3">
             <AlertTriangle className="w-5 h-5 text-white" />
           </div>
-          <p className="text-2xl font-bold text-white">{baggages.filter(b => b.status === 'lost').length}</p>
+          <p className="text-2xl font-bold text-white">{baggages.filter(b => isLost(b.status)).length}</p>
           <p className="text-sm text-white/80">Perdus</p>
         </div>
       </div>
@@ -300,7 +327,90 @@ export default function BaggagesPage() {
         </div>
       ) : (
         <>
-          {/* AGENCY-FIX: Section 1 — Bagages activés */}
+          {/* Section 1 — Colis en transit / livrés */}
+          {transitBaggages.length > 0 && (
+            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden mb-6">
+              <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800 bg-orange-50/50 dark:bg-orange-500/5">
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-orange-500" />
+                  <h2 className="text-sm font-semibold text-slate-800 dark:text-white">
+                    Colis en transit / livrés ({transitBaggages.length})
+                  </h2>
+                </div>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
+                      <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm">Référence</th>
+                      <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm">Expéditeur</th>
+                      <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm hidden md:table-cell">Trajet</th>
+                      <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm">Statut</th>
+                      <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {transitBaggages.map((baggage) => (
+                      <tr
+                        key={baggage.id}
+                        className={`border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors ${
+                          isDelivered(baggage.status) ? 'bg-green-50/50 dark:bg-green-500/5' : ''
+                        }`}
+                      >
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-2">
+                            <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${isDelivered(baggage.status) ? 'bg-green-100 dark:bg-green-500/10' : 'bg-orange-100 dark:bg-orange-500/10'}`}>
+                              <QrCode className={`w-4 h-4 ${isDelivered(baggage.status) ? 'text-green-500' : 'text-orange-500'}`} />
+                            </div>
+                            <span className="text-slate-800 dark:text-white font-mono font-medium">
+                              {baggage.reference}
+                            </span>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className="text-slate-800 dark:text-white font-medium">
+                            {baggage.travelerFirstName || '—'}
+                          </span>
+                          {baggage.receiverName && (
+                            <p className="text-slate-400 dark:text-slate-500 text-xs mt-0.5">
+                              → {baggage.receiverName}
+                            </p>
+                          )}
+                        </td>
+                        <td className="px-6 py-4 hidden md:table-cell">
+                          <span className="text-slate-600 dark:text-slate-300 text-sm">
+                            {baggage.departureCity || '—'} → {baggage.destination || '—'}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4">
+                          {getStatusBadge(baggage.status)}
+                        </td>
+                        <td className="px-6 py-4">
+                          <button
+                            onClick={() => {
+                              setSelectedBaggage(baggage);
+                              setShowDetailModal(true);
+                            }}
+                            className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors group"
+                            title="Voir détails"
+                          >
+                            <Eye className="w-4 h-4 text-slate-400 group-hover:text-amber-500" />
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <div className="px-6 py-4 border-t border-slate-200 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50">
+                <span className="text-slate-500 dark:text-slate-400 text-sm">
+                  {transitBaggages.length} colis en transit / livré(s)
+                </span>
+              </div>
+            </div>
+          )}
+
+          {/* AGENCY-FIX: Section 2 — Bagages activés */}
           {activatedBaggages.length > 0 && (
             <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden mb-6">
               <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800 bg-emerald-50/50 dark:bg-emerald-500/5">
@@ -524,8 +634,16 @@ export default function BaggagesPage() {
             </div>
             <div className="p-6 space-y-4">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-amber-100 dark:bg-amber-500/10 rounded-xl flex items-center justify-center">
-                  <QrCode className="w-6 h-6 text-amber-500" />
+                <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
+                  isInTransit(selectedBaggage.status) ? 'bg-orange-100 dark:bg-orange-500/10' :
+                  isDelivered(selectedBaggage.status) ? 'bg-green-100 dark:bg-green-500/10' :
+                  'bg-amber-100 dark:bg-amber-500/10'
+                }`}>
+                  <QrCode className={`w-6 h-6 ${
+                    isInTransit(selectedBaggage.status) ? 'text-orange-500' :
+                    isDelivered(selectedBaggage.status) ? 'text-green-500' :
+                    'text-amber-500'
+                  }`} />
                 </div>
                 <div>
                   <p className="text-slate-800 dark:text-white font-mono font-bold">{selectedBaggage.reference}</p>
@@ -533,48 +651,101 @@ export default function BaggagesPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-slate-500 dark:text-slate-400 text-sm">Pèlerin</p>
-                  {/* AGENCY-FIX: Fallback "Non assigné" when both names are null */}
-                  {selectedBaggage.travelerFirstName || selectedBaggage.travelerLastName ? (
-                    <p className="text-slate-800 dark:text-white font-medium">{selectedBaggage.travelerFirstName} {selectedBaggage.travelerLastName}</p>
-                  ) : (
-                    <span className="px-2 py-1 bg-amber-100 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 rounded-full text-xs font-medium">
-                      À attribuer
-                    </span>
+              {/* Status */}
+              <div className="flex items-center gap-2">
+                {getStatusBadge(selectedBaggage.status)}
+              </div>
+
+              {/* Expéditeur / Destinataire — colis info */}
+              {isInTransit(selectedBaggage.status) || isDelivered(selectedBaggage.status) ? (
+                <div className="space-y-3">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-slate-500 dark:text-slate-400 text-xs mb-1">Expéditeur</p>
+                      <p className="text-slate-800 dark:text-white font-medium text-sm">{selectedBaggage.travelerFirstName || '—'}</p>
+                      {selectedBaggage.whatsappOwner && (
+                        <p className="text-slate-400 dark:text-slate-500 text-xs">{selectedBaggage.whatsappOwner}</p>
+                      )}
+                    </div>
+                    <div>
+                      <p className="text-slate-500 dark:text-slate-400 text-xs mb-1">Destinataire</p>
+                      <p className="text-slate-800 dark:text-white font-medium text-sm">{selectedBaggage.receiverName || '—'}</p>
+                      {selectedBaggage.receiverWhatsapp && (
+                        <p className="text-slate-400 dark:text-slate-500 text-xs">{selectedBaggage.receiverWhatsapp}</p>
+                      )}
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-slate-500 dark:text-slate-400 text-xs mb-1">Trajet</p>
+                      <p className="text-slate-800 dark:text-white font-medium text-sm">{selectedBaggage.departureCity || '—'} → {selectedBaggage.destination || '—'}</p>
+                    </div>
+                    <div>
+                      <p className="text-slate-500 dark:text-slate-400 text-xs mb-1">Compagnie</p>
+                      <p className="text-slate-800 dark:text-white font-medium text-sm">{selectedBaggage.busCompany || selectedBaggage.airlineName || '—'}</p>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-slate-500 dark:text-slate-400 text-xs mb-1">Départ</p>
+                      <p className="text-slate-800 dark:text-white text-sm">
+                        {selectedBaggage.departureDate ? formatDate(selectedBaggage.departureDate) : '—'}
+                        {selectedBaggage.departureTime ? ` à ${selectedBaggage.departureTime}` : ''}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-slate-500 dark:text-slate-400 text-xs mb-1">Lieu de livraison</p>
+                      <p className="text-slate-800 dark:text-white text-sm">{selectedBaggage.deliveryLocation || '—'}</p>
+                    </div>
+                  </div>
+                  {isDelivered(selectedBaggage.status) && (
+                    <div>
+                      <p className="text-slate-500 dark:text-slate-400 text-xs mb-1">Livré le</p>
+                      <p className="text-green-600 dark:text-green-400 font-medium text-sm">{formatDateTime(selectedBaggage.deliveredAt || selectedBaggage.arrivedAt)}</p>
+                    </div>
                   )}
                 </div>
-                <div>
-                  <p className="text-slate-500 dark:text-slate-400 text-sm">Type</p>
-                  <p className="text-slate-800 dark:text-white">{selectedBaggage.baggageType} #{selectedBaggage.baggageIndex}</p>
+              ) : (
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-slate-500 dark:text-slate-400 text-sm">Pèlerin</p>
+                    {selectedBaggage.travelerFirstName || selectedBaggage.travelerLastName ? (
+                      <p className="text-slate-800 dark:text-white font-medium">{selectedBaggage.travelerFirstName} {selectedBaggage.travelerLastName}</p>
+                    ) : (
+                      <span className="px-2 py-1 bg-amber-100 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 rounded-full text-xs font-medium">
+                        À attribuer
+                      </span>
+                    )}
+                  </div>
+                  <div>
+                    <p className="text-slate-500 dark:text-slate-400 text-sm">Type</p>
+                    <p className="text-slate-800 dark:text-white">{selectedBaggage.baggageType} #{selectedBaggage.baggageIndex}</p>
+                  </div>
                 </div>
-              </div>
+              )}
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-slate-500 dark:text-slate-400 text-sm">Statut</p>
-                  {getStatusBadge(selectedBaggage.status)}
+              {/* Créé le / Dernier scan — non-colis fields */}
+              {!isInTransit(selectedBaggage.status) && !isDelivered(selectedBaggage.status) && (
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-slate-500 dark:text-slate-400 text-sm">Créé le</p>
+                    <p className="text-slate-800 dark:text-white">{formatDate(selectedBaggage.createdAt)}</p>
+                  </div>
+                  <div>
+                    <p className="text-slate-500 dark:text-slate-400 text-sm">Dernier scan</p>
+                    <p className="text-slate-800 dark:text-white">{formatDateTime(selectedBaggage.lastScanDate)}</p>
+                    {selectedBaggage.lastLocation && (
+                      <p className="text-slate-500 dark:text-slate-400 text-sm flex items-center gap-1 mt-1">
+                        <MapPin className="w-3 h-3" />
+                        {selectedBaggage.lastLocation}
+                      </p>
+                    )}
+                  </div>
                 </div>
-                <div>
-                  <p className="text-slate-500 dark:text-slate-400 text-sm">Créé le</p>
-                  <p className="text-slate-800 dark:text-white">{formatDate(selectedBaggage.createdAt)}</p>
-                </div>
-              </div>
+              )}
 
-              <div>
-                <p className="text-slate-500 dark:text-slate-400 text-sm">Dernier scan</p>
-                <p className="text-slate-800 dark:text-white">{formatDateTime(selectedBaggage.lastScanDate)}</p>
-                {selectedBaggage.lastLocation && (
-                  <p className="text-slate-500 dark:text-slate-400 text-sm flex items-center gap-1 mt-1">
-                    <MapPin className="w-3 h-3" />
-                    {selectedBaggage.lastLocation}
-                  </p>
-                )}
-              </div>
-
-              {/* AGENCY-FIX: Attribuer edit form for unassigned baggages — parity with tableau-de-bord */}
-              {(!selectedBaggage.travelerFirstName && !selectedBaggage.travelerLastName) && (
+              {/* AGENCY-FIX: Attribuer edit form for unassigned non-transit baggages */}
+              {(!selectedBaggage.travelerFirstName && !selectedBaggage.travelerLastName) && !isInTransit(selectedBaggage.status) && !isDelivered(selectedBaggage.status) && (
                 <div className="p-4 bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-800 rounded-xl">
                   <h4 className="text-amber-700 dark:text-amber-400 font-medium mb-3">Attribuer ce colis</h4>
                   <div className="space-y-3">
@@ -629,8 +800,7 @@ export default function BaggagesPage() {
 
               <div className="pt-4 border-t border-slate-200 dark:border-slate-800 space-y-3">
                 {/* Action Buttons based on status */}
-                {/* AGENCY-FIX: Use isLost() for French DB compat */}
-                {isActive(selectedBaggage.status) && (
+                {isActive(selectedBaggage.status) && !isInTransit(selectedBaggage.status) && !isDelivered(selectedBaggage.status) && (
                   <button
                     onClick={() => handleDeclareLost(selectedBaggage.id)}
                     disabled={actionLoading === selectedBaggage.id}
