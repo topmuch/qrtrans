@@ -14,11 +14,11 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: {
-    default: "QRTrans - Protection intelligente des colis",
+    default: "QRTrans - Traçabilité & sécurité logistique pour le transport inter-villes",
     template: "%s | QRTrans",
   },
-  description: "Protégez vos colis avec un autocollant QR intelligent. Sans application, sans batterie, sans GPS. Un seul scan pour la tranquillité d'esprit.",
-  keywords: ["QR", "colis", "voyage", "hajj", "protection", "sticker", "luggage", "travel", "pèlerinage"],
+  description: "QRTrans : activez, tracez et sécurisez vos colis entre villes. Notifications WhatsApp automatiques, code PIN de retrait, suivi GPS en temps réel. Solution pour chauffeurs et agences de transport au Sénégal.",
+  keywords: ["QRTrans", "QR code", "colis", "transport inter-villes", "Sénégal", "traçabilité", "logistique", "WhatsApp", "suivi colis", "chauffeur", "agence transport", "PIN retrait", "GPS"],
   authors: [{ name: "QRTrans Team" }],
   creator: "MMASOLUTION",
   publisher: "QRTrans",
@@ -41,8 +41,8 @@ export const metadata: Metadata = {
 
   // Open Graph
   openGraph: {
-    title: "QRTrans - Protection intelligente des colis",
-    description: "Un autocollant QR intelligent pour protéger vos effets personnels. Sans application. Sans batterie. Sans GPS.",
+    title: "QRTrans - Traçabilité & sécurité logistique | Transport inter-villes",
+    description: "Activez, tracez et sécurisez vos colis entre villes au Sénégal. Notifications WhatsApp, code PIN, suivi GPS temps réel.",
     url: "https://qrtrans.com",
     siteName: "QRTrans",
     type: "website",
