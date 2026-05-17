@@ -41,18 +41,22 @@ export function generateCode(): string {
   return Math.floor(100000 + Math.random() * 900000).toString();
 }
 
-// Get email settings from database
+// Get email settings from database (auto-creates defaults if missing)
 export async function getEmailSettings(): Promise<EmailConfig | null> {
   try {
-    const settings = await prisma.emailSettings.findFirst();
+    let settings = await prisma.emailSettings.findFirst();
     if (!settings) {
-      // Return default console provider settings
-      return {
-        provider: 'console',
-        fromEmail: 'noreply@qrtrans.com',
-        fromName: 'QRTrans',
-        smtpEncryption: 'tls',
-      };
+      // Auto-create default settings so the table is never empty
+      console.log('📧 No email settings found, creating defaults...');
+      settings = await prisma.emailSettings.create({
+        data: {
+          provider: 'console',
+          fromEmail: 'noreply@qrtrans.com',
+          fromName: 'QRTrans',
+          smtpEncryption: 'tls',
+        },
+      });
+      console.log('📧 Default email settings created:', settings.id);
     }
     return {
       provider: settings.provider as EmailProvider,
@@ -67,7 +71,7 @@ export async function getEmailSettings(): Promise<EmailConfig | null> {
       smtpEncryption: settings.smtpEncryption || 'tls',
     };
   } catch (error) {
-    console.error('Error fetching email settings:', error);
+    console.error('❌ Error fetching email settings:', error);
     return null;
   }
 }
