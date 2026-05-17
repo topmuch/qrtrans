@@ -233,7 +233,7 @@ export default function SmartPhoneInput({
         }`}
       >
         {/* Country badge — fixed on the left */}
-        <div className="flex items-center gap-1.5 pl-3 pr-2 bg-white border-r border-gray-200 h-full shrink-0 select-none">
+        <div className="flex items-center gap-1.5 pl-3 pr-2 !bg-white border-r border-gray-200 h-full shrink-0 select-none">
           <span className="text-sm sm:text-base leading-none">{flag}</span>
           <span className="text-sm sm:text-base font-mono font-semibold text-gray-900">{callingCode}</span>
         </div>
@@ -247,7 +247,7 @@ export default function SmartPhoneInput({
           value={formattedDisplay}
           onChange={handleLocalChange}
           placeholder="77 12 34 56 67"
-          className="h-full border-0 rounded-none shadow-none focus-visible:ring-0 focus-visible:border-0 text-sm sm:text-base font-mono px-2.5 sm:px-3 bg-transparent"
+          className="h-full border-0 rounded-none shadow-none focus-visible:ring-0 focus-visible:border-0 text-sm sm:text-base font-mono px-2.5 sm:px-3 !bg-white"
           aria-required="true"
           aria-invalid={!!error}
           aria-describedby={error ? errorId : hint ? hintId : undefined}

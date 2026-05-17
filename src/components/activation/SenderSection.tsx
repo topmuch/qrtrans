@@ -88,7 +88,7 @@ export default function SenderSection({
                 value={senderName}
                 onChange={(e) => setSenderName(e.target.value)}
                 placeholder={t('Ex: Moussa Diop', 'Ex: Moussa Diop')}
-                className="h-12 sm:h-14 bg-white border-white/30 focus-visible:ring-white/50 focus-visible:border-white/60 text-sm sm:text-base text-gray-900 placeholder:text-gray-500"
+                className="h-12 sm:h-14 !bg-white border-white/30 focus-visible:ring-white/50 focus-visible:border-white/60 text-sm sm:text-base text-gray-900 placeholder:text-gray-500"
                 aria-required="true"
               />
             </div>
@@ -139,7 +139,7 @@ export default function SenderSection({
                   value={baggageTypeOther}
                   onChange={(e) => setBaggageTypeOther(e.target.value)}
                   placeholder={t('Précisez le type...', 'Specify type...')}
-                  className="h-12 sm:h-14 bg-white border-white/30 focus-visible:ring-white/50 focus-visible:border-white/60 text-sm sm:text-base text-gray-900 placeholder:text-gray-500"
+                  className="h-12 sm:h-14 !bg-white border-white/30 focus-visible:ring-white/50 focus-visible:border-white/60 text-sm sm:text-base text-gray-900 placeholder:text-gray-500"
                   aria-required="true"
                 />
               )}
@@ -160,7 +160,7 @@ export default function SenderSection({
                     value={baggageWeight}
                     onChange={(e) => setBaggageWeight(e.target.value)}
                     placeholder="0.0"
-                    className="h-12 sm:h-14 bg-white border-white/30 focus-visible:ring-white/50 focus-visible:border-white/60 text-sm sm:text-base text-gray-900 placeholder:text-gray-500 pr-10"
+                    className="h-12 sm:h-14 !bg-white border-white/30 focus-visible:ring-white/50 focus-visible:border-white/60 text-sm sm:text-base text-gray-900 placeholder:text-gray-500 pr-10"
                   />
                   <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs sm:text-sm text-white font-semibold">kg</span>
                 </div>
@@ -174,7 +174,7 @@ export default function SenderSection({
                   value={baggageColor}
                   onChange={(e) => setBaggageColor(e.target.value)}
                   placeholder={t('Noir, Bleu...', 'Black, Blue...')}
-                  className="h-12 sm:h-14 bg-white border-white/30 focus-visible:ring-white/50 focus-visible:border-white/60 text-sm sm:text-base text-gray-900 placeholder:text-gray-500"
+                  className="h-12 sm:h-14 !bg-white border-white/30 focus-visible:ring-white/50 focus-visible:border-white/60 text-sm sm:text-base text-gray-900 placeholder:text-gray-500"
                 />
               </div>
             </div>
@@ -188,7 +188,7 @@ export default function SenderSection({
                 value={baggageDimensions}
                 onChange={(e) => setBaggageDimensions(e.target.value)}
                 placeholder={t('L x l x h en cm', 'L x W x H in cm')}
-                className="h-12 sm:h-14 bg-white border-white/30 focus-visible:ring-white/50 focus-visible:border-white/60 text-sm sm:text-base text-gray-900 placeholder:text-gray-500"
+                className="h-12 sm:h-14 !bg-white border-white/30 focus-visible:ring-white/50 focus-visible:border-white/60 text-sm sm:text-base text-gray-900 placeholder:text-gray-500"
               />
             </div>
           </div>
@@ -238,7 +238,7 @@ export default function SenderSection({
                   value={declaredValue}
                   onChange={(e) => setDeclaredValue(e.target.value)}
                   placeholder="0"
-                  className="h-12 sm:h-14 bg-white border-white/30 focus-visible:ring-white/50 focus-visible:border-white/60 text-sm sm:text-base text-gray-900 placeholder:text-gray-500 pr-14 sm:pr-16"
+                  className="h-12 sm:h-14 !bg-white border-white/30 focus-visible:ring-white/50 focus-visible:border-white/60 text-sm sm:text-base text-gray-900 placeholder:text-gray-500 pr-14 sm:pr-16"
                 />
                 <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs sm:text-sm text-white font-semibold">FCFA</span>
               </div>

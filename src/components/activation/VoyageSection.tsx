@@ -102,7 +102,7 @@ export default function VoyageSection({
             value={company}
             onChange={(e) => setCompany(e.target.value)}
             placeholder="Ex: Salam, Aline, Fatick Express..."
-            className="h-12 sm:h-14 bg-white border-white/30 focus-visible:ring-white/50 focus-visible:border-white/60 text-sm sm:text-base text-gray-900 placeholder:text-gray-500"
+            className="h-12 sm:h-14 !bg-white border-white/30 focus-visible:ring-white/50 focus-visible:border-white/60 text-sm sm:text-base text-gray-900 placeholder:text-gray-500"
             aria-required="true"
           />
         </div>
@@ -118,7 +118,7 @@ export default function VoyageSection({
               value={departureCity}
               onChange={(e) => setDepartureCity(e.target.value)}
               placeholder={t('Ex: Dakar', 'Ex: Dakar')}
-              className="h-12 sm:h-14 bg-white border-white/30 focus-visible:ring-white/50 focus-visible:border-white/60 text-sm sm:text-base text-gray-900 placeholder:text-gray-500"
+              className="h-12 sm:h-14 !bg-white border-white/30 focus-visible:ring-white/50 focus-visible:border-white/60 text-sm sm:text-base text-gray-900 placeholder:text-gray-500"
               aria-required="true"
             />
           </div>
@@ -131,7 +131,7 @@ export default function VoyageSection({
               value={arrivalCity}
               onChange={(e) => setArrivalCity(e.target.value)}
               placeholder={t('Ex: Ziguinchor', 'Ex: Ziguinchor')}
-              className="h-12 sm:h-14 bg-white border-white/30 focus-visible:ring-white/50 focus-visible:border-white/60 text-sm sm:text-base text-gray-900 placeholder:text-gray-500"
+              className="h-12 sm:h-14 !bg-white border-white/30 focus-visible:ring-white/50 focus-visible:border-white/60 text-sm sm:text-base text-gray-900 placeholder:text-gray-500"
               aria-required="true"
             />
           </div>
@@ -149,7 +149,7 @@ export default function VoyageSection({
               value={departureDate}
               min={new Date().toISOString().split('T')[0]}
               onChange={(e) => setDepartureDate(e.target.value)}
-              className="h-12 sm:h-14 bg-white border-white/30 focus-visible:ring-white/50 focus-visible:border-white/60 text-sm sm:text-base text-gray-900 [color-scheme:light]"
+              className="h-12 sm:h-14 !bg-white border-white/30 focus-visible:ring-white/50 focus-visible:border-white/60 text-sm sm:text-base text-gray-900 [color-scheme:light]"
               aria-required="true"
             />
           </div>
@@ -162,7 +162,7 @@ export default function VoyageSection({
               type="time"
               value={departureTime}
               onChange={(e) => setDepartureTime(e.target.value)}
-              className="h-12 sm:h-14 bg-white border-white/30 focus-visible:ring-white/50 focus-visible:border-white/60 text-sm sm:text-base text-gray-900 [color-scheme:light]"
+              className="h-12 sm:h-14 !bg-white border-white/30 focus-visible:ring-white/50 focus-visible:border-white/60 text-sm sm:text-base text-gray-900 [color-scheme:light]"
               aria-required="true"
             />
           </div>
@@ -185,7 +185,7 @@ export default function VoyageSection({
               value={pickupAddress}
               onChange={(e) => setPickupAddress(e.target.value)}
               placeholder={t('Ex: Gare routière, Boutique X, N° de porte...', 'Ex: Bus station, Shop X, Door number...')}
-              className="w-full min-h-[56px] sm:min-h-[70px] px-3 py-2.5 sm:py-3 bg-white border-white/30 focus-visible:ring-white/50 focus-visible:border-white/60 rounded-lg text-sm sm:text-base text-gray-900 placeholder:text-gray-500 resize-none"
+              className="w-full min-h-[56px] sm:min-h-[70px] px-3 py-2.5 sm:py-3 !bg-white border-white/30 focus-visible:ring-white/50 focus-visible:border-white/60 rounded-lg text-sm sm:text-base text-gray-900 placeholder:text-gray-500 resize-none"
               minRows={2}
             />
           </div>
@@ -201,7 +201,7 @@ export default function VoyageSection({
               type="time"
               value={estimatedArrival}
               onChange={(e) => setEstimatedArrival(e.target.value)}
-              className="h-12 sm:h-14 bg-white border-white/30 focus-visible:ring-white/50 focus-visible:border-white/60 text-sm sm:text-base text-gray-900 [color-scheme:light]"
+              className="h-12 sm:h-14 !bg-white border-white/30 focus-visible:ring-white/50 focus-visible:border-white/60 text-sm sm:text-base text-gray-900 [color-scheme:light]"
             />
           </div>
         </div>
