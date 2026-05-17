@@ -215,18 +215,18 @@ export default function SmartPhoneInput({
 
   return (
     <div className="space-y-1.5">
-      <Label htmlFor={inputId} className={`text-sm font-medium ${labelClassName}`}>
+      <Label htmlFor={inputId} className={`text-base font-semibold ${labelClassName}`}>
         {label}{' '}
         {optional ? (
-          <span className="text-xs font-normal opacity-60">(optionnel)</span>
+          <span className="text-sm font-normal opacity-70">(optionnel)</span>
         ) : (
-          <span className="text-red-500">*</span>
+          <span className="text-red-400">*</span>
         )}
       </Label>
 
       {/* Phone input with badge */}
       <div
-        className={`flex items-center h-12 rounded-md border overflow-hidden transition-[color,box-shadow] ${
+        className={`flex items-center h-14 rounded-md border overflow-hidden transition-[color,box-shadow] ${
           error
             ? 'border-red-400 focus-within:ring-2 focus-within:ring-red-400/30'
             : 'border-[#E5E7EB] focus-within:border-[#25D366] focus-within:ring-2 focus-within:ring-[#25D366]/20'
@@ -234,8 +234,8 @@ export default function SmartPhoneInput({
       >
         {/* Country badge — fixed on the left */}
         <div className="flex items-center gap-1.5 pl-3 pr-2 bg-gray-50 border-r border-[#E5E7EB] h-full shrink-0 select-none">
-          <span className="text-base leading-none">{flag}</span>
-          <span className="text-sm font-mono font-medium text-gray-600">{callingCode}</span>
+          <span className="text-lg leading-none">{flag}</span>
+          <span className="text-base font-mono font-semibold text-gray-700">{callingCode}</span>
         </div>
 
         {/* Local number input */}
@@ -247,7 +247,7 @@ export default function SmartPhoneInput({
           value={formattedDisplay}
           onChange={handleLocalChange}
           placeholder="77 12 34 56 67"
-          className="h-full border-0 rounded-none shadow-none focus-visible:ring-0 focus-visible:border-0 text-sm font-mono px-3 bg-transparent"
+          className="h-full border-0 rounded-none shadow-none focus-visible:ring-0 focus-visible:border-0 text-base font-mono px-3 bg-transparent"
           aria-required="true"
           aria-invalid={!!error}
           aria-describedby={error ? errorId : hint ? hintId : undefined}
@@ -256,13 +256,13 @@ export default function SmartPhoneInput({
 
       {/* Error or hint message */}
       {error ? (
-        <p id={errorId} className="text-xs text-red-500" role="alert">
+        <p id={errorId} className="text-sm text-red-400 font-medium" role="alert">
           {error}
         </p>
       ) : (
         <div className="space-y-0.5">
           {hint && (
-            <p id={hintId} className={`text-xs ${hintClassName || 'text-gray-400'}`}>
+            <p id={hintId} className={`text-sm ${hintClassName || 'text-gray-400'}`}>
               {hint}
             </p>
           )}

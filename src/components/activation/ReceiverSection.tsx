@@ -23,13 +23,13 @@ export default function ReceiverSection({
 
   return (
     <div className="bg-[#8b5cf6] rounded-2xl p-6 shadow-lg shadow-violet-500/20">
-      <h2 className="text-base font-bold text-white mb-5 flex items-center gap-2">
+      <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
         📥 {t('DESTINATAIRE', 'RECEIVER')}
       </h2>
 
       <div className="space-y-4">
         <div className="space-y-1.5">
-          <Label htmlFor="receiver_name" className="text-sm font-medium text-violet-100">
+          <Label htmlFor="receiver_name" className="text-base font-semibold text-white">
             {t('Nom Complet', 'Full Name')} <span className="text-yellow-300">*</span>
           </Label>
           <Input
@@ -37,7 +37,7 @@ export default function ReceiverSection({
             value={receiverName}
             onChange={(e) => setReceiverName(e.target.value)}
             placeholder={t('Ex: Fatou Sow', 'Ex: Fatou Sow')}
-            className="h-12 bg-white/95 border-white/30 focus-visible:ring-white/50 focus-visible:border-white/60 text-sm text-gray-900 placeholder:text-gray-400"
+            className="h-14 bg-white/95 border-white/30 focus-visible:ring-white/50 focus-visible:border-white/60 text-base text-gray-900 placeholder:text-gray-400"
             aria-required="true"
           />
         </div>
