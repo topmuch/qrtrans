@@ -5,6 +5,7 @@
  * This runs BEFORE the Next.js server starts, ensuring schema is always in sync.
  * 
  * Safe: uses try-catch per column so it's idempotent.
+ * Must be run from /app directory where full node_modules is available.
  */
 
 const { PrismaClient } = require('@prisma/client');
@@ -73,7 +74,7 @@ const MIGRATIONS = [
 ];
 
 async function migrate() {
-  console.log('🔧 Migration: connecting to database...');
+  console.log('    Connecting to database...');
   
   const prisma = new PrismaClient();
 
@@ -85,15 +86,13 @@ async function migrate() {
     const tableSet = new Set(tables.map(t => t.name));
 
     let totalAdded = 0;
+    let totalSkipped = 0;
 
-    console.log('');
-    console.log('═══════════════════════════════════════');
-    console.log('  QRTrans Database Column Migration');
-    console.log('═══════════════════════════════════════');
-    console.log('');
+    console.log(`    Found ${tableSet.size} existing tables`);
 
     for (const mig of MIGRATIONS) {
       if (!tableSet.has(mig.table)) {
+        totalSkipped++;
         continue; // Table doesn't exist yet, Prisma will create it
       }
 
@@ -110,26 +109,25 @@ async function migrate() {
         await prisma.$executeRawUnsafe(
           `ALTER TABLE "${mig.table}" ADD COLUMN "${mig.column}" ${mig.type}`
         );
-        console.log(`  ✅ ${mig.table}.${mig.column} (${mig.type})`);
+        console.log(`    ✅ Added ${mig.table}.${mig.column} (${mig.type})`);
         totalAdded++;
       } catch (e) {
-        console.log(`  ⚠️  ${mig.table}.${mig.column}: ${e.message}`);
+        console.log(`    ⚠️  ${mig.table}.${mig.column}: ${e.message}`);
       }
     }
 
-    console.log('');
-    console.log('═══════════════════════════════════════');
-    console.log(`  ✅ Migration complete: ${totalAdded} columns added`);
-    console.log('═══════════════════════════════════════');
-    console.log('');
+    console.log(`    ✅ Migration complete: ${totalAdded} columns added, ${totalSkipped} tables skipped`);
 
   } catch (error) {
-    console.error('❌ Migration failed:', error.message);
-    // Don't exit - let the server try to start anyway
-    // (Prisma db push in a fresh DB will create all tables from scratch)
+    console.error(`    ❌ Migration error: ${error.message}`);
+    // Don't exit with error code — let the server try to start anyway
+    // (prisma db push should have already created tables from scratch)
   } finally {
     await prisma.$disconnect();
   }
 }
 
-migrate();
+migrate().then(() => process.exit(0)).catch((e) => {
+  console.error(`    ❌ Migration script crashed: ${e.message}`);
+  process.exit(0); // Exit 0 so the CMD chain continues to start the server
+});

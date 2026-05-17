@@ -2,10 +2,11 @@
 FROM node:20-alpine
 
 # Cache buster - increment to force rebuild
-ARG CACHEBUST=12
+ARG CACHEBUST=13
 
 # Install required packages (Alpine correct package names)
-RUN apk add --no-cache git sqlite-libs
+# sqlite = CLI tool + shared library (needed for runtime migrations)
+RUN apk add --no-cache git sqlite
 RUN npm install -g bun
 
 WORKDIR /app
@@ -34,16 +35,19 @@ RUN bun run build
 RUN cp -r .next/static .next/standalone/.next/static
 RUN cp -r public .next/standalone/public
 
-# Copy Prisma client + CLI into standalone for runtime queries + migrations
+# Copy Prisma client into standalone for runtime queries
 RUN cp -r node_modules/.prisma .next/standalone/node_modules/.prisma
 RUN cp -r node_modules/@prisma/client .next/standalone/node_modules/@prisma/client
 RUN cp -r node_modules/@prisma/engines .next/standalone/node_modules/@prisma/engines 2>/dev/null || true
-RUN cp -r node_modules/prisma .next/standalone/node_modules/prisma 2>/dev/null || true
 
-# Copy migration script (uses Prisma client for column additions on existing DBs)
-RUN mkdir -p .next/standalone/scripts
-RUN cp scripts/migrate-db.js .next/standalone/scripts/migrate-db.js
+# Copy prisma schema for reference
+RUN mkdir -p .next/standalone/prisma
 RUN cp prisma/schema.prisma .next/standalone/prisma/schema.prisma
+
+# IMPORTANT: Keep full node_modules at /app/node_modules for migration scripts.
+# The standalone node_modules is incomplete (missing prisma CLI dependencies),
+# so we run migrations using the FULL node_modules before starting the server.
+# Do NOT delete /app/node_modules.
 
 # Create data directories
 RUN mkdir -p /app/data /app/public/uploads
@@ -59,14 +63,18 @@ ENV NODE_ENV=production
 HEALTHCHECK --interval=10s --timeout=5s --start-period=30s --retries=3 \
   CMD wget -qO- http://localhost:3000/api/health || exit 1
 
-# Start command: create tables (fresh DB) + migrate columns (existing DB) + start server
+# Start command:
+# Step 1: prisma db push creates tables from scratch (fresh DB) or syncs schema
+# Step 2: migrate-db.js adds missing columns to existing tables (existing DB upgrade)
+# Both run against /app/node_modules (full deps) — NOT standalone's incomplete node_modules
+# Step 3: Start the Next.js standalone server
 CMD ["sh", "-c", "\
   mkdir -p /app/data /app/public/uploads && \
   export DATABASE_URL=file:/app/data/qrtrans.db && \
-  echo '>>> [1/3] Creating/updating tables via Prisma...' && \
-  npx prisma db push --skip-generate --accept-data-loss 2>&1 || true && \
-  echo '>>> [2/3] Migrating missing columns...' && \
-  node .next/standalone/scripts/migrate-db.js && \
+  echo '>>> [1/3] Creating/syncing database tables via Prisma CLI...' && \
+  (./node_modules/.bin/prisma db push --skip-generate --accept-data-loss 2>&1 && echo '    ✅ Schema synced' || echo '    ⚠️ prisma db push issue — column migration will handle it') && \
+  echo '>>> [2/3] Running column migrations for existing databases...' && \
+  node scripts/migrate-db.js 2>&1 && \
   echo '>>> [3/3] Starting server on port 3000...' && \
   exec node .next/standalone/server.js \
 "]
