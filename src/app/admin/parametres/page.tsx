@@ -27,6 +27,8 @@ import {
   AlertCircle,
   Eye,
   EyeOff,
+  Package,
+  Bell,
 } from "lucide-react";
 
 interface SettingsData {
@@ -277,6 +279,7 @@ export default function ParametresPage() {
   const [testResult, setTestResult] = useState<{ success: boolean; message: string; warning?: boolean } | null>(null);
   const [emailSaving, setEmailSaving] = useState(false);
   const [emailSaved, setEmailSaved] = useState(false);
+  const [emailSubTab, setEmailSubTab] = useState<'colis' | 'system'>('colis');
 
   // Update active tab when URL param changes
   useEffect(() => {
@@ -817,7 +820,7 @@ export default function ParametresPage() {
             <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6">
               <h3 className="text-lg font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
                 <Mail className="w-5 h-5 text-[#ff7f00]" />
-                Expéditeur & Destinataire
+                Expéditeur
               </h3>
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
@@ -844,37 +847,140 @@ export default function ParametresPage() {
                     className="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-[#ff7f00]"
                   />
                 </div>
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-2">
-                    📧 Email notifications Colis
-                  </label>
-                  <input
-                    type="email"
-                    value={emailSettings.recipientColisEmail || ''}
-                    onChange={(e) => setEmailSettings({ ...emailSettings, recipientColisEmail: e.target.value || null })}
-                    placeholder="colis@votredomaine.com"
-                    className="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-orange-300 dark:border-orange-700 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-orange-500"
-                  />
-                  <p className="mt-1.5 text-xs text-orange-500">
-                    Reçoit les notifications : colis activé, livré, perdu, retrouvé, scan
-                  </p>
-                </div>
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-2">
-                    ⚙️ Email notifications Système
-                  </label>
-                  <input
-                    type="email"
-                    value={emailSettings.recipientSystemEmail || ''}
-                    onChange={(e) => setEmailSettings({ ...emailSettings, recipientSystemEmail: e.target.value || null })}
-                    placeholder="admin@votredomaine.com"
-                    className="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-blue-300 dark:border-blue-700 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-blue-500"
-                  />
-                  <p className="mt-1.5 text-xs text-blue-500">
-                    Reçoit les notifications : nouveaux leads, agences, messages de contact, inscriptions
-                  </p>
-                </div>
               </div>
+            </div>
+
+            {/* Email Destination — 2 Sub-Tabs */}
+            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6">
+              <h3 className="text-lg font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
+                <Bell className="w-5 h-5 text-[#ff7f00]" />
+                Destinataire des notifications
+              </h3>
+              <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
+                Sélectionnez un mode pour configurer l&apos;email de destination des notifications.
+              </p>
+
+              {/* Sub-Tab Navigation */}
+              <div className="flex gap-2 mb-6">
+                <button
+                  onClick={() => setEmailSubTab('colis')}
+                  className={`flex items-center gap-2 px-5 py-3 rounded-xl font-medium transition-all text-sm ${
+                    emailSubTab === 'colis'
+                      ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/25'
+                      : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
+                  }`}
+                >
+                  <Package className="w-4 h-4" />
+                  Colis
+                  <span className={`text-xs px-2 py-0.5 rounded-full ${emailSubTab === 'colis' ? 'bg-white/20' : 'bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400'}`}>
+                    Opérationnel
+                  </span>
+                </button>
+                <button
+                  onClick={() => setEmailSubTab('system')}
+                  className={`flex items-center gap-2 px-5 py-3 rounded-xl font-medium transition-all text-sm ${
+                    emailSubTab === 'system'
+                      ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/25'
+                      : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
+                  }`}
+                >
+                  <Settings className="w-4 h-4" />
+                  Système
+                  <span className={`text-xs px-2 py-0.5 rounded-full ${emailSubTab === 'system' ? 'bg-white/20' : 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400'}`}>
+                    Admin
+                  </span>
+                </button>
+              </div>
+
+              {/* Sub-Tab: Colis */}
+              {emailSubTab === 'colis' && (
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-2">
+                      Email de destination — Notifications Colis
+                    </label>
+                    <input
+                      type="email"
+                      value={emailSettings.recipientColisEmail || ''}
+                      onChange={(e) => setEmailSettings({ ...emailSettings, recipientColisEmail: e.target.value || null })}
+                      placeholder="colis@votredomaine.com"
+                      className="w-full px-4 py-3 bg-white dark:bg-slate-800 border-2 border-orange-300 dark:border-orange-700 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-orange-500 transition-colors"
+                    />
+                  </div>
+                  <div className="bg-orange-50 dark:bg-orange-500/10 border border-orange-200 dark:border-orange-800 rounded-xl p-4">
+                    <p className="text-sm font-medium text-orange-700 dark:text-orange-300 mb-3">
+                      Cet email reçoit les notifications suivantes :
+                    </p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      {[
+                        { icon: '🚀', label: 'Colis activé', desc: 'Quand un colis est activé et en transit' },
+                        { icon: '✅', label: 'Colis livré', desc: 'Livraison confirmée (chauffeur ou PIN)' },
+                        { icon: '🚨', label: 'Colis perdu', desc: 'Signalement de colis perdu' },
+                        { icon: '🔍', label: 'Colis retrouvé', desc: 'Colis précédemment perdu et retrouvé' },
+                      ].map((item) => (
+                        <div key={item.label} className="flex items-start gap-2">
+                          <span className="text-base mt-0.5">{item.icon}</span>
+                          <div>
+                            <p className="text-sm font-medium text-slate-700 dark:text-slate-300">{item.label}</p>
+                            <p className="text-xs text-slate-500 dark:text-slate-400">{item.desc}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  {emailSettings.recipientColisEmail && (
+                    <div className="flex items-center gap-2 text-sm text-emerald-600 dark:text-emerald-400">
+                      <CheckCircle className="w-4 h-4" />
+                      <span>Les notifications colis seront envoyées à <strong>{emailSettings.recipientColisEmail}</strong></span>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Sub-Tab: System */}
+              {emailSubTab === 'system' && (
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-2">
+                      Email de destination — Notifications Système
+                    </label>
+                    <input
+                      type="email"
+                      value={emailSettings.recipientSystemEmail || ''}
+                      onChange={(e) => setEmailSettings({ ...emailSettings, recipientSystemEmail: e.target.value || null })}
+                      placeholder="admin@votredomaine.com"
+                      className="w-full px-4 py-3 bg-white dark:bg-slate-800 border-2 border-blue-300 dark:border-blue-700 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-blue-500 transition-colors"
+                    />
+                  </div>
+                  <div className="bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-800 rounded-xl p-4">
+                    <p className="text-sm font-medium text-blue-700 dark:text-blue-300 mb-3">
+                      Cet email reçoit les notifications suivantes :
+                    </p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      {[
+                        { icon: '🏢', label: 'Nouvelle agence', desc: 'Création d\'une agence partenaire' },
+                        { icon: '🆕', label: 'Nouveau lead CRM', desc: 'Nouveau prospect ajouté' },
+                        { icon: '💬', label: 'Message agence', desc: 'Message envoyé par une agence' },
+                        { icon: '👤', label: 'Inscription partenaire', desc: 'Nouveau partenaire inscrit' },
+                      ].map((item) => (
+                        <div key={item.label} className="flex items-start gap-2">
+                          <span className="text-base mt-0.5">{item.icon}</span>
+                          <div>
+                            <p className="text-sm font-medium text-slate-700 dark:text-slate-300">{item.label}</p>
+                            <p className="text-xs text-slate-500 dark:text-slate-400">{item.desc}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  {emailSettings.recipientSystemEmail && (
+                    <div className="flex items-center gap-2 text-sm text-emerald-600 dark:text-emerald-400">
+                      <CheckCircle className="w-4 h-4" />
+                      <span>Les notifications système seront envoyées à <strong>{emailSettings.recipientSystemEmail}</strong></span>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
 
             {/* SMTP Settings - Only show when SMTP is selected */}

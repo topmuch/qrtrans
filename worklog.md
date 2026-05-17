@@ -2236,3 +2236,38 @@ Stage Summary:
 - Email notifications now separated into 2 categories:
   - 📧 recipientColisEmail: colis activé, livré, perdu, retrouvé
   - ⚙️ recipientSystemEmail: nouveaux leads, agences, messages de contact, inscriptions
+
+---
+Task ID: 18
+Agent: Main Agent
+Task: Redesign Email settings with 2 sub-tabs for notification email separation
+
+Work Log:
+- Analyzed existing code: Prisma schema already had `recipientColisEmail` and `recipientSystemEmail` columns
+- API routes already correctly used `recipientColisEmail` for colis notifications and `recipientSystemEmail` for system notifications
+- UI had two email input fields but displayed as simple inputs in the same section — no visual separation
+- Redesigned the Email tab in `/src/app/admin/parametres/page.tsx`:
+  - Separated "Expéditeur" section (fromEmail + fromName) from "Destinataire des notifications" section
+  - Added 2 sub-tabs within the Destinataire section: "Colis" (orange, operational) and "Système" (blue, admin)
+  - Each sub-tab shows its own email input field with color-coded border (orange/blue)
+  - Each sub-tab includes a descriptive card listing all notification types that the email will receive
+  - Sub-tabs have icons: Package for Colis, Settings for Système
+  - Added confirmation message when email is configured (green CheckCircle)
+  - Added Bell icon import for the section header
+  - Added Package icon import for the Colis sub-tab
+- Verified all 8 API routes correctly use the right email field:
+  - Colis: mark-found, declare-lost, activate, arrivee, validate-pin → `recipientColisEmail` ✅
+  - System: crm/leads, agencies, agency/messages → `recipientSystemEmail` ✅
+- Ran `bunx prisma db push` — DB already in sync
+- Ran `bun run lint` — 0 errors
+- Dev server compiles cleanly
+
+Stage Summary:
+- 1 file modified: src/app/admin/parametres/page.tsx
+- 2 new icon imports: Package, Bell
+- 1 new state: emailSubTab ('colis' | 'system')
+- Email settings now have clear visual separation with 2 sub-tabs
+- Colis tab (orange): colis activé, livré, perdu, retrouvé
+- Système tab (blue): nouvelle agence, lead CRM, message agence, inscription partenaire
+- Zero lint errors, zero compilation errors
+- Backend API routes already correct — no backend changes needed
