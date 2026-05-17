@@ -5,49 +5,45 @@ import { motion } from 'framer-motion'
 interface Article {
   title: string
   badge: string
-  badgeColor: 'green' | 'orange' | 'navy'
   excerpt: string
   href: string
+  bg: string
+  hoverShadow: string
+  iconBg: string
 }
 
 const articles: Article[] = [
   {
     title: 'Sécuriser vos colis : 5 bonnes pratiques pour le transport inter-villes',
     badge: 'Sécurité',
-    badgeColor: 'green',
     excerpt:
       'Découvrez comment les codes QR et la traçabilité numérique réduisent les pertes et les litiges lors du transport de marchandises entre villes au Sénégal.',
     href: '#',
+    bg: 'bg-[#00a885]',
+    hoverShadow: 'hover:shadow-[0_8px_32px_rgba(0,168,133,0.35)]',
+    iconBg: 'bg-white/20',
   },
   {
     title: 'Optimiser vos tournées de livraison avec la technologie',
     badge: 'Productivité',
-    badgeColor: 'orange',
     excerpt:
       "La bonne gestion des itinéraires et le suivi en temps réel permettent aux chauffeurs et agences de gagner du temps et d'améliorer leur rentabilité.",
     href: '#',
+    bg: 'bg-[#FF6B35]',
+    hoverShadow: 'hover:shadow-[0_8px_32px_rgba(255,107,53,0.35)]',
+    iconBg: 'bg-white/20',
   },
   {
     title: 'Réglementation du transport de marchandises au Sénégal',
     badge: 'Conformité',
-    badgeColor: 'navy',
     excerpt:
       'Un guide complet sur les obligations légales, les documents requis et les normes à respecter pour le transport inter-villes de marchandises.',
     href: '#',
+    bg: 'bg-[#0A2540]',
+    hoverShadow: 'hover:shadow-[0_8px_32px_rgba(10,37,64,0.35)]',
+    iconBg: 'bg-white/20',
   },
 ]
-
-const badgeStyles: Record<Article['badgeColor'], string> = {
-  green: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-  orange: 'bg-orange-50 text-orange-700 border-orange-200',
-  navy: 'bg-blue-50 text-blue-700 border-blue-200',
-}
-
-const topBarColors: Record<Article['badgeColor'], string> = {
-  green: 'bg-emerald-500',
-  orange: 'bg-[#FF6B35]',
-  navy: 'bg-[#0A2540]',
-}
 
 const containerVariants = {
   hidden: {},
@@ -97,31 +93,31 @@ export default function BlogSection() {
               key={article.title}
               variants={cardVariants}
               href={article.href}
-              className="group block bg-white border border-[#E2E8F0] rounded-xl overflow-hidden shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300"
+              className={`group block ${article.bg} rounded-2xl overflow-hidden shadow-[0_4px_24px_rgba(10,37,64,0.08)] hover:translate-y-[-4px] ${article.hoverShadow} transition-all duration-300 border border-white/20`}
             >
-              {/* Colored Top Bar */}
-              <div className={`h-1 ${topBarColors[article.badgeColor]}`} />
-
-              <div className="p-6 sm:p-8">
+              <div className="p-7 sm:p-8">
                 {/* Badge */}
                 <span
-                  className={`inline-block text-xs font-semibold px-3 py-1 rounded-full border mb-4 ${badgeStyles[article.badgeColor]}`}
+                  className={`inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full ${article.iconBg} backdrop-blur-sm text-white mb-5`}
                 >
+                  {article.badge === 'Sécurité' && '🔒'}
+                  {article.badge === 'Productivité' && '⚡'}
+                  {article.badge === 'Conformité' && '📋'}
                   {article.badge}
                 </span>
 
                 {/* Title */}
-                <h3 className="text-lg sm:text-xl font-bold text-[#0A2540] mb-3 group-hover:text-[#1A3A52] transition-colors line-clamp-2">
+                <h3 className="text-lg sm:text-xl font-bold text-white mb-3 group-hover:text-white/95 transition-colors line-clamp-2 leading-snug">
                   {article.title}
                 </h3>
 
                 {/* Excerpt */}
-                <p className="text-gray-500 text-sm leading-relaxed mb-4 line-clamp-2">
+                <p className="text-white/80 text-sm leading-relaxed mb-5 line-clamp-3">
                   {article.excerpt}
                 </p>
 
                 {/* Read Link */}
-                <span className="inline-flex items-center text-sm font-semibold text-[#FF6B35] group-hover:gap-2 transition-all duration-200">
+                <span className="inline-flex items-center text-sm font-semibold text-white group-hover:gap-3 transition-all duration-200">
                   Lire
                   <span className="ml-1 group-hover:ml-2 transition-all duration-200">&rarr;</span>
                 </span>
