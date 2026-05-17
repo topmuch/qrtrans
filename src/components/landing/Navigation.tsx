@@ -9,7 +9,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 const navLinks = [
   { label: 'Solutions', href: '#services' },
   { label: 'Processus', href: '#process' },
-  { label: 'Chauffeur / Agence', href: '#spaces' },
   { label: 'Contact', href: '#footer' },
 ];
 
@@ -18,7 +17,7 @@ export default function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20);
+    const onScroll = () => setScrolled(window.scrollY > 80);
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
@@ -31,12 +30,14 @@ export default function Navigation() {
     }
   }, []);
 
+  const isOnHero = !scrolled;
+
   return (
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         scrolled
           ? 'bg-white/95 backdrop-blur-xl shadow-[0_4px_24px_rgba(10,37,64,0.08)] border-b border-[#E2E8F0]'
-          : 'bg-transparent'
+          : 'bg-gradient-to-b from-[#0A2540]/50 to-transparent backdrop-blur-sm'
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -46,7 +47,7 @@ export default function Navigation() {
             <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-[#FF6B35] shadow-[0_4px_12px_rgba(255,107,53,0.25)] group-hover:shadow-[0_4px_16px_rgba(255,107,53,0.35)] transition-shadow">
               <QrCode className="w-5 h-5 text-white" />
             </div>
-            <span className="text-xl font-bold text-[#0A2540] tracking-tight">
+            <span className={`text-xl font-bold tracking-tight transition-colors duration-300 ${isOnHero ? 'text-white drop-shadow-[0_1px_4px_rgba(0,0,0,0.3)]' : 'text-[#0A2540]'}`}>
               QRTrans
             </span>
           </Link>
@@ -61,7 +62,11 @@ export default function Navigation() {
                   e.preventDefault();
                   handleNavClick(link.href);
                 }}
-                className="text-sm font-medium text-[#475569] hover:text-[#0A2540] transition-colors duration-200 relative after:absolute after:bottom-[-4px] after:left-0 after:w-0 after:h-[2px] after:bg-[#FF6B35] after:transition-all after:duration-300 hover:after:w-full"
+                className={`text-sm font-medium transition-colors duration-200 relative after:absolute after:bottom-[-4px] after:left-0 after:w-0 after:h-[2px] after:bg-[#FF6B35] after:transition-all after:duration-300 hover:after:w-full ${
+                  isOnHero
+                    ? 'text-white/90 hover:text-white after:bg-white/60'
+                    : 'text-[#475569] hover:text-[#0A2540]'
+                }`}
               >
                 {link.label}
               </a>
@@ -73,7 +78,11 @@ export default function Navigation() {
             <Link href="/agence/connexion">
               <Button
                 variant="ghost"
-                className="text-[#475569] hover:text-[#0A2540] text-sm font-medium border border-[#E2E8F0] hover:border-[#0A2540]/20 hover:bg-white rounded-lg"
+                className={`text-sm font-medium border rounded-lg transition-all duration-300 ${
+                  isOnHero
+                    ? 'text-white border-white/30 hover:border-white/60 hover:bg-white/10'
+                    : 'text-[#475569] border-[#E2E8F0] hover:border-[#0A2540]/20 hover:bg-white'
+                }`}
               >
                 Espace Agence
               </Button>
@@ -87,7 +96,7 @@ export default function Navigation() {
 
           {/* Mobile hamburger */}
           <button
-            className="md:hidden text-[#0A2540] p-1"
+            className={`md:hidden p-1 transition-colors duration-300 ${isOnHero ? 'text-white' : 'text-[#0A2540]'}`}
             onClick={() => setIsOpen(!isOpen)}
             aria-label="Menu"
           >
