@@ -226,7 +226,7 @@ export default function SmartPhoneInput({
 
       {/* Phone input with badge */}
       <div
-        className={`flex items-center h-14 rounded-md border overflow-hidden transition-[color,box-shadow] ${
+        className={`flex items-center h-12 sm:h-14 rounded-md border overflow-hidden transition-[color,box-shadow] ${
           error
             ? 'border-red-400 focus-within:ring-2 focus-within:ring-red-400/30'
             : 'border-[#E5E7EB] focus-within:border-[#25D366] focus-within:ring-2 focus-within:ring-[#25D366]/20'
@@ -234,8 +234,8 @@ export default function SmartPhoneInput({
       >
         {/* Country badge — fixed on the left */}
         <div className="flex items-center gap-1.5 pl-3 pr-2 bg-gray-50 border-r border-[#E5E7EB] h-full shrink-0 select-none">
-          <span className="text-lg leading-none">{flag}</span>
-          <span className="text-base font-mono font-semibold text-gray-700">{callingCode}</span>
+          <span className="text-sm sm:text-base leading-none">{flag}</span>
+          <span className="text-sm sm:text-base font-mono font-semibold text-gray-700">{callingCode}</span>
         </div>
 
         {/* Local number input */}
@@ -247,7 +247,7 @@ export default function SmartPhoneInput({
           value={formattedDisplay}
           onChange={handleLocalChange}
           placeholder="77 12 34 56 67"
-          className="h-full border-0 rounded-none shadow-none focus-visible:ring-0 focus-visible:border-0 text-base font-mono px-3 bg-transparent"
+          className="h-full border-0 rounded-none shadow-none focus-visible:ring-0 focus-visible:border-0 text-sm sm:text-base font-mono px-2.5 sm:px-3 bg-transparent"
           aria-required="true"
           aria-invalid={!!error}
           aria-describedby={error ? errorId : hint ? hintId : undefined}

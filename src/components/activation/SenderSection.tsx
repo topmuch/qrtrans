@@ -11,7 +11,6 @@ interface SenderSectionProps {
   setSenderPhone: (v: string) => void;
   phoneError: string | null;
   lang: 'fr' | 'en';
-  // Baggage fields
   baggageType: string;
   setBaggageType: (v: string) => void;
   baggageTypeOther: string;
@@ -68,20 +67,20 @@ export default function SenderSection({
   const t = (fr: string, en: string) => lang === 'fr' ? fr : en;
 
   return (
-    <div className="bg-[#f97316] rounded-2xl p-6 shadow-lg shadow-orange-500/20 border-2 border-dashed border-white/60">
-      <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
+    <div className="bg-[#f97316] rounded-2xl p-4 sm:p-6 shadow-lg shadow-orange-500/20 border-2 border-dashed border-white/60">
+      <h2 className="text-lg sm:text-xl font-bold text-white mb-4 sm:mb-6 flex items-center gap-2">
         📤 {t('EXPÉDITEUR & COLIS', 'SENDER & PACKAGE')}
       </h2>
 
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-6">
         {/* ─── Section A: Coordonnées Expéditeur ─── */}
         <div>
-          <p className="text-sm font-bold text-white uppercase tracking-wider mb-3">
+          <p className="text-xs sm:text-sm font-bold text-white uppercase tracking-wider mb-2 sm:mb-3">
             👤 {t('Coordonnées Expéditeur', 'Sender Details')}
           </p>
-          <div className="space-y-4">
+          <div className="space-y-3 sm:space-y-4">
             <div className="space-y-1.5">
-              <Label htmlFor="sender_name" className="text-base font-semibold text-white">
+              <Label htmlFor="sender_name" className="text-sm sm:text-base font-semibold text-white">
                 {t('Nom Complet', 'Full Name')} <span className="text-yellow-300">*</span>
               </Label>
               <Input
@@ -89,7 +88,7 @@ export default function SenderSection({
                 value={senderName}
                 onChange={(e) => setSenderName(e.target.value)}
                 placeholder={t('Ex: Moussa Diop', 'Ex: Moussa Diop')}
-                className="h-14 bg-white/95 border-white/30 focus-visible:ring-white/50 focus-visible:border-white/60 text-base text-gray-900 placeholder:text-gray-400"
+                className="h-12 sm:h-14 bg-white/95 border-white/30 focus-visible:ring-white/50 focus-visible:border-white/60 text-sm sm:text-base text-gray-900 placeholder:text-gray-400"
                 aria-required="true"
               />
             </div>
@@ -112,23 +111,23 @@ export default function SenderSection({
 
         {/* ─── Section B: Type & Physique du Bagage ─── */}
         <div>
-          <p className="text-sm font-bold text-white uppercase tracking-wider mb-3">
+          <p className="text-xs sm:text-sm font-bold text-white uppercase tracking-wider mb-2 sm:mb-3">
             📦 {t('Type & Physique du Bagage', 'Baggage Type & Physical')}
           </p>
-          <div className="space-y-4">
+          <div className="space-y-3 sm:space-y-4">
             {/* Baggage Type */}
             <div className="space-y-1.5">
-              <Label className="text-base font-semibold text-white">
+              <Label className="text-sm sm:text-base font-semibold text-white">
                 {t('Type de bagage', 'Baggage type')} <span className="text-yellow-300">*</span>
               </Label>
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                 {BAGGAGE_TYPES.map((bt) => (
                   <button
                     key={bt.value}
                     type="button"
                     onClick={() => setBaggageType(bt.value)}
                     aria-pressed={baggageType === bt.value}
-                    className={`flex items-center justify-center h-12 rounded-lg border-2 text-sm font-bold transition-all px-2 ${
+                    className={`flex items-center justify-center h-11 sm:h-12 rounded-lg border-2 text-xs sm:text-sm font-bold transition-all px-1.5 sm:px-2 ${
                       baggageType === bt.value
                         ? 'border-white bg-white/25 text-white shadow-sm shadow-black/10'
                         : 'border-white/30 text-white hover:border-white/50'
@@ -138,22 +137,21 @@ export default function SenderSection({
                   </button>
                 ))}
               </div>
-              {/* If OTHER selected → text field */}
               {baggageType === 'OTHER' && (
                 <Input
                   value={baggageTypeOther}
                   onChange={(e) => setBaggageTypeOther(e.target.value)}
                   placeholder={t('Précisez le type...', 'Specify type...')}
-                  className="h-14 bg-white/95 border-white/30 focus-visible:ring-white/50 focus-visible:border-white/60 text-base text-gray-900 placeholder:text-gray-400"
+                  className="h-12 sm:h-14 bg-white/95 border-white/30 focus-visible:ring-white/50 focus-visible:border-white/60 text-sm sm:text-base text-gray-900 placeholder:text-gray-400"
                   aria-required="true"
                 />
               )}
             </div>
 
-            {/* Weight / Dimensions / Color */}
+            {/* Weight / Color */}
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <Label htmlFor="baggage_weight" className="text-base font-semibold text-white">
+                <Label htmlFor="baggage_weight" className="text-sm sm:text-base font-semibold text-white">
                   🏋️ {t('Poids', 'Weight')}
                 </Label>
                 <div className="relative">
@@ -165,13 +163,13 @@ export default function SenderSection({
                     value={baggageWeight}
                     onChange={(e) => setBaggageWeight(e.target.value)}
                     placeholder="0.0"
-                    className="h-14 bg-white/95 border-white/30 focus-visible:ring-white/50 focus-visible:border-white/60 text-base text-gray-900 placeholder:text-gray-400 pr-10"
+                    className="h-12 sm:h-14 bg-white/95 border-white/30 focus-visible:ring-white/50 focus-visible:border-white/60 text-sm sm:text-base text-gray-900 placeholder:text-gray-400 pr-10"
                   />
-                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-white font-semibold">kg</span>
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs sm:text-sm text-white font-semibold">kg</span>
                 </div>
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="baggage_color" className="text-base font-semibold text-white">
+                <Label htmlFor="baggage_color" className="text-sm sm:text-base font-semibold text-white">
                   🎨 {t('Couleur', 'Color')}
                 </Label>
                 <Input
@@ -179,13 +177,13 @@ export default function SenderSection({
                   value={baggageColor}
                   onChange={(e) => setBaggageColor(e.target.value)}
                   placeholder={t('Noir, Bleu...', 'Black, Blue...')}
-                  className="h-14 bg-white/95 border-white/30 focus-visible:ring-white/50 focus-visible:border-white/60 text-base text-gray-900 placeholder:text-gray-400"
+                  className="h-12 sm:h-14 bg-white/95 border-white/30 focus-visible:ring-white/50 focus-visible:border-white/60 text-sm sm:text-base text-gray-900 placeholder:text-gray-400"
                 />
               </div>
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="baggage_dimensions" className="text-base font-semibold text-white">
+              <Label htmlFor="baggage_dimensions" className="text-sm sm:text-base font-semibold text-white">
                 📏 {t('Dimensions', 'Dimensions')}
               </Label>
               <Input
@@ -193,7 +191,7 @@ export default function SenderSection({
                 value={baggageDimensions}
                 onChange={(e) => setBaggageDimensions(e.target.value)}
                 placeholder={t('L x l x h en cm', 'L x W x H in cm')}
-                className="h-14 bg-white/95 border-white/30 focus-visible:ring-white/50 focus-visible:border-white/60 text-base text-gray-900 placeholder:text-gray-400"
+                className="h-12 sm:h-14 bg-white/95 border-white/30 focus-visible:ring-white/50 focus-visible:border-white/60 text-sm sm:text-base text-gray-900 placeholder:text-gray-400"
               />
             </div>
           </div>
@@ -204,23 +202,23 @@ export default function SenderSection({
 
         {/* ─── Section C: Contenu & Valeur ─── */}
         <div>
-          <p className="text-sm font-bold text-white uppercase tracking-wider mb-3">
+          <p className="text-xs sm:text-sm font-bold text-white uppercase tracking-wider mb-2 sm:mb-3">
             📋 {t('Contenu & Valeur', 'Content & Value')}
           </p>
-          <div className="space-y-4">
+          <div className="space-y-3 sm:space-y-4">
             {/* Content Category */}
             <div className="space-y-1.5">
-              <Label className="text-base font-semibold text-white">
+              <Label className="text-sm sm:text-base font-semibold text-white">
                 {t('Catégorie du contenu', 'Content category')}
               </Label>
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                 {CONTENT_CATEGORIES.map((cat) => (
                   <button
                     key={cat.value}
                     type="button"
                     onClick={() => setContentCategory(cat.value)}
                     aria-pressed={contentCategory === cat.value}
-                    className={`flex items-center justify-center h-12 rounded-lg border-2 text-sm font-bold transition-all px-2 ${
+                    className={`flex items-center justify-center h-11 sm:h-12 rounded-lg border-2 text-xs sm:text-sm font-bold transition-all px-1.5 sm:px-2 ${
                       contentCategory === cat.value
                         ? 'border-white bg-white/25 text-white shadow-sm shadow-black/10'
                         : 'border-white/30 text-white hover:border-white/50'
@@ -234,8 +232,8 @@ export default function SenderSection({
 
             {/* Declared Value */}
             <div className="space-y-1.5">
-              <Label htmlFor="declared_value" className="text-base font-semibold text-white">
-                💰 {t('Valeur déclarée', 'Declared value')} <span className="text-sm text-white font-normal opacity-80">({t('optionnel', 'optional')})</span>
+              <Label htmlFor="declared_value" className="text-sm sm:text-base font-semibold text-white">
+                💰 {t('Valeur déclarée', 'Declared value')} <span className="text-xs sm:text-sm text-white font-normal opacity-80">({t('optionnel', 'optional')})</span>
               </Label>
               <div className="relative">
                 <Input
@@ -246,82 +244,86 @@ export default function SenderSection({
                   value={declaredValue}
                   onChange={(e) => setDeclaredValue(e.target.value)}
                   placeholder="0"
-                  className="h-14 bg-white/95 border-white/30 focus-visible:ring-white/50 focus-visible:border-white/60 text-base text-gray-900 placeholder:text-gray-400 pr-16"
+                  className="h-12 sm:h-14 bg-white/95 border-white/30 focus-visible:ring-white/50 focus-visible:border-white/60 text-sm sm:text-base text-gray-900 placeholder:text-gray-400 pr-14 sm:pr-16"
                 />
-                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-white font-semibold">FCFA</span>
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs sm:text-sm text-white font-semibold">FCFA</span>
               </div>
             </div>
 
-            {/* Toggles: Fragile / Prohibited */}
+            {/* Toggles: Fragile / Prohibited — stacked on mobile */}
             <div className="space-y-3">
               {/* Fragile Toggle */}
-              <div className="flex items-center justify-between p-3.5 bg-white/15 rounded-xl border border-white/20">
-                <div className="flex items-center gap-2.5">
-                  <span className="text-base">⚠️</span>
-                  <div>
-                    <Label className="text-base font-semibold text-white cursor-pointer">
-                      {t('Objet fragile ?', 'Fragile item?')}
-                    </Label>
-                    <p className="text-sm text-white/90">{t('Manutention avec précaution', 'Handle with care')}</p>
+              <div className="p-3 sm:p-3.5 bg-white/15 rounded-xl border border-white/20">
+                <div className="flex flex-col gap-2.5 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
+                    <span className="text-base shrink-0">⚠️</span>
+                    <div>
+                      <Label className="text-sm sm:text-base font-semibold text-white cursor-pointer leading-snug">
+                        {t('Objet fragile ?', 'Fragile item?')}
+                      </Label>
+                      <p className="text-xs sm:text-sm text-white/90">{t('Manutention avec précaution', 'Handle with care')}</p>
+                    </div>
                   </div>
-                </div>
-                <button
-                  type="button"
-                  role="switch"
-                  aria-checked={isFragile}
-                  onClick={() => setIsFragile(!isFragile)}
-                  className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-300 focus-visible:ring-offset-2 ${
-                    isFragile ? 'bg-orange-500' : 'bg-gray-300'
-                  }`}
-                >
-                  <span
-                    aria-hidden="true"
-                    className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
-                      isFragile ? 'translate-x-5' : 'translate-x-0'
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={isFragile}
+                    onClick={() => setIsFragile(!isFragile)}
+                    className={`relative inline-flex h-7 w-12 sm:h-6 sm:w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-300 focus-visible:ring-offset-2 self-end ${
+                      isFragile ? 'bg-orange-500' : 'bg-gray-300'
                     }`}
-                  />
-                </button>
+                  >
+                    <span
+                      aria-hidden="true"
+                      className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out mt-0.5 sm:mt-0 ${
+                        isFragile ? 'translate-x-5' : 'translate-x-0'
+                      }`}
+                    />
+                  </button>
+                </div>
               </div>
 
               {/* Prohibited Items Toggle */}
-              <div className="flex items-center justify-between p-3.5 bg-white/15 rounded-xl border border-white/20">
-                <div className="flex items-center gap-2.5">
-                  <span className="text-base">🚫</span>
-                  <div>
-                    <Label className="text-base font-semibold text-white cursor-pointer">
-                      {t('Contient produits interdits ?', 'Contains prohibited items?')}
-                    </Label>
-                    <p className="text-sm text-white/90">{t('Inflammables, liquides, armes...', 'Flammables, liquids, weapons...')}</p>
+              <div className="p-3 sm:p-3.5 bg-white/15 rounded-xl border border-white/20">
+                <div className="flex flex-col gap-2.5 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
+                    <span className="text-base shrink-0">🚫</span>
+                    <div>
+                      <Label className="text-sm sm:text-base font-semibold text-white cursor-pointer leading-snug">
+                        {t('Contient produits interdits ?', 'Contains prohibited items?')}
+                      </Label>
+                      <p className="text-xs sm:text-sm text-white/90">{t('Inflammables, liquides, armes...', 'Flammables, liquids, weapons...')}</p>
+                    </div>
                   </div>
-                </div>
-                <button
-                  type="button"
-                  role="switch"
-                  aria-checked={hasProhibited}
-                  onClick={() => setHasProhibited(!hasProhibited)}
-                  className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-red-400 focus-visible:ring-offset-2 ${
-                    hasProhibited ? 'bg-red-500' : 'bg-gray-300'
-                  }`}
-                >
-                  <span
-                    aria-hidden="true"
-                    className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
-                      hasProhibited ? 'translate-x-5' : 'translate-x-0'
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={hasProhibited}
+                    onClick={() => setHasProhibited(!hasProhibited)}
+                    className={`relative inline-flex h-7 w-12 sm:h-6 sm:w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-red-400 focus-visible:ring-offset-2 self-end ${
+                      hasProhibited ? 'bg-red-500' : 'bg-gray-300'
                     }`}
-                  />
-                </button>
+                  >
+                    <span
+                      aria-hidden="true"
+                      className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out mt-0.5 sm:mt-0 ${
+                        hasProhibited ? 'translate-x-5' : 'translate-x-0'
+                      }`}
+                    />
+                  </button>
+                </div>
               </div>
             </div>
 
             {/* Prohibited warning */}
             {hasProhibited && (
-              <div className="bg-red-600 border border-red-400 rounded-xl p-3.5 flex items-start gap-2.5 animate-in fade-in slide-in-from-top-2 duration-200">
+              <div className="bg-red-600 border border-red-400 rounded-xl p-3 sm:p-3.5 flex items-start gap-2.5 animate-in fade-in slide-in-from-top-2 duration-200">
                 <span className="text-base mt-0.5">⚠️</span>
                 <div>
-                  <p className="text-base font-bold text-white">
+                  <p className="text-sm sm:text-base font-bold text-white">
                     {t('Produits interdits détectés !', 'Prohibited items detected!')}
                   </p>
-                  <p className="text-sm text-red-100 mt-0.5">
+                  <p className="text-xs sm:text-sm text-red-100 mt-0.5">
                     {t("Les produits inflammables, liquides >100ml et armes ne sont pas acceptés.", "Flammable products, liquids >100ml and weapons are not accepted.")}
                   </p>
                 </div>

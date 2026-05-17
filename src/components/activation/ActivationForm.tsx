@@ -287,15 +287,15 @@ export default function ActivationForm({ qrCode, lang }: ActivationFormProps) {
   // Already active/delivered/in_transit → redirect appropriately
   if (errorCode === 'already_in_transit') {
     return (
-      <div className="text-center py-12 space-y-4 animate-in fade-in duration-300">
-        <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-500/20 rounded-full">
-          <span className="text-3xl">🚚</span>
+      <div className="text-center py-10 sm:py-12 space-y-4 animate-in fade-in duration-300">
+        <div className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 bg-blue-500/20 rounded-full">
+          <span className="text-2xl sm:text-3xl">🚚</span>
         </div>
-        <h2 className="text-xl font-bold text-white">{errorMessage}</h2>
-        <p className="text-base text-white/70 font-mono">#{qrCode}</p>
+        <h2 className="text-lg sm:text-xl font-bold text-white">{errorMessage}</h2>
+        <p className="text-sm sm:text-base text-white/70 font-mono">#{qrCode}</p>
         <a
           href={`/retrieve/${qrCode}`}
-          className="inline-flex items-center gap-2 px-6 h-14 bg-[#FF6B35] hover:bg-[#e65a28] text-white rounded-xl font-bold text-base transition-colors no-underline shadow-lg shadow-orange-500/20"
+          className="inline-flex items-center gap-2 px-5 sm:px-6 h-12 sm:h-14 bg-[#FF6B35] hover:bg-[#e65a28] text-white rounded-xl font-bold text-sm sm:text-base transition-colors no-underline shadow-lg shadow-orange-500/20"
         >
           🔐 {t('Récupérer le colis', 'Retrieve package')}
         </a>
@@ -305,15 +305,15 @@ export default function ActivationForm({ qrCode, lang }: ActivationFormProps) {
 
   if (['already_delivered', 'already_active'].includes(errorCode || '')) {
     return (
-      <div className="text-center py-12 space-y-4 animate-in fade-in duration-300">
-        <div className="inline-flex items-center justify-center w-16 h-16 bg-amber-500/20 rounded-full">
-          <span className="text-3xl">⚠️</span>
+      <div className="text-center py-10 sm:py-12 space-y-4 animate-in fade-in duration-300">
+        <div className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 bg-amber-500/20 rounded-full">
+          <span className="text-2xl sm:text-3xl">⚠️</span>
         </div>
-        <h2 className="text-xl font-bold text-white">{errorMessage}</h2>
-        <p className="text-base text-white/70 font-mono">#{qrCode}</p>
+        <h2 className="text-lg sm:text-xl font-bold text-white">{errorMessage}</h2>
+        <p className="text-sm sm:text-base text-white/70 font-mono">#{qrCode}</p>
         <a
           href={`/activate/${qrCode}`}
-          className="inline-flex items-center gap-2 px-6 h-14 bg-gray-900 hover:bg-gray-800 text-white rounded-xl font-bold text-base transition-colors no-underline"
+          className="inline-flex items-center gap-2 px-5 sm:px-6 h-12 sm:h-14 bg-gray-900 hover:bg-gray-800 text-white rounded-xl font-bold text-sm sm:text-base transition-colors no-underline"
         >
           🔍 {t('Voir le suivi', 'View tracking')}
         </a>
@@ -322,10 +322,10 @@ export default function ActivationForm({ qrCode, lang }: ActivationFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} noValidate className="space-y-4">
+    <form onSubmit={handleSubmit} noValidate className="space-y-3 sm:space-y-4">
       {/* Error banner */}
       {errorCode && errorMessage && (
-        <div className="bg-red-900/80 border border-red-500/50 rounded-xl p-4 flex items-start gap-3 animate-in fade-in slide-in-from-top-2 duration-200">
+        <div className="bg-red-900/80 border border-red-500/50 rounded-xl p-3 sm:p-4 flex items-start gap-2.5 sm:gap-3 animate-in fade-in slide-in-from-top-2 duration-200">
           <span className="text-xl mt-0.5">🚨</span>
           <div className="flex-1">
             <p className="text-base font-bold text-white">
@@ -389,11 +389,11 @@ export default function ActivationForm({ qrCode, lang }: ActivationFormProps) {
       />
 
       {/* Buttons */}
-      <div className="space-y-3 pt-2 pb-4">
+      <div className="space-y-3 pt-1 sm:pt-2 pb-4">
         <button
           type="submit"
           disabled={loading}
-          className="flex items-center justify-center gap-2 w-full h-16 bg-[#25D366] hover:bg-[#1fb855] active:bg-[#1a9e49] disabled:opacity-60 disabled:cursor-not-allowed text-white rounded-xl font-bold text-lg shadow-lg shadow-green-500/25 transition-all"
+          className="flex items-center justify-center gap-2 w-full h-14 sm:h-16 bg-[#25D366] hover:bg-[#1fb855] active:bg-[#1a9e49] disabled:opacity-60 disabled:cursor-not-allowed text-white rounded-xl font-bold text-base sm:text-lg shadow-lg shadow-green-500/25 transition-all"
         >
           {loading ? (
             <>
@@ -401,7 +401,7 @@ export default function ActivationForm({ qrCode, lang }: ActivationFormProps) {
               {t('Enregistrement...', 'Registering...')}
             </>
           ) : (
-            <>✅ {t('ACTIVER LE COLIS & GÉNÉRER LES NOTIFICATIONS', 'ACTIVATE PACKAGE & SEND NOTIFICATIONS')}</>
+            <>✅ {t('ACTIVER LE COLIS', 'ACTIVATE PACKAGE')}</>
           )}
         </button>
 
@@ -409,7 +409,7 @@ export default function ActivationForm({ qrCode, lang }: ActivationFormProps) {
           type="button"
           onClick={handleReset}
           disabled={loading}
-          className="flex items-center justify-center w-full h-14 border-2 border-white/30 hover:border-white/50 text-white hover:text-white rounded-xl font-bold text-base transition-colors disabled:opacity-50 bg-white/5"
+          className="flex items-center justify-center w-full h-12 sm:h-14 border-2 border-white/30 hover:border-white/50 text-white hover:text-white rounded-xl font-bold text-sm sm:text-base transition-colors disabled:opacity-50 bg-white/5"
         >
           ❌ {t('Annuler', 'Cancel')}
         </button>

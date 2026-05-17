@@ -57,10 +57,10 @@ export default function ActivatePage() {
     return (
       <div className="min-h-screen bg-gradient-to-b from-[#1a1a2e] to-[#16213e]">
         <ActivationHeader qrCode={qrCode} onLangChange={setLang} currentLang={lang} />
-        <div className="flex items-center justify-center py-32">
+        <div className="flex items-center justify-center py-24 sm:py-32">
           <div className="text-center">
-            <Loader2 className="w-10 h-10 text-white animate-spin mx-auto mb-3" />
-            <p className="text-base text-white">Vérification en cours...</p>
+            <Loader2 className="w-8 h-8 sm:w-10 sm:h-10 text-white animate-spin mx-auto mb-3" />
+            <p className="text-sm sm:text-base text-white">Vérification en cours...</p>
           </div>
         </div>
       </div>
@@ -71,7 +71,7 @@ export default function ActivatePage() {
     <div className="min-h-screen bg-gradient-to-b from-[#1a1a2e] to-[#16213e]">
       <ActivationHeader qrCode={qrCode} onLangChange={setLang} currentLang={lang} />
 
-      <main className="max-w-[600px] mx-auto px-4 py-6 pb-20">
+      <main className="max-w-[600px] mx-auto px-3 sm:px-4 py-4 sm:py-6 pb-24">
         <ActivationForm qrCode={qrCode} lang={lang} />
       </main>
     </div>

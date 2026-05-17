@@ -118,20 +118,20 @@ export default function SuccessScreen({
   return (
     <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
       {/* Success banner */}
-      <div className="bg-gradient-to-br from-[#25D366]/20 to-[#25D366]/10 border border-[#25D366]/30 rounded-xl p-6 text-center">
-        <div className="inline-flex items-center justify-center w-18 h-18 bg-[#25D366] rounded-full mb-3 shadow-lg shadow-green-500/30">
-          <CheckCircle className="w-10 h-10 text-white" />
+      <div className="bg-gradient-to-br from-[#25D366]/20 to-[#25D366]/10 border border-[#25D366]/30 rounded-xl p-4 sm:p-6 text-center">
+        <div className="inline-flex items-center justify-center w-14 h-14 sm:w-[72px] sm:h-[72px] bg-[#25D366] rounded-full mb-2 sm:mb-3 shadow-lg shadow-green-500/30">
+          <CheckCircle className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
         </div>
-        <h2 className="text-2xl font-bold text-white">
+        <h2 className="text-xl sm:text-2xl font-bold text-white">
           ✅ {t('Colis Activé avec Succès !', 'Package Activated Successfully!')}
         </h2>
-        <div className="mt-3 flex items-center justify-center gap-2 text-base text-white/70">
-          <span className="font-mono bg-white/10 px-2 py-0.5 rounded text-sm text-white">#{reference}</span>
+        <div className="mt-2 sm:mt-3 flex items-center justify-center gap-2 text-sm sm:text-base text-white/70">
+          <span className="font-mono bg-white/10 px-2 py-0.5 rounded text-xs sm:text-sm text-white">#{reference}</span>
         </div>
 
         {/* PIN warning banner */}
-        <div className="mt-4 bg-amber-900/50 border border-amber-500/30 rounded-lg p-4">
-          <p className="text-base font-bold text-white">
+        <div className="mt-3 sm:mt-4 bg-amber-900/50 border border-amber-500/30 rounded-lg p-3 sm:p-4">
+          <p className="text-sm sm:text-base font-bold text-white">
             ⚠️ {t(
               'Le code PIN a été envoyé UNIQUEMENT au destinataire par WhatsApp. Ne le partagez pas.',
               'The PIN code was sent ONLY to the receiver via WhatsApp. Do not share it.'
@@ -141,7 +141,7 @@ export default function SuccessScreen({
       </div>
 
       {/* Summary */}
-      <div className="bg-white/10 backdrop-blur rounded-xl border border-white/10 p-5 space-y-3">
+      <div className="bg-white/10 backdrop-blur rounded-xl border border-white/10 p-4 sm:p-5 space-y-2.5 sm:space-y-3">
         <h3 className="text-sm font-bold text-white uppercase tracking-widest">
           {t('Résumé', 'Summary')}
         </h3>
@@ -200,7 +200,7 @@ export default function SuccessScreen({
       </div>
 
       {/* Section: Notifier les contacts */}
-      <div className="bg-white/10 backdrop-blur rounded-xl border border-white/10 p-5 space-y-3">
+      <div className="bg-white/10 backdrop-blur rounded-xl border border-white/10 p-4 sm:p-5 space-y-2.5 sm:space-y-3">
         <h3 className="text-sm font-bold text-white uppercase tracking-widest">
           📱 {t('Notifier les contacts', 'Notify contacts')}
         </h3>
@@ -218,7 +218,7 @@ export default function SuccessScreen({
           href={senderLink}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center justify-center gap-2 w-full h-[56px] bg-[#25D366] hover:bg-[#1fb855] active:bg-[#1a9e49] text-white rounded-xl font-bold text-lg shadow-lg shadow-green-500/25 transition-all no-underline"
+          className="flex items-center justify-center gap-2 w-full h-12 sm:h-[56px] bg-[#25D366] hover:bg-[#1fb855] active:bg-[#1a9e49] text-white rounded-xl font-bold text-sm sm:text-lg shadow-lg shadow-green-500/25 transition-all no-underline"
         >
           🟢 {t("NOTIFIER L'EXPÉDITEUR", 'NOTIFY SENDER')}
           <ExternalLink className="w-3.5 h-3.5 opacity-50" />
@@ -227,7 +227,7 @@ export default function SuccessScreen({
           href={receiverLink}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center justify-center gap-2 w-full h-[56px] bg-[#0077B6] hover:bg-[#005f8d] active:bg-[#004a6e] text-white rounded-xl font-bold text-lg shadow-lg shadow-blue-500/25 transition-all no-underline"
+          className="flex items-center justify-center gap-2 w-full h-12 sm:h-[56px] bg-[#0077B6] hover:bg-[#005f8d] active:bg-[#004a6e] text-white rounded-xl font-bold text-sm sm:text-lg shadow-lg shadow-blue-500/25 transition-all no-underline"
         >
           🔵 {t('NOTIFIER LE DESTINATAIRE', 'NOTIFY RECEIVER')}
           <ExternalLink className="w-3.5 h-3.5 opacity-50" />
@@ -235,7 +235,7 @@ export default function SuccessScreen({
       </div>
 
       {/* Transition to retrieval */}
-      <div className="bg-gradient-to-r from-amber-900/30 to-orange-900/30 border border-amber-500/30 rounded-xl p-5 space-y-3">
+      <div className="bg-gradient-to-r from-amber-900/30 to-orange-900/30 border border-amber-500/30 rounded-xl p-4 sm:p-5 space-y-2.5 sm:space-y-3">
         <div className="flex items-center gap-2 text-white">
           <Truck className="w-5 h-5" />
           <p className="text-base font-bold">
@@ -250,7 +250,7 @@ export default function SuccessScreen({
         </p>
         <Link
           href={`/retrieve/${reference}`}
-          className="flex items-center justify-center gap-2 w-full h-14 bg-[#FF6B35] hover:bg-[#e65a28] active:bg-[#d35400] text-white rounded-xl font-bold text-lg shadow-lg shadow-orange-500/25 transition-all no-underline"
+          className="flex items-center justify-center gap-2 w-full h-12 sm:h-14 bg-[#FF6B35] hover:bg-[#e65a28] active:bg-[#d35400] text-white rounded-xl font-bold text-sm sm:text-lg shadow-lg shadow-orange-500/25 transition-all no-underline"
         >
           <Truck className="w-5 h-5" />
           {t('Accéder à la Page de Récupération', 'Go to Retrieval Page')}
@@ -261,7 +261,7 @@ export default function SuccessScreen({
       {/* Copy tracking link */}
       <button
         onClick={copyLink}
-        className="flex items-center justify-center gap-2 w-full h-14 border-2 border-white/20 hover:border-[#25D366] hover:bg-[#25D366]/10 rounded-xl text-base font-bold text-white hover:text-[#25D366] transition-all"
+        className="flex items-center justify-center gap-2 w-full h-12 sm:h-14 border-2 border-white/20 hover:border-[#25D366] hover:bg-[#25D366]/10 rounded-xl text-sm sm:text-base font-bold text-white hover:text-[#25D366] transition-all"
       >
         <Copy className="w-4 h-4" />
         {copied ? '✅ ' + t('Copié !', 'Copied!') : t('Copier le lien de suivi', 'Copy tracking link')}
