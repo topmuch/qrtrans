@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, Suspense } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
 import ActivationHeader from '@/components/activation/ActivationHeader';
 import ActivationForm from '@/components/activation/ActivationForm';
@@ -9,21 +9,37 @@ import { notificationSound } from '@/lib/notification-sound';
 
 function ActivateContent() {
   const params = useParams();
+  const searchParams = useSearchParams();
   const router = useRouter();
   const qrCode = ((params?.id as string) || '').toUpperCase().trim();
   const [lang, setLang] = useState<'fr' | 'en'>('fr');
+
+  // Check if we're returning from /sending (WhatsApp notification flow)
+  // In that case, we must NOT redirect to /retrieve — ActivationForm will
+  // restore from sessionStorage and show the SuccessScreen with the correct
+  // notified state.
+  const notifiedParam = searchParams.get('notified');
+  const isReturningFromNotify = notifiedParam === 'sender' || notifiedParam === 'receiver';
 
   // Pre-load audio on page mount (doesn't play, just unlocks context)
   useEffect(() => {
     notificationSound.unlock();
   }, []);
 
-  // Status-based routing: check if colis is already in_transit → redirect to arrivee
+  // Status-based routing: check if colis is already in_transit → redirect to retrieve
+  // IMPORTANT: Skip redirect when returning from /sending (isReturningFromNotify)
   const [checking, setChecking] = useState(true);
   const [checkError, setCheckError] = useState(false);
 
   useEffect(() => {
     if (!qrCode) {
+      setChecking(false);
+      return;
+    }
+
+    // Skip status check when returning from WhatsApp notification flow
+    // ActivationForm will handle restoration from sessionStorage
+    if (isReturningFromNotify) {
       setChecking(false);
       return;
     }
@@ -56,7 +72,7 @@ function ActivateContent() {
     };
 
     checkStatus();
-  }, [qrCode, router]);
+  }, [qrCode, router, isReturningFromNotify]);
 
   // Loading: checking status
   if (checking) {
