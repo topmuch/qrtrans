@@ -38,6 +38,7 @@ export interface NotificationVars {
   arrived_date?: string;
   arrived_time?: string;
   delivery_location?: string;
+  pickup_address?: string; // Adresse de retrait renseignée par l'expéditeur à l'activation
   tracking_url: string;
   feedback_url?: string;
   pin?: string;
@@ -123,8 +124,9 @@ Merci de votre confiance 🙏
 🔗 Suivre le colis : ${v.tracking_url}`,
 
   // ─── NOTIFICATION 2 : DÉPART → RECEVEUR ───
-  departure_receiver: (v) =>
-`🔵 *QRTrans — Colis en Transit*
+  departure_receiver: (v) => {
+    const pickupLine = v.pickup_address ? `\n📍 Adresse de retrait : ${v.pickup_address}` : '';
+    return `🔵 *QRTrans — Colis en Transit*
 
 Bonjour *${v.receiver_name}*,
 
@@ -134,23 +136,25 @@ Un colis destiné à votre attention est actuellement en route.
 👤 Expéditeur : ${v.sender_name}
 🚌 Compagnie : ${v.company_name}
 📍 Destination : ${v.arrival_city}
-🕐 Arrivée estimée : ${v.departure_date}
+🕐 Arrivée estimée : ${v.departure_date}${pickupLine}
 ${v.pin ? `🔐 *Code de retrait : ${v.pin}*\nConservez ce code. Il sera exigé à l'arrivée.\n` : ''}${v.share_driver_phone && v.driver_phone ? `📞 Contacter le transporteur : ${v.driver_phone}\n` : '📞 Pour toute question, contactez l\'agence au +221 78 123 00 00\n'}Vous serez notifié immédiatement dès l'arrivée du colis.
 
 🤝 Merci d'utiliser QRTrans
 
-🔗 Suivre le colis : ${v.tracking_url}`,
+🔗 Suivre le colis : ${v.tracking_url}`;
+  },
 
   // ─── NOTIFICATION 3 : ARRIVÉE/LIVRAISON → ENVOYEUR ───
-  arrival_sender: (v) =>
-`🟢 *QRTrans — Colis Livré ✅*
+  arrival_sender: (v) => {
+    const location = v.delivery_location || v.pickup_address || 'Non renseigné';
+    return `🟢 *QRTrans — Colis Livré ✅*
 
 Bonjour *${v.sender_name}*,
 
 Bonne nouvelle ! Votre colis a bien été livré avec succès.
 
 📦 Référence : *${v.reference}*
-📍 Lieu de livraison : ${v.delivery_location || 'Non renseigné'}
+📍 Lieu de livraison : ${location}
 ✅ Livré le : ${v.arrived_date || ''} à ${v.arrived_time || ''}
 👤 Destinataire : ${v.receiver_name}
 
@@ -158,25 +162,28 @@ Merci de votre confiance envers QRTrans 🙏
 
 ⭐ Évaluer le service : ${v.feedback_url || ''}
 
-🔗 Suivre le colis : ${v.tracking_url}`,
+🔗 Suivre le colis : ${v.tracking_url}`;
+  },
 
   // ─── NOTIFICATION 4 : ARRIVÉE → RECEVEUR (Colis Disponible) ───
-  arrival_receiver: (v) =>
-`🔵 *QRTrans — Colis Disponible 📦*
+  arrival_receiver: (v) => {
+    const location = v.delivery_location || v.pickup_address || 'Non renseigné';
+    return `🔵 *QRTrans — Colis Disponible 📦*
 
 Bonjour *${v.receiver_name}*,
 
 Votre colis est arrivé et peut maintenant être retiré.
 
 📦 Référence : *${v.reference}*
-📍 Point de retrait : ${v.delivery_location || 'Non renseigné'}
+📍 Point de retrait : ${location}
 🕐 Horaires : 08h00 - 18h00
 ✅ Arrivé le : ${v.arrived_date || ''} à ${v.arrived_time || ''}
 ${v.share_driver_phone && v.driver_phone ? `📞 Contacter le transporteur : ${v.driver_phone}` : `📞 Assistance : ${v.company_name}`}
 
 Merci d'utiliser QRTrans 🙏
 
-🔗 Suivre le colis : ${v.tracking_url}`,
+🔗 Suivre le colis : ${v.tracking_url}`;
+  },
 };
 
 // ═══════════════════════════════════════════════════════

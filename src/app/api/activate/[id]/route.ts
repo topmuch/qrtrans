@@ -228,6 +228,11 @@ Merci de votre confiance 🙏
       ? `📞 Contacter le transporteur : ${data.driver_phone}`
       : '📞 Pour toute question, contactez l\'agence au +221 78 123 00 00';
 
+    // Pickup address line (set by sender during activation)
+    const pickupLine = data.pickup_address
+      ? `📍 Adresse de retrait : ${data.pickup_address}`
+      : '';
+
     // ─── 🔵 RECEIVER MESSAGE (Departure — with PIN) ───
     const receiverMessage = `🔵 *QRTrans — Colis en Transit*
 
@@ -239,7 +244,8 @@ Un colis destiné à votre attention est actuellement en route.
 👤 Expéditeur : ${data.sender.name}
 🚌 Compagnie : ${data.company_name}
 📍 Destination : ${data.arrival_city}
-🕐 Arrivée estimée : ${estimatedArrivalLine}
+🕐 Arrivée estimée : ${estimatedArrivalLine}${pickupLine ? `
+${pickupLine}` : ''}
 🔐 *Code de retrait : ${pin}*
 Conservez ce code. Il sera exigé à l'arrivée.
 ${driverLine}

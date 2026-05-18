@@ -188,6 +188,9 @@ export async function POST(
       console.error('Failed to send delivery email:', emailError);
     }
 
+    // Resolve pickup location: driver's input > sender's pickupAddress > fallback
+    const pickupLocation = data.delivery_location || colis.pickupAddress || 'Non renseigné';
+
     // ─── 🟢 SENDER MESSAGE (Arrival confirmed) ───
     const senderArrivalMessage = `🟢 *QRTrans — Colis Livré ✅*
 
@@ -196,7 +199,7 @@ Bonjour *${updated.travelerFirstName || 'Expéditeur'}*,
 Bonne nouvelle ! Votre colis a bien été livré avec succès.
 
 📦 Référence : *${updated.reference}*
-📍 Lieu de livraison : ${data.delivery_location}
+📍 Lieu de livraison : ${pickupLocation}
 ✅ Livré le : ${arrivedDate} à ${arrivedTime}
 👤 Destinataire : ${updated.receiverName || '—'}
 
@@ -214,7 +217,7 @@ Bonjour *${updated.receiverName || 'Destinataire'}*,
 Votre colis est arrivé et peut maintenant être retiré.
 
 📦 Référence : *${updated.reference}*
-📍 Point de retrait : ${data.delivery_location}
+📍 Point de retrait : ${pickupLocation}
 🕐 Horaires : 08h00 - 18h00
 ✅ Arrivé le : ${arrivedDate} à ${arrivedTime}
 ${driverLine}

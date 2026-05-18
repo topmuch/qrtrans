@@ -147,6 +147,9 @@ export async function POST(request: NextRequest) {
       ? `📞 Contacter le transporteur : ${updated.driverPhone}`
       : `📞 Assistance : ${companyName}`;
 
+    // Resolve pickup location: deliveryLocation > pickupAddress > fallback
+    const pickupLocation = updated.deliveryLocation || updated.pickupAddress || 'Non renseigné';
+
     // ─── 🟢 SENDER MESSAGE (Delivery confirmed) ───
     const senderMessage = `🟢 *QRTrans — Colis Livré ✅*
 
@@ -155,7 +158,7 @@ Bonjour *${updated.travelerFirstName || 'Expéditeur'}*,
 Bonne nouvelle ! Votre colis a bien été livré avec succès.
 
 📦 Référence : *${updated.reference}*
-📍 Lieu de livraison : ${updated.deliveryLocation || 'Non renseigné'}
+📍 Lieu de livraison : ${pickupLocation}
 ✅ Livré le : ${today} à ${deliveryTime}
 👤 Destinataire : ${updated.receiverName || '—'}
 
@@ -173,7 +176,7 @@ Bonjour *${updated.receiverName || 'Destinataire'}*,
 Votre colis est arrivé et a été retiré avec succès.
 
 📦 Référence : *${updated.reference}*
-📍 Retrait : ${updated.deliveryLocation || 'Non renseigné'}
+📍 Retrait : ${pickupLocation}
 ✅ Retiré le : ${today} à ${deliveryTime}
 ${driverLine}
 
