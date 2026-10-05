@@ -44,17 +44,6 @@ export default function ActivationForm({ qrCode, lang }: ActivationFormProps) {
   const [senderName, setSenderName] = useState('');
   const [senderPhone, setSenderPhone] = useState('');
 
-  // Baggage (Card 2)
-  const [baggageType, setBaggageType] = useState('');
-  const [baggageTypeOther, setBaggageTypeOther] = useState('');
-  const [baggageWeight, setBaggageWeight] = useState('');
-  const [baggageDimensions, setBaggageDimensions] = useState('');
-  const [baggageColor, setBaggageColor] = useState('');
-  const [contentCategory, setContentCategory] = useState('');
-  const [declaredValue, setDeclaredValue] = useState('');
-  const [isFragile, setIsFragile] = useState(false);
-  const [hasProhibited, setHasProhibited] = useState(false);
-
   // Receiver (Card 3)
   const [receiverName, setReceiverName] = useState('');
   const [receiverPhone, setReceiverPhone] = useState('');
@@ -94,16 +83,10 @@ export default function ActivationForm({ qrCode, lang }: ActivationFormProps) {
 
     if (!paymentStatus) return t('Sélectionnez le statut de paiement.', 'Select the payment status.');
 
-    // Card 2: Sender & Baggage
+    // Card 2: Sender
     if (!senderName.trim()) return t("Saisissez le nom de l'expéditeur.", "Enter the sender's name.");
     const sErr = validatePhone(senderPhone);
     if (sErr) { setSenderPhoneError(sErr); return sErr; }
-
-    if (!baggageType) return t('Sélectionnez le type de bagage.', 'Select the baggage type.');
-    if (baggageType === 'OTHER' && !baggageTypeOther.trim()) return t('Précisez le type de bagage.', 'Specify the baggage type.');
-
-    // Prohibited items block
-    if (hasProhibited) return t("Les produits interdits (inflammables, liquides >100ml, armes) ne sont pas acceptés. Veuillez modifier.", 'Prohibited items (flammables, liquids >100ml, weapons) are not accepted. Please modify.');
 
     // Card 1: Driver phone (optional, but if filled → must be valid)
     if (driverPhone) {
@@ -173,17 +156,6 @@ export default function ActivationForm({ qrCode, lang }: ActivationFormProps) {
           name: receiverName.trim(),
           phone: receiverPhone.replace(/\s/g, ''),
         },
-        baggage: {
-          type: baggageType,
-          typeOther: baggageType === 'OTHER' ? baggageTypeOther.trim() : undefined,
-          weight: baggageWeight ? parseFloat(baggageWeight) : undefined,
-          dimensions: baggageDimensions.trim() || undefined,
-          color: baggageColor.trim() || undefined,
-          contentCategory: contentCategory || undefined,
-          declaredValue: declaredValue ? parseFloat(declaredValue) : undefined,
-          isFragile,
-          hasProhibited,
-        },
       };
 
       const res = await fetch(`/api/activate/${encodeURIComponent(qrCode)}`, {
@@ -204,7 +176,6 @@ export default function ActivationForm({ qrCode, lang }: ActivationFormProps) {
             transportType, company, departureCity, arrivalCity, departureDate, departureTime,
             pickupAddress, estimatedArrival, paymentStatus, senderName, senderPhone: senderPhone.replace(/\s/g, ''),
             receiverName, receiverPhone: receiverPhone.replace(/\s/g, ''), wa_sender: data.wa_sender, wa_receiver: data.wa_receiver,
-            baggageType, baggageTypeOther, baggageWeight, isFragile,
           }));
         } catch { /* noop */ }
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -249,15 +220,6 @@ export default function ActivationForm({ qrCode, lang }: ActivationFormProps) {
     setShareDriverPhone(false);
     setSenderName('');
     setSenderPhone('');
-    setBaggageType('');
-    setBaggageTypeOther('');
-    setBaggageWeight('');
-    setBaggageDimensions('');
-    setBaggageColor('');
-    setContentCategory('');
-    setDeclaredValue('');
-    setIsFragile(false);
-    setHasProhibited(false);
     setReceiverName('');
     setReceiverPhone('');
     setWaSenderUrl('');
@@ -292,10 +254,6 @@ export default function ActivationForm({ qrCode, lang }: ActivationFormProps) {
           setReceiverPhone(data.receiverPhone || '');
           setWaSenderUrl(data.wa_sender || '');
           setWaReceiverUrl(data.wa_receiver || '');
-          setBaggageType(data.baggageType || '');
-          setBaggageTypeOther(data.baggageTypeOther || '');
-          setBaggageWeight(data.baggageWeight || '');
-          setIsFragile(data.isFragile || false);
           setSuccess(true);
         }
       } catch { /* noop */ }
@@ -322,11 +280,6 @@ export default function ActivationForm({ qrCode, lang }: ActivationFormProps) {
         lang={lang}
         onReset={handleReset}
         notified={isReturningFromNotify ? notifiedParam : 'none'}
-        // New baggage fields
-        baggageType={baggageType}
-        baggageTypeOther={baggageTypeOther}
-        baggageWeight={baggageWeight}
-        isFragile={isFragile}
         paymentStatus={paymentStatus}
         pickupAddress={pickupAddress}
       />
@@ -413,21 +366,12 @@ export default function ActivationForm({ qrCode, lang }: ActivationFormProps) {
         lang={lang}
       />
 
-      {/* CARTE 2 : EXPÉDITEUR & COLIS */}
+      {/* CARTE 2 : EXPÉDITEUR */}
       <SenderSection
         senderName={senderName} setSenderName={setSenderName}
         senderPhone={senderPhone} setSenderPhone={setSenderPhone}
         phoneError={senderPhoneError}
         lang={lang}
-        baggageType={baggageType} setBaggageType={setBaggageType}
-        baggageTypeOther={baggageTypeOther} setBaggageTypeOther={setBaggageTypeOther}
-        baggageWeight={baggageWeight} setBaggageWeight={setBaggageWeight}
-        baggageDimensions={baggageDimensions} setBaggageDimensions={setBaggageDimensions}
-        baggageColor={baggageColor} setBaggageColor={setBaggageColor}
-        contentCategory={contentCategory} setContentCategory={setContentCategory}
-        declaredValue={declaredValue} setDeclaredValue={setDeclaredValue}
-        isFragile={isFragile} setIsFragile={setIsFragile}
-        hasProhibited={hasProhibited} setHasProhibited={setHasProhibited}
       />
 
       {/* CARTE 3 : DESTINATAIRE */}

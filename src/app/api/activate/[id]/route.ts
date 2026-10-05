@@ -17,7 +17,7 @@ const receiverSchema = z.object({
 });
 
 const baggageSchema = z.object({
-  type: z.enum(['VALISE', 'SAC', 'CARTON', 'BACKPACK', 'CABIN', 'OTHER']),
+  type: z.enum(['VALISE', 'SAC', 'CARTON', 'BACKPACK', 'CABIN', 'OTHER']).optional(),
   typeOther: z.string().optional(),
   weight: z.number().min(0.1, 'Le poids doit être positif').optional(),
   dimensions: z.string().optional(),
@@ -32,7 +32,7 @@ const baggageSchema = z.object({
 ).refine(
   (data) => data.hasProhibited === false,
   { message: "Les produits interdits (inflammables, liquides >100ml, armes) ne sont pas acceptés.", path: ['hasProhibited'] }
-);
+).optional();
 
 const activateSchema = z.object({
   transport_type: z.enum(['GP', 'BUS'], { message: 'Le type de transport est obligatoire' }),
@@ -133,9 +133,9 @@ export async function POST(
     // Baggage type label for display
     const baggageTypeLabels: Record<string, string> = {
       VALISE: 'Valise', SAC: 'Sac', CARTON: 'Carton',
-      BACKPACK: 'Sac à dos', CABIN: 'Bagage cabine', OTHER: data.baggage.typeOther || 'Autre',
+      BACKPACK: 'Sac à dos', CABIN: 'Bagage cabine', OTHER: data.baggage?.typeOther || 'Autre',
     };
-    const baggageTypeLabel = baggageTypeLabels[data.baggage.type] || data.baggage.type;
+    const baggageTypeLabel = data.baggage?.type ? (baggageTypeLabels[data.baggage.type] || data.baggage.type) : '';
 
     // Payment status labels
     const paymentLabels: Record<string, string> = {
@@ -166,16 +166,16 @@ export async function POST(
         // Driver phone & consent
         driverPhone: data.driver_phone || null,
         shareDriverPhone: data.share_driver_phone,
-        // New baggage fields
-        colisType: data.baggage.type,
-        colisTypeOther: data.baggage.type === 'OTHER' ? (data.baggage.typeOther || null) : null,
-        colisWeight: data.baggage.weight ?? null,
-        colisDimensions: data.baggage.dimensions || null,
-        colisColor: data.baggage.color || null,
-        contentCategory: data.baggage.contentCategory || null,
-        declaredValue: data.baggage.declaredValue ?? null,
-        isFragile: data.baggage.isFragile,
-        hasProhibited: data.baggage.hasProhibited,
+        // New baggage fields (optional — may be omitted when activation form hides baggage UI)
+        colisType: data.baggage?.type ?? null,
+        colisTypeOther: data.baggage?.type === 'OTHER' ? (data.baggage.typeOther || null) : null,
+        colisWeight: data.baggage?.weight ?? null,
+        colisDimensions: data.baggage?.dimensions || null,
+        colisColor: data.baggage?.color || null,
+        contentCategory: data.baggage?.contentCategory || null,
+        declaredValue: data.baggage?.declaredValue ?? null,
+        isFragile: data.baggage?.isFragile ?? false,
+        hasProhibited: data.baggage?.hasProhibited ?? false,
       },
     });
 

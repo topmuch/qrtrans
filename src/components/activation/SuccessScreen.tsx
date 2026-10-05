@@ -26,7 +26,7 @@ interface SuccessScreenProps {
   /** 'none' = both buttons active, 'sender' = sender done, 'receiver' = receiver done */
   notified?: 'none' | 'sender' | 'receiver';
   // New baggage fields
-  baggageType: string;
+  baggageType?: string;
   baggageTypeOther?: string;
   baggageWeight?: string;
   isFragile?: boolean;
@@ -136,11 +136,13 @@ export default function SuccessScreen({
     }
   };
 
-  // Baggage description
+  // Baggage description (hidden if no baggage type — activation form no longer collects it)
   const baggageLabel = baggageType === 'OTHER'
     ? (baggageTypeOther || 'Autre')
-    : (BAGGAGE_TYPE_LABELS[baggageType] || baggageType);
-  const baggageDesc = `${baggageLabel}${baggageWeight ? ` — ${baggageWeight}kg` : ''}${isFragile ? ' ⚠️' : ''}`;
+    : (BAGGAGE_TYPE_LABELS[baggageType || ''] || baggageType || '');
+  const baggageDesc = baggageType
+    ? `${baggageLabel}${baggageWeight ? ` — ${baggageWeight}kg` : ''}${isFragile ? ' ⚠️' : ''}`
+    : '';
 
   // Payment label
   const paymentLabel = paymentStatus === 'SENDER_PAID'
@@ -198,11 +200,13 @@ export default function SuccessScreen({
           </div>
         </div>
 
-        {/* Baggage */}
-        <div className="bg-white/5 rounded-lg p-3">
-          <p className="text-sm text-white/60">{t('Colis', 'Package')}</p>
-          <p className="font-bold text-white text-base">{baggageDesc}</p>
-        </div>
+        {/* Baggage — only shown if a type was captured during activation */}
+        {baggageDesc && (
+          <div className="bg-white/5 rounded-lg p-3">
+            <p className="text-sm text-white/60">{t('Colis', 'Package')}</p>
+            <p className="font-bold text-white text-base">{baggageDesc}</p>
+          </div>
+        )}
 
         {/* Payment */}
         <div className="bg-white/5 rounded-lg p-3">
