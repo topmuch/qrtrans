@@ -1188,3 +1188,238 @@ body * {
 .text-muted-ink {
   color: var(--q-light-muted);
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   DASHBOARD PREMIUM DESIGN SYSTEM — Brand-bleu + Emerald
+   Light: #F8FAFC bg + white cards + #1E4B7A accent
+   Dark:  #0F172A bg + #1E293B cards + #10B981 accent
+   ═══════════════════════════════════════════════════════════════ */
+
+:root {
+  /* Dashboard light tokens */
+  --dash-bg: #F8FAFC;
+  --dash-bg-2: #FFFFFF;
+  --dash-bg-3: #F1F5F9;
+  --dash-card: #FFFFFF;
+  --dash-card-hover: #FAFBFC;
+  --dash-border: #E2E8F0;
+  --dash-border-strong: #CBD5E1;
+  --dash-ink: #0F172A;
+  --dash-ink-2: #334155;
+  --dash-muted: #64748B;
+  --dash-muted-2: #94A3B8;
+  --dash-brand: #1E4B7A;
+  --dash-brand-2: #487AA8;
+  --dash-brand-soft: #EEF5FC;
+  --dash-emerald: #10B981;
+  --dash-emerald-soft: #ECFDF5;
+  --dash-sidebar-bg: #FFFFFF;
+  --dash-sidebar-border: #E2E8F0;
+  --dash-sidebar-text: #475569;
+  --dash-sidebar-text-active: #0F172A;
+  --dash-sidebar-hover: #F1F5F9;
+  --dash-sidebar-active-bg: #EEF5FC;
+  --dash-sidebar-active-accent: #1E4B7A;
+  --dash-header-bg: #FFFFFF;
+  --dash-header-border: #E2E8F0;
+}
+
+.dark {
+  --dash-bg: #0F172A;
+  --dash-bg-2: #1E293B;
+  --dash-bg-3: #1E293B;
+  --dash-card: #1E293B;
+  --dash-card-hover: #334155;
+  --dash-border: #334155;
+  --dash-border-strong: #475569;
+  --dash-ink: #F1F5F9;
+  --dash-ink-2: #CBD5E1;
+  --dash-muted: #94A3B8;
+  --dash-muted-2: #64748B;
+  --dash-brand: #6BA3D6;
+  --dash-brand-2: #89BDE0;
+  --dash-brand-soft: rgba(107, 163, 214, 0.1);
+  --dash-emerald: #34D399;
+  --dash-emerald-soft: rgba(52, 211, 153, 0.1);
+  --dash-sidebar-bg: #0F172A;
+  --dash-sidebar-border: #1E293B;
+  --dash-sidebar-text: #94A3B8;
+  --dash-sidebar-text-active: #F1F5F9;
+  --dash-sidebar-hover: #1E293B;
+  --dash-sidebar-active-bg: rgba(107, 163, 214, 0.1);
+  --dash-sidebar-active-accent: #6BA3D6;
+  --dash-header-bg: #0F172A;
+  --dash-header-border: #1E293B;
+}
+
+/* ─── Dashboard utility classes ─────────────────────────── */
+
+.dash-surface {
+  background: var(--dash-card);
+  border: 1px solid var(--dash-border);
+  border-radius: 16px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.dash-surface:hover {
+  border-color: var(--dash-border-strong);
+}
+
+.dash-card {
+  background: var(--dash-card);
+  border: 1px solid var(--dash-border);
+  border-radius: 16px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.dash-card:hover {
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.08);
+  transform: translateY(-1px);
+}
+.dark .dash-card {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+.dark .dash-card:hover {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Sidebar nav item */
+.dash-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--dash-sidebar-text);
+  transition: all 0.2s ease;
+  cursor: pointer;
+  position: relative;
+}
+.dash-nav-item:hover {
+  background: var(--dash-sidebar-hover);
+  color: var(--dash-sidebar-text-active);
+}
+.dash-nav-item.active {
+  background: var(--dash-sidebar-active-bg);
+  color: var(--dash-sidebar-active-accent);
+  font-weight: 600;
+}
+.dash-nav-item.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 20px;
+  background: var(--dash-sidebar-active-accent);
+  border-radius: 0 3px 3px 0;
+}
+
+.dash-nav-category {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--dash-muted-2);
+  padding: 20px 14px 8px;
+}
+
+/* Modern table */
+.dash-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+.dash-table th {
+  text-align: left;
+  padding: 12px 16px;
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--dash-muted);
+  background: var(--dash-bg-3);
+  border-bottom: 1px solid var(--dash-border);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.dash-table th:first-child { border-top-left-radius: 12px; }
+.dash-table th:last-child { border-top-right-radius: 12px; }
+.dash-table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--dash-border);
+  font-size: 14px;
+  color: var(--dash-ink-2);
+  transition: background 0.15s ease;
+}
+.dash-table tr:last-child td { border-bottom: none; }
+.dash-table tr:hover td {
+  background: var(--dash-bg-3);
+}
+
+/* Status badge pills */
+.dash-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.dash-badge-success { background: var(--dash-emerald-soft); color: var(--dash-emerald); }
+.dash-badge-warning { background: #FEF3C7; color: #D97706; }
+.dark .dash-badge-warning { background: rgba(245, 158, 11, 0.15); color: #FBBF24; }
+.dash-badge-danger  { background: #FEE2E2; color: #DC2626; }
+.dark .dash-badge-danger  { background: rgba(239, 68, 68, 0.15); color: #F87171; }
+.dash-badge-info    { background: var(--dash-brand-soft); color: var(--dash-brand); }
+.dash-badge-neutral { background: var(--dash-bg-3); color: var(--dash-muted); }
+
+/* KPI card with sparkline */
+.dash-kpi {
+  background: var(--dash-card);
+  border: 1px solid var(--dash-border);
+  border-radius: 16px;
+  padding: 20px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+.dash-kpi:hover {
+  border-color: var(--dash-border-strong);
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.06);
+  transform: translateY(-2px);
+}
+.dark .dash-kpi:hover {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Search input */
+.dash-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  background: var(--dash-bg-3);
+  border: 1px solid var(--dash-border);
+  border-radius: 10px;
+  transition: all 0.2s ease;
+}
+.dash-search:focus-within {
+  border-color: var(--dash-brand);
+  box-shadow: 0 0 0 3px var(--dash-brand-soft);
+}
+.dash-search input {
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: 14px;
+  color: var(--dash-ink);
+  width: 100%;
+}
+.dash-search input::placeholder {
+  color: var(--dash-muted);
+}

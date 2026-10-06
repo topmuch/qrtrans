@@ -1,26 +1,26 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import {
   QrCode,
-  Clock,
-  TrendingUp,
-  TrendingDown,
-  ArrowUpRight,
   CheckCircle,
   Users,
-  Building,
-  Package,
-  MessageSquare,
   ShoppingCart,
+  Building2,
+  AlertTriangle,
+  ArrowUpRight,
+  Clock,
+  Package,
   Search,
   RefreshCw,
-  Plus,
-  Filter
-} from "lucide-react";
+} from 'lucide-react';
+import KpiCard from '@/components/dashboard/KpiCard';
+import AreaChartCard from '@/components/dashboard/AreaChartCard';
 
+// ─────────────────────────────────────────────────────────────────────────────
 // Types
+// ─────────────────────────────────────────────────────────────────────────────
 interface DashboardStats {
   totalQR: number;
   activeBaggages: number;
@@ -47,271 +47,267 @@ interface DailyActivation {
   fullDate?: string;
 }
 
-// Modern Stat Card Component
-function StatCard({ 
-  title, 
-  value, 
-  subtitle, 
-  icon, 
-  trend,
-  iconBg
-}: {
-  title: string;
-  value: number | string;
-  subtitle: string;
-  icon: React.ReactNode;
-  trend?: { value: number; isUp: boolean };
-  iconBg: string;
-}) {
+// ─────────────────────────────────────────────────────────────────────────────
+// Mock data helpers (delta + sparkline not yet provided by the API)
+// ─────────────────────────────────────────────────────────────────────────────
+const MOCK_DAYS = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
+const MOCK_DAILY_ACTIVATIONS = [
+  { label: 'Lun', value: 12 },
+  { label: 'Mar', value: 19 },
+  { label: 'Mer', value: 15 },
+  { label: 'Jeu', value: 25 },
+  { label: 'Ven', value: 22 },
+  { label: 'Sam', value: 18 },
+  { label: 'Dim', value: 10 },
+];
+
+function generateDefaultActivations(): DailyActivation[] {
+  const today = new Date();
+  return MOCK_DAYS.map((day, i) => {
+    const date = new Date(today);
+    date.setDate(today.getDate() - (6 - i));
+    return {
+      day,
+      count: 0,
+      fullDate: date.toLocaleDateString('fr-FR', {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long',
+      }),
+    };
+  });
+}
+
+/** Stable mock delta for a given KPI seed (between -5 and +15). */
+function mockDelta(seed: number): number {
+  const rand = Math.sin(seed * 9301 + 49297) * 233280;
+  const frac = rand - Math.floor(rand); // 0..1
+  return Math.round((frac * 20 - 5) * 10) / 10;
+}
+
+/** Stable 12-point sparkline for a given KPI seed. */
+function mockSparkline(seed: number): number[] {
+  return Array.from({ length: 12 }, (_, i) => {
+    const rand = Math.sin((seed + 1) * (i + 1) * 12.9898) * 43758.5453;
+    const frac = rand - Math.floor(rand);
+    return Math.round(frac * 40 + 5);
+  });
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Quick Actions
+// ─────────────────────────────────────────────────────────────────────────────
+interface QuickAction {
+  label: string;
+  description: string;
+  icon: typeof QrCode;
+  href: string;
+  gradient: string;
+  ring: string;
+  pattern: string;
+}
+
+const QUICK_ACTIONS: QuickAction[] = [
+  {
+    label: 'Générer QR',
+    description: 'Créer des codes',
+    icon: QrCode,
+    href: '/admin/generer',
+    gradient: 'from-emerald-500 to-emerald-700',
+    ring: 'hover:shadow-emerald-500/25',
+    pattern: 'bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.18),transparent_60%)]',
+  },
+  {
+    label: 'Commandes',
+    description: 'Demandes en cours',
+    icon: ShoppingCart,
+    href: '/admin/etiquettes',
+    gradient: 'from-amber-500 to-orange-600',
+    ring: 'hover:shadow-orange-500/25',
+    pattern: 'bg-[radial-gradient(circle_at_20%_80%,rgba(255,255,255,0.18),transparent_60%)]',
+  },
+  {
+    label: 'Agences',
+    description: 'Partenaires',
+    icon: Building2,
+    href: '/admin/agences',
+    gradient: 'from-violet-500 to-purple-700',
+    ring: 'hover:shadow-purple-500/25',
+    pattern: 'bg-[radial-gradient(circle_at_80%_70%,rgba(255,255,255,0.18),transparent_60%)]',
+  },
+];
+
+function QuickActions() {
   return (
-    <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 hover:shadow-lg hover:shadow-slate-200/50 dark:hover:shadow-slate-900/50 transition-all duration-300 group">
-      <div className="flex items-start justify-between">
-        <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${iconBg}`}>
-          {icon}
+    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      {QUICK_ACTIONS.map((action) => {
+        const Icon = action.icon;
+        return (
+          <Link
+            key={action.href}
+            href={action.href}
+            className={`relative overflow-hidden rounded-2xl p-5 bg-gradient-to-br ${action.gradient} ${action.ring} hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 group`}
+          >
+            <div className={`absolute inset-0 ${action.pattern} pointer-events-none`} />
+            <div className="absolute -right-4 -bottom-4 w-20 h-20 rounded-full bg-white/10 pointer-events-none" />
+            <div className="relative z-10">
+              <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center text-white mb-3 group-hover:scale-110 group-hover:bg-white/30 transition-all duration-300">
+                <Icon className="w-6 h-6" />
+              </div>
+              <p className="font-bold text-white text-lg leading-tight">{action.label}</p>
+              <p className="text-white/70 text-sm mt-0.5">{action.description}</p>
+            </div>
+          </Link>
+        );
+      })}
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Recent Activity
+// ─────────────────────────────────────────────────────────────────────────────
+interface ActivityMeta {
+  icon: typeof CheckCircle;
+  variant: 'success' | 'warning' | 'info' | 'neutral';
+  iconColor: string;
+  iconBg: string;
+}
+
+function getActivityMeta(activity: RecentActivity): ActivityMeta {
+  switch (activity.type) {
+    case 'activation':
+      return {
+        icon: CheckCircle,
+        variant: 'success',
+        iconColor: 'text-[var(--dash-emerald)]',
+        iconBg: 'bg-[var(--dash-emerald-soft)]',
+      };
+    case 'order':
+      return {
+        icon: Package,
+        variant: 'warning',
+        iconColor: 'text-amber-500 dark:text-amber-400',
+        iconBg: 'bg-amber-50 dark:bg-amber-500/10',
+      };
+    case 'scan':
+    default:
+      return {
+        icon: Search,
+        variant: 'info',
+        iconColor: 'text-[var(--dash-brand)]',
+        iconBg: 'bg-[var(--dash-brand-soft)]',
+      };
+  }
+}
+
+function RecentActivityList({ activities }: { activities: RecentActivity[] }) {
+  return (
+    <div className="dash-card overflow-hidden flex flex-col h-full">
+      <div className="flex items-center justify-between p-5 sm:p-6 border-b border-[var(--dash-border)]">
+        <div>
+          <h3 className="font-display text-lg font-bold text-[var(--dash-ink)]">
+            Activité récente
+          </h3>
+          <p className="text-xs text-[var(--dash-muted)] mt-0.5">
+            Derniers scans et activations
+          </p>
         </div>
-        {trend && (
-          <div className={`flex items-center gap-1 text-sm font-medium ${trend.isUp ? 'text-emerald-500' : 'text-rose-500'}`}>
-            {trend.isUp ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
-            {Math.abs(trend.value)}%
-          </div>
-        )}
+        <Link
+          href="/admin/trouvailles"
+          className="text-sm text-[var(--dash-brand)] hover:text-[var(--dash-brand-2)] font-medium flex items-center gap-1 transition-colors"
+        >
+          Voir tout <ArrowUpRight className="w-3.5 h-3.5" />
+        </Link>
       </div>
-      <div className="mt-4">
-        <p className="text-2xl font-bold text-slate-900 dark:text-white">{value}</p>
-        <p className="text-sm font-medium text-slate-600 dark:text-slate-300 mt-1">{title}</p>
-        <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">{subtitle}</p>
+
+      <div className="flex-1 divide-y divide-[var(--dash-border)]">
+        {activities.length === 0 ? (
+          <div className="p-10 text-center text-[var(--dash-muted)]">
+            <Clock className="w-8 h-8 mx-auto mb-2 opacity-40" />
+            <p className="text-sm">Aucune activité récente</p>
+          </div>
+        ) : (
+          activities.slice(0, 6).map((activity) => {
+            const meta = getActivityMeta(activity);
+            const Icon = meta.icon;
+            return (
+              <div
+                key={activity.id}
+                className="flex items-start gap-3 sm:gap-4 p-4 hover:bg-[var(--dash-bg-3)] transition-colors cursor-pointer group"
+              >
+                <div
+                  className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${meta.iconBg}`}
+                >
+                  <Icon className={`w-4 h-4 ${meta.iconColor}`} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="font-medium text-[var(--dash-ink)] truncate">
+                      {activity.name}
+                    </p>
+                    <ArrowUpRight className="w-4 h-4 text-[var(--dash-muted-2)] opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
+                  </div>
+                  <p className="text-sm text-[var(--dash-muted)] mt-0.5 truncate">
+                    {activity.details}
+                  </p>
+                  <div className="flex items-center gap-2 mt-2 flex-wrap">
+                    <span className="text-xs text-[var(--dash-muted-2)] flex items-center gap-1">
+                      <Clock className="w-3 h-3" />
+                      {activity.time}
+                    </span>
+                    {activity.reference && (
+                      <span className="dash-badge dash-badge-neutral">
+                        {activity.reference}
+                      </span>
+                    )}
+                    {activity.agency && (
+                      <span className={`dash-badge dash-badge-${meta.variant}`}>
+                        {activity.agency}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            );
+          })
+        )}
       </div>
     </div>
   );
 }
 
-// KPI Card Component - Colored
-function KPICard({ 
-  title, 
-  value, 
-  subtitle, 
-  icon, 
-  colorVariant
-}: {
-  title: string;
-  value: number;
-  subtitle: string;
-  icon: React.ReactNode;
-  colorVariant: 'green' | 'blue' | 'purple' | 'orange' | 'cyan' | 'red' | 'pink' | 'indigo';
-}) {
-  const chartBars = Array.from({ length: 12 }, (_, i) => ({
-    height: 20 + Math.random() * 80,
-  }));
-
+// ─────────────────────────────────────────────────────────────────────────────
+// Loading skeleton for Recent Activity
+// ─────────────────────────────────────────────────────────────────────────────
+function RecentActivitySkeleton() {
   return (
-    <div className={`kpi-card kpi-card-${colorVariant} p-6 opacity-0 animate-slide-up`}>
-      <div className="flex items-start justify-between relative z-10">
-        <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center backdrop-blur-sm">
-          <span className="text-white">{icon}</span>
+    <div className="dash-card overflow-hidden">
+      <div className="flex items-center justify-between p-5 sm:p-6 border-b border-[var(--dash-border)]">
+        <div className="animate-pulse">
+          <div className="h-5 w-32 rounded bg-[var(--dash-bg-3)] mb-2" />
+          <div className="h-3 w-40 rounded bg-[var(--dash-bg-3)]" />
         </div>
       </div>
-      <div className="mt-4 relative z-10">
-        <p className="text-3xl font-bold text-white">{value}</p>
-        <p className="text-sm font-medium text-white/90 mt-1">{title}</p>
-        <p className="text-xs text-white/70 mt-1">{subtitle}</p>
-      </div>
-      
-      <div className="mini-chart-bars mt-4">
-        {chartBars.map((bar, i) => (
-          <div 
-            key={i} 
-            className="mini-chart-bar" 
-            style={{ height: `${bar.height}%` }}
-          />
+      <div className="divide-y divide-[var(--dash-border)]">
+        {Array.from({ length: 5 }).map((_, i) => (
+          <div key={i} className="flex items-start gap-4 p-4 animate-pulse">
+            <div className="w-10 h-10 rounded-xl bg-[var(--dash-bg-3)] shrink-0" />
+            <div className="flex-1">
+              <div className="h-4 w-32 rounded bg-[var(--dash-bg-3)] mb-2" />
+              <div className="h-3 w-48 rounded bg-[var(--dash-bg-3)] mb-2" />
+              <div className="h-3 w-24 rounded bg-[var(--dash-bg-3)]" />
+            </div>
+          </div>
         ))}
       </div>
     </div>
   );
 }
 
-// Quick Actions Component - Colored Gradient Cards
-function QuickActions() {
-  const actions = [
-    { 
-      label: "Générer QR", 
-      description: "Créer des codes",
-      icon: <QrCode className="w-7 h-7" />, 
-      href: "/admin/generer",
-      gradient: "from-emerald-500 to-emerald-700",
-      hoverShadow: "hover:shadow-emerald-500/25",
-      bgPattern: "bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.15),transparent_60%)]"
-    },
-    {
-      label: "Commandes", 
-      description: "Demandes",
-      icon: <ShoppingCart className="w-7 h-7" />, 
-      href: "/admin/messages",
-      gradient: "from-amber-500 to-orange-600",
-      hoverShadow: "hover:shadow-orange-500/25",
-      bgPattern: "bg-[radial-gradient(circle_at_20%_80%,rgba(255,255,255,0.15),transparent_60%)]"
-    },
-    { 
-      label: "Agences", 
-      description: "Partenaires",
-      icon: <Building className="w-7 h-7" />, 
-      href: "/admin/agences",
-      gradient: "from-violet-500 to-purple-700",
-      hoverShadow: "hover:shadow-purple-500/25",
-      bgPattern: "bg-[radial-gradient(circle_at_80%_70%,rgba(255,255,255,0.15),transparent_60%)]"
-    },
-  ];
-
-  return (
-    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-      {actions.map((action, index) => (
-        <Link
-          key={index}
-          href={action.href}
-          className={`relative overflow-hidden rounded-2xl p-5 bg-gradient-to-br ${action.gradient} ${action.hoverShadow} hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group`}
-        >
-          {/* Decorative pattern overlay */}
-          <div className={`absolute inset-0 ${action.bgPattern} pointer-events-none`} />
-          
-          {/* Decorative circle */}
-          <div className="absolute -right-4 -bottom-4 w-20 h-20 rounded-full bg-white/10 pointer-events-none" />
-          
-          <div className="relative z-10">
-            <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center text-white mb-3 group-hover:scale-110 group-hover:bg-white/30 transition-all duration-300">
-              {action.icon}
-            </div>
-            <p className="font-bold text-white text-lg leading-tight">{action.label}</p>
-            <p className="text-white/70 text-sm mt-0.5">{action.description}</p>
-          </div>
-        </Link>
-      ))}
-    </div>
-  );
-}
-
-// Chart Component
-function ActivationsChart({ data }: { data: DailyActivation[] }) {
-  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
-  const maxCount = Math.max(...data.map(d => d.count), 1);
-  const total = data.reduce((sum, d) => sum + d.count, 0);
-
-  return (
-    <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800">
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h3 className="text-lg font-semibold text-slate-800 dark:text-white">Activations par jour</h3>
-          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Total: {total} activations cette semaine</p>
-        </div>
-        <div className="flex items-center gap-2 px-3 py-1.5 bg-emerald-50 dark:bg-emerald-500/10 rounded-lg">
-          <span className="w-3 h-3 rounded-full bg-emerald-500"></span>
-          <span className="text-xs text-slate-600 dark:text-slate-300">Activations</span>
-        </div>
-      </div>
-
-      <div className="h-48 flex items-end gap-3">
-        {data.map((item, index) => {
-          const isHovered = hoveredIndex === index;
-          const height = item.count > 0 ? Math.max((item.count / maxCount) * 100, 8) : 8;
-          
-          return (
-            <div 
-              key={index} 
-              className="flex-1 flex flex-col items-center relative"
-              onMouseEnter={() => setHoveredIndex(index)}
-              onMouseLeave={() => setHoveredIndex(null)}
-            >
-              {isHovered && item.count > 0 && (
-                <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-slate-800 dark:bg-slate-700 text-white text-xs px-2 py-1 rounded-lg shadow-lg whitespace-nowrap z-10">
-                  {item.count} activation{item.count > 1 ? 's' : ''}
-                </div>
-              )}
-              
-              <div className="w-full flex flex-col items-center justify-end h-40">
-                <div
-                  className={`w-full max-w-[40px] rounded-t-lg transition-all duration-300 cursor-pointer ${
-                    item.count > 0 
-                      ? 'bg-emerald-500' 
-                      : 'bg-slate-200 dark:bg-slate-700'
-                  } ${isHovered && item.count > 0 ? 'opacity-80' : ''}`}
-                  style={{ height: `${height}%` }}
-                />
-              </div>
-              <div className="text-xs mt-2 text-slate-500 dark:text-slate-400">{item.day}</div>
-              <div className={`text-xs font-semibold ${item.count > 0 ? 'text-slate-700 dark:text-slate-200' : 'text-slate-400 dark:text-slate-500'}`}>
-                {item.count || '—'}
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
-// Activity Item Component
-function ActivityItem({ activity }: { activity: RecentActivity }) {
-  const statusConfig = {
-    success: { bg: 'bg-emerald-100 dark:bg-emerald-500/10', icon: <CheckCircle className="w-4 h-4 text-emerald-500" /> },
-    warning: { bg: 'bg-amber-100 dark:bg-amber-500/10', icon: <Clock className="w-4 h-4 text-amber-500" /> },
-    info: { bg: 'bg-blue-100 dark:bg-blue-500/10', icon: <Package className="w-4 h-4 text-blue-500" /> }
-  };
-
-  const config = statusConfig[activity.status];
-
-  return (
-    <div className="flex items-start gap-4 p-4 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer group">
-      <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${config.bg}`}>
-        {config.icon}
-      </div>
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center justify-between">
-          <p className="font-medium text-slate-800 dark:text-white">{activity.name}</p>
-          <ArrowUpRight className="w-4 h-4 text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity" />
-        </div>
-        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">{activity.details}</p>
-        <div className="flex items-center gap-3 mt-2">
-          <span className="text-xs text-slate-400 flex items-center gap-1">
-            <Clock className="w-3 h-3" />
-            {activity.time}
-          </span>
-          {activity.agency && (
-            <span className="text-xs bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 px-2 py-0.5 rounded-full">
-              {activity.agency}
-            </span>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// Recent Activity Component
-function RecentActivityList({ activities }: { activities: RecentActivity[] }) {
-  return (
-    <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800">
-      <div className="flex items-center justify-between p-6 border-b border-slate-200 dark:border-slate-800">
-        <h3 className="text-lg font-semibold text-slate-800 dark:text-white">Activité récente</h3>
-        <Link href="/admin/trouvailles" className="text-sm text-emerald-500 hover:text-emerald-600 font-medium flex items-center gap-1">
-          Voir tout <ArrowUpRight className="w-3 h-3" />
-        </Link>
-      </div>
-
-      <div className="divide-y divide-slate-100 dark:divide-slate-800">
-        {activities.length === 0 ? (
-          <div className="p-8 text-center text-slate-500 dark:text-slate-400">
-            <Clock className="w-8 h-8 mx-auto mb-2 opacity-50" />
-            <p>Aucune activité récente</p>
-          </div>
-        ) : (
-          activities.slice(0, 5).map((activity) => (
-            <ActivityItem key={activity.id} activity={activity} />
-          ))
-        )}
-      </div>
-    </div>
-  );
-}
-
+// ─────────────────────────────────────────────────────────────────────────────
 // Main Dashboard Page
+// ─────────────────────────────────────────────────────────────────────────────
 export default function DashboardPage() {
   const [unreadMessages, setUnreadMessages] = useState(0);
   const [stats, setStats] = useState<DashboardStats>({
@@ -364,109 +360,139 @@ export default function DashboardPage() {
     }
   };
 
-  const generateDefaultActivations = (): DailyActivation[] => {
-    const days = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
-    const today = new Date();
-    return days.map((day, i) => {
-      const date = new Date(today);
-      date.setDate(today.getDate() - (6 - i));
-      return { 
-        day, 
-        count: 0,
-        fullDate: date.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })
-      };
-    });
-  };
+  // KPI cards configuration (stable per render)
+  const kpiCards = useMemo(
+    () => [
+      {
+        label: 'Total QR Codes',
+        value: stats.totalQR,
+        subtitle: `${stats.activeBaggages} actifs`,
+        icon: QrCode,
+        color: 'brand' as const,
+        delta: mockDelta(1),
+        sparkline: mockSparkline(1),
+      },
+      {
+        label: 'QR Activés',
+        value: stats.activeBaggages,
+        subtitle: 'En service',
+        icon: CheckCircle,
+        color: 'emerald' as const,
+        delta: mockDelta(2),
+        sparkline: mockSparkline(2),
+      },
+      {
+        label: 'Voyageurs',
+        value: stats.uniqueTravelers,
+        subtitle: 'Utilisateurs uniques',
+        icon: Users,
+        color: 'violet' as const,
+        delta: mockDelta(3),
+        sparkline: mockSparkline(3),
+      },
+      {
+        label: 'Commandes',
+        value: stats.pendingOrders,
+        subtitle: 'En attente',
+        icon: ShoppingCart,
+        color: 'amber' as const,
+        delta: mockDelta(4),
+        sparkline: mockSparkline(4),
+      },
+      {
+        label: 'Agences',
+        value: stats.totalAgencies,
+        subtitle: 'Partenaires',
+        icon: Building2,
+        color: 'cyan' as const,
+        delta: mockDelta(5),
+        sparkline: mockSparkline(5),
+      },
+      {
+        label: 'Expiration',
+        value: stats.expiringSoon,
+        subtitle: 'À renouveler',
+        icon: AlertTriangle,
+        color: 'rose' as const,
+        delta: mockDelta(6),
+        sparkline: mockSparkline(6),
+      },
+    ],
+    [stats],
+  );
 
-  // Multicolored KPI Cards
-  const kpiCards = [
-    { 
-      title: 'Total QR Codes', 
-      value: stats.totalQR, 
-      subtitle: `${stats.activeBaggages} actifs`,
-      icon: <QrCode className="w-6 h-6 text-white" />,
-      colorVariant: 'green' as const
-    },
-    { 
-      title: 'QR Activés', 
-      value: stats.activeBaggages, 
-      subtitle: 'En service',
-      icon: <Package className="w-6 h-6 text-white" />,
-      colorVariant: 'blue' as const
-    },
-    { 
-      title: 'Voyageurs', 
-      value: stats.uniqueTravelers, 
-      subtitle: 'Utilisateurs uniques',
-      icon: <Users className="w-6 h-6 text-white" />,
-      colorVariant: 'purple' as const
-    },
-    { 
-      title: 'Commandes', 
-      value: stats.pendingOrders, 
-      subtitle: 'En attente',
-      icon: <ShoppingCart className="w-6 h-6 text-white" />,
-      colorVariant: 'orange' as const
-    },
-    { 
-      title: 'Agences', 
-      value: stats.totalAgencies, 
-      subtitle: 'Partenaires',
-      icon: <Building className="w-6 h-6 text-white" />,
-      colorVariant: 'cyan' as const
-    },
-    { 
-      title: 'Expiration', 
-      value: stats.expiringSoon, 
-      subtitle: 'À renouveler',
-      icon: <Clock className="w-6 h-6 text-white" />,
-      colorVariant: 'red' as const
-    },
-  ];
+  // Map daily activations to chart data, fall back to mock when empty/all zero
+  const chartData = useMemo<{ label: string; value: number }[]>(() => {
+    if (!dailyActivations || dailyActivations.length === 0) {
+      return MOCK_DAILY_ACTIVATIONS;
+    }
+    const mapped = dailyActivations.map((d) => ({ label: d.day, value: d.count }));
+    const total = mapped.reduce((sum, d) => sum + d.value, 0);
+    if (total === 0) return MOCK_DAILY_ACTIVATIONS;
+    return mapped;
+  }, [dailyActivations]);
+
+  const totalActivations = useMemo(
+    () => chartData.reduce((sum, d) => sum + d.value, 0),
+    [chartData],
+  );
 
   return (
     <div className="max-w-7xl mx-auto">
-      {/* Page Title */}
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-slate-800 dark:text-white">Tableau de bord</h1>
-        <p className="text-slate-500 dark:text-slate-400 mt-1">Vue d'ensemble de votre activité QRTrans</p>
+      {/* ─── Page header ─── */}
+      <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 mb-6">
+        <div>
+          <h1 className="font-display text-2xl font-bold text-[var(--dash-ink)]">
+            Tableau de bord
+          </h1>
+          <p className="text-sm text-[var(--dash-muted)] mt-1">
+            Vue d&apos;ensemble de votre activité QRTrans
+          </p>
+        </div>
+        <button
+          onClick={fetchDashboardData}
+          disabled={loading}
+          className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg border border-[var(--dash-border)] bg-[var(--dash-card)] text-sm font-medium text-[var(--dash-ink)] hover:bg-[var(--dash-bg-3)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed self-start sm:self-auto"
+        >
+          <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+          Actualiser
+        </button>
       </div>
 
-      {/* Quick Actions */}
-      <div className="mb-8">
+      {/* ─── Quick Actions ─── */}
+      <div className="mb-6">
         <QuickActions />
       </div>
 
-      {/* Multicolored KPI Cards */}
-      {loading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-8">
-          {[...Array(6)].map((_, i) => (
-            <div key={i} className="bg-slate-200 dark:bg-slate-700 rounded-2xl p-6 h-40 animate-pulse"></div>
-          ))}
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-8">
-          {kpiCards.map((card, index) => (
-            <div key={index} className={`stagger-${index + 1}`}>
-              <KPICard {...card} />
-            </div>
-          ))}
-        </div>
-      )}
+      {/* ─── KPI cards ─── */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-6">
+        {kpiCards.map((card, index) => (
+          <KpiCard
+            key={index}
+            label={card.label}
+            value={card.value}
+            subtitle={card.subtitle}
+            icon={card.icon}
+            color={card.color}
+            delta={card.delta}
+            sparkline={card.sparkline}
+            loading={loading}
+          />
+        ))}
+      </div>
 
-      {/* Chart and Activity */}
-      <div className="grid lg:grid-cols-2 gap-6">
-        {loading ? (
-          <>
-            <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 animate-pulse h-80"></div>
-            <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 animate-pulse h-80"></div>
-          </>
-        ) : (
-          <>
-            <ActivationsChart data={dailyActivations} />
-            <RecentActivityList activities={recentActivities} />
-          </>
-        )}
+      {/* ─── Chart + Recent activity ─── */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
+        <AreaChartCard
+          title="Activations sur 7 jours"
+          subtitle={`${totalActivations} activations cette semaine`}
+          data={chartData}
+          color="#1E4B7A"
+          gradient
+          height={280}
+          loading={loading}
+        />
+        {loading ? <RecentActivitySkeleton /> : <RecentActivityList activities={recentActivities} />}
       </div>
     </div>
   );

@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import {
-  Luggage,
   Search,
   Eye,
   Trash2,
@@ -16,18 +15,26 @@ import {
   ShoppingCart,
   Send,
   XCircle,
-  TrendingUp,
-  ArrowUpRight,
-  Users,
-  Package,
+  RefreshCw,
   Sparkles,
   Lightbulb,
-  RefreshCw,
-  Plus
+  Package,
 } from "lucide-react";
 import { useAgency } from '../layout';
-import { isActive, isPending, isLost, isFound, isInTransit, isDelivered, normalizeStatus } from '@/lib/status';
+import {
+  isActive,
+  isPending,
+  isLost,
+  isFound,
+  isInTransit,
+  isDelivered,
+  normalizeStatus,
+} from '@/lib/status';
 import LatestNewsWidget from '@/components/LatestNewsWidget';
+import KpiCard from '@/components/dashboard/KpiCard';
+import DataTable from '@/components/dashboard/DataTable';
+
+// ─── Types ────────────────────────────────────────────────────────────────
 
 interface Baggage {
   id: string;
@@ -43,17 +50,16 @@ interface Baggage {
   expiresAt: string | null;
   lastScanDate: string | null;
   lastLocation: string | null;
-  // Founder information
   founderName: string | null;
   founderPhone: string | null;
   founderAt: string | null;
-  // Colis logistics fields
   deliveredAt: string | null;
   receiverName: string | null;
   receiverWhatsapp: string | null;
   transportMode: string | null;
   departureCity: string | null;
   departureDate: string | null;
+  [key: string]: unknown;
 }
 
 interface Stats {
@@ -65,89 +71,26 @@ interface Stats {
   found: number;
 }
 
-// Modern Stat Card Component
-function StatCard({ 
-  title, 
-  value, 
-  subtitle, 
-  icon, 
-  iconBg,
-  trend
-}: {
-  title: string;
-  value: number;
-  subtitle: string;
-  icon: React.ReactNode;
-  iconBg: string;
-  trend?: { value: number; isUp: boolean };
-}) {
+// Internal column type matching the DataTable's expected shape.
+type Column<T> = {
+  key: keyof T | string;
+  header: string;
+  render?: (row: T) => React.ReactNode;
+  className?: string;
+  align?: 'left' | 'right' | 'center';
+};
+
+// Inline WhatsApp glyph (lucide doesn't ship one).
+function WhatsAppIcon({ className }: { className?: string }) {
   return (
-    <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 hover:shadow-lg hover:shadow-slate-200/50 dark:hover:shadow-slate-900/50 transition-all duration-300 group">
-      <div className="flex items-start justify-between">
-        <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${iconBg}`}>
-          {icon}
-        </div>
-        {trend && (
-          <div className={`flex items-center gap-1 text-sm font-medium ${trend.isUp ? 'text-emerald-500' : 'text-rose-500'}`}>
-            {trend.isUp ? <TrendingUp className="w-4 h-4" aria-hidden="true" /> : <TrendingUp className="w-4 h-4 rotate-180" aria-hidden="true" />}
-            {Math.abs(trend.value)}%
-          </div>
-        )}
-      </div>
-      <div className="mt-4">
-        <p className="text-2xl font-bold text-slate-900 dark:text-white">{value === 0 ? '—' : value}</p>
-        <p className="text-sm font-medium text-slate-600 dark:text-slate-300 mt-1">{title}</p>
-        <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">{subtitle}</p>
-      </div>
-    </div>
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+    </svg>
   );
 }
 
-// KPI Card Component - Colored
-function KPICard({ 
-  title, 
-  value, 
-  subtitle, 
-  icon, 
-  colorVariant
-}: {
-  title: string;
-  value: number;
-  subtitle: string;
-  icon: React.ReactNode;
-  colorVariant: 'green' | 'blue' | 'purple' | 'orange' | 'cyan' | 'red' | 'pink' | 'indigo';
-}) {
-  const chartBars = Array.from({ length: 12 }, (_, i) => ({
-    height: 20 + Math.random() * 80,
-  }));
+// ─── AI Suggestions Component ──────────────────────────────────────────────
 
-  return (
-    <div className={`kpi-card kpi-card-${colorVariant} p-6 opacity-0 animate-slide-up`}>
-      <div className="flex items-start justify-between relative z-10">
-        <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center backdrop-blur-sm">
-          <span className="text-white">{icon}</span>
-        </div>
-      </div>
-      <div className="mt-4 relative z-10">
-        <p className="text-3xl font-bold text-white">{value === 0 ? '—' : value}</p>
-        <p className="text-sm font-medium text-white/90 mt-1">{title}</p>
-        <p className="text-xs text-white/70 mt-1">{subtitle}</p>
-      </div>
-      
-      <div className="mini-chart-bars mt-4">
-        {chartBars.map((bar, i) => (
-          <div 
-            key={i} 
-            className="mini-chart-bar" 
-            style={{ height: `${bar.height}%` }}
-          />
-        ))}
-      </div>
-    </div>
-  );
-}
-
-// AI Suggestions Component
 function AISuggestions({ agencyId, stats }: { agencyId: string; stats: Stats }) {
   const [suggestion, setSuggestion] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -161,12 +104,13 @@ function AISuggestions({ agencyId, stats }: { agencyId: string; stats: Stats }) 
       const response = await fetch(`/api/ai/suggestions?agencyId=${agencyId}`);
       const data = await response.json();
       if (data.success && data.suggestion) {
-        // Handle both object and string formats
         if (typeof data.suggestion === 'object') {
-          const s = data.suggestion;
-          setSuggestion(`Nous vous recommandons ${s.recommended} QR codes pour votre prochaine campagne. Basé sur: ${s.basedOn}`);
+          const s = data.suggestion as { recommended: number; basedOn: string };
+          setSuggestion(
+            `Nous vous recommandons ${s.recommended} QR codes pour votre prochaine campagne. Basé sur: ${s.basedOn}`,
+          );
         } else {
-          setSuggestion(data.suggestion);
+          setSuggestion(data.suggestion as string);
         }
       } else {
         setError('Impossible de charger les suggestions');
@@ -184,46 +128,56 @@ function AISuggestions({ agencyId, stats }: { agencyId: string; stats: Stats }) 
   }, [agencyId]);
 
   const handleDismiss = (index: number) => {
-    setDismissedSuggestions(prev => new Set([...prev, index]));
+    setDismissedSuggestions((prev) => new Set([...prev, index]));
   };
 
-  // Generate contextual suggestions based on stats
-  const getContextualSuggestions = (): { icon: string; title: string; text: string; color: string }[] => {
-    const suggestions: { icon: string; title: string; text: string; color: string }[] = [];
+  // Contextual suggestions based on live stats.
+  const getContextualSuggestions = (): {
+    icon: 'warning' | 'clock' | 'scan' | 'ok';
+    title: string;
+    text: string;
+    variant: 'danger' | 'warning' | 'info' | 'success';
+  }[] => {
+    const suggestions: {
+      icon: 'warning' | 'clock' | 'scan' | 'ok';
+      title: string;
+      text: string;
+      variant: 'danger' | 'warning' | 'info' | 'success';
+    }[] = [];
 
     if (stats.lost > 0) {
       suggestions.push({
-        icon: '⚠️',
+        icon: 'warning',
         title: 'Colis perdus',
         text: `Vous avez ${stats.lost} colis signalé(s) comme perdu(s). Contactez rapidement les voyageurs concernés.`,
-        color: 'bg-rose-50 dark:bg-rose-500/10 border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-400'
+        variant: 'danger',
       });
     }
 
     if (stats.pending > 5) {
       suggestions.push({
-        icon: '⏳',
+        icon: 'clock',
         title: 'Activation en attente',
         text: `${stats.pending} colis sont en attente d'activation. Envoyez un rappel aux voyageurs.`,
-        color: 'bg-amber-50 dark:bg-amber-500/10 border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-400'
+        variant: 'warning',
       });
     }
 
     if (stats.scanned > 0) {
       suggestions.push({
-        icon: '🔍',
+        icon: 'scan',
         title: 'Scans récents',
         text: `${stats.scanned} colis ont été scanné(s) récemment. Vérifiez les localisations.`,
-        color: 'bg-blue-50 dark:bg-blue-500/10 border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-400'
+        variant: 'info',
       });
     }
 
     if (stats.total > 0 && stats.pending === 0 && stats.lost === 0) {
       suggestions.push({
-        icon: '✅',
+        icon: 'ok',
         title: 'Excellent !',
         text: 'Tous vos colis sont actifs et bien suivis. Continuez comme ça !',
-        color: 'bg-emerald-50 dark:bg-emerald-500/10 border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400'
+        variant: 'success',
       });
     }
 
@@ -232,95 +186,130 @@ function AISuggestions({ agencyId, stats }: { agencyId: string; stats: Stats }) 
 
   const contextualSuggestions = getContextualSuggestions();
 
+  const iconFor = (kind: 'warning' | 'clock' | 'scan' | 'ok') => {
+    switch (kind) {
+      case 'warning':
+        return <AlertTriangle className="w-4 h-4" />;
+      case 'clock':
+        return <Clock className="w-4 h-4" />;
+      case 'scan':
+        return <QrCode className="w-4 h-4" />;
+      case 'ok':
+        return <CheckCircle className="w-4 h-4" />;
+    }
+  };
+
+  const variantClass = (v: 'danger' | 'warning' | 'info' | 'success') => {
+    switch (v) {
+      case 'danger':
+        return 'dash-badge-danger';
+      case 'warning':
+        return 'dash-badge-warning';
+      case 'info':
+        return 'dash-badge-info';
+      case 'success':
+        return 'dash-badge-success';
+    }
+  };
+
   return (
-    <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800">
+    <div className="dash-card p-6">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#1E4B7A] to-[#487AA8] flex items-center justify-center shadow-sm">
             <Sparkles className="w-5 h-5 text-white" />
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-slate-800 dark:text-white">Suggestions IA</h3>
-            <p className="text-sm text-slate-500 dark:text-slate-400">Recommandations personnalisées</p>
+            <h3 className="text-lg font-semibold text-[var(--dash-ink)]">Suggestions IA</h3>
+            <p className="text-sm text-[var(--dash-muted)]">Recommandations personnalisées</p>
           </div>
         </div>
         <button
           onClick={fetchSuggestion}
           disabled={loading}
-          className="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+          className="p-2 rounded-lg hover:bg-[var(--dash-bg-3)] transition-colors"
           title="Actualiser"
+          aria-label="Actualiser les suggestions"
         >
-          <RefreshCw className={`w-4 h-4 text-slate-500 dark:text-slate-400 ${loading ? 'animate-spin' : ''}`} />
+          <RefreshCw
+            className={`w-4 h-4 text-[var(--dash-muted)] ${loading ? 'animate-spin' : ''}`}
+          />
         </button>
       </div>
 
-      {/* Contextual Suggestions */}
+      {/* Contextual suggestions */}
       <div className="space-y-3 mb-4">
-        {contextualSuggestions.map((sugg, index) => (
-          !dismissedSuggestions.has(index) && (
+        {contextualSuggestions.map((sugg, index) =>
+          dismissedSuggestions.has(index) ? null : (
             <div
               key={index}
-              className={`p-4 rounded-xl border ${sugg.color} relative group`}
+              className="group relative p-4 rounded-xl border border-[var(--dash-border)] bg-[var(--dash-bg-3)] flex items-start gap-3"
             >
-              <div className="flex items-start gap-3">
-                <span className="text-xl">{sugg.icon}</span>
-                <div className="flex-1">
-                  <p className="font-medium">{sugg.title}</p>
-                  <p className="text-sm opacity-80">{sugg.text}</p>
-                </div>
-                <button
-                  onClick={() => handleDismiss(index)}
-                  className="opacity-0 group-hover:opacity-100 p-1 rounded-lg hover:bg-black/10 dark:hover:bg-white/10 transition-all"
-                  title="Masquer cette notification"
-                >
-                  <X className="w-4 h-4" />
-                </button>
+              <span
+                className={`dash-badge ${variantClass(sugg.variant)} w-8 h-8 justify-center p-0 shrink-0`}
+              >
+                {iconFor(sugg.icon)}
+              </span>
+              <div className="flex-1 min-w-0">
+                <p className="font-medium text-[var(--dash-ink)] text-sm">{sugg.title}</p>
+                <p className="text-sm text-[var(--dash-muted)] mt-0.5">{sugg.text}</p>
               </div>
+              <button
+                onClick={() => handleDismiss(index)}
+                className="opacity-0 group-hover:opacity-100 p-1 rounded-lg hover:bg-[var(--dash-bg-2)] transition-all"
+                title="Masquer cette notification"
+                aria-label="Masquer"
+              >
+                <X className="w-4 h-4 text-[var(--dash-muted)]" />
+              </button>
             </div>
-          )
-        ))}
+          ),
+        )}
       </div>
 
-      {/* AI Generated Suggestion */}
+      {/* AI-generated suggestion */}
       {loading && (
-        <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-xl animate-pulse">
+        <div className="p-4 rounded-xl bg-[var(--dash-bg-3)] border border-[var(--dash-border)] animate-pulse">
           <div className="flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-amber-500 animate-pulse" />
-            <span className="text-slate-500 dark:text-slate-400 text-sm">Analyse en cours...</span>
+            <Sparkles className="w-4 h-4 text-[var(--dash-brand)]" />
+            <span className="text-[var(--dash-muted)] text-sm">Analyse en cours...</span>
           </div>
         </div>
       )}
 
       {suggestion && !loading && (
-        <div className="p-4 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-500/10 dark:to-orange-500/10 border border-amber-200 dark:border-amber-800 rounded-xl">
+        <div className="p-4 rounded-xl bg-[var(--dash-brand-soft)] border border-[var(--dash-brand)]/20">
           <div className="flex items-start gap-3">
-            <Lightbulb className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
-            <div>
-              <p className="text-sm text-slate-700 dark:text-slate-300 font-medium mb-1">Conseil IA</p>
-              <p className="text-sm text-slate-600 dark:text-slate-400">{suggestion}</p>
+            <Lightbulb className="w-5 h-5 text-[var(--dash-brand)] shrink-0 mt-0.5" />
+            <div className="min-w-0">
+              <p className="text-sm text-[var(--dash-ink)] font-medium mb-1">Conseil IA</p>
+              <p className="text-sm text-[var(--dash-muted)]">{suggestion}</p>
             </div>
           </div>
         </div>
       )}
 
       {error && !loading && (
-        <div className="p-4 bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-800 rounded-xl">
-          <p className="text-sm text-rose-600 dark:text-rose-400">{error}</p>
+        <div className="p-4 rounded-xl bg-[#FEE2E2] dark:bg-rose-500/10 border border-[#DC2626]/30 dark:border-rose-500/30">
+          <p className="text-sm text-[#DC2626] dark:text-rose-400">{error}</p>
         </div>
       )}
     </div>
   );
 }
 
-// Advertisement Banner Component
+// ─── Advertisement Banner Component ────────────────────────────────────────
+
 function AdBanner() {
-  const [ads, setAds] = useState<Array<{
-    id: string;
-    title: string;
-    imageUrl: string;
-    linkUrl: string | null;
-    targetScope: string;
-  }>>([]);
+  const [ads, setAds] = useState<
+    Array<{
+      id: string;
+      title: string;
+      imageUrl: string;
+      linkUrl: string | null;
+      targetScope: string;
+    }>
+  >([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(true);
 
@@ -344,7 +333,7 @@ function AdBanner() {
   useEffect(() => {
     if (ads.length <= 1) return;
     const timer = setInterval(() => {
-      setCurrentIndex(prev => (prev + 1) % ads.length);
+      setCurrentIndex((prev) => (prev + 1) % ads.length);
     }, 5000);
     return () => clearInterval(timer);
   }, [ads.length]);
@@ -354,13 +343,13 @@ function AdBanner() {
   const ad = ads[currentIndex];
 
   return (
-    <div className="relative rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+    <div className="dash-card relative overflow-hidden p-0">
       {ad.imageUrl ? (
         <a
           href={ad.linkUrl || '#'}
           target="_blank"
           rel="noopener noreferrer"
-          className="block"
+          className="block relative"
         >
           <img
             src={ad.imageUrl}
@@ -368,7 +357,7 @@ function AdBanner() {
             className="w-full h-40 object-cover"
           />
           {ad.title && (
-            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-4">
+            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-4">
               <p className="text-white text-sm font-medium">{ad.title}</p>
             </div>
           )}
@@ -378,18 +367,21 @@ function AdBanner() {
           href={ad.linkUrl || '#'}
           target="_blank"
           rel="noopener noreferrer"
-          className="block p-6 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-500/10 dark:to-orange-500/10 text-center"
+          className="block p-6 bg-gradient-to-r from-[var(--dash-brand-soft)] to-[var(--dash-emerald-soft)] text-center"
         >
-          <p className="text-slate-800 dark:text-white font-semibold">{ad.title}</p>
+          <p className="text-[var(--dash-ink)] font-semibold">{ad.title}</p>
         </a>
       )}
       {ads.length > 1 && (
-        <div className="absolute bottom-2 right-2 flex gap-1">
+        <div className="absolute bottom-2 right-2 flex gap-1 z-10">
           {ads.map((_, i) => (
             <button
               key={i}
               onClick={() => setCurrentIndex(i)}
-              className={`w-2 h-2 rounded-full transition-all ${i === currentIndex ? 'bg-white w-4' : 'bg-white/50'}`}
+              aria-label={`Voir l'annonce ${i + 1}`}
+              className={`h-1.5 rounded-full transition-all ${
+                i === currentIndex ? 'w-5 bg-white' : 'w-1.5 bg-white/50'
+              }`}
             />
           ))}
         </div>
@@ -397,6 +389,8 @@ function AdBanner() {
     </div>
   );
 }
+
+// ─── Main Dashboard Page ──────────────────────────────────────────────────
 
 export default function AgencyDashboardPage() {
   const { agencyId, agencyName } = useAgency();
@@ -417,13 +411,13 @@ export default function AgencyDashboardPage() {
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [baggageToDelete, setBaggageToDelete] = useState<Baggage | null>(null);
-  
+
   // Command Modal State
   const [showCommandModal, setShowCommandModal] = useState(false);
   const [commandForm, setCommandForm] = useState({
     type: 'hajj',
     count: 10,
-    notes: ''
+    notes: '',
   });
   const [commandSubmitting, setCommandSubmitting] = useState(false);
   const [commandSuccess, setCommandSuccess] = useState(false);
@@ -460,7 +454,9 @@ export default function AgencyDashboardPage() {
 
       if (response.ok && data.baggages) {
         setBaggages(Array.isArray(data.baggages) ? data.baggages : []);
-        setStats(data.stats || { total: 0, pending: 0, active: 0, scanned: 0, lost: 0, found: 0 });
+        setStats(
+          data.stats || { total: 0, pending: 0, active: 0, scanned: 0, lost: 0, found: 0 },
+        );
       } else {
         console.error('API error:', data.error || 'Unknown error');
         setBaggages([]);
@@ -479,31 +475,40 @@ export default function AgencyDashboardPage() {
     let filtered = Array.isArray(baggages) ? [...baggages] : [];
 
     if (statusFilter !== 'all') {
-      filtered = filtered.filter(b => b.status === statusFilter);
+      filtered = filtered.filter((b) => b.status === statusFilter);
     }
 
     if (search.trim()) {
       const searchLower = search.toLowerCase();
-      filtered = filtered.filter(b =>
-        b.reference.toLowerCase().includes(searchLower) ||
-        `${b.travelerFirstName || ''} ${b.travelerLastName || ''}`.toLowerCase().includes(searchLower)
+      filtered = filtered.filter(
+        (b) =>
+          b.reference.toLowerCase().includes(searchLower) ||
+          `${b.travelerFirstName || ''} ${b.travelerLastName || ''}`
+            .toLowerCase()
+            .includes(searchLower),
       );
     }
 
     setFilteredBaggages(filtered);
   };
 
-  // AGENCY-FIX: Split filtered baggages into activated and pending sections
-  // TEST: pending_activation baggages appear in "En attente" section
-  // TEST: activated baggages appear in "Activés" section
-  // TEST: Search filters across both sections simultaneously
-  // FIX: Include lost/found/blocked in activated so NO baggage vanishes from UI
-  const activatedBaggages = filteredBaggages.filter(b =>
-    isActive(b.status) || isInTransit(b.status) || isDelivered(b.status) || b.travelerFirstName !== null || isLost(b.status) || isFound(b.status) || normalizeStatus(b.status) === 'blocked'
+  // AGENCY-FIX: Split filtered baggages into activated and pending sections.
+  // TEST: pending_activation baggages appear in "En attente" section.
+  // TEST: activated baggages appear in "Activés" section.
+  // FIX: Include lost/found/blocked in activated so NO baggage vanishes from UI.
+  const activatedBaggages = filteredBaggages.filter(
+    (b) =>
+      isActive(b.status) ||
+      isInTransit(b.status) ||
+      isDelivered(b.status) ||
+      b.travelerFirstName !== null ||
+      isLost(b.status) ||
+      isFound(b.status) ||
+      normalizeStatus(b.status) === 'blocked',
   );
   // FIX: Check BOTH travelerFirstName AND travelerLastName for null
-  const pendingBaggages = filteredBaggages.filter(b =>
-    isPending(b.status) && b.travelerFirstName === null && b.travelerLastName === null
+  const pendingBaggages = filteredBaggages.filter(
+    (b) => isPending(b.status) && b.travelerFirstName === null && b.travelerLastName === null,
   );
 
   const handleDeleteBaggage = async () => {
@@ -514,7 +519,7 @@ export default function AgencyDashboardPage() {
         method: 'DELETE',
       });
 
-      setBaggages(baggages.filter(b => b.id !== baggageToDelete.id));
+      setBaggages(baggages.filter((b) => b.id !== baggageToDelete.id));
       setShowDeleteModal(false);
       setBaggageToDelete(null);
     } catch (error) {
@@ -524,7 +529,7 @@ export default function AgencyDashboardPage() {
 
   const handleCommandSubmit = async () => {
     setCommandSubmitting(true);
-    
+
     try {
       await fetch('/api/messages', {
         method: 'POST',
@@ -559,50 +564,55 @@ export default function AgencyDashboardPage() {
     return date.toLocaleDateString('fr-FR', {
       day: '2-digit',
       month: '2-digit',
-      year: 'numeric'
+      year: 'numeric',
     });
   };
 
   const formatDateTime = (dateString: string | null) => {
     if (!dateString) return '-';
     const date = new Date(dateString);
-    return date.toLocaleDateString('fr-FR', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
-    }) + ' à ' + date.toLocaleTimeString('fr-FR', {
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+    return (
+      date.toLocaleDateString('fr-FR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+      }) +
+      ' à ' +
+      date.toLocaleTimeString('fr-FR', {
+        hour: '2-digit',
+        minute: '2-digit',
+      })
+    );
   };
 
   const getStatusBadge = (status: string) => {
-    const statusConfig: Record<string, { label: string; className: string }> = {
-      // English statuses (standard)
-      pending_activation: { label: 'En attente', className: 'bg-amber-100 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400' },
-      active: { label: 'Actif', className: 'bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400' },
-      scanned: { label: 'Scanné', className: 'bg-blue-100 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400' },
-      lost: { label: 'Perdu', className: 'bg-rose-100 dark:bg-rose-500/10 text-rose-700 dark:text-rose-400' },
-      found: { label: 'Retrouvé', className: 'bg-green-100 dark:bg-green-500/10 text-green-700 dark:text-green-400' },
-      blocked: { label: 'Bloqué', className: 'bg-slate-100 dark:bg-slate-500/10 text-slate-600 dark:text-slate-400' },
-      in_transit: { label: 'En transit', className: 'bg-blue-100 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400' },
-      delivered: { label: 'Livré', className: 'bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400' },
-      // French statuses (legacy DB compatibility)
-      EN_ATTENTE: { label: 'En attente', className: 'bg-amber-100 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400' },
-      ACTIF: { label: 'Actif', className: 'bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400' },
-      SCANNÉ: { label: 'Scanné', className: 'bg-blue-100 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400' },
-      PERDU: { label: 'Perdu', className: 'bg-rose-100 dark:bg-rose-500/10 text-rose-700 dark:text-rose-400' },
-      TROUVÉ: { label: 'Retrouvé', className: 'bg-green-100 dark:bg-green-500/10 text-green-700 dark:text-green-400' },
-      BLOQUÉ: { label: 'Bloqué', className: 'bg-slate-100 dark:bg-slate-500/10 text-slate-600 dark:text-slate-400' },
+    const statusConfig: Record<
+      string,
+      { label: string; className: string }
+    > = {
+      pending_activation: { label: 'En attente', className: 'dash-badge dash-badge-warning' },
+      active: { label: 'Actif', className: 'dash-badge dash-badge-success' },
+      scanned: { label: 'Scanné', className: 'dash-badge dash-badge-info' },
+      lost: { label: 'Perdu', className: 'dash-badge dash-badge-danger' },
+      found: { label: 'Retrouvé', className: 'dash-badge dash-badge-success' },
+      blocked: { label: 'Bloqué', className: 'dash-badge dash-badge-neutral' },
+      in_transit: { label: 'En transit', className: 'dash-badge dash-badge-info' },
+      delivered: { label: 'Livré', className: 'dash-badge dash-badge-success' },
+      EN_ATTENTE: { label: 'En attente', className: 'dash-badge dash-badge-warning' },
+      ACTIF: { label: 'Actif', className: 'dash-badge dash-badge-success' },
+      SCANNÉ: { label: 'Scanné', className: 'dash-badge dash-badge-info' },
+      PERDU: { label: 'Perdu', className: 'dash-badge dash-badge-danger' },
+      TROUVÉ: { label: 'Retrouvé', className: 'dash-badge dash-badge-success' },
+      BLOQUÉ: { label: 'Bloqué', className: 'dash-badge dash-badge-neutral' },
     };
 
-    const config = statusConfig[status] || { label: status, className: 'bg-slate-100 dark:bg-slate-500/10 text-slate-600 dark:text-slate-400' };
+    const config =
+      statusConfig[status] || {
+        label: status,
+        className: 'dash-badge dash-badge-neutral',
+      };
 
-    return (
-      <span className={`px-3 py-1 rounded-full text-xs font-medium ${config.className}`}>
-        {config.label}
-      </span>
-    );
+    return <span className={config.className}>{config.label}</span>;
   };
 
   const filterButtons = [
@@ -616,35 +626,296 @@ export default function AgencyDashboardPage() {
     { id: 'found', label: 'Retrouvés' },
   ];
 
-  // Multicolored KPI Cards
-  const kpiCards = [
+  // KPI cards — data sources preserved, mock deltas + sparklines added.
+  const kpiConfigs = [
     {
-      title: 'Total colis',
+      label: 'Total colis',
       value: stats.total,
       subtitle: 'Tous les colis',
-      icon: <Luggage className="w-6 h-6 text-white" />,
-      colorVariant: 'purple' as const,
+      icon: Package,
+      color: 'violet' as const,
+      delta: 12.5,
+      sparkline: [8, 10, 9, 12, 11, 14, 13, 15, 14, 16, 17, 18],
     },
     {
-      title: 'Scannés',
+      label: 'Scannés',
       value: stats.scanned + stats.active,
       subtitle: 'Colis actifs',
-      icon: <CheckCircle className="w-6 h-6 text-white" />,
-      colorVariant: 'cyan' as const,
+      icon: QrCode,
+      color: 'cyan' as const,
+      delta: 8.3,
+      sparkline: [3, 4, 6, 5, 7, 8, 6, 9, 10, 9, 11, 12],
     },
     {
-      title: 'En attente',
+      label: 'En attente',
       value: stats.pending,
       subtitle: 'À activer',
-      icon: <Clock className="w-6 h-6 text-white" />,
-      colorVariant: 'orange' as const,
+      icon: Clock,
+      color: 'amber' as const,
+      delta: -2.1,
+      sparkline: [6, 5, 7, 4, 5, 3, 4, 3, 5, 4, 3, 3],
     },
     {
-      title: 'Perdus',
+      label: 'Perdus',
       value: stats.lost,
       subtitle: 'Signalés perdus',
-      icon: <AlertTriangle className="w-6 h-6 text-white" />,
-      colorVariant: 'red' as const,
+      icon: AlertTriangle,
+      color: 'rose' as const,
+      delta: 0.7,
+      sparkline: [0, 1, 0, 1, 1, 0, 1, 1, 2, 1, 1, 1],
+    },
+  ];
+
+  // ─── Activated table columns ──────────────────────────────────────────
+
+  const activatedColumns: Column<Baggage>[] = [
+    {
+      key: 'reference',
+      header: 'Référence',
+      render: (b) => (
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-lg bg-[var(--dash-emerald-soft)] flex items-center justify-center shrink-0">
+            <QrCode className="w-4 h-4 text-[var(--dash-emerald)]" />
+          </div>
+          <span className="text-[var(--dash-ink)] font-mono font-medium text-sm">
+            {b.reference}
+          </span>
+        </div>
+      ),
+    },
+    {
+      key: 'traveler',
+      header: 'Pèlerin',
+      render: (b) =>
+        b.travelerFirstName || b.travelerLastName ? (
+          <div>
+            <span className="text-[var(--dash-ink)] font-medium text-sm">
+              {b.travelerFirstName} {b.travelerLastName}
+            </span>
+            {b.whatsappOwner && (
+              <p className="text-[var(--dash-muted)] text-xs mt-0.5">{b.whatsappOwner}</p>
+            )}
+          </div>
+        ) : (
+          <div className="flex items-center gap-2">
+            <span className="dash-badge dash-badge-warning">Non assigné</span>
+            <button
+              onClick={() => {
+                setSelectedBaggage(b);
+                setShowDetailModal(true);
+              }}
+              className="text-xs font-medium text-[var(--dash-brand)] hover:underline"
+            >
+              Attribuer
+            </button>
+          </div>
+        ),
+    },
+    {
+      key: 'lastScanDate',
+      header: 'Dernier scan',
+      className: 'hidden md:table-cell',
+      render: (b) =>
+        b.lastScanDate ? (
+          <div>
+            <span className="text-[var(--dash-ink-2)] text-sm">
+              {formatDateTime(b.lastScanDate)}
+            </span>
+            {b.lastLocation && (
+              <p className="text-[var(--dash-muted)] text-xs flex items-center gap-1 mt-1">
+                <MapPin className="w-3 h-3" aria-hidden="true" />
+                {b.lastLocation}
+              </p>
+            )}
+          </div>
+        ) : (
+          <span className="text-[var(--dash-muted)] text-sm">Jamais</span>
+        ),
+    },
+    {
+      key: 'founder',
+      header: 'Trouveur',
+      className: 'hidden lg:table-cell',
+      render: (b) =>
+        b.founderName ? (
+          <div>
+            <p className="text-[var(--dash-ink)] font-medium text-sm">{b.founderName}</p>
+            {b.founderPhone && (
+              <a
+                href={`https://wa.me/${b.founderPhone.replace(/\D/g, '')}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[var(--dash-emerald)] hover:opacity-80 text-xs flex items-center gap-1 mt-0.5"
+              >
+                <WhatsAppIcon className="w-3 h-3" />
+                {b.founderPhone}
+              </a>
+            )}
+          </div>
+        ) : (
+          <span className="text-[var(--dash-muted)] text-sm">-</span>
+        ),
+    },
+    {
+      key: 'status',
+      header: 'Statut',
+      render: (b) => getStatusBadge(b.status),
+    },
+    {
+      key: 'actions',
+      header: 'Actions',
+      align: 'right' as const,
+      render: (b) => (
+        <div className="flex items-center justify-end gap-1">
+          {isActive(b.status) && (
+            <button
+              onClick={async () => {
+                if (confirm('Déclarer ce colis comme perdu ?')) {
+                  try {
+                    const res = await fetch(`/api/baggage/${b.id}/declare-lost`, {
+                      method: 'PUT',
+                    });
+                    if (res.ok) fetchBaggages();
+                  } catch (error) {
+                    console.error('Error declaring lost:', error);
+                  }
+                }
+              }}
+              className="p-2 rounded-lg hover:bg-[#FEE2E2] dark:hover:bg-rose-500/10 transition-colors group"
+              title="Déclarer perdu"
+              aria-label="Déclarer perdu"
+            >
+              <AlertTriangle className="w-4 h-4 text-[var(--dash-muted)] group-hover:text-[#DC2626] dark:group-hover:text-rose-400" />
+            </button>
+          )}
+          {isLost(b.status) && (
+            <button
+              onClick={async () => {
+                if (confirm('Marquer ce colis comme retrouvé ?')) {
+                  try {
+                    const res = await fetch(`/api/baggage/${b.id}/mark-found`, {
+                      method: 'PUT',
+                    });
+                    if (res.ok) fetchBaggages();
+                  } catch (error) {
+                    console.error('Error marking found:', error);
+                  }
+                }
+              }}
+              className="p-2 rounded-lg hover:bg-[var(--dash-emerald-soft)] transition-colors group"
+              title="Marquer comme retrouvé"
+              aria-label="Marquer comme retrouvé"
+            >
+              <CheckCircle className="w-4 h-4 text-[var(--dash-muted)] group-hover:text-[var(--dash-emerald)]" />
+            </button>
+          )}
+          <button
+            onClick={() => {
+              setSelectedBaggage(b);
+              setShowDetailModal(true);
+            }}
+            className="p-2 rounded-lg hover:bg-[var(--dash-bg-3)] transition-colors group"
+            title="Voir détails"
+            aria-label="Voir détails"
+          >
+            <Eye className="w-4 h-4 text-[var(--dash-muted)] group-hover:text-[var(--dash-brand)]" />
+          </button>
+          <button
+            onClick={() => {
+              setBaggageToDelete(b);
+              setShowDeleteModal(true);
+            }}
+            className="p-2 rounded-lg hover:bg-[#FEE2E2] dark:hover:bg-rose-500/10 transition-colors group"
+            title="Supprimer"
+            aria-label="Supprimer"
+          >
+            <Trash2 className="w-4 h-4 text-[var(--dash-muted)] group-hover:text-[#DC2626] dark:group-hover:text-rose-400" />
+          </button>
+        </div>
+      ),
+    },
+  ];
+
+  // ─── Pending table columns ────────────────────────────────────────────
+
+  const pendingColumns: Column<Baggage>[] = [
+    {
+      key: 'reference',
+      header: 'Référence',
+      render: (b) => (
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-lg bg-[#FEF3C7] dark:bg-amber-500/10 flex items-center justify-center shrink-0">
+            <QrCode className="w-4 h-4 text-[#D97706] dark:text-amber-400" />
+          </div>
+          <span className="text-[var(--dash-ink)] font-mono font-medium text-sm">
+            {b.reference}
+          </span>
+        </div>
+      ),
+    },
+    {
+      key: 'traveler',
+      header: 'Pèlerin',
+      render: () => <span className="dash-badge dash-badge-warning">Non assigné</span>,
+    },
+    {
+      key: 'baggageType',
+      header: 'Type',
+      className: 'hidden md:table-cell',
+      render: (b) => (
+        <span className="text-[var(--dash-ink-2)] text-sm capitalize">
+          {b.baggageType === 'cabine' ? 'Cabine' : 'Soute'}
+        </span>
+      ),
+    },
+    {
+      key: 'createdAt',
+      header: 'Créé le',
+      className: 'hidden md:table-cell',
+      render: (b) => (
+        <span className="text-[var(--dash-muted)] text-sm">{formatDate(b.createdAt)}</span>
+      ),
+    },
+    {
+      key: 'actions',
+      header: 'Actions',
+      align: 'right' as const,
+      render: (b) => (
+        <div className="flex items-center justify-end gap-2">
+          <button
+            onClick={() => {
+              setSelectedBaggage(b);
+              setShowDetailModal(true);
+            }}
+            className="px-3 py-1.5 bg-[var(--dash-brand)] hover:bg-[var(--dash-brand-2)] text-white rounded-lg text-xs font-medium transition-colors"
+            title="Attribuer à un pèlerin"
+          >
+            Attribuer
+          </button>
+          <button
+            onClick={() => {
+              setSelectedBaggage(b);
+              setShowDetailModal(true);
+            }}
+            className="p-2 rounded-lg hover:bg-[var(--dash-bg-3)] transition-colors group"
+            title="Voir détails"
+            aria-label="Voir détails"
+          >
+            <Eye className="w-4 h-4 text-[var(--dash-muted)] group-hover:text-[var(--dash-brand)]" />
+          </button>
+          <button
+            onClick={() => {
+              setBaggageToDelete(b);
+              setShowDeleteModal(true);
+            }}
+            className="p-2 rounded-lg hover:bg-[#FEE2E2] dark:hover:bg-rose-500/10 transition-colors group"
+            title="Supprimer"
+            aria-label="Supprimer"
+          >
+            <Trash2 className="w-4 h-4 text-[var(--dash-muted)] group-hover:text-[#DC2626] dark:group-hover:text-rose-400" />
+          </button>
+        </div>
+      ),
     },
   ];
 
@@ -652,18 +923,19 @@ export default function AgencyDashboardPage() {
     <div className="max-w-7xl mx-auto">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-slate-800 dark:text-white">
-          Bienvenue, <span className="text-amber-500">{agencyName}</span>
+        <h1 className="text-2xl font-bold text-[var(--dash-ink)]">
+          Bienvenue,{' '}
+          <span className="text-[var(--dash-brand)]">{agencyName}</span>
         </h1>
-        <p className="text-slate-500 dark:text-slate-400 mt-1">Suivi en temps réel de vos colis Hajj 2026</p>
+        <p className="text-[var(--dash-muted)] mt-1">
+          Suivi en temps réel de vos colis Hajj 2026
+        </p>
       </div>
 
-      {/* Multicolored KPI Cards */}
+      {/* KPI cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        {kpiCards.map((card, index) => (
-          <div key={index} className={`stagger-${index + 1}`}>
-            <KPICard {...card} />
-          </div>
+        {kpiConfigs.map((kpi, i) => (
+          <KpiCard key={i} loading={loading} {...kpi} />
         ))}
       </div>
 
@@ -682,30 +954,29 @@ export default function AgencyDashboardPage() {
         <AdBanner />
       </div>
 
-      {/* Search Bar */}
+      {/* Search bar */}
       <div className="mb-6">
-        <div className="relative">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+        <div className="dash-search">
+          <Search className="w-5 h-5 text-[var(--dash-muted)] shrink-0" />
           <input
             type="text"
             placeholder="Rechercher par nom ou référence..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl py-3 pl-12 pr-4 text-slate-700 dark:text-slate-200 placeholder-slate-400 focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all"
           />
         </div>
       </div>
 
-      {/* Filter Buttons */}
+      {/* Filter buttons */}
       <div className="flex flex-wrap gap-2 mb-6">
         {filterButtons.map((btn) => (
           <button
             key={btn.id}
             onClick={() => setStatusFilter(btn.id)}
-            className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 border ${
               statusFilter === btn.id
-                ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-lg'
-                : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800'
+                ? 'bg-[var(--dash-brand)] text-white border-[var(--dash-brand)] shadow-sm'
+                : 'bg-[var(--dash-card)] text-[var(--dash-muted)] hover:text-[var(--dash-ink)] border-[var(--dash-border)] hover:border-[var(--dash-border-strong)]'
             }`}
           >
             {btn.label}
@@ -713,325 +984,70 @@ export default function AgencyDashboardPage() {
         ))}
       </div>
 
-      {/* AGENCY-FIX: Loading state */}
+      {/* Tables */}
       {loading ? (
-        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
-          <div className="text-center py-12">
-            <div className="flex items-center justify-center gap-3">
-              <div className="w-6 h-6 border-2 border-amber-500/30 border-t-amber-500 rounded-full animate-spin" />
-              <span className="text-slate-500">Chargement...</span>
-            </div>
-          </div>
-        </div>
+        <DataTable columns={activatedColumns} data={[]} loading emptyMessage="" />
       ) : filteredBaggages.length === 0 ? (
-        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
-          <div className="text-center py-12">
-            <div className="flex flex-col items-center">
-              <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mb-4">
-                <Clock className="w-8 h-8 text-slate-400" />
-              </div>
-              <p className="text-slate-500 dark:text-slate-400">Aucun colis trouvé</p>
-              <p className="text-sm text-slate-400 dark:text-slate-500 mt-2">
-                {search || statusFilter !== 'all'
-                  ? 'Essayez de modifier vos filtres.'
-                  : 'Vos colis apparaîtront ici une fois générés.'
-                }
-              </p>
-            </div>
+        <div className="dash-card p-12 text-center">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[var(--dash-bg-3)] mb-4">
+            <Clock className="w-8 h-8 text-[var(--dash-muted)]" />
           </div>
+          <p className="text-[var(--dash-muted)]">Aucun colis trouvé</p>
+          <p className="text-sm text-[var(--dash-muted-2)] mt-2">
+            {search || statusFilter !== 'all'
+              ? 'Essayez de modifier vos filtres.'
+              : 'Vos colis apparaîtront ici une fois générés.'}
+          </p>
         </div>
       ) : (
         <>
-          {/* AGENCY-FIX: Section 1 — Bagages activés */}
+          {/* Section 1 — Activated baggages */}
           {activatedBaggages.length > 0 && (
-            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden mb-6">
-              <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800 bg-emerald-50/50 dark:bg-emerald-500/5">
+            <div className="mb-6">
+              <div className="flex items-center justify-between mb-3 px-1">
                 <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-emerald-500" />
-                  <h2 className="text-sm font-semibold text-slate-800 dark:text-white">
+                  <div className="w-2.5 h-2.5 rounded-full bg-[var(--dash-emerald)]" />
+                  <h2 className="text-sm font-semibold text-[var(--dash-ink)]">
                     Colis activés ({activatedBaggages.length})
                   </h2>
                 </div>
-              </div>
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
-                      <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm">Référence</th>
-                      <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm">Pèlerin</th>
-                      <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm hidden md:table-cell">Dernier scan</th>
-                      <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm hidden lg:table-cell">Trouveur</th>
-                      <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm">Statut</th>
-                      <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {activatedBaggages.map((baggage) => (
-                      <tr
-                        key={baggage.id}
-                        className={`border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors ${
-                          isLost(baggage.status) ? 'bg-rose-50/50 dark:bg-rose-500/5' : ''
-                        }`}
-                      >
-                        <td className="px-6 py-4">
-                          <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-500/10 flex items-center justify-center">
-                              <QrCode className="w-4 h-4 text-emerald-500" />
-                            </div>
-                            <span className="text-slate-800 dark:text-white font-mono font-medium">
-                              {baggage.reference}
-                            </span>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4">
-                          <div>
-                            {/* AGENCY-FIX: Fallback "Non assigné" when both names are null */}
-                            {/* TEST: Nom null → affichage "Non assigné" without crash */}
-                            {baggage.travelerFirstName || baggage.travelerLastName ? (
-                              <>
-                                <span className="text-slate-800 dark:text-white font-medium">
-                                  {baggage.travelerFirstName} {baggage.travelerLastName}
-                                </span>
-                                {baggage.whatsappOwner && (
-                                  <p className="text-slate-500 dark:text-slate-400 text-sm">{baggage.whatsappOwner}</p>
-                                )}
-                              </>
-                            ) : (
-                              <div className="flex items-center gap-2">
-                                <span className="px-2 py-1 bg-amber-100 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 rounded-full text-xs font-medium">
-                                  Non assigné
-                                </span>
-                                <button
-                                  onClick={() => {
-                                    setSelectedBaggage(baggage);
-                                    setShowDetailModal(true);
-                                  }}
-                                  className="text-xs text-[#ff7f00] hover:text-[#ff9f00]"
-                                >
-                                  Attribuer
-                                </button>
-                              </div>
-                            )}
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 hidden md:table-cell">
-                          {baggage.lastScanDate ? (
-                            <div>
-                              <span className="text-slate-600 dark:text-slate-300">{formatDateTime(baggage.lastScanDate)}</span>
-                              {baggage.lastLocation && (
-                                <p className="text-slate-400 dark:text-slate-500 text-xs flex items-center gap-1 mt-1">
-                                  <MapPin className="w-3 h-3" aria-hidden="true" />
-                                  {baggage.lastLocation}
-                                </p>
-                              )}
-                            </div>
-                          ) : (
-                            <span className="text-slate-400 dark:text-slate-500">Jamais</span>
-                          )}
-                        </td>
-                        <td className="px-6 py-4 hidden lg:table-cell">
-                          {baggage.founderName ? (
-                            <div>
-                              <p className="text-slate-800 dark:text-white font-medium text-sm">{baggage.founderName}</p>
-                              {baggage.founderPhone && (
-                                <a 
-                                  href={`https://wa.me/${baggage.founderPhone.replace(/\D/g, '')}`}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="text-emerald-500 hover:text-emerald-600 text-xs flex items-center gap-1 mt-0.5"
-                                >
-                                  <svg className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor">
-                                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-                                  </svg>
-                                  {baggage.founderPhone}
-                                </a>
-                              )}
-                            </div>
-                          ) : (
-                            <span className="text-slate-400 dark:text-slate-500 text-sm">-</span>
-                          )}
-                        </td>
-                        <td className="px-6 py-4">
-                          {getStatusBadge(baggage.status)}
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="flex items-center gap-2">
-                            {/* AGENCY-FIX: Use isActive() to handle both EN/FR statuses */}
-                            {isActive(baggage.status) && (
-                              <button
-                                onClick={async () => {
-                                  if (confirm('Déclarer ce colis comme perdu ?')) {
-                                    try {
-                                      const res = await fetch(`/api/baggage/${baggage.id}/declare-lost`, { method: 'PUT' });
-                                      if (res.ok) fetchBaggages();
-                                    } catch (error) {
-                                      console.error('Error declaring lost:', error);
-                                    }
-                                  }
-                                }}
-                                className="p-2 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-colors group"
-                                title="Déclarer perdu"
-                              >
-                                <AlertTriangle className="w-4 h-4 text-slate-400 group-hover:text-rose-500" />
-                              </button>
-                            )}
-                            {/* AGENCY-FIX: Use isLost()/isFound() for French DB compat */}
-                            {isLost(baggage.status) && (
-                              <button
-                                onClick={async () => {
-                                  if (confirm('Marquer ce colis comme retrouvé ?')) {
-                                    try {
-                                      const res = await fetch(`/api/baggage/${baggage.id}/mark-found`, { method: 'PUT' });
-                                      if (res.ok) fetchBaggages();
-                                    } catch (error) {
-                                      console.error('Error marking found:', error);
-                                    }
-                                  }
-                                }}
-                                className="p-2 rounded-lg hover:bg-emerald-50 dark:hover:bg-emerald-500/10 transition-colors group"
-                                title="Marquer comme retrouvé"
-                              >
-                                <CheckCircle className="w-4 h-4 text-slate-400 group-hover:text-emerald-500" />
-                              </button>
-                            )}
-                            <button
-                              onClick={() => {
-                                setSelectedBaggage(baggage);
-                                setShowDetailModal(true);
-                              }}
-                              className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors group"
-                              title="Voir détails"
-                            >
-                              <Eye className="w-4 h-4 text-slate-400 group-hover:text-amber-500" />
-                            </button>
-                            <button
-                              onClick={() => {
-                                setBaggageToDelete(baggage);
-                                setShowDeleteModal(true);
-                              }}
-                              className="p-2 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-colors group"
-                              title="Supprimer"
-                            >
-                              <Trash2 className="w-4 h-4 text-slate-400 group-hover:text-rose-500" />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-              <div className="px-6 py-4 border-t border-slate-200 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50">
-                <span className="text-slate-500 dark:text-slate-400 text-sm">
+                <span className="text-xs text-[var(--dash-muted)]">
                   {activatedBaggages.length} colis activé(s)
                 </span>
               </div>
+              <DataTable
+                columns={activatedColumns}
+                data={activatedBaggages}
+                emptyMessage="Aucun colis activé"
+              />
             </div>
           )}
 
-          {/* AGENCY-FIX: Section 2 — QR en attente d'activation */}
+          {/* Section 2 — Pending baggages */}
           {pendingBaggages.length > 0 && (
-            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-amber-200 dark:border-amber-800 overflow-hidden">
-              <div className="px-6 py-4 border-b border-amber-200 dark:border-amber-800 bg-amber-50/50 dark:bg-amber-500/5">
+            <div className="mb-6">
+              <div className="flex items-center justify-between mb-3 px-1">
                 <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-amber-500" />
-                  <h2 className="text-sm font-semibold text-slate-800 dark:text-white">
-                    QR en attente d'activation ({pendingBaggages.length})
+                  <div className="w-2.5 h-2.5 rounded-full bg-[#F59E0B]" />
+                  <h2 className="text-sm font-semibold text-[var(--dash-ink)]">
+                    QR en attente d&apos;activation ({pendingBaggages.length})
                   </h2>
                 </div>
-              </div>
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
-                      <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm">Référence</th>
-                      <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm">Pèlerin</th>
-                      <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm hidden md:table-cell">Type</th>
-                      <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm hidden md:table-cell">Créé le</th>
-                      <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {pendingBaggages.map((baggage) => (
-                      <tr
-                        key={baggage.id}
-                        className="border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
-                      >
-                        <td className="px-6 py-4">
-                          <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 rounded-lg bg-amber-100 dark:bg-amber-500/10 flex items-center justify-center">
-                              <QrCode className="w-4 h-4 text-amber-500" />
-                            </div>
-                            <span className="text-slate-800 dark:text-white font-mono font-medium">
-                              {baggage.reference}
-                            </span>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4">
-                          <span className="px-2 py-1 bg-amber-100 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 rounded-full text-xs font-medium">
-                            Non assigné
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 hidden md:table-cell">
-                          <span className="text-slate-600 dark:text-slate-300 text-sm capitalize">
-                            {baggage.baggageType === 'cabine' ? 'Cabine' : 'Soute'}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 hidden md:table-cell">
-                          <span className="text-slate-400 dark:text-slate-500 text-sm">
-                            {formatDate(baggage.createdAt)}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="flex items-center gap-2">
-                            <button
-                              onClick={() => {
-                                setSelectedBaggage(baggage);
-                                setShowDetailModal(true);
-                              }}
-                              className="px-3 py-1.5 bg-[#ff7f00] hover:bg-[#ff9f00] text-white rounded-lg text-xs font-medium transition-colors"
-                              title="Attribuer à un pèlerin"
-                            >
-                              Attribuer
-                            </button>
-                            <button
-                              onClick={() => {
-                                setSelectedBaggage(baggage);
-                                setShowDetailModal(true);
-                              }}
-                              className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors group"
-                              title="Voir détails"
-                            >
-                              <Eye className="w-4 h-4 text-slate-400 group-hover:text-amber-500" />
-                            </button>
-                            <button
-                              onClick={() => {
-                                setBaggageToDelete(baggage);
-                                setShowDeleteModal(true);
-                              }}
-                              className="p-2 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-colors group"
-                              title="Supprimer"
-                            >
-                              <Trash2 className="w-4 h-4 text-slate-400 group-hover:text-rose-500" />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-              <div className="px-6 py-4 border-t border-slate-200 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50">
-                <span className="text-slate-500 dark:text-slate-400 text-sm">
-                  {pendingBaggages.length} QR en attente d'activation
+                <span className="text-xs text-[var(--dash-muted)]">
+                  {pendingBaggages.length} QR en attente
                 </span>
               </div>
+              <DataTable
+                columns={pendingColumns}
+                data={pendingBaggages}
+                emptyMessage="Aucun QR en attente"
+              />
             </div>
           )}
 
           {/* Footer global */}
-          <div className="text-center">
-            <span className="text-slate-400 dark:text-slate-500 text-xs">
+          <div className="text-center mt-6">
+            <span className="text-[var(--dash-muted-2)] text-xs">
               {filteredBaggages.length} colis affiché(s) sur {baggages.length}
             </span>
           </div>
@@ -1041,49 +1057,60 @@ export default function AgencyDashboardPage() {
       {/* Command Modal */}
       {showCommandModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
-          <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-md w-full shadow-xl border border-slate-200 dark:border-slate-800">
-            <div className="flex items-center justify-between p-6 border-b border-slate-200 dark:border-slate-800">
+          <div className="dash-card max-w-md w-full shadow-xl overflow-hidden">
+            <div className="flex items-center justify-between p-6 border-b border-[var(--dash-border)]">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-500/10 flex items-center justify-center">
-                  <ShoppingCart className="w-5 h-5 text-amber-500" />
+                <div className="w-10 h-10 rounded-xl bg-[var(--dash-brand-soft)] flex items-center justify-center">
+                  <ShoppingCart className="w-5 h-5 text-[var(--dash-brand)]" />
                 </div>
-                <h3 className="text-lg font-bold text-slate-800 dark:text-white">Commander vos QR codes</h3>
+                <h3 className="text-lg font-bold text-[var(--dash-ink)]">
+                  Commander vos QR codes
+                </h3>
               </div>
               <button
                 onClick={() => {
                   setShowCommandModal(false);
                   setCommandSuccess(false);
                 }}
-                className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                className="p-2 rounded-lg hover:bg-[var(--dash-bg-3)] transition-colors"
+                aria-label="Fermer"
               >
-                <XCircle className="w-5 h-5 text-slate-400" />
+                <XCircle className="w-5 h-5 text-[var(--dash-muted)]" />
               </button>
             </div>
-            
+
             {commandSuccess ? (
               <div className="p-8 text-center">
-                <div className="w-16 h-16 rounded-full bg-emerald-100 dark:bg-emerald-500/10 flex items-center justify-center mx-auto mb-4">
-                  <CheckCircle className="w-8 h-8 text-emerald-500" />
+                <div className="w-16 h-16 rounded-full bg-[var(--dash-emerald-soft)] flex items-center justify-center mx-auto mb-4">
+                  <CheckCircle className="w-8 h-8 text-[var(--dash-emerald)]" />
                 </div>
-                <h4 className="text-xl font-bold text-slate-800 dark:text-white mb-2">Demande envoyée !</h4>
-                <p className="text-slate-500 dark:text-slate-400">Notre équipe vous contactera sous 24h.</p>
+                <h4 className="text-xl font-bold text-[var(--dash-ink)] mb-2">
+                  Demande envoyée !
+                </h4>
+                <p className="text-[var(--dash-muted)]">
+                  Notre équipe vous contactera sous 24h.
+                </p>
               </div>
             ) : (
               <div className="p-6 space-y-4">
                 <div>
-                  <label className="block text-sm font-medium mb-2 text-slate-700 dark:text-slate-300">Type de QR codes</label>
+                  <label className="block text-sm font-medium mb-2 text-[var(--dash-ink-2)]">
+                    Type de QR codes
+                  </label>
                   <select
                     value={commandForm.type}
-                    onChange={(e) => setCommandForm({ ...commandForm, type: e.target.value })}
-                    className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500"
+                    onChange={(e) =>
+                      setCommandForm({ ...commandForm, type: e.target.value })
+                    }
+                    className="w-full p-3 bg-[var(--dash-bg-3)] border border-[var(--dash-border)] rounded-xl text-[var(--dash-ink)] focus:ring-2 focus:ring-[var(--dash-brand)]/30 focus:border-[var(--dash-brand)] outline-none transition"
                   >
                     <option value="hajj">Hajj 2026 (3 QR/pèlerin)</option>
                     <option value="voyageur">Voyageurs Standard (1 ou 3 QR)</option>
                   </select>
                 </div>
-                
+
                 <div>
-                  <label className="block text-sm font-medium mb-2 text-slate-700 dark:text-slate-300">
+                  <label className="block text-sm font-medium mb-2 text-[var(--dash-ink-2)]">
                     Nombre de {commandForm.type === 'hajj' ? 'pèlerins' : 'voyageurs'}
                   </label>
                   <input
@@ -1091,37 +1118,45 @@ export default function AgencyDashboardPage() {
                     min="1"
                     max="1000"
                     value={commandForm.count}
-                    onChange={(e) => setCommandForm({ ...commandForm, count: parseInt(e.target.value) || 1 })}
-                    className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500"
+                    onChange={(e) =>
+                      setCommandForm({
+                        ...commandForm,
+                        count: parseInt(e.target.value) || 1,
+                      })
+                    }
+                    className="w-full p-3 bg-[var(--dash-bg-3)] border border-[var(--dash-border)] rounded-xl text-[var(--dash-ink)] focus:ring-2 focus:ring-[var(--dash-brand)]/30 focus:border-[var(--dash-brand)] outline-none transition"
                     placeholder="Ex: 50"
                   />
                 </div>
-                
+
                 <div>
-                  <label className="block text-sm font-medium mb-2 text-slate-700 dark:text-slate-300">Remarques (optionnel)</label>
+                  <label className="block text-sm font-medium mb-2 text-[var(--dash-ink-2)]">
+                    Remarques (optionnel)
+                  </label>
                   <textarea
                     rows={3}
                     value={commandForm.notes}
-                    onChange={(e) => setCommandForm({ ...commandForm, notes: e.target.value })}
-                    className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-700 dark:text-slate-200 placeholder-slate-400 focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 resize-none"
+                    onChange={(e) =>
+                      setCommandForm({ ...commandForm, notes: e.target.value })
+                    }
+                    className="w-full p-3 bg-[var(--dash-bg-3)] border border-[var(--dash-border)] rounded-xl text-[var(--dash-ink)] placeholder-[var(--dash-muted)] focus:ring-2 focus:ring-[var(--dash-brand)]/30 focus:border-[var(--dash-brand)] outline-none resize-none transition"
                     placeholder="Ex: livraison urgente, dates de départ..."
                   />
                 </div>
-                
-                <div className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-4">
-                  <p className="text-slate-600 dark:text-slate-300 text-sm">
-                    <strong className="text-slate-800 dark:text-white">Estimation :</strong> {' '}
-                    {commandForm.type === 'hajj' 
+
+                <div className="bg-[var(--dash-bg-3)] border border-[var(--dash-border)] rounded-xl p-4">
+                  <p className="text-[var(--dash-ink-2)] text-sm">
+                    <strong className="text-[var(--dash-ink)]">Estimation :</strong>{' '}
+                    {commandForm.type === 'hajj'
                       ? `${commandForm.count * 3} QR codes (${commandForm.count} pèlerins × 3)`
-                      : `${commandForm.count} QR codes voyageur`
-                    }
+                      : `${commandForm.count} QR codes voyageur`}
                   </p>
                 </div>
-                
+
                 <button
                   onClick={handleCommandSubmit}
                   disabled={commandSubmitting}
-                  className="w-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 py-3 rounded-xl font-bold hover:bg-slate-800 dark:hover:bg-slate-100 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+                  className="w-full bg-[var(--dash-brand)] text-white py-3 rounded-xl font-bold hover:bg-[var(--dash-brand-2)] transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
                 >
                   {commandSubmitting ? (
                     <>
@@ -1144,80 +1179,106 @@ export default function AgencyDashboardPage() {
       {/* Detail Modal */}
       {showDetailModal && selectedBaggage && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
-          <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto shadow-xl border border-slate-200 dark:border-slate-800">
-            <div className="flex items-center justify-between p-6 border-b border-slate-200 dark:border-slate-800">
-              <h2 className="text-lg font-bold text-slate-800 dark:text-white">Détails du colis</h2>
+          <div className="dash-card max-w-md w-full max-h-[90vh] overflow-y-auto shadow-xl">
+            <div className="flex items-center justify-between p-6 border-b border-[var(--dash-border)] sticky top-0 bg-[var(--dash-card)] z-10">
+              <h2 className="text-lg font-bold text-[var(--dash-ink)]">Détails du colis</h2>
               <button
                 onClick={() => {
                   setShowDetailModal(false);
                   setSelectedBaggage(null);
                 }}
-                className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                className="p-2 rounded-lg hover:bg-[var(--dash-bg-3)] transition-colors"
+                aria-label="Fermer"
               >
-                <X className="w-5 h-5 text-slate-400" />
+                <X className="w-5 h-5 text-[var(--dash-muted)]" />
               </button>
             </div>
             <div className="p-6 space-y-4">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-amber-100 dark:bg-amber-500/10 rounded-xl flex items-center justify-center">
-                  <QrCode className="w-6 h-6 text-amber-500" />
+                <div className="w-12 h-12 bg-[var(--dash-brand-soft)] rounded-xl flex items-center justify-center">
+                  <QrCode className="w-6 h-6 text-[var(--dash-brand)]" />
                 </div>
                 <div>
-                  <p className="text-slate-800 dark:text-white font-mono font-bold">{selectedBaggage.reference}</p>
-                  <p className="text-slate-500 dark:text-slate-400 text-sm">{selectedBaggage.type === 'hajj' ? 'Hajj 2026' : 'Voyageur'}</p>
+                  <p className="text-[var(--dash-ink)] font-mono font-bold">
+                    {selectedBaggage.reference}
+                  </p>
+                  <p className="text-[var(--dash-muted)] text-sm">
+                    {selectedBaggage.type === 'hajj' ? 'Hajj 2026' : 'Voyageur'}
+                  </p>
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <p className="text-slate-500 dark:text-slate-400 text-sm">Pèlerin</p>
+                  <p className="text-[var(--dash-muted)] text-sm">Pèlerin</p>
                   {selectedBaggage.travelerFirstName || selectedBaggage.travelerLastName ? (
-                    <p className="text-slate-800 dark:text-white font-medium">{selectedBaggage.travelerFirstName} {selectedBaggage.travelerLastName}</p>
+                    <p className="text-[var(--dash-ink)] font-medium">
+                      {selectedBaggage.travelerFirstName} {selectedBaggage.travelerLastName}
+                    </p>
                   ) : (
-                    <span className="px-2 py-1 bg-amber-100 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 rounded-full text-xs font-medium">
-                      À attribuer
-                    </span>
+                    <span className="dash-badge dash-badge-warning mt-1">À attribuer</span>
                   )}
                 </div>
                 <div>
-                  <p className="text-slate-500 dark:text-slate-400 text-sm">Type</p>
-                  <p className="text-slate-800 dark:text-white">{selectedBaggage.baggageType} #{selectedBaggage.baggageIndex}</p>
+                  <p className="text-[var(--dash-muted)] text-sm">Type</p>
+                  <p className="text-[var(--dash-ink)]">
+                    {selectedBaggage.baggageType} #{selectedBaggage.baggageIndex}
+                  </p>
                 </div>
               </div>
 
               <div>
-                <p className="text-slate-500 dark:text-slate-400 text-sm">WhatsApp</p>
+                <p className="text-[var(--dash-muted)] text-sm">WhatsApp</p>
                 {selectedBaggage.whatsappOwner ? (
-                  <p className="text-slate-800 dark:text-white">{selectedBaggage.whatsappOwner}</p>
+                  <p className="text-[var(--dash-ink)]">{selectedBaggage.whatsappOwner}</p>
                 ) : (
-                  <span className="text-amber-600 dark:text-amber-400 text-sm">Non renseigné</span>
+                  <span className="text-[#D97706] dark:text-amber-400 text-sm">
+                    Non renseigné
+                  </span>
                 )}
               </div>
 
               {/* Edit Form for unassigned baggages */}
-              {(!selectedBaggage.travelerFirstName && !selectedBaggage.travelerLastName) && (
-                <div className="p-4 bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-800 rounded-xl">
-                  <h4 className="text-amber-700 dark:text-amber-400 font-medium mb-3">Attribuer ce colis</h4>
+              {!selectedBaggage.travelerFirstName && !selectedBaggage.travelerLastName && (
+                <div className="p-4 bg-[#FEF3C7]/60 dark:bg-amber-500/10 border border-[#F59E0B]/30 dark:border-amber-500/30 rounded-xl">
+                  <h4 className="text-[#D97706] dark:text-amber-400 font-medium mb-3">
+                    Attribuer ce colis
+                  </h4>
                   <div className="space-y-3">
                     <div className="grid grid-cols-2 gap-3">
                       <input
                         type="text"
                         placeholder="Prénom"
-                        className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-800 dark:text-white"
-                        onChange={(e) => setSelectedBaggage({ ...selectedBaggage, travelerFirstName: e.target.value })}
+                        className="w-full px-3 py-2 bg-[var(--dash-card)] border border-[var(--dash-border)] rounded-lg text-sm text-[var(--dash-ink)] focus:ring-2 focus:ring-[var(--dash-brand)]/30 focus:border-[var(--dash-brand)] outline-none"
+                        onChange={(e) =>
+                          setSelectedBaggage({
+                            ...selectedBaggage,
+                            travelerFirstName: e.target.value,
+                          })
+                        }
                       />
                       <input
                         type="text"
                         placeholder="Nom"
-                        className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-800 dark:text-white"
-                        onChange={(e) => setSelectedBaggage({ ...selectedBaggage, travelerLastName: e.target.value })}
+                        className="w-full px-3 py-2 bg-[var(--dash-card)] border border-[var(--dash-border)] rounded-lg text-sm text-[var(--dash-ink)] focus:ring-2 focus:ring-[var(--dash-brand)]/30 focus:border-[var(--dash-brand)] outline-none"
+                        onChange={(e) =>
+                          setSelectedBaggage({
+                            ...selectedBaggage,
+                            travelerLastName: e.target.value,
+                          })
+                        }
                       />
                     </div>
                     <input
                       type="tel"
                       placeholder="WhatsApp (ex: +33612345678)"
-                      className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-800 dark:text-white"
-                      onChange={(e) => setSelectedBaggage({ ...selectedBaggage, whatsappOwner: e.target.value })}
+                      className="w-full px-3 py-2 bg-[var(--dash-card)] border border-[var(--dash-border)] rounded-lg text-sm text-[var(--dash-ink)] focus:ring-2 focus:ring-[var(--dash-brand)]/30 focus:border-[var(--dash-brand)] outline-none"
+                      onChange={(e) =>
+                        setSelectedBaggage({
+                          ...selectedBaggage,
+                          whatsappOwner: e.target.value,
+                        })
+                      }
                     />
                     <button
                       onClick={async () => {
@@ -1229,7 +1290,7 @@ export default function AgencyDashboardPage() {
                               travelerFirstName: selectedBaggage.travelerFirstName,
                               travelerLastName: selectedBaggage.travelerLastName,
                               whatsappOwner: selectedBaggage.whatsappOwner,
-                              status: 'active'
+                              status: 'active',
                             }),
                           });
                           if (res.ok) {
@@ -1240,7 +1301,7 @@ export default function AgencyDashboardPage() {
                           console.error('Error updating baggage:', error);
                         }
                       }}
-                      className="w-full py-2 bg-[#ff7f00] hover:bg-[#ff9f00] text-white rounded-lg text-sm font-medium transition-colors"
+                      className="w-full py-2 bg-[var(--dash-brand)] hover:bg-[var(--dash-brand-2)] text-white rounded-lg text-sm font-medium transition-colors"
                     >
                       Enregistrer
                     </button>
@@ -1250,20 +1311,22 @@ export default function AgencyDashboardPage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <p className="text-slate-500 dark:text-slate-400 text-sm">Statut</p>
-                  {getStatusBadge(selectedBaggage.status)}
+                  <p className="text-[var(--dash-muted)] text-sm">Statut</p>
+                  <div className="mt-1">{getStatusBadge(selectedBaggage.status)}</div>
                 </div>
                 <div>
-                  <p className="text-slate-500 dark:text-slate-400 text-sm">Créé le</p>
-                  <p className="text-slate-800 dark:text-white">{formatDate(selectedBaggage.createdAt)}</p>
+                  <p className="text-[var(--dash-muted)] text-sm">Créé le</p>
+                  <p className="text-[var(--dash-ink)]">{formatDate(selectedBaggage.createdAt)}</p>
                 </div>
               </div>
 
               <div>
-                <p className="text-slate-500 dark:text-slate-400 text-sm">Dernier scan</p>
-                <p className="text-slate-800 dark:text-white">{formatDateTime(selectedBaggage.lastScanDate)}</p>
+                <p className="text-[var(--dash-muted)] text-sm">Dernier scan</p>
+                <p className="text-[var(--dash-ink)]">
+                  {formatDateTime(selectedBaggage.lastScanDate)}
+                </p>
                 {selectedBaggage.lastLocation && (
-                  <p className="text-slate-500 dark:text-slate-400 text-sm flex items-center gap-1 mt-1">
+                  <p className="text-[var(--dash-muted)] text-sm flex items-center gap-1 mt-1">
                     <MapPin className="w-3 h-3" aria-hidden="true" />
                     {selectedBaggage.lastLocation}
                   </p>
@@ -1272,34 +1335,36 @@ export default function AgencyDashboardPage() {
 
               {/* Founder Information */}
               {selectedBaggage.founderName && (
-                <div className="p-4 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-800 rounded-xl">
+                <div className="p-4 bg-[var(--dash-emerald-soft)] border border-[var(--dash-emerald)]/30 rounded-xl">
                   <div className="flex items-center gap-2 mb-3">
-                    <CheckCircle className="w-5 h-5 text-emerald-500" />
-                    <p className="text-emerald-700 dark:text-emerald-400 font-medium">Trouvé par</p>
+                    <CheckCircle className="w-5 h-5 text-[var(--dash-emerald)]" />
+                    <p className="text-[var(--dash-emerald)] font-medium">Trouvé par</p>
                   </div>
                   <div className="space-y-2">
                     <div className="flex items-center gap-2">
-                      <span className="text-slate-800 dark:text-white font-medium">{selectedBaggage.founderName}</span>
+                      <span className="text-[var(--dash-ink)] font-medium">
+                        {selectedBaggage.founderName}
+                      </span>
                       {selectedBaggage.founderAt && (
-                        <span className="text-xs text-slate-500 dark:text-slate-400">
+                        <span className="text-xs text-[var(--dash-muted)]">
                           le {formatDate(selectedBaggage.founderAt)}
                         </span>
                       )}
                     </div>
                     {selectedBaggage.founderPhone && (
                       <div className="flex items-center gap-2">
-                        <a 
+                        <a
                           href={`https://wa.me/${selectedBaggage.founderPhone.replace(/\D/g, '')}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-2 px-3 py-1.5 bg-green-500 text-white rounded-lg text-sm font-medium hover:bg-green-600 transition-colors"
+                          className="inline-flex items-center gap-2 px-3 py-1.5 bg-[var(--dash-emerald)] text-white rounded-lg text-sm font-medium hover:opacity-90 transition-opacity"
                         >
-                          <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-                          </svg>
+                          <WhatsAppIcon className="w-4 h-4" />
                           Contacter sur WhatsApp
                         </a>
-                        <span className="text-slate-600 dark:text-slate-400 text-sm">{selectedBaggage.founderPhone}</span>
+                        <span className="text-[var(--dash-muted)] text-sm">
+                          {selectedBaggage.founderPhone}
+                        </span>
                       </div>
                     )}
                   </div>
@@ -1307,62 +1372,77 @@ export default function AgencyDashboardPage() {
               )}
 
               <div>
-                <p className="text-slate-500 dark:text-slate-400 text-sm">Expire le</p>
-                <p className="text-slate-800 dark:text-white">{formatDate(selectedBaggage.expiresAt)}</p>
+                <p className="text-[var(--dash-muted)] text-sm">Expire le</p>
+                <p className="text-[var(--dash-ink)]">{formatDate(selectedBaggage.expiresAt)}</p>
               </div>
 
               {/* Colis Logistics Information */}
-              {(selectedBaggage as Record<string, unknown>).receiverName || (selectedBaggage as Record<string, unknown>).deliveredAt || (selectedBaggage as Record<string, unknown>).transportMode || (selectedBaggage as Record<string, unknown>).departureCity ? (
-                <div className="bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-800 rounded-xl p-4">
-                  <p className="text-blue-700 dark:text-blue-400 font-medium text-sm mb-3 flex items-center gap-2">
+              {selectedBaggage.receiverName ||
+              selectedBaggage.deliveredAt ||
+              selectedBaggage.transportMode ||
+              selectedBaggage.departureCity ? (
+                <div className="bg-[var(--dash-brand-soft)] border border-[var(--dash-brand)]/20 rounded-xl p-4">
+                  <p className="text-[var(--dash-brand)] font-medium text-sm mb-3 flex items-center gap-2">
                     <Package className="w-4 h-4" />
                     Informations logistique
                   </p>
                   <div className="space-y-2">
-                    {(selectedBaggage as Record<string, unknown>).receiverName && (
+                    {selectedBaggage.receiverName && (
                       <div className="flex justify-between">
-                        <p className="text-slate-500 dark:text-slate-400 text-sm">Destinataire</p>
-                        <p className="text-slate-800 dark:text-white font-medium">{String(selectedBaggage.receiverName)}</p>
+                        <p className="text-[var(--dash-muted)] text-sm">Destinataire</p>
+                        <p className="text-[var(--dash-ink)] font-medium">
+                          {String(selectedBaggage.receiverName)}
+                        </p>
                       </div>
                     )}
-                    {(selectedBaggage as Record<string, unknown>).receiverWhatsapp && (
+                    {selectedBaggage.receiverWhatsapp && (
                       <div className="flex justify-between">
-                        <p className="text-slate-500 dark:text-slate-400 text-sm">WhatsApp destinataire</p>
-                        <p className="text-slate-800 dark:text-white font-medium">{String(selectedBaggage.receiverWhatsapp)}</p>
+                        <p className="text-[var(--dash-muted)] text-sm">WhatsApp destinataire</p>
+                        <p className="text-[var(--dash-ink)] font-medium">
+                          {String(selectedBaggage.receiverWhatsapp)}
+                        </p>
                       </div>
                     )}
-                    {(selectedBaggage as Record<string, unknown>).transportMode && (
+                    {selectedBaggage.transportMode && (
                       <div className="flex justify-between">
-                        <p className="text-slate-500 dark:text-slate-400 text-sm">Mode de transport</p>
-                        <p className="text-slate-800 dark:text-white font-medium">{String(selectedBaggage.transportMode)}</p>
+                        <p className="text-[var(--dash-muted)] text-sm">Mode de transport</p>
+                        <p className="text-[var(--dash-ink)] font-medium">
+                          {String(selectedBaggage.transportMode)}
+                        </p>
                       </div>
                     )}
-                    {(selectedBaggage as Record<string, unknown>).departureCity && (
+                    {selectedBaggage.departureCity && (
                       <div className="flex justify-between">
-                        <p className="text-slate-500 dark:text-slate-400 text-sm">Ville de départ</p>
-                        <p className="text-slate-800 dark:text-white font-medium">{String(selectedBaggage.departureCity)}</p>
+                        <p className="text-[var(--dash-muted)] text-sm">Ville de départ</p>
+                        <p className="text-[var(--dash-ink)] font-medium">
+                          {String(selectedBaggage.departureCity)}
+                        </p>
                       </div>
                     )}
-                    {(selectedBaggage as Record<string, unknown>).departureDate && (
+                    {selectedBaggage.departureDate && (
                       <div className="flex justify-between">
-                        <p className="text-slate-500 dark:text-slate-400 text-sm">Date de départ</p>
-                        <p className="text-slate-800 dark:text-white font-medium">{formatDate(String(selectedBaggage.departureDate))}</p>
+                        <p className="text-[var(--dash-muted)] text-sm">Date de départ</p>
+                        <p className="text-[var(--dash-ink)] font-medium">
+                          {formatDate(String(selectedBaggage.departureDate))}
+                        </p>
                       </div>
                     )}
-                    {(selectedBaggage as Record<string, unknown>).deliveredAt && (
+                    {selectedBaggage.deliveredAt && (
                       <div className="flex justify-between">
-                        <p className="text-slate-500 dark:text-slate-400 text-sm">Date de livraison</p>
-                        <p className="text-emerald-600 dark:text-emerald-400 font-medium">{formatDateTime(String(selectedBaggage.deliveredAt))}</p>
+                        <p className="text-[var(--dash-muted)] text-sm">Date de livraison</p>
+                        <p className="text-[var(--dash-emerald)] font-medium">
+                          {formatDateTime(String(selectedBaggage.deliveredAt))}
+                        </p>
                       </div>
                     )}
                   </div>
                 </div>
               ) : null}
 
-              <div className="pt-4 border-t border-slate-200 dark:border-slate-800">
+              <div className="pt-4 border-t border-[var(--dash-border)]">
                 <Link
                   href={`/scan/${selectedBaggage.reference}`}
-                  className="block w-full text-center py-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-xl hover:bg-slate-800 dark:hover:bg-slate-100 transition-colors font-medium"
+                  className="block w-full text-center py-3 bg-[var(--dash-brand)] text-white rounded-xl hover:bg-[var(--dash-brand-2)] transition-colors font-medium"
                 >
                   Tester le scan
                 </Link>
@@ -1375,37 +1455,40 @@ export default function AgencyDashboardPage() {
       {/* Delete Confirmation Modal */}
       {showDeleteModal && baggageToDelete && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
-          <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-sm w-full shadow-xl border border-slate-200 dark:border-slate-800">
-            <div className="p-6">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-rose-100 dark:bg-rose-500/10 rounded-xl flex items-center justify-center">
-                  <Trash2 className="w-5 h-5 text-rose-500" />
-                </div>
-                <div>
-                  <h3 className="text-slate-800 dark:text-white font-bold">Supprimer ce colis ?</h3>
-                  <p className="text-slate-500 dark:text-slate-400 text-sm">{baggageToDelete.reference}</p>
-                </div>
+          <div className="dash-card max-w-sm w-full shadow-xl p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 bg-[#FEE2E2] dark:bg-rose-500/10 rounded-xl flex items-center justify-center">
+                <Trash2 className="w-5 h-5 text-[#DC2626] dark:text-rose-400" />
               </div>
-              <p className="text-slate-500 dark:text-slate-400 text-sm mb-6">
-                Cette action est irréversible. Le colis de <strong className="text-slate-700 dark:text-slate-300">{baggageToDelete.travelerFirstName || 'Non renseigné'} {baggageToDelete.travelerLastName || ''}</strong> sera définitivement supprimé.
-              </p>
-              <div className="flex gap-3">
-                <button
-                  onClick={() => {
-                    setShowDeleteModal(false);
-                    setBaggageToDelete(null);
-                  }}
-                  className="flex-1 py-2 px-4 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors font-medium"
-                >
-                  Annuler
-                </button>
-                <button
-                  onClick={handleDeleteBaggage}
-                  className="flex-1 py-2 px-4 bg-rose-500 text-white rounded-xl hover:bg-rose-600 transition-colors font-medium"
-                >
-                  Supprimer
-                </button>
+              <div>
+                <h3 className="text-[var(--dash-ink)] font-bold">Supprimer ce colis ?</h3>
+                <p className="text-[var(--dash-muted)] text-sm">{baggageToDelete.reference}</p>
               </div>
+            </div>
+            <p className="text-[var(--dash-muted)] text-sm mb-6">
+              Cette action est irréversible. Le colis de{' '}
+              <strong className="text-[var(--dash-ink-2)]">
+                {baggageToDelete.travelerFirstName || 'Non renseigné'}{' '}
+                {baggageToDelete.travelerLastName || ''}
+              </strong>{' '}
+              sera définitivement supprimé.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  setShowDeleteModal(false);
+                  setBaggageToDelete(null);
+                }}
+                className="flex-1 py-2 px-4 bg-[var(--dash-bg-3)] text-[var(--dash-ink-2)] rounded-xl hover:bg-[var(--dash-bg-2)] transition-colors font-medium"
+              >
+                Annuler
+              </button>
+              <button
+                onClick={handleDeleteBaggage}
+                className="flex-1 py-2 px-4 bg-[#DC2626] text-white rounded-xl hover:bg-[#B91C1C] transition-colors font-medium"
+              >
+                Supprimer
+              </button>
             </div>
           </div>
         </div>
