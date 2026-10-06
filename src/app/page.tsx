@@ -75,30 +75,34 @@ const WHY_CARDS: { icon: LucideIcon; title: string; desc: string }[] = [
   },
 ];
 
-const STEPS: { num: string; icon: LucideIcon; title: string; desc: string }[] = [
+const STEPS: { num: string; icon: LucideIcon; title: string; desc: string; gradient: string }[] = [
   {
     num: '01',
     icon: ScanLine,
     title: 'Scan du QR',
     desc: "L'agent scanne le QR code du colis pour démarrer l'activation en moins de 30 secondes.",
+    gradient: 'from-[#0D9488] to-[#10B981]',
   },
   {
     num: '02',
     icon: Smartphone,
     title: 'Saisie des infos',
     desc: 'Expéditeur, destinataire, téléphone, itinéraire : le formulaire est guidé et pré-rempli.',
+    gradient: 'from-[#1E4B7A] to-[#3B82F6]',
   },
   {
     num: '03',
     icon: Bell,
     title: 'Notifications auto',
     desc: "Le destinataire reçoit un message WhatsApp avec son code PIN à chaque étape du trajet.",
+    gradient: 'from-[#F97316] to-[#FBBF24]',
   },
   {
     num: '04',
     icon: ShieldCheck,
     title: 'Récupération par PIN',
     desc: "Le destinataire présente son code PIN à l'arrivée : le colis est remis en toute sécurité.",
+    gradient: 'from-[#6D28D9] to-[#A78BFA]',
   },
 ];
 
@@ -447,24 +451,31 @@ export default function HomePage() {
             {STEPS.map((step) => (
               <div
                 key={step.num}
-                className="reveal-up group relative gradient-border-light rounded-2xl p-6 sm:p-8 transition-all hover:-translate-y-1 hover:shadow-xl hover:shadow-[#1E4B7A]/10"
+                className={`reveal-up group relative rounded-2xl overflow-hidden transition-all hover:-translate-y-1 hover:shadow-2xl bg-gradient-to-br ${step.gradient}`}
               >
-                <div className="flex items-start gap-5">
-                  <span className="font-display font-bold text-5xl sm:text-6xl leading-none text-[#1E4B7A]/25 transition-colors group-hover:text-[#1E4B7A]/60">
-                    {step.num}
-                  </span>
-                  <div className="flex-1 pt-1">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-white border border-[#1E4B7A]/15 flex items-center justify-center shadow-sm">
-                        <step.icon className="w-5 h-5 text-[#1E4B7A]" />
+                {/* Decorative top-right glow */}
+                <div className="absolute -top-16 -right-16 w-48 h-48 rounded-full bg-white opacity-20 blur-3xl group-hover:opacity-40 transition-opacity duration-500 pointer-events-none" />
+                {/* Subtle grid overlay for texture */}
+                <div className="absolute inset-0 bg-grid opacity-[0.08] pointer-events-none" />
+
+                <div className="relative p-6 sm:p-8">
+                  <div className="flex items-start gap-5">
+                    <span className="font-display font-bold text-5xl sm:text-6xl leading-none text-white/30 transition-colors group-hover:text-white/55">
+                      {step.num}
+                    </span>
+                    <div className="flex-1 pt-1">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center shadow-sm">
+                          <step.icon className="w-5 h-5 text-white" />
+                        </div>
+                        <h3 className="font-display font-bold text-lg sm:text-xl text-white">
+                          {step.title}
+                        </h3>
                       </div>
-                      <h3 className="font-display font-bold text-lg sm:text-xl text-[#0A1426]">
-                        {step.title}
-                      </h3>
+                      <p className="mt-3 text-sm sm:text-base text-white/85 leading-relaxed">
+                        {step.desc}
+                      </p>
                     </div>
-                    <p className="mt-3 text-sm sm:text-base text-[#5B7088] leading-relaxed">
-                      {step.desc}
-                    </p>
                   </div>
                 </div>
               </div>
