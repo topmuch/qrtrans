@@ -1,5 +1,7 @@
 'use client';
 
+import { Package } from 'lucide-react';
+
 interface ColisInfoCardProps {
   reference: string;
   company: string;
@@ -24,40 +26,41 @@ export default function ColisInfoCard({
     }
   };
 
-  const typeLabel = transportType === 'bus' ? '🚌 BUS' : '🚛 GP';
+  const typeLabel = transportType === 'bus' ? 'BUS' : 'GP';
 
   return (
-    <div className="bg-white rounded-xl shadow-[0_2px_8px_rgba(0,0,0,0.06)] p-5 border-l-4 border-l-[#FF6B35]">
-      <h2 className="text-base font-bold text-gray-900 mb-4 flex items-center gap-2">
-        📦 {t('Détails du Colis', 'Package Details')}
+    <div className="glass-card rounded-xl p-5 border-l-4 border-l-emerald-500">
+      <h2 className="font-display text-base font-bold text-white mb-4 flex items-center gap-2">
+        <Package className="w-4 h-4 text-emerald-400" />
+        {t('Détails du Colis', 'Package Details')}
       </h2>
 
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <span className="text-sm text-gray-400">{t('Référence', 'Reference')}</span>
-          <span className="font-mono font-bold text-gray-900 text-sm">#{reference}</span>
+          <span className="text-sm text-white/50">{t('Référence', 'Reference')}</span>
+          <span className="font-mono font-bold text-white text-sm">#{reference}</span>
         </div>
 
         <div className="flex items-center justify-between">
-          <span className="text-sm text-gray-400">{t('Statut', 'Status')}</span>
-          <span className="inline-flex items-center gap-1.5 bg-amber-50 text-amber-700 text-xs font-semibold px-2.5 py-1 rounded-full">
-            🚚 {t('En Transit', 'In Transit')}
+          <span className="text-sm text-white/50">{t('Statut', 'Status')}</span>
+          <span className="inline-flex items-center gap-1.5 bg-sky-500/15 text-sky-300 text-xs font-semibold px-2.5 py-1 rounded-full border border-sky-500/30">
+            {t('En Transit', 'In Transit')}
           </span>
         </div>
 
         <div className="flex items-center justify-between">
-          <span className="text-sm text-gray-400">{t('Transport', 'Transport')}</span>
-          <span className="font-semibold text-gray-900 text-sm">{typeLabel} — {company}</span>
+          <span className="text-sm text-white/50">{t('Transport', 'Transport')}</span>
+          <span className="font-semibold text-white text-sm">{typeLabel} — {company}</span>
         </div>
 
         <div className="flex items-center justify-between">
-          <span className="text-sm text-gray-400">{t('Trajet', 'Route')}</span>
-          <span className="font-semibold text-gray-900 text-sm">{arrivalCity}</span>
+          <span className="text-sm text-white/50">{t('Trajet', 'Route')}</span>
+          <span className="font-semibold text-white text-sm">{arrivalCity}</span>
         </div>
 
         <div className="flex items-center justify-between">
-          <span className="text-sm text-gray-400">{t('Départ', 'Departure')}</span>
-          <span className="font-medium text-gray-700 text-sm">
+          <span className="text-sm text-white/50">{t('Départ', 'Departure')}</span>
+          <span className="font-medium text-white/80 text-sm">
             {formatDate(departureDate)} {departureTime || ''}
           </span>
         </div>

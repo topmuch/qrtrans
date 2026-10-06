@@ -1,15 +1,22 @@
 'use client';
 
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import Link from 'next/link';
 import {
-  MessageCircleQuestion,
   HelpCircle,
   Smartphone,
   ShieldCheck,
   ChevronDown,
+  MessageCircleQuestion,
+  ArrowRight,
 } from 'lucide-react';
-import SecondaryPageLayout from '@/components/landing/SecondaryPageLayout';
+import SiteLayout from '@/components/site/SiteLayout';
+import AuroraBackground from '@/components/site/AuroraBackground';
+import SectionHeading from '@/components/site/SectionHeading';
+
+/* ---------------------------------------------------------------
+   Static content
+---------------------------------------------------------------- */
 
 interface FAQ {
   question: string;
@@ -19,15 +26,15 @@ interface FAQ {
 interface FAQCategory {
   title: string;
   icon: React.ElementType;
-  color: string;
+  description: string;
   questions: FAQ[];
 }
 
-const faqCategories: FAQCategory[] = [
+const FAQ_CATEGORIES: FAQCategory[] = [
   {
     title: 'Général',
     icon: HelpCircle,
-    color: '#0A2540',
+    description: 'Les bases de QRTrans et de notre offre.',
     questions: [
       {
         question: "Qu'est-ce que QRTrans ?",
@@ -49,7 +56,7 @@ const faqCategories: FAQCategory[] = [
   {
     title: 'Utilisation',
     icon: Smartphone,
-    color: '#FF6B35',
+    description: 'Tout ce qu’il faut savoir pour activer et suivre vos colis.',
     questions: [
       {
         question: 'Comment activer un colis ?',
@@ -64,14 +71,14 @@ const faqCategories: FAQCategory[] = [
       {
         question: 'Comment suivre mon colis ?',
         answer:
-          "Entrez votre référence colis (ex: TRSP-2026-0042) dans la barre de recherche de la page d'accueil. Vous verrez le statut en temps réel et l'historique des scans.",
+          "Entrez votre référence colis (ex: VOL26-WRQZNE) dans la barre de recherche de la page d'accueil. Vous verrez le statut en temps réel et l'historique des scans.",
       },
     ],
   },
   {
     title: 'Sécurité',
     icon: ShieldCheck,
-    color: '#10B981',
+    description: 'Comment nous protégeons vos colis et vos données.',
     questions: [
       {
         question: 'Comment fonctionne le code PIN ?',
@@ -81,168 +88,192 @@ const faqCategories: FAQCategory[] = [
       {
         question: 'Mes données sont-elles protégées ?',
         answer:
-          'Oui, toutes les données sont chiffrées et hébergées de manière sécurisée. QRTrans est conforme au RGPD.',
+          'Oui, toutes les données sont chiffrées de bout en bout et hébergées de manière sécurisée en France. QRTrans est entièrement conforme au RGPD.',
       },
     ],
   },
 ];
 
+/* ---------------------------------------------------------------
+   Accordion item
+---------------------------------------------------------------- */
+
 function FAQItem({ question, answer }: FAQ) {
   const [isOpen, setIsOpen] = useState(false);
-
   return (
-    <div className="border border-[#E2E8F0] rounded-xl overflow-hidden hover:shadow-md transition-shadow duration-300">
+    <div
+      className={`glass-card overflow-hidden transition-all ${
+        isOpen ? 'border-emerald-400/40' : ''
+      }`}
+    >
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between gap-4 p-5 sm:p-6 text-left bg-white hover:bg-slate-50/50 transition-colors duration-200"
+        className="w-full flex items-center justify-between gap-4 p-5 sm:p-6 text-left"
         aria-expanded={isOpen}
       >
-        <span className="text-base sm:text-lg font-medium text-[#0A2540] leading-snug">
+        <span className="font-medium text-base sm:text-lg text-white leading-snug">
           {question}
         </span>
-        <motion.div
-          animate={{ rotate: isOpen ? 180 : 0 }}
-          transition={{ duration: 0.3, ease: 'easeInOut' }}
-          className="flex-shrink-0"
+        <div
+          className={`flex-shrink-0 w-9 h-9 rounded-lg flex items-center justify-center transition-all ${
+            isOpen
+              ? 'bg-emerald-400/20 border border-emerald-400/40 rotate-180'
+              : 'bg-white/5 border border-white/10'
+          }`}
         >
-          <ChevronDown className="w-5 h-5 text-[#475569]" />
-        </motion.div>
+          <ChevronDown
+            className={`w-4 h-4 transition-colors ${
+              isOpen ? 'text-emerald-300' : 'text-white/60'
+            }`}
+          />
+        </div>
       </button>
-      <AnimatePresence initial={false}>
-        {isOpen && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.3, ease: 'easeInOut' }}
-            className="overflow-hidden"
-          >
-            <div className="px-5 sm:px-6 pb-5 sm:pb-6 pt-0">
-              <div className="border-t border-[#E2E8F0] pt-4">
-                <p className="text-[#475569] leading-relaxed text-sm sm:text-base">
-                  {answer}
-                </p>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {isOpen && (
+        <div className="px-5 sm:px-6 pb-5 sm:pb-6">
+          <div className="border-t border-white/10 pt-4">
+            <p className="text-white/70 leading-relaxed text-sm sm:text-base">
+              {answer}
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.1,
-    },
-  },
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.5, ease: 'easeOut' },
-  },
-};
+/* ---------------------------------------------------------------
+   Page
+---------------------------------------------------------------- */
 
 export default function FAQPage() {
-  return (
-    <SecondaryPageLayout
-      title="Questions Fréquentes"
-      subtitle="Trouvez rapidement les réponses à vos questions sur QRTrans"
-    >
-      <motion.div
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-        className="space-y-12"
-      >
-        {/* Header stats */}
-        <motion.div
-          variants={itemVariants}
-          className="flex flex-wrap items-center justify-center gap-6 sm:gap-8"
-        >
-          <div className="flex items-center gap-2 text-sm text-[#475569]">
-            <MessageCircleQuestion className="w-4 h-4 text-[#FF6B35]" />
-            <span>
-              <strong className="text-[#0A2540]">
-                {faqCategories.reduce((acc, c) => acc + c.questions.length, 0)}
-              </strong>{' '}
-              questions
-            </span>
-          </div>
-          <div className="flex items-center gap-2 text-sm text-[#475569]">
-            <HelpCircle className="w-4 h-4 text-[#FF6B35]" />
-            <span>
-              <strong className="text-[#0A2540]">
-                {faqCategories.length}
-              </strong>{' '}
-              catégories
-            </span>
-          </div>
-        </motion.div>
+  const totalQuestions = FAQ_CATEGORIES.reduce(
+    (acc, c) => acc + c.questions.length,
+    0,
+  );
 
-        {/* FAQ Categories */}
-        {faqCategories.map((category) => {
-          const CategoryIcon = category.icon;
-          return (
-            <motion.section key={category.title} variants={itemVariants}>
-              <div className="flex items-center gap-3 mb-6">
-                <div
-                  className="w-10 h-10 rounded-xl flex items-center justify-center"
-                  style={{ backgroundColor: `${category.color}15` }}
-                >
-                  <CategoryIcon
-                    className="w-5 h-5"
-                    style={{ color: category.color }}
-                  />
-                </div>
-                <h2 className="text-xl sm:text-2xl font-bold text-[#0A2540]">
-                  {category.title}
-                </h2>
-                <span className="hidden sm:inline-flex items-center justify-center px-2.5 py-0.5 rounded-full text-xs font-semibold text-[#475569] bg-slate-100">
-                  {category.questions.length} questions
+  return (
+    <SiteLayout hasDarkHero>
+      {/* =====================================================
+          1. HERO
+         ===================================================== */}
+      <section className="relative overflow-hidden bg-hero pt-36 pb-20 lg:pt-44 lg:pb-24">
+        <AuroraBackground />
+        <div className="absolute inset-0 bg-grid bg-grid-fade opacity-40 pointer-events-none" />
+
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-3xl mx-auto text-center">
+            <div className="reveal-up inline-flex items-center gap-2.5 px-4 py-2 mb-7 rounded-full glass">
+              <MessageCircleQuestion className="w-4 h-4 text-emerald-300" />
+              <span className="text-xs sm:text-sm font-medium text-emerald-200 tracking-wide">
+                FAQ
+              </span>
+            </div>
+
+            <h1 className="reveal-up font-display text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.08]">
+              Questions{' '}
+              <span className="text-gradient-emerald">fréquentes</span>
+            </h1>
+
+            <p className="reveal-up mt-6 text-lg sm:text-xl text-white/70 max-w-2xl mx-auto leading-relaxed">
+              Trouvez rapidement les réponses à vos questions sur QRTrans, son
+              fonctionnement, son utilisation et sa sécurité.
+            </p>
+
+            <div className="reveal-up mt-8 flex flex-wrap items-center justify-center gap-3">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass text-sm text-white/80">
+                <HelpCircle className="w-4 h-4 text-emerald-300" />
+                <span>
+                  <strong className="text-white">{totalQuestions}</strong> questions
                 </span>
               </div>
-
-              <div className="space-y-3">
-                {category.questions.map((faq) => (
-                  <FAQItem
-                    key={faq.question}
-                    question={faq.question}
-                    answer={faq.answer}
-                  />
-                ))}
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass text-sm text-white/80">
+                <MessageCircleQuestion className="w-4 h-4 text-emerald-300" />
+                <span>
+                  <strong className="text-white">{FAQ_CATEGORIES.length}</strong> catégories
+                </span>
               </div>
-            </motion.section>
-          );
-        })}
+            </div>
+          </div>
+        </div>
+      </section>
 
-        {/* CTA */}
-        <motion.div
-          variants={itemVariants}
-          className="bg-gradient-to-br from-[#0A2540] to-[#0A2540]/90 rounded-2xl p-6 sm:p-8 text-center"
-        >
-          <h3 className="text-xl sm:text-2xl font-bold text-white mb-2">
-            Vous n&apos;avez pas trouvé votre réponse ?
-          </h3>
-          <p className="text-white/70 mb-6 max-w-lg mx-auto">
-            Notre équipe est disponible pour répondre à toutes vos questions et
-            vous accompagner dans l&apos;utilisation de QRTrans.
-          </p>
-          <a
-            href="/contact"
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-[#FF6B35] text-white font-semibold text-sm hover:bg-[#e55a28] transition-colors shadow-[0_4px_12px_rgba(255,107,53,0.3)]"
-          >
-            Contactez-nous
-          </a>
-        </motion.div>
-      </motion.div>
-    </SecondaryPageLayout>
+      {/* =====================================================
+          2. FAQ CATEGORIES
+         ===================================================== */}
+      <section className="relative py-16 lg:py-24">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
+          {FAQ_CATEGORIES.map((category, catIdx) => {
+            const CategoryIcon = category.icon;
+            return (
+              <div key={category.title} className="reveal-up" style={{ transitionDelay: `${catIdx * 60}ms` }}>
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-400/20 to-blue-500/20 border border-emerald-400/30 flex items-center justify-center">
+                    <CategoryIcon className="w-6 h-6 text-emerald-300" />
+                  </div>
+                  <div>
+                    <h2 className="font-display text-xl sm:text-2xl font-bold text-white">
+                      {category.title}
+                    </h2>
+                    <p className="text-sm text-white/60">{category.description}</p>
+                  </div>
+                  <span className="ml-auto hidden sm:inline-flex items-center justify-center px-3 py-1 rounded-full text-xs font-semibold text-emerald-200 bg-emerald-400/10 border border-emerald-400/30">
+                    {category.questions.length} Q
+                  </span>
+                </div>
+
+                <div className="space-y-3">
+                  {category.questions.map((faq) => (
+                    <FAQItem
+                      key={faq.question}
+                      question={faq.question}
+                      answer={faq.answer}
+                    />
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* =====================================================
+          3. CTA BANNER
+         ===================================================== */}
+      <section className="relative py-16 lg:py-24">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="glass-strong rounded-3xl p-8 sm:p-12 relative overflow-hidden">
+            <div
+              aria-hidden="true"
+              className="absolute -top-24 -right-24 w-72 h-72 rounded-full opacity-40 pointer-events-none"
+              style={{
+                background:
+                  'radial-gradient(circle, rgba(16,185,129,0.35), transparent 70%)',
+                filter: 'blur(60px)',
+              }}
+            />
+            <div className="relative text-center">
+              <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-emerald-400/15 border border-emerald-400/30 mb-5">
+                <HelpCircle className="w-7 h-7 text-emerald-300" />
+              </div>
+              <h3 className="font-display text-2xl sm:text-3xl font-bold text-white mb-4 leading-tight">
+                Vous n&apos;avez pas trouvé votre{' '}
+                <span className="text-gradient-emerald">réponse</span> ?
+              </h3>
+              <p className="text-white/70 mb-8 max-w-xl mx-auto leading-relaxed">
+                Notre équipe est disponible pour répondre à toutes vos questions et vous
+                accompagner dans l&apos;utilisation de QRTrans.
+              </p>
+              <Link
+                href="/contact"
+                className="btn-magnetic inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-gradient-to-r from-[#10B981] to-[#34D399] text-[#060B1F] font-bold shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/50 transition-all"
+              >
+                Contactez-nous
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+    </SiteLayout>
   );
 }

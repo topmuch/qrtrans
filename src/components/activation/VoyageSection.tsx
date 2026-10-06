@@ -1,6 +1,6 @@
 'use client';
 
-import { Bus, Truck, MapPin, Clock, CreditCard, Phone } from 'lucide-react';
+import { Bus, Truck, MapPin, Clock, CreditCard, Phone, Navigation } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import TextareaAutosize from 'react-textarea-autosize';
@@ -51,16 +51,17 @@ export default function VoyageSection({
   const t = (fr: string, en: string) => lang === 'fr' ? fr : en;
 
   return (
-    <div className="bg-[#10b981] rounded-2xl p-4 sm:p-6 shadow-lg shadow-emerald-500/20 border-2 border-dashed border-white/60">
-      <h2 className="text-lg sm:text-xl font-bold text-white mb-4 sm:mb-6 flex items-center gap-2">
-        🚌 {t('ITINÉRAIRE & RETRAIT', 'ITINERARY & PICKUP')}
+    <div className="glass-card rounded-2xl p-4 sm:p-6 border border-emerald-500/20">
+      <h2 className="font-display text-lg sm:text-xl font-bold text-white mb-4 sm:mb-6 flex items-center gap-2">
+        <Navigation className="w-5 h-5 text-emerald-400" />
+        {t('ITINÉRAIRE & RETRAIT', 'ITINERARY & PICKUP')}
       </h2>
 
       <div className="space-y-4 sm:space-y-5">
         {/* Transport Type Toggle */}
         <div className="space-y-1.5">
           <Label className="text-sm sm:text-base font-semibold text-white">
-            {t('Type de Transport', 'Transport Type')} <span className="text-yellow-300">*</span>
+            {t('Type de Transport', 'Transport Type')} <span className="text-emerald-400">*</span>
           </Label>
           <div className="grid grid-cols-2 gap-2 sm:gap-3">
             <button
@@ -69,12 +70,12 @@ export default function VoyageSection({
               aria-pressed={transportType === 'GP'}
               className={`flex items-center justify-center gap-1.5 sm:gap-2 h-12 sm:h-14 rounded-xl border-2 text-sm sm:text-base font-bold transition-all ${
                 transportType === 'GP'
-                  ? 'border-white bg-white/25 text-white shadow-sm shadow-black/10'
-                  : 'border-white/30 text-white hover:border-white/50'
+                  ? 'border-emerald-400 bg-emerald-500/20 text-white shadow-sm shadow-emerald-500/20'
+                  : 'border-white/15 text-white/70 hover:border-emerald-500/40'
               }`}
             >
               <Truck className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
-              GP 🚛
+              GP
             </button>
             <button
               type="button"
@@ -82,12 +83,12 @@ export default function VoyageSection({
               aria-pressed={transportType === 'BUS'}
               className={`flex items-center justify-center gap-1.5 sm:gap-2 h-12 sm:h-14 rounded-xl border-2 text-sm sm:text-base font-bold transition-all ${
                 transportType === 'BUS'
-                  ? 'border-white bg-white/25 text-white shadow-sm shadow-black/10'
-                  : 'border-white/30 text-white hover:border-white/50'
+                  ? 'border-emerald-400 bg-emerald-500/20 text-white shadow-sm shadow-emerald-500/20'
+                  : 'border-white/15 text-white/70 hover:border-emerald-500/40'
               }`}
             >
               <Bus className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
-              BUS 🚌
+              BUS
             </button>
           </div>
         </div>
@@ -95,14 +96,14 @@ export default function VoyageSection({
         {/* Company */}
         <div className="space-y-1.5">
           <Label htmlFor="company_name" className="text-sm sm:text-base font-semibold text-white">
-            {t('Compagnie de Transport', 'Transport Company')} <span className="text-yellow-300">*</span>
+            {t('Compagnie de Transport', 'Transport Company')} <span className="text-emerald-400">*</span>
           </Label>
           <Input
             id="company_name"
             value={company}
             onChange={(e) => setCompany(e.target.value)}
             placeholder="Ex: Salam, Aline, Fatick Express..."
-            className="h-12 sm:h-14 !bg-white border-white/30 focus-visible:ring-white/50 focus-visible:border-white/60 text-sm sm:text-base text-gray-900 placeholder:text-gray-500"
+            className="h-12 sm:h-14 !bg-white border-white/30 focus-visible:ring-emerald-400/50 focus-visible:border-emerald-400/60 text-sm sm:text-base text-gray-900 placeholder:text-gray-500"
             aria-required="true"
           />
         </div>
@@ -111,27 +112,27 @@ export default function VoyageSection({
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div className="space-y-1.5">
             <Label htmlFor="departure_city" className="text-sm sm:text-base font-semibold text-white">
-              {t('Ville de Départ', 'Departure City')} <span className="text-yellow-300">*</span>
+              {t('Ville de Départ', 'Departure City')} <span className="text-emerald-400">*</span>
             </Label>
             <Input
               id="departure_city"
               value={departureCity}
               onChange={(e) => setDepartureCity(e.target.value)}
               placeholder={t('Ex: Dakar', 'Ex: Dakar')}
-              className="h-12 sm:h-14 !bg-white border-white/30 focus-visible:ring-white/50 focus-visible:border-white/60 text-sm sm:text-base text-gray-900 placeholder:text-gray-500"
+              className="h-12 sm:h-14 !bg-white border-white/30 focus-visible:ring-emerald-400/50 focus-visible:border-emerald-400/60 text-sm sm:text-base text-gray-900 placeholder:text-gray-500"
               aria-required="true"
             />
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="arrival_city" className="text-sm sm:text-base font-semibold text-white">
-              {t("Ville d'Arrivée", 'Arrival City')} <span className="text-yellow-300">*</span>
+              {t("Ville d'Arrivée", 'Arrival City')} <span className="text-emerald-400">*</span>
             </Label>
             <Input
               id="arrival_city"
               value={arrivalCity}
               onChange={(e) => setArrivalCity(e.target.value)}
               placeholder={t('Ex: Ziguinchor', 'Ex: Ziguinchor')}
-              className="h-12 sm:h-14 !bg-white border-white/30 focus-visible:ring-white/50 focus-visible:border-white/60 text-sm sm:text-base text-gray-900 placeholder:text-gray-500"
+              className="h-12 sm:h-14 !bg-white border-white/30 focus-visible:ring-emerald-400/50 focus-visible:border-emerald-400/60 text-sm sm:text-base text-gray-900 placeholder:text-gray-500"
               aria-required="true"
             />
           </div>
@@ -141,7 +142,7 @@ export default function VoyageSection({
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div className="space-y-1.5">
             <Label htmlFor="departure_date" className="text-sm sm:text-base font-semibold text-white">
-              {t('Date de Départ', 'Departure Date')} <span className="text-yellow-300">*</span>
+              {t('Date de Départ', 'Departure Date')} <span className="text-emerald-400">*</span>
             </Label>
             <Input
               id="departure_date"
@@ -149,28 +150,28 @@ export default function VoyageSection({
               value={departureDate}
               min={new Date().toISOString().split('T')[0]}
               onChange={(e) => setDepartureDate(e.target.value)}
-              className="h-12 sm:h-14 !bg-white border-white/30 focus-visible:ring-white/50 focus-visible:border-white/60 text-sm sm:text-base text-gray-900 [color-scheme:light]"
+              className="h-12 sm:h-14 !bg-white border-white/30 focus-visible:ring-emerald-400/50 focus-visible:border-emerald-400/60 text-sm sm:text-base text-gray-900 [color-scheme:light]"
               aria-required="true"
             />
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="departure_time" className="text-sm sm:text-base font-semibold text-white">
-              {t('Heure de Départ', 'Departure Time')} <span className="text-yellow-300">*</span>
+              {t('Heure de Départ', 'Departure Time')} <span className="text-emerald-400">*</span>
             </Label>
             <Input
               id="departure_time"
               type="time"
               value={departureTime}
               onChange={(e) => setDepartureTime(e.target.value)}
-              className="h-12 sm:h-14 !bg-white border-white/30 focus-visible:ring-white/50 focus-visible:border-white/60 text-sm sm:text-base text-gray-900 [color-scheme:light]"
+              className="h-12 sm:h-14 !bg-white border-white/30 focus-visible:ring-emerald-400/50 focus-visible:border-emerald-400/60 text-sm sm:text-base text-gray-900 [color-scheme:light]"
               aria-required="true"
             />
           </div>
         </div>
 
         {/* ─── Récupération & Paiement ─── */}
-        <div className="border-2 border-dashed border-white/60 rounded-xl p-3 sm:p-4">
-          <p className="text-xs sm:text-sm font-bold text-white uppercase tracking-wider mb-3 sm:mb-4 flex items-center gap-1.5 sm:gap-2">
+        <div className="border-2 border-dashed border-emerald-500/30 rounded-xl p-3 sm:p-4">
+          <p className="font-display text-xs sm:text-sm font-bold text-emerald-300 uppercase tracking-wider mb-3 sm:mb-4 flex items-center gap-1.5 sm:gap-2">
             <MapPin className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             {t('Récupération & Paiement', 'Pickup & Payment')}
           </p>
@@ -178,14 +179,14 @@ export default function VoyageSection({
           {/* Pickup Address */}
           <div className="space-y-1.5">
             <Label htmlFor="pickup_address" className="text-sm sm:text-base font-semibold text-white">
-              📍 {t('Adresse de récupération précise', 'Precise pickup address')}
+              {t('Adresse de récupération précise', 'Precise pickup address')}
             </Label>
             <TextareaAutosize
               id="pickup_address"
               value={pickupAddress}
               onChange={(e) => setPickupAddress(e.target.value)}
               placeholder={t('Ex: Gare routière, Boutique X, N° de porte...', 'Ex: Bus station, Shop X, Door number...')}
-              className="w-full min-h-[56px] sm:min-h-[70px] px-3 py-2.5 sm:py-3 !bg-white border-white/30 focus-visible:ring-white/50 focus-visible:border-white/60 rounded-lg text-sm sm:text-base text-gray-900 placeholder:text-gray-500 resize-none"
+              className="w-full min-h-[56px] sm:min-h-[70px] px-3 py-2.5 sm:py-3 !bg-white border-white/30 focus-visible:ring-emerald-400/50 focus-visible:border-emerald-400/60 rounded-lg text-sm sm:text-base text-gray-900 placeholder:text-gray-500 resize-none"
               minRows={2}
             />
           </div>
@@ -201,14 +202,14 @@ export default function VoyageSection({
               type="time"
               value={estimatedArrival}
               onChange={(e) => setEstimatedArrival(e.target.value)}
-              className="h-12 sm:h-14 !bg-white border-white/30 focus-visible:ring-white/50 focus-visible:border-white/60 text-sm sm:text-base text-gray-900 [color-scheme:light]"
+              className="h-12 sm:h-14 !bg-white border-white/30 focus-visible:ring-emerald-400/50 focus-visible:border-emerald-400/60 text-sm sm:text-base text-gray-900 [color-scheme:light]"
             />
           </div>
         </div>
 
         {/* ─── Chauffeur / Transporteur ─── */}
-        <div className="border-2 border-dashed border-white/60 rounded-xl p-3 sm:p-4">
-          <p className="text-xs sm:text-sm font-bold text-white uppercase tracking-wider mb-3 sm:mb-4 flex items-center gap-1.5 sm:gap-2">
+        <div className="border-2 border-dashed border-emerald-500/30 rounded-xl p-3 sm:p-4">
+          <p className="font-display text-xs sm:text-sm font-bold text-emerald-300 uppercase tracking-wider mb-3 sm:mb-4 flex items-center gap-1.5 sm:gap-2">
             <Phone className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             {t('Chauffeur / Transporteur', 'Driver / Transporter')}
           </p>
@@ -228,66 +229,66 @@ export default function VoyageSection({
           </div>
 
           {/* Share Toggle — stacked on mobile */}
-          <div className="p-3 sm:p-3.5 bg-white/10 rounded-xl border-2 border-dashed border-white/60 mt-3">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex-1 min-w-0">
-              <Label className="text-sm sm:text-base font-semibold text-white cursor-pointer leading-snug">
-                {t('Partager ce numéro avec le destinataire ?', 'Share this number with the recipient?')}
-              </Label>
-              <p className="text-xs sm:text-sm text-white/90 mt-0.5 leading-snug">
-                {t('Le destinataire pourra contacter le chauffeur directement.', 'The recipient will be able to contact the driver directly.')}
-              </p>
-            </div>
-            <button
-              type="button"
-              role="switch"
-              aria-checked={shareDriverPhone}
-              onClick={() => setShareDriverPhone(!shareDriverPhone)}
-              className={`relative inline-flex h-7 w-12 sm:h-6 sm:w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:ring-offset-2 self-end sm:self-auto ${
-                shareDriverPhone ? 'bg-emerald-400' : 'bg-white/30'
-              }`}
-            >
-              <span
-                aria-hidden="true"
-                className={`pointer-events-none inline-block h-5 w-5 sm:h-5 sm:w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out mt-0.5 sm:mt-0 ${
-                  shareDriverPhone ? 'translate-x-5' : 'translate-x-0'
+          <div className="p-3 sm:p-3.5 bg-white/[0.04] border border-white/10 rounded-xl mt-3">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex-1 min-w-0">
+                <Label className="text-sm sm:text-base font-semibold text-white cursor-pointer leading-snug">
+                  {t('Partager ce numéro avec le destinataire ?', 'Share this number with the recipient?')}
+                </Label>
+                <p className="text-xs sm:text-sm text-white/70 mt-0.5 leading-snug">
+                  {t('Le destinataire pourra contacter le chauffeur directement.', 'The recipient will be able to contact the driver directly.')}
+                </p>
+              </div>
+              <button
+                type="button"
+                role="switch"
+                aria-checked={shareDriverPhone}
+                onClick={() => setShareDriverPhone(!shareDriverPhone)}
+                className={`relative inline-flex h-7 w-12 sm:h-6 sm:w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 focus-visible:ring-offset-2 self-end sm:self-auto ${
+                  shareDriverPhone ? 'bg-gradient-to-r from-[#10B981] to-[#34D399]' : 'bg-white/15'
                 }`}
-              />
-            </button>
+              >
+                <span
+                  aria-hidden="true"
+                  className={`pointer-events-none inline-block h-5 w-5 sm:h-5 sm:w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out mt-0.5 sm:mt-0 ${
+                    shareDriverPhone ? 'translate-x-5' : 'translate-x-0'
+                  }`}
+                />
+              </button>
+            </div>
           </div>
-        </div>
         </div>
 
         {/* ─── Statut & Paiement ─── */}
-        <div className="border-2 border-dashed border-white/60 rounded-xl p-3 sm:p-4">
+        <div className="border-2 border-dashed border-emerald-500/30 rounded-xl p-3 sm:p-4">
           <Label className="text-sm sm:text-base font-semibold text-white">
             <CreditCard className="w-3.5 h-3.5 sm:w-4 sm:h-4 inline mr-1" />
-            {t('Statut Paiement', 'Payment Status')} <span className="text-yellow-300">*</span>
+            {t('Statut Paiement', 'Payment Status')} <span className="text-emerald-400">*</span>
           </Label>
           <div className="grid grid-cols-2 gap-2 sm:gap-3 mt-1.5">
             <button
               type="button"
               onClick={() => setPaymentStatus('SENDER_PAID')}
               aria-pressed={paymentStatus === 'SENDER_PAID'}
-              className={`flex items-center justify-center gap-1 sm:gap-2 h-12 sm:h-14 rounded-xl border-2 border-dashed text-xs sm:text-base font-bold transition-all px-1.5 sm:px-3 ${
+              className={`flex items-center justify-center gap-1 sm:gap-2 h-12 sm:h-14 rounded-xl border-2 text-xs sm:text-base font-bold transition-all px-1.5 sm:px-3 ${
                 paymentStatus === 'SENDER_PAID'
-                  ? 'border-white bg-white/25 text-white shadow-sm shadow-black/10'
-                  : 'border-white/30 text-white hover:border-white/50'
+                  ? 'border-emerald-400 bg-emerald-500/20 text-white shadow-sm shadow-emerald-500/20'
+                  : 'border-white/15 text-white/70 hover:border-emerald-500/40'
               }`}
             >
-              ✅ {t("Payé", 'Paid')}
+              {t('Payé', 'Paid')}
             </button>
             <button
               type="button"
               onClick={() => setPaymentStatus('RECEIVER_PAY')}
               aria-pressed={paymentStatus === 'RECEIVER_PAY'}
-              className={`flex items-center justify-center gap-1 sm:gap-2 h-12 sm:h-14 rounded-xl border-2 border-dashed text-xs sm:text-base font-bold transition-all px-1.5 sm:px-3 ${
+              className={`flex items-center justify-center gap-1 sm:gap-2 h-12 sm:h-14 rounded-xl border-2 text-xs sm:text-base font-bold transition-all px-1.5 sm:px-3 ${
                 paymentStatus === 'RECEIVER_PAY'
-                  ? 'border-yellow-300 bg-yellow-400/25 text-yellow-100 shadow-sm shadow-black/10'
-                  : 'border-white/30 text-white hover:border-white/50'
+                  ? 'border-amber-400 bg-amber-500/20 text-amber-100 shadow-sm shadow-amber-500/20'
+                  : 'border-white/15 text-white/70 hover:border-amber-400/40'
               }`}
             >
-              💸 {t('À payer', 'Pay on delivery')}
+              {t('À payer', 'Pay on delivery')}
             </button>
           </div>
         </div>

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
+import { Check, Globe } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 
@@ -247,7 +248,7 @@ export default function SmartPhoneInput({
           value={formattedDisplay}
           onChange={handleLocalChange}
           placeholder="77 12 34 56 67"
-          className="h-full border-0 rounded-none shadow-none focus-visible:ring-0 focus-visible:border-0 text-sm sm:text-base font-mono px-2.5 sm:px-3 !bg-white"
+          className="h-full border-0 rounded-none shadow-none focus-visible:ring-0 focus-visible:border-0 text-sm sm:text-base font-mono px-2.5 sm:px-3 !bg-white text-gray-900 placeholder:text-gray-500"
           aria-required="true"
           aria-invalid={!!error}
           aria-describedby={error ? errorId : hint ? hintId : undefined}
@@ -267,12 +268,14 @@ export default function SmartPhoneInput({
             </p>
           )}
           {detected ? (
-            <p className="text-sm flex items-center gap-1 text-white">
-              ✅ Indicatif détecté automatiquement
+            <p className="text-sm flex items-center gap-1 text-emerald-300">
+              <Check className="w-3.5 h-3.5" />
+              Indicatif détecté automatiquement
             </p>
           ) : (
             <p className="text-sm flex items-center gap-1 text-white/70">
-              🌐 Indicatif par défaut ({flag} {callingCode})
+              <Globe className="w-3.5 h-3.5" />
+              Indicatif par défaut ({flag} {callingCode})
             </p>
           )}
         </div>

@@ -1,238 +1,337 @@
 'use client';
 
-import { motion } from 'framer-motion';
-import { Shield, Lock, MapPin, Award, CheckCircle2 } from 'lucide-react';
-import SecondaryPageLayout from '@/components/landing/SecondaryPageLayout';
+import Link from 'next/link';
+import {
+  Shield,
+  Lock,
+  KeyRound,
+  FileCheck,
+  Server,
+  Globe,
+  BadgeCheck,
+  CheckCircle2,
+  PackageCheck,
+  Star,
+  Building2,
+  ArrowRight,
+} from 'lucide-react';
+import SiteLayout from '@/components/site/SiteLayout';
+import AuroraBackground from '@/components/site/AuroraBackground';
+import SectionHeading from '@/components/site/SectionHeading';
+import AnimatedCounter from '@/components/site/AnimatedCounter';
 
-const pillars = [
-  {
-    icon: Lock,
-    title: 'Chiffrement des données',
-    description:
-      "Toutes les données sont chiffrées de bout en bout. Les codes PIN sont générés aléatoirement et ne sont jamais stockés en clair.",
-    color: '#FF6B35',
-    bgLight: 'bg-orange-50',
-    border: 'border-orange-100',
-  },
-  {
-    icon: Shield,
-    title: 'Validation PIN anti-fraude',
-    description:
-      'Le code PIN à 6 chiffres est requis pour la remise du colis. Aucune livraison sans validation.',
-    color: '#10B981',
-    bgLight: 'bg-emerald-50',
-    border: 'border-emerald-100',
-  },
-  {
-    icon: MapPin,
-    title: 'Traçabilité GPS continue',
-    description:
-      'Chaque scan est horodaté et géolocalisé. Historique complet consultable en temps réel.',
-    color: '#3B82F6',
-    bgLight: 'bg-blue-50',
-    border: 'border-blue-100',
-  },
-];
+/* ---------------------------------------------------------------
+   Static content
+---------------------------------------------------------------- */
 
-const certifications = [
-  {
-    label: 'RGPD Conforme',
-    icon: Shield,
-  },
-  {
-    label: 'Données hébergées en France',
-    icon: Award,
-  },
-  {
-    label: 'SSL 256 bits',
-    icon: Lock,
-  },
-  {
-    label: 'Audit de sécurité annuel',
-    icon: CheckCircle2,
-  },
-];
-
-const stats = [
-  { value: '0', unit: '', label: 'colis perdus avec PIN validé' },
-  { value: '98%', unit: '', label: 'taux de livraison réussie' },
-  { value: '10 000+', unit: '', label: 'colis protégés' },
-  { value: '500+', unit: '', label: 'agences partenaires' },
-];
-
-const containerVariants = {
-  hidden: {},
-  visible: {
-    transition: {
-      staggerChildren: 0.1,
-    },
-  },
+type Pillar = {
+  icon: typeof Lock;
+  title: string;
+  description: string;
+  bullets: string[];
 };
 
-const cardVariants = {
-  hidden: { opacity: 0, y: 24 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.5, ease: 'easeOut' },
+const PILLARS: Pillar[] = [
+  {
+    icon: Lock,
+    title: 'Chiffrement bout-en-bout',
+    description:
+      'Toutes les données de colis sont chiffrées en transit et au repos. Les codes PIN ne sont jamais stockés en clair.',
+    bullets: [
+      'Chiffrement AES-256 au repos',
+      'TLS 1.3 en transit',
+      'PIN jamais persisté en clair',
+    ],
   },
+  {
+    icon: KeyRound,
+    title: 'Code PIN à 6 chiffres',
+    description:
+      'Chaque colis reçoit un PIN unique, envoyé au destinataire par WhatsApp. Aucune remise sans validation du PIN.',
+    bullets: [
+      'Génération aléatoire cryptographique',
+      'Envoi via WhatsApp chiffré',
+      'PIN invalidé après remise',
+    ],
+  },
+  {
+    icon: FileCheck,
+    title: 'Conformité RGPD',
+    description:
+      'QRTrans respecte intégralement le RGPD et la loi sénégalaise sur la protection des données personnelles.',
+    bullets: [
+      'Droit à l’effacement garanti',
+      'Hébergement Union Européenne',
+      'Registre des traitements tenu à jour',
+    ],
+  },
+];
+
+type Cert = {
+  icon: typeof Shield;
+  label: string;
+  sublabel: string;
 };
+
+const CERTIFICATIONS: Cert[] = [
+  { icon: FileCheck, label: 'RGPD Conforme', sublabel: 'Règlement UE 2016/679' },
+  { icon: Server, label: 'Hébergement France', sublabel: 'Datacenter tiers de confiance' },
+  { icon: Lock, label: 'SSL 256 bits', sublabel: 'Chiffrement TLS 1.3' },
+  { icon: BadgeCheck, label: 'Audit annuel', sublabel: 'Pentest indépendant' },
+];
+
+type Stat = {
+  value: number;
+  suffix?: string;
+  label: string;
+  icon: typeof PackageCheck;
+};
+
+const STATS: Stat[] = [
+  { value: 0, label: 'colis perdu avec PIN validé', icon: Shield },
+  { value: 98, suffix: '%', label: 'taux de satisfaction client', icon: Star },
+  { value: 10000, suffix: '+', label: 'colis protégés', icon: PackageCheck },
+  { value: 500, suffix: '+', label: 'agences partenaires', icon: Building2 },
+];
+
+/* ---------------------------------------------------------------
+   Page
+---------------------------------------------------------------- */
 
 export default function SecuritePage() {
   return (
-    <SecondaryPageLayout
-      title="Sécurité & Protection"
-      subtitle="Comment QRTrans protège vos colis à chaque étape du transport inter-villes"
-    >
-      {/* Security Pillars */}
-      <motion.section
-        variants={containerVariants}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, margin: '-60px' }}
-        className="mb-20 sm:mb-28"
-      >
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-80px' }}
-          transition={{ duration: 0.5 }}
-          className="text-center mb-10 sm:mb-14"
-        >
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#0A2540] mb-3">
-            3 piliers de sécurité
-          </h2>
-          <p className="text-[#475569] text-base sm:text-lg max-w-2xl mx-auto">
-            Votre colis est protégé par un système de sécurité multi-couches à
-            chaque étape du transport.
-          </p>
-        </motion.div>
+    <SiteLayout hasDarkHero>
+      {/* =====================================================
+          1. HERO
+         ===================================================== */}
+      <section className="relative overflow-hidden bg-hero pt-36 pb-24 lg:pt-44 lg:pb-32">
+        <AuroraBackground />
+        <div className="absolute inset-0 bg-grid bg-grid-fade opacity-40 pointer-events-none" />
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 sm:gap-6">
-          {pillars.map((pillar) => {
-            const Icon = pillar.icon;
-            return (
-              <motion.div
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-3xl mx-auto text-center">
+            <div className="reveal-up inline-flex items-center gap-2.5 px-4 py-2 mb-7 rounded-full glass">
+              <Shield className="w-4 h-4 text-emerald-300" />
+              <span className="text-xs sm:text-sm font-medium text-emerald-200 tracking-wide">
+                Sécurité & Protection
+              </span>
+            </div>
+
+            <h1 className="reveal-up font-display text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.08]">
+              Votre colis, protégé{' '}
+              <span className="text-gradient-emerald">à chaque étape</span>
+            </h1>
+
+            <p className="reveal-up mt-6 text-lg sm:text-xl text-white/70 max-w-2xl mx-auto leading-relaxed">
+              QRTrans applique un système de sécurité multi-couches : chiffrement
+              bout-en-bout, code PIN anti-fraude et conformité RGPD totale. Zéro colis
+              perdu depuis notre lancement.
+            </p>
+
+            <div className="reveal-up mt-10 flex flex-wrap items-center justify-center gap-4">
+              <Link
+                href="/contact"
+                className="btn-magnetic inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-gradient-to-r from-[#10B981] to-[#34D399] text-[#060B1F] font-bold shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/50 transition-all"
+              >
+                Demander un audit
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+              <Link
+                href="/fonctionnalites"
+                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl glass text-white font-semibold hover:border-emerald-400/40 transition-all"
+              >
+                Voir les fonctionnalités
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* =====================================================
+          2. THREE PILLARS
+         ===================================================== */}
+      <section className="relative py-24 lg:py-32">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <SectionHeading
+            eyebrow="Piliers de sécurité"
+            title={
+              <>
+                3 piliers pour{' '}
+                <span className="text-gradient-emerald">zéro colis perdu</span>
+              </>
+            }
+            subtitle="Chaque colis est protégé par un dispositif de sécurité multi-couches qui intervient à chaque étape du transport inter-villes."
+          />
+
+          <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-6">
+            {PILLARS.map((pillar, idx) => (
+              <div
                 key={pillar.title}
-                variants={cardVariants}
-                className={`${pillar.bgLight} ${pillar.border} border rounded-2xl p-6 sm:p-7 hover:translate-y-[-4px] transition-all duration-300 shadow-sm hover:shadow-md`}
+                className="reveal-up gradient-border rounded-3xl p-7 sm:p-8 relative overflow-hidden"
+                style={{ transitionDelay: `${idx * 80}ms` }}
               >
                 <div
-                  className="w-12 h-12 rounded-xl flex items-center justify-center mb-4"
-                  style={{ backgroundColor: `${pillar.color}15` }}
-                >
-                  <Icon
-                    className="w-6 h-6"
-                    style={{ color: pillar.color }}
-                  />
+                  aria-hidden="true"
+                  className="absolute -top-16 -right-16 w-40 h-40 rounded-full opacity-50 pointer-events-none"
+                  style={{
+                    background:
+                      'radial-gradient(circle, rgba(16,185,129,0.25), transparent 70%)',
+                    filter: 'blur(40px)',
+                  }}
+                />
+                <div className="relative">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-400/20 to-blue-500/20 border border-emerald-400/30 flex items-center justify-center mb-5">
+                    <pillar.icon className="w-6 h-6 text-emerald-300" />
+                  </div>
+                  <h3 className="font-display text-xl font-bold text-white mb-3">
+                    {pillar.title}
+                  </h3>
+                  <p className="text-sm text-white/70 leading-relaxed mb-5">
+                    {pillar.description}
+                  </p>
+                  <ul className="space-y-2.5">
+                    {pillar.bullets.map((b) => (
+                      <li key={b} className="flex items-start gap-2.5 text-sm text-white/80">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
+                        <span>{b}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-                <h3 className="text-lg font-bold text-[#0A2540] mb-2 leading-snug">
-                  {pillar.title}
-                </h3>
-                <p className="text-[#475569] text-sm leading-relaxed">
-                  {pillar.description}
-                </p>
-              </motion.div>
-            );
-          })}
+              </div>
+            ))}
+          </div>
         </div>
-      </motion.section>
+      </section>
 
-      {/* Certifications */}
-      <motion.section
-        initial={{ opacity: 0, y: 30 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: '-60px' }}
-        transition={{ duration: 0.6 }}
-        className="mb-20 sm:mb-28"
-      >
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-80px' }}
-          transition={{ duration: 0.5 }}
-          className="text-center mb-10 sm:mb-14"
-        >
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#0A2540] mb-3">
-            Nos certifications
-          </h2>
-          <p className="text-[#475569] text-base sm:text-lg max-w-2xl mx-auto">
-            QRTrans respecte les normes les plus strictes en matière de
-            protection des données.
-          </p>
-        </motion.div>
+      {/* =====================================================
+          3. CERTIFICATIONS
+         ===================================================== */}
+      <section className="relative py-24 lg:py-32 bg-mesh">
+        <div className="absolute inset-0 bg-grid bg-grid-fade opacity-30 pointer-events-none" />
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <SectionHeading
+            eyebrow="Certifications"
+            title={
+              <>
+                Conforme aux normes{' '}
+                <span className="text-gradient-emerald">les plus strictes</span>
+              </>
+            }
+            subtitle="QRTrans respecte intégralement les standards européens et internationaux en matière de protection des données et de sécurité applicative."
+          />
 
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-40px' }}
-          className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-5"
-        >
-          {certifications.map((cert) => {
-            const Icon = cert.icon;
-            return (
-              <motion.div
+          <div className="mt-16 grid grid-cols-2 lg:grid-cols-4 gap-5">
+            {CERTIFICATIONS.map((cert, idx) => (
+              <div
                 key={cert.label}
-                variants={cardVariants}
-                className="flex flex-col items-center text-center p-5 sm:p-6 bg-[#F8FAFC] rounded-2xl border border-[#E2E8F0] hover:shadow-md hover:translate-y-[-2px] transition-all duration-300"
+                className="reveal-up glass-card p-6 flex flex-col items-center text-center"
+                style={{ transitionDelay: `${idx * 60}ms` }}
               >
-                <div className="w-11 h-11 rounded-full bg-[#0A2540] flex items-center justify-center mb-3">
-                  <Icon className="w-5 h-5 text-[#FF6B35]" />
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-400/20 to-blue-500/20 border border-emerald-400/30 flex items-center justify-center mb-4">
+                  <cert.icon className="w-7 h-7 text-emerald-300" />
                 </div>
-                <p className="text-sm font-semibold text-[#0A2540] leading-snug">
+                <p className="font-display text-base font-bold text-white leading-snug">
                   {cert.label}
                 </p>
-              </motion.div>
-            );
-          })}
-        </motion.div>
-      </motion.section>
-
-      {/* Stats */}
-      <motion.section
-        initial={{ opacity: 0, y: 30 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: '-60px' }}
-        transition={{ duration: 0.6 }}
-      >
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-80px' }}
-          transition={{ duration: 0.5 }}
-          className="text-center mb-10 sm:mb-14"
-        >
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#0A2540] mb-3">
-            La confiance en chiffres
-          </h2>
-        </motion.div>
-
-        <div className="bg-[#0A2540] rounded-2xl p-8 sm:p-10 shadow-[0_8px_32px_rgba(10,37,64,0.15)]">
-          <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: '-40px' }}
-            className="grid grid-cols-2 sm:grid-cols-4 gap-6 sm:gap-8"
-          >
-            {stats.map((stat) => (
-              <motion.div
-                key={stat.label}
-                variants={cardVariants}
-                className="text-center"
-              >
-                <p className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#FF6B35] mb-2">
-                  {stat.value}
+                <p className="text-xs text-white/60 mt-1.5 leading-relaxed">
+                  {cert.sublabel}
                 </p>
-                <p className="text-white/70 text-xs sm:text-sm leading-relaxed">
-                  {stat.label}
-                </p>
-              </motion.div>
+              </div>
             ))}
-          </motion.div>
+          </div>
         </div>
-      </motion.section>
-    </SecondaryPageLayout>
+      </section>
+
+      {/* =====================================================
+          4. STATS PANEL
+         ===================================================== */}
+      <section className="relative py-24 lg:py-32">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <SectionHeading
+            eyebrow="La confiance en chiffres"
+            title={
+              <>
+                Des résultats{' '}
+                <span className="text-gradient-emerald">qui parlent d&apos;eux-mêmes</span>
+              </>
+            }
+          />
+
+          <div className="mt-16 relative">
+            <div
+              aria-hidden="true"
+              className="absolute -inset-6 rounded-[2.5rem] opacity-60 pointer-events-none"
+              style={{
+                background:
+                  'radial-gradient(ellipse at 50% 0%, rgba(16,185,129,0.18), transparent 60%)',
+                filter: 'blur(50px)',
+              }}
+            />
+            <div className="relative glass-strong rounded-3xl p-8 sm:p-12">
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-6">
+                {STATS.map((stat) => (
+                  <div
+                    key={stat.label}
+                    className="reveal-up text-center"
+                  >
+                    <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-emerald-400/10 border border-emerald-400/30 mb-4">
+                      <stat.icon className="w-5 h-5 text-emerald-300" />
+                    </div>
+                    <p className="font-display text-4xl sm:text-5xl font-bold text-gradient-emerald leading-none">
+                      <AnimatedCounter
+                        value={stat.value}
+                        suffix={stat.suffix ?? ''}
+                      />
+                    </p>
+                    <p className="mt-3 text-xs sm:text-sm text-white/70 leading-relaxed">
+                      {stat.label}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* =====================================================
+          5. CTA
+         ===================================================== */}
+      <section className="relative py-16 lg:py-24">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="glass-strong rounded-3xl p-8 sm:p-12 text-center relative overflow-hidden">
+            <div
+              aria-hidden="true"
+              className="absolute -top-24 -right-24 w-72 h-72 rounded-full opacity-40 pointer-events-none"
+              style={{
+                background: 'radial-gradient(circle, rgba(16,185,129,0.35), transparent 70%)',
+                filter: 'blur(60px)',
+              }}
+            />
+            <div className="relative">
+              <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-emerald-400/15 border border-emerald-400/30 mb-5">
+                <Globe className="w-7 h-7 text-emerald-300" />
+              </div>
+              <h3 className="font-display text-2xl sm:text-3xl font-bold text-white mb-4 leading-tight">
+                Une question sur notre{' '}
+                <span className="text-gradient-emerald">politique de sécurité</span> ?
+              </h3>
+              <p className="text-white/70 mb-8 max-w-xl mx-auto leading-relaxed">
+                Notre équipe est disponible pour répondre à toute demande technique,
+                audit de conformité ou question RGPD.
+              </p>
+              <Link
+                href="/contact"
+                className="btn-magnetic inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-gradient-to-r from-[#10B981] to-[#34D399] text-[#060B1F] font-bold shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/50 transition-all"
+              >
+                Contacter l&apos;équipe sécurité
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+    </SiteLayout>
   );
 }

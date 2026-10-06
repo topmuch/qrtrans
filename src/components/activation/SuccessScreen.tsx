@@ -3,7 +3,7 @@
 import { useState, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { CheckCircle, Copy, RotateCcw, ArrowRight, Truck, MessageCircle } from 'lucide-react';
+import { CheckCircle, Copy, RotateCcw, ArrowRight, Truck, MessageCircle, AlertTriangle, MapPin, Send } from 'lucide-react';
 import { createDepartureLinks, formatDateFR, formatTime } from '@/lib/wame';
 import { notificationSound } from '@/lib/notification-sound';
 
@@ -35,8 +35,8 @@ interface SuccessScreenProps {
 }
 
 const BAGGAGE_TYPE_LABELS: Record<string, string> = {
-  VALISE: '🧳 Valise', SAC: '👜 Sac', CARTON: '📦 Carton',
-  BACKPACK: '🎒 Sac à dos', CABIN: '✈️ Bagage cabine', OTHER: '📦 Autre',
+  VALISE: 'Valise', SAC: 'Sac', CARTON: 'Carton',
+  BACKPACK: 'Sac à dos', CABIN: 'Bagage cabine', OTHER: 'Autre',
 };
 
 export default function SuccessScreen({
@@ -141,50 +141,55 @@ export default function SuccessScreen({
     ? (baggageTypeOther || 'Autre')
     : (BAGGAGE_TYPE_LABELS[baggageType || ''] || baggageType || '');
   const baggageDesc = baggageType
-    ? `${baggageLabel}${baggageWeight ? ` — ${baggageWeight}kg` : ''}${isFragile ? ' ⚠️' : ''}`
+    ? `${baggageLabel}${baggageWeight ? ` — ${baggageWeight}kg` : ''}${isFragile ? ' — Fragile' : ''}`
     : '';
 
   // Payment label
   const paymentLabel = paymentStatus === 'SENDER_PAID'
-    ? t('✅ Payé par l\'expéditeur', '✅ Paid by sender')
-    : t('💸 À payer par le destinataire', '💸 Pay on delivery');
+    ? t('Payé par l\'expéditeur', 'Paid by sender')
+    : t('À payer par le destinataire', 'Pay on delivery');
 
   return (
     <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
       {/* Success banner */}
-      <div className="bg-gradient-to-br from-[#25D366]/20 to-[#25D366]/10 border border-[#25D366]/30 rounded-xl p-4 sm:p-6 text-center">
-        <div className="inline-flex items-center justify-center w-14 h-14 sm:w-[72px] sm:h-[72px] bg-[#25D366] rounded-full mb-2 sm:mb-3 shadow-lg shadow-green-500/30">
-          <CheckCircle className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
-        </div>
-        <h2 className="text-xl sm:text-2xl font-bold text-white">
-          ✅ {t('Colis Activé avec Succès !', 'Package Activated Successfully!')}
-        </h2>
-        <div className="mt-2 sm:mt-3 flex items-center justify-center gap-2 text-sm sm:text-base text-white/70">
-          <span className="font-mono bg-white/10 px-2 py-0.5 rounded text-xs sm:text-sm text-white">#{reference}</span>
-        </div>
+      <div className="glass-strong rounded-xl p-4 sm:p-6 text-center relative overflow-hidden">
+        <div className="absolute -top-12 -right-12 w-32 h-32 rounded-full bg-[#25D366]/30 blur-3xl" />
+        <div className="absolute -bottom-12 -left-12 w-32 h-32 rounded-full bg-[#25D366]/15 blur-3xl" />
+        <div className="relative">
+          <div className="inline-flex items-center justify-center w-14 h-14 sm:w-[72px] sm:h-[72px] bg-gradient-to-br from-[#10B981] to-[#34D399] rounded-full mb-2 sm:mb-3 shadow-lg shadow-emerald-500/30">
+            <CheckCircle className="w-8 h-8 sm:w-10 sm:h-10 text-[#060B1F]" />
+          </div>
+          <h2 className="font-display text-xl sm:text-2xl font-bold text-white">
+            {t('Colis Activé avec Succès !', 'Package Activated Successfully!')}
+          </h2>
+          <div className="mt-2 sm:mt-3 flex items-center justify-center gap-2 text-sm sm:text-base text-white/70">
+            <span className="font-mono bg-white/10 px-2 py-0.5 rounded text-xs sm:text-sm text-white">#{reference}</span>
+          </div>
 
-        {/* PIN warning banner */}
-        <div className="mt-3 sm:mt-4 bg-amber-900/50 border border-amber-500/30 rounded-lg p-3 sm:p-4">
-          <p className="text-sm sm:text-base font-bold text-white">
-            ⚠️ {t(
-              'Le code PIN a été envoyé UNIQUEMENT au destinataire par WhatsApp. Ne le partagez pas.',
-              'The PIN code was sent ONLY to the receiver via WhatsApp. Do not share it.'
-            )}
-          </p>
+          {/* PIN warning banner */}
+          <div className="mt-3 sm:mt-4 bg-amber-500/10 border border-amber-500/30 rounded-lg p-3 sm:p-4 flex items-start gap-2 text-left">
+            <AlertTriangle className="w-4 h-4 text-amber-300 mt-0.5 shrink-0" />
+            <p className="text-sm sm:text-base font-medium text-amber-100">
+              {t(
+                'Le code PIN a été envoyé UNIQUEMENT au destinataire par WhatsApp. Ne le partagez pas.',
+                'The PIN code was sent ONLY to the receiver via WhatsApp. Do not share it.'
+              )}
+            </p>
+          </div>
         </div>
       </div>
 
       {/* Summary */}
-      <div className="bg-white/10 backdrop-blur rounded-xl border border-white/10 p-4 sm:p-5 space-y-2.5 sm:space-y-3">
-        <h3 className="text-sm font-bold text-white uppercase tracking-widest">
+      <div className="glass-card rounded-xl p-4 sm:p-5 space-y-2.5 sm:space-y-3">
+        <h3 className="font-display text-sm font-bold text-white uppercase tracking-widest">
           {t('Résumé', 'Summary')}
         </h3>
 
         {/* Route */}
-        <div className="flex items-center gap-3 bg-white/5 rounded-lg p-3">
+        <div className="flex items-center gap-3 bg-white/[0.04] border border-white/5 rounded-lg p-3">
           <div className="flex-1">
             <p className="text-sm text-white/60">{t('Trajet', 'Route')}</p>
-            <p className="font-bold text-white text-base">{departureCity} <span className="text-[#FF6B35]">→</span> {arrivalCity}</p>
+            <p className="font-bold text-white text-base">{departureCity} <span className="text-emerald-400">→</span> {arrivalCity}</p>
           </div>
           <div className="text-right">
             <p className="text-sm text-white/60">{t('Transport', 'Transport')}</p>
@@ -193,7 +198,7 @@ export default function SuccessScreen({
         </div>
 
         {/* Departure */}
-        <div className="flex items-center gap-3 bg-white/5 rounded-lg p-3">
+        <div className="flex items-center gap-3 bg-white/[0.04] border border-white/5 rounded-lg p-3">
           <div className="flex-1">
             <p className="text-sm text-white/60">{t('Départ', 'Departure')}</p>
             <p className="font-bold text-white text-base">{formattedDate} {t('à', 'at')} {formattedTime}</p>
@@ -202,33 +207,36 @@ export default function SuccessScreen({
 
         {/* Baggage — only shown if a type was captured during activation */}
         {baggageDesc && (
-          <div className="bg-white/5 rounded-lg p-3">
+          <div className="bg-white/[0.04] border border-white/5 rounded-lg p-3">
             <p className="text-sm text-white/60">{t('Colis', 'Package')}</p>
             <p className="font-bold text-white text-base">{baggageDesc}</p>
           </div>
         )}
 
         {/* Payment */}
-        <div className="bg-white/5 rounded-lg p-3">
+        <div className="bg-white/[0.04] border border-white/5 rounded-lg p-3">
           <p className="text-sm text-white/60">{t('Paiement', 'Payment')}</p>
           <p className="font-bold text-white text-base">{paymentLabel}</p>
         </div>
 
         {/* Pickup address if provided */}
         {pickupAddress && (
-          <div className="bg-white/5 rounded-lg p-3">
-            <p className="text-sm text-white/60">{t('Point de retrait', 'Pickup point')}</p>
-            <p className="font-bold text-white text-base">📍 {pickupAddress}</p>
+          <div className="bg-white/[0.04] border border-white/5 rounded-lg p-3 flex items-start gap-2">
+            <MapPin className="w-4 h-4 text-emerald-400 mt-0.5 shrink-0" />
+            <div>
+              <p className="text-sm text-white/60">{t('Point de retrait', 'Pickup point')}</p>
+              <p className="font-bold text-white text-base">{pickupAddress}</p>
+            </div>
           </div>
         )}
 
         {/* Sender & Receiver */}
         <div className="grid grid-cols-2 gap-3">
-          <div className="bg-white/5 rounded-lg p-3">
+          <div className="bg-white/[0.04] border border-white/5 rounded-lg p-3">
             <p className="text-sm text-white/60">{t('Expéditeur', 'Sender')}</p>
             <p className="font-bold text-white text-base mt-0.5">{senderName}</p>
           </div>
-          <div className="bg-white/5 rounded-lg p-3">
+          <div className="bg-white/[0.04] border border-white/5 rounded-lg p-3">
             <p className="text-sm text-white/60">{t('Destinataire', 'Receiver')}</p>
             <p className="font-bold text-white text-base mt-0.5">{receiverName}</p>
           </div>
@@ -236,9 +244,10 @@ export default function SuccessScreen({
       </div>
 
       {/* Section: Notifier les contacts */}
-      <div className="bg-white/10 backdrop-blur rounded-xl border border-white/10 p-4 sm:p-5 space-y-2.5 sm:space-y-3">
-        <h3 className="text-sm font-bold text-white uppercase tracking-widest">
-          📱 {t('Notifier les contacts', 'Notify contacts')}
+      <div className="glass-card rounded-xl p-4 sm:p-5 space-y-2.5 sm:space-y-3">
+        <h3 className="font-display text-sm font-bold text-white uppercase tracking-widest flex items-center gap-2">
+          <Send className="w-4 h-4 text-emerald-400" />
+          {t('Notifier les contacts', 'Notify contacts')}
         </h3>
         <p className="text-sm text-white/70">
           {t(
@@ -251,9 +260,9 @@ export default function SuccessScreen({
       {/* WhatsApp Buttons — redirect via /sending page */}
       <div className="space-y-3">
         {notified === 'sender' ? (
-          <div className="flex items-center justify-center gap-3 w-full h-12 sm:h-[56px] bg-white/10 border border-white/20 rounded-xl text-white/50">
-            <CheckCircle className="w-5 h-5" />
-            <span className="font-bold text-sm sm:text-lg">✅ {t('EXPÉDITEUR NOTIFIÉ', 'SENDER NOTIFIED')}</span>
+          <div className="flex items-center justify-center gap-3 w-full h-12 sm:h-[56px] bg-white/5 border border-white/10 rounded-xl text-white/50">
+            <CheckCircle className="w-5 h-5 text-emerald-400" />
+            <span className="font-bold text-sm sm:text-lg">{t('EXPÉDITEUR NOTIFIÉ', 'SENDER NOTIFIED')}</span>
           </div>
         ) : (
           <button
@@ -267,9 +276,9 @@ export default function SuccessScreen({
         )}
 
         {notified === 'receiver' ? (
-          <div className="flex items-center justify-center gap-3 w-full h-12 sm:h-[56px] bg-white/10 border border-white/20 rounded-xl text-white/50">
-            <CheckCircle className="w-5 h-5" />
-            <span className="font-bold text-sm sm:text-lg">✅ {t('DESTINATAIRE NOTIFIÉ', 'RECEIVER NOTIFIED')}</span>
+          <div className="flex items-center justify-center gap-3 w-full h-12 sm:h-[56px] bg-white/5 border border-white/10 rounded-xl text-white/50">
+            <CheckCircle className="w-5 h-5 text-emerald-400" />
+            <span className="font-bold text-sm sm:text-lg">{t('DESTINATAIRE NOTIFIÉ', 'RECEIVER NOTIFIED')}</span>
           </div>
         ) : (
           <button
@@ -284,10 +293,10 @@ export default function SuccessScreen({
       </div>
 
       {/* Transition to retrieval */}
-      <div className="bg-gradient-to-r from-amber-900/30 to-orange-900/30 border border-amber-500/30 rounded-xl p-4 sm:p-5 space-y-2.5 sm:space-y-3">
+      <div className="glass-card border border-amber-500/30 rounded-xl p-4 sm:p-5 space-y-2.5 sm:space-y-3">
         <div className="flex items-center gap-2 text-white">
-          <Truck className="w-5 h-5" />
-          <p className="text-base font-bold">
+          <Truck className="w-5 h-5 text-amber-300" />
+          <p className="font-display text-base font-bold">
             {t('Colis en route — Prêt pour la livraison', 'Package in transit — Ready for delivery')}
           </p>
         </div>
@@ -299,7 +308,7 @@ export default function SuccessScreen({
         </p>
         <Link
           href={`/retrieve/${reference}`}
-          className="flex items-center justify-center gap-2 w-full h-12 sm:h-14 bg-[#FF6B35] hover:bg-[#e65a28] active:bg-[#d35400] text-white rounded-xl font-bold text-sm sm:text-lg shadow-lg shadow-orange-500/25 transition-all no-underline"
+          className="flex items-center justify-center gap-2 w-full h-12 sm:h-14 bg-gradient-to-r from-[#10B981] to-[#34D399] hover:from-[#34D399] hover:to-[#6EE7B7] text-[#060B1F] rounded-xl font-bold text-sm sm:text-lg shadow-lg shadow-emerald-500/25 transition-all no-underline"
         >
           <Truck className="w-5 h-5" />
           {t('Accéder à la Page de Récupération', 'Go to Retrieval Page')}
@@ -310,10 +319,10 @@ export default function SuccessScreen({
       {/* Copy tracking link */}
       <button
         onClick={copyLink}
-        className="flex items-center justify-center gap-2 w-full h-12 sm:h-14 border-2 border-white/20 hover:border-[#25D366] hover:bg-[#25D366]/10 rounded-xl text-sm sm:text-base font-bold text-white hover:text-[#25D366] transition-all"
+        className="flex items-center justify-center gap-2 w-full h-12 sm:h-14 border-2 border-white/20 hover:border-emerald-400 hover:bg-emerald-500/10 rounded-xl text-sm sm:text-base font-bold text-white hover:text-emerald-300 transition-all"
       >
         <Copy className="w-4 h-4" />
-        {copied ? '✅ ' + t('Copié !', 'Copied!') : t('Copier le lien de suivi', 'Copy tracking link')}
+        {copied ? t('Copié !', 'Copied!') : t('Copier le lien de suivi', 'Copy tracking link')}
       </button>
 
       {/* New registration */}
