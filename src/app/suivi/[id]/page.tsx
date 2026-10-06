@@ -527,25 +527,18 @@ function SuiviHeader({
   return (
     <header className="sticky top-0 z-50 glass-light-strong border-b border-[#1E4B7A]/10 safe-area-inset-top">
       <div className="max-w-[600px] mx-auto px-4 h-16 flex items-center justify-between">
-        <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-xl bg-white border border-[#1E4B7A]/15 flex items-center justify-center overflow-hidden">
-            <Image
-              src="/brand/logo.png"
-              width={32}
-              height={32}
-              alt="QRTrans"
-              className="object-contain"
-              priority
-            />
-          </div>
-          <div>
-            <span className="font-display text-lg font-bold tracking-tight block leading-tight text-[#0F1B2E]">
-              QR<span className="text-gradient-blue">Trans</span>
-            </span>
-            {reference && (
-              <span className="text-[10px] font-mono text-[#5B7088] leading-tight">{reference}</span>
-            )}
-          </div>
+        <div className="flex flex-col shrink-0">
+          <Image
+            src="/brand/logo.png"
+            width={150}
+            height={44}
+            alt="QRTrans"
+            className="h-8 sm:h-10 w-auto object-contain"
+            priority
+          />
+          {reference && (
+            <span className="text-[10px] font-mono text-[#5B7088] leading-tight mt-0.5">{reference}</span>
+          )}
         </div>
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-1.5 bg-[#1E4B7A]/10 border border-[#1E4B7A]/30 rounded-full px-3 py-1.5">

@@ -53,23 +53,16 @@ export default function SiteHeader({ theme = 'light' }: { theme?: 'light' | 'dar
   return (
     <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${headerBg}`}>
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
-        {/* Logo — uses the brand logo PNG */}
-        <Link href="/" className="flex items-center gap-2.5 group">
-          <div className={`w-9 h-9 rounded-xl flex items-center justify-center overflow-hidden ${
-            isDark ? 'bg-white/10 border border-white/10' : 'bg-white border border-[#1E4B7A]/15'
-          } shadow-lg group-hover:shadow-lg transition-shadow`}>
-            <Image
-              src="/brand/logo.png"
-              alt="QRTrans"
-              width={32}
-              height={32}
-              className="w-full h-full object-contain p-1"
-              priority
-            />
-          </div>
-          <span className={`font-display text-xl font-bold tracking-tight hidden sm:inline ${logoTextClass}`}>
-            QRTrans
-          </span>
+        {/* Logo — full brand logo (image contains the "QRTRANS" wordmark) */}
+        <Link href="/" className="flex items-center group shrink-0">
+          <Image
+            src="/brand/logo.png"
+            alt="QRTrans"
+            width={180}
+            height={53}
+            className="h-9 sm:h-11 w-auto object-contain transition-transform group-hover:scale-[1.02]"
+            priority
+          />
         </Link>
 
         {/* Desktop nav */}

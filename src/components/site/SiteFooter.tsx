@@ -134,21 +134,14 @@ export default function SiteFooter({ theme = 'light' }: { theme?: 'light' | 'dar
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12">
             {/* Brand block */}
             <div className="lg:col-span-2 space-y-6">
-              <Link href="/" className="flex items-center gap-2.5">
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center overflow-hidden ${
-                  isDark ? 'bg-white/10 border border-white/10' : 'bg-white border border-[#1E4B7A]/15'
-                } shadow-lg`}>
-                  <Image
-                    src="/brand/logo.png"
-                    alt="QRTrans"
-                    width={36}
-                    height={36}
-                    className="w-full h-full object-contain p-1"
-                  />
-                </div>
-                <span className={`font-display text-xl font-bold tracking-tight ${isDark ? 'text-white' : 'text-[#0F1B2E]'}`}>
-                  QRTrans
-                </span>
+              <Link href="/" className="flex items-center group">
+                <Image
+                  src="/brand/logo.png"
+                  alt="QRTrans"
+                  width={200}
+                  height={59}
+                  className="h-10 sm:h-12 w-auto object-contain transition-transform group-hover:scale-[1.02]"
+                />
               </Link>
               <p className={`text-sm max-w-sm leading-relaxed ${textMuted}`}>
                 La plateforme de traçabilité de colis par QR code pensée pour
