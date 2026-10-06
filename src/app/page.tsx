@@ -162,6 +162,7 @@ const TESTIMONIALS: {
   name: string;
   agency: string;
   role: string;
+  avatar: string;
 }[] = [
   {
     quote:
@@ -169,6 +170,7 @@ const TESTIMONIALS: {
     name: 'Awa Diop',
     agency: 'Wari Dakar',
     role: 'Responsable agence',
+    avatar: '/images/testimonial-awa.jpg',
   },
   {
     quote:
@@ -176,6 +178,7 @@ const TESTIMONIALS: {
     name: 'Mamadou Sow',
     agency: 'Cash Express',
     role: 'Directeur logistique',
+    avatar: '/images/testimonial-mamadou.jpg',
   },
   {
     quote:
@@ -183,6 +186,7 @@ const TESTIMONIALS: {
     name: 'Fatou Ndiaye',
     agency: 'Senbus Voyages',
     role: 'Cheffe de gare',
+    avatar: '/images/testimonial-fatou.jpg',
   },
   {
     quote:
@@ -190,6 +194,7 @@ const TESTIMONIALS: {
     name: 'Cheikh Fall',
     agency: 'Téra Voyages',
     role: 'Gérant',
+    avatar: '/images/testimonial-cheikh.jpg',
   },
 ];
 
@@ -335,8 +340,22 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* RIGHT — 40% (col-span-5) — delivery card mockup */}
-            <div className="lg:col-span-5 mt-2 lg:mt-0">
+            {/* RIGHT — 40% (col-span-5) — delivery card mockup with hero image backdrop */}
+            <div className="lg:col-span-5 mt-2 lg:mt-0 relative">
+              {/* Hero image backdrop with mask */}
+              <div className="absolute -inset-6 lg:-inset-8 -z-10 pointer-events-none">
+                <div className="relative w-full h-full">
+                  <Image
+                    src="/images/hero-logistics.jpg"
+                    alt=""
+                    fill
+                    priority
+                    sizes="40vw"
+                    className="object-cover rounded-3xl opacity-25"
+                  />
+                  <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-[#FBFCFE] via-transparent to-transparent" />
+                </div>
+              </div>
               <DeliveryCardMockup />
             </div>
           </div>
@@ -394,6 +413,28 @@ export default function HomePage() {
                   Explorer les fonctionnalités
                   <ArrowUpRight className="w-4 h-4" />
                 </Link>
+
+                {/* Companion image — premium logistics photo */}
+                <div className="reveal-up mt-10 relative rounded-2xl overflow-hidden shadow-xl shadow-[#1E4B7A]/15 group/img">
+                  <Image
+                    src="/images/qr-scan-app.jpg"
+                    alt="Application QRTrans de scan"
+                    width={1024}
+                    height={1024}
+                    sizes="(max-width: 1024px) 100vw, 40vw"
+                    className="w-full h-auto object-cover aspect-square transition-transform duration-700 group-hover/img:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0F2D52]/70 via-[#0F2D52]/10 to-transparent pointer-events-none" />
+                  {/* Overlay caption */}
+                  <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-6">
+                    <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#6EE7B7]">
+                      Application mobile
+                    </p>
+                    <p className="font-display font-bold text-white text-lg sm:text-xl mt-1">
+                      Scannez. Activez. Suivez.
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -488,6 +529,15 @@ export default function HomePage() {
           SECTION 5 — Big Numbers (full-bleed dark band)
           ═══════════════════════════════════════════════════════════ */}
       <section className="relative bg-[#0F2D52] py-20 lg:py-28 overflow-hidden">
+        {/* Background image with dark overlay for premium editorial feel */}
+        <Image
+          src="/images/africa-transport.jpg"
+          alt=""
+          fill
+          sizes="100vw"
+          className="object-cover opacity-15"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0F2D52] via-[#0F2D52]/85 to-[#0F2D52]" />
         {/* subtle radial highlight */}
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[60rem] h-[40rem] bg-[radial-gradient(ellipse_at_center,rgba(72,122,168,0.25),transparent_60%)]" />
@@ -531,7 +581,7 @@ export default function HomePage() {
             {BENTO_CARDS.map((card) => (
               <div
                 key={card.title}
-                className={`reveal-up glass-card-light p-6 sm:p-7 flex flex-col ${
+                className={`reveal-up glass-card-light p-6 sm:p-7 flex flex-col relative overflow-hidden ${
                   card.featured ? 'lg:col-span-2 lg:row-span-2 lg:p-9' : ''
                 }`}
               >
@@ -559,13 +609,34 @@ export default function HomePage() {
                   {card.desc}
                 </p>
                 {card.featured && (
-                  <Link
-                    href="/devenir-partenaire"
-                    className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-[#1E4B7A] link-underline self-start"
-                  >
-                    Devenir partenaire
-                    <ArrowUpRight className="w-4 h-4" />
-                  </Link>
+                  <>
+                    {/* Dashboard mockup image */}
+                    <div className="relative mt-7 rounded-2xl overflow-hidden border border-[#1E4B7A]/15 shadow-xl shadow-[#1E4B7A]/10 group/img">
+                      <Image
+                        src="/images/dashboard-mockup.jpg"
+                        alt="Aperçu du tableau de bord QRTrans"
+                        width={1344}
+                        height={768}
+                        sizes="(max-width: 1024px) 100vw, 50vw"
+                        className="w-full h-auto object-cover transition-transform duration-700 group-hover/img:scale-105"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#0F2D52]/40 via-transparent to-transparent pointer-events-none" />
+                      {/* Floating badge */}
+                      <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-md border border-[#1E4B7A]/20 rounded-full px-3 py-1.5 shadow-md">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-[#1E4B7A] flex items-center gap-1.5">
+                          <span className="w-1.5 h-1.5 rounded-full bg-[#10B981] pulse-soft" />
+                          Live preview
+                        </span>
+                      </div>
+                    </div>
+                    <Link
+                      href="/devenir-partenaire"
+                      className="mt-7 inline-flex items-center gap-2 text-sm font-semibold text-[#1E4B7A] link-underline self-start"
+                    >
+                      Devenir partenaire
+                      <ArrowUpRight className="w-4 h-4" />
+                    </Link>
+                  </>
                 )}
               </div>
             ))}
@@ -607,18 +678,29 @@ export default function HomePage() {
                 key={i}
                 className="reveal-up glass-card-light btn-magnetic shrink-0 w-[20rem] sm:w-[24rem] p-7 sm:p-8 flex flex-col"
               >
-                <Quote className="w-8 h-8 text-[#1E4B7A]/30" />
-                <p className="mt-4 font-display italic text-base sm:text-lg text-[#0A1426] leading-relaxed flex-1">
-                  {t.quote}
+                <div className="flex items-center gap-3 mb-4">
+                  {/* Avatar with image */}
+                  <div className="relative w-12 h-12 rounded-full overflow-hidden border-2 border-white shadow-md shrink-0">
+                    <Image
+                      src={t.avatar}
+                      alt={t.name}
+                      fill
+                      sizes="48px"
+                      className="object-cover"
+                    />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-sm text-[#0A1426] truncate">{t.name}</p>
+                    <p className="text-xs text-[#5B7088] truncate">{t.agency}</p>
+                  </div>
+                  <Quote className="w-6 h-6 text-[#1E4B7A]/30 shrink-0" />
+                </div>
+                <p className="font-display italic text-base sm:text-lg text-[#0A1426] leading-relaxed flex-1">
+                  "{t.quote}"
                 </p>
                 <div className="my-5 h-px divider-blue" />
                 <div className="flex items-center justify-between gap-4">
-                  <div>
-                    <p className="font-semibold text-sm text-[#0A1426]">{t.name}</p>
-                    <p className="text-xs text-[#5B7088]">
-                      {t.agency} · {t.role}
-                    </p>
-                  </div>
+                  <p className="text-xs text-[#5B7088]">{t.role}</p>
                   <div className="flex gap-0.5">
                     {Array.from({ length: 5 }).map((_, j) => (
                       <Star key={j} className="w-3.5 h-3.5 text-[#10B981] fill-[#10B981]" />
