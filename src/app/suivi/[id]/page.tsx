@@ -29,6 +29,7 @@ import {
   ListChecks,
 } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 // ═══════════════════════════════════════════════════
 //  TYPES
@@ -99,15 +100,9 @@ function formatTime(iso: string, lang: 'fr' | 'en') {
   }
 }
 
-function getEventDotColor(type: string): string {
-  switch (type) {
-    case 'activation': return 'bg-emerald-400';
-    case 'pin_generated': return 'bg-amber-400';
-    case 'arrival': return 'bg-orange-400';
-    case 'delivery': return 'bg-emerald-400';
-    case 'created': return 'bg-slate-400';
-    default: return 'bg-slate-500';
-  }
+function getEventDotColor(_type: string): string {
+  // All timeline dots use a uniform steel-blue gradient (light theme brand mark).
+  return 'bg-gradient-to-br from-[#1E4B7A] to-[#487AA8]';
 }
 
 // ═══════════════════════════════════════════════════
@@ -142,11 +137,11 @@ function MessageCard({
   };
 
   return (
-    <div className="glass-card rounded-xl overflow-hidden">
+    <div className="glass-card-light rounded-xl overflow-hidden">
       {/* Header */}
       <button
         onClick={() => setExpanded(!expanded)}
-        className="w-full flex items-center gap-3 px-4 py-3.5 hover:bg-white/[0.04] transition-colors text-left"
+        className="w-full flex items-center gap-3 px-4 py-3.5 hover:bg-[#1E4B7A]/5 transition-colors text-left"
       >
         <div
           className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
@@ -159,19 +154,19 @@ function MessageCard({
           )}
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold text-white truncate">{entry.label}</p>
-          <p className="text-xs text-white/60">
+          <p className="text-sm font-semibold text-[#0F1B2E] truncate">{entry.label}</p>
+          <p className="text-xs text-[#5B7088]">
             {recipientLabel}{entry.recipientName ? ` — ${entry.recipientName}` : ''}
           </p>
         </div>
         <div className="flex items-center gap-2 flex-shrink-0">
-          <span className="text-[11px] text-white/40">
+          <span className="text-[11px] text-[#5B7088]">
             {formatTime(entry.timestamp, lang)}
           </span>
           {expanded ? (
-            <ChevronUp className="w-4 h-4 text-white/40" />
+            <ChevronUp className="w-4 h-4 text-[#5B7088]" />
           ) : (
-            <ChevronDown className="w-4 h-4 text-white/40" />
+            <ChevronDown className="w-4 h-4 text-[#5B7088]" />
           )}
         </div>
       </button>
@@ -180,7 +175,7 @@ function MessageCard({
       {expanded && entry.messageContent && (
         <div className="px-4 pb-4 space-y-3">
           {/* WhatsApp message preview */}
-          <div className="bg-[#0b1437] border border-white/5 rounded-lg p-3 relative">
+          <div className="bg-[#F4F7FB] border border-[#1E4B7A]/10 rounded-lg p-3 relative">
             {/* WhatsApp header */}
             <div className="flex items-center gap-2 mb-2">
               <svg viewBox="0 0 24 24" className="w-4 h-4 text-[#25D366]" fill="currentColor">
@@ -189,7 +184,7 @@ function MessageCard({
               <span className="text-xs font-medium text-[#25D366]">WhatsApp</span>
             </div>
             {/* Message text (preserve formatting) */}
-            <div className="text-[13px] text-white/90 whitespace-pre-wrap leading-relaxed font-sans">
+            <div className="text-[13px] text-[#0F1B2E] whitespace-pre-wrap leading-relaxed font-sans">
               {entry.messageContent}
             </div>
           </div>
@@ -209,7 +204,7 @@ function MessageCard({
             )}
             <button
               onClick={handleCopyMessage}
-              className="flex items-center gap-1.5 px-3 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-xs font-medium text-white/80 transition-colors"
+              className="flex items-center gap-1.5 px-3 py-2 bg-[#1E4B7A]/5 hover:bg-[#1E4B7A]/10 border border-[#1E4B7A]/10 rounded-lg text-xs font-medium text-[#1E4B7A] transition-colors"
             >
               <Copy className="w-3.5 h-3.5" />
               {copied ? t('Copié !', 'Copied!') : t('Copier', 'Copy')}
@@ -291,12 +286,12 @@ export default function SuiviPage() {
   // ─── Loading ───
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#060B1F]">
+      <div className="min-h-screen bg-[#F4F7FB]">
         <SuiviHeader reference={reference} lang={lang} onLangChange={setLang} />
         <div className="flex items-center justify-center py-32">
           <div className="text-center">
-            <Loader2 className="w-8 h-8 text-emerald-400 animate-spin mx-auto mb-3" />
-            <p className="text-sm text-white/60">{t('Chargement du suivi...', 'Loading tracking...')}</p>
+            <Loader2 className="w-8 h-8 text-[#1E4B7A] animate-spin mx-auto mb-3" />
+            <p className="text-sm text-[#5B7088]">{t('Chargement du suivi...', 'Loading tracking...')}</p>
           </div>
         </div>
       </div>
@@ -306,16 +301,16 @@ export default function SuiviPage() {
   // ─── Error ───
   if (error && !colis) {
     return (
-      <div className="min-h-screen bg-[#060B1F]">
+      <div className="min-h-screen bg-[#F4F7FB]">
         <SuiviHeader reference={reference} lang={lang} onLangChange={setLang} />
         <div className="max-w-[600px] mx-auto px-4 py-16 text-center space-y-4">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-red-500/10 border border-red-500/20 rounded-full">
-            <AlertTriangle className="w-8 h-8 text-red-400" />
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-red-50 border border-red-200 rounded-full">
+            <AlertTriangle className="w-8 h-8 text-red-500" />
           </div>
-          <h2 className="text-lg font-bold text-white">{error}</h2>
+          <h2 className="text-lg font-bold text-[#0F1B2E]">{error}</h2>
           <Link
             href="/"
-            className="inline-flex items-center gap-2 px-5 h-12 bg-gradient-to-r from-[#10B981] to-[#34D399] hover:from-[#34D399] hover:to-[#6EE7B7] text-[#060B1F] rounded-xl font-semibold text-sm transition-colors no-underline shadow-lg shadow-emerald-500/20"
+            className="btn-brand inline-flex items-center gap-2 px-5 h-12 rounded-xl font-semibold text-sm transition-colors no-underline text-white"
           >
             <Home className="w-4 h-4" />
             {t("Retour à l'accueil", 'Back to home')}
@@ -326,14 +321,14 @@ export default function SuiviPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#060B1F]">
+    <div className="min-h-screen bg-[#F4F7FB]">
       <SuiviHeader reference={reference} lang={lang} onLangChange={setLang} />
 
       <main className="max-w-[600px] mx-auto px-4 py-6 pb-20 space-y-5">
         {/* ─── STATUS BANNER ─── */}
         {colis && (
           <div
-            className="glass-strong rounded-2xl p-5 relative overflow-hidden"
+            className="glass-light-strong rounded-2xl p-5 relative overflow-hidden border border-[#1E4B7A]/10"
           >
             {/* Status accent glow */}
             <div
@@ -346,27 +341,19 @@ export default function SuiviPage() {
                     : '#F59E0B',
               }}
             />
-            <div className="absolute -bottom-8 -left-8 w-24 h-24 rounded-full bg-white/5 blur-xl" />
+            <div className="absolute -bottom-8 -left-8 w-24 h-24 rounded-full bg-[#1E4B7A]/5 blur-xl" />
 
             <div className="relative space-y-3">
               <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-3 min-w-0">
                   <div
-                    className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
-                    style={{
-                      backgroundColor:
-                        colis.status === 'delivered'
-                          ? 'rgba(16,185,129,0.18)'
-                          : colis.status === 'in_transit'
-                            ? 'rgba(59,130,246,0.18)'
-                            : 'rgba(245,158,11,0.18)',
-                      color:
-                        colis.status === 'delivered'
-                          ? '#34D399'
-                          : colis.status === 'in_transit'
-                            ? '#60A5FA'
-                            : '#FBBF24',
-                    }}
+                    className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${
+                      colis.status === 'delivered'
+                        ? 'bg-emerald-50 text-emerald-600'
+                        : colis.status === 'in_transit'
+                          ? 'bg-sky-50 text-sky-600'
+                          : 'bg-amber-50 text-amber-600'
+                    }`}
                   >
                     {colis.status === 'delivered' ? (
                       <CheckCircle className="w-5 h-5" />
@@ -377,14 +364,14 @@ export default function SuiviPage() {
                     )}
                   </div>
                   <div className="min-w-0">
-                    <h1 className="font-display text-base font-bold leading-tight text-white truncate">
+                    <h1 className="font-display text-base font-bold leading-tight text-[#0F1B2E] truncate">
                       {colis.statusLabel}
                     </h1>
-                    <p className="text-xs text-white/50 font-mono truncate">{colis.reference}</p>
+                    <p className="text-xs text-[#5B7088] font-mono truncate">{colis.reference}</p>
                   </div>
                 </div>
                 <div
-                  className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 border border-white/10 bg-white/[0.04] text-white/70"
+                  className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 border border-[#1E4B7A]/10 bg-[#1E4B7A]/5 text-[#1E4B7A]"
                   aria-hidden
                 >
                   <TransportGlyph mode={colis.transportMode || colis.transportIcon} />
@@ -392,17 +379,17 @@ export default function SuiviPage() {
               </div>
 
               {/* Route */}
-              <div className="flex items-center gap-3 bg-white/[0.04] border border-white/5 rounded-xl px-4 py-3">
+              <div className="flex items-center gap-3 bg-[#1E4B7A]/5 border border-[#1E4B7A]/10 rounded-xl px-4 py-3">
                 <div className="text-center flex-1 min-w-0">
-                  <p className="text-lg font-bold text-white truncate">{colis.departureCity}</p>
-                  <p className="text-[10px] text-white/50 uppercase tracking-wide">{t('Départ', 'Departure')}</p>
+                  <p className="text-lg font-bold text-[#0F1B2E] truncate">{colis.departureCity}</p>
+                  <p className="text-[10px] text-[#5B7088] uppercase tracking-wide">{t('Départ', 'Departure')}</p>
                 </div>
-                <div className="flex items-center gap-1 text-emerald-400 flex-shrink-0">
+                <div className="flex items-center gap-1 text-[#1E4B7A] flex-shrink-0">
                   <ArrowRight className="w-5 h-5" />
                 </div>
                 <div className="text-center flex-1 min-w-0">
-                  <p className="text-lg font-bold text-white truncate">{colis.arrivalCity}</p>
-                  <p className="text-[10px] text-white/50 uppercase tracking-wide">{t('Arrivée', 'Arrival')}</p>
+                  <p className="text-lg font-bold text-[#0F1B2E] truncate">{colis.arrivalCity}</p>
+                  <p className="text-[10px] text-[#5B7088] uppercase tracking-wide">{t('Arrivée', 'Arrival')}</p>
                 </div>
               </div>
             </div>
@@ -411,10 +398,10 @@ export default function SuiviPage() {
 
         {/* ─── COLIS INFO CARD ─── */}
         {colis && (
-          <div className="glass-card rounded-2xl p-5 space-y-3">
+          <div className="glass-card-light rounded-2xl p-5 space-y-3">
             <div className="flex items-center gap-2 mb-1">
-              <Package className="w-4 h-4 text-emerald-400" />
-              <h3 className="font-display text-xs font-semibold text-white/60 uppercase tracking-wider">
+              <Package className="w-4 h-4 text-[#1E4B7A]" />
+              <h3 className="font-display text-xs font-semibold text-[#5B7088] uppercase tracking-wider">
                 {t('Détails du colis', 'Package details')}
               </h3>
             </div>
@@ -452,33 +439,33 @@ export default function SuiviPage() {
         {/* ─── TIMELINE ─── */}
         <div>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="font-display text-sm font-bold text-white flex items-center gap-2">
-              <ListChecks className="w-4 h-4 text-emerald-400" />
+            <h2 className="font-display text-sm font-bold text-[#0F1B2E] flex items-center gap-2">
+              <ListChecks className="w-4 h-4 text-[#1E4B7A]" />
               {t('Historique du voyage', 'Journey history')}
             </h2>
-            <span className="text-xs font-medium text-emerald-300">
+            <span className="text-xs font-medium text-[#1E4B7A]">
               {timeline.length} {t('événement(s)', 'event(s)')}
             </span>
           </div>
 
           {timeline.length === 0 ? (
-            <div className="glass-card text-center py-12">
-              <Clock className="w-8 h-8 text-white/30 mx-auto mb-3" />
-              <p className="text-sm text-white/50">
+            <div className="glass-card-light text-center py-12">
+              <Clock className="w-8 h-8 text-[#5B7088]/40 mx-auto mb-3" />
+              <p className="text-sm text-[#5B7088]">
                 {t('Aucun événement enregistré.', 'No events recorded.')}
               </p>
             </div>
           ) : (
             <div className="relative">
               {/* Timeline line */}
-              <div className="absolute left-[15px] top-2 bottom-2 w-0.5 bg-gradient-to-b from-emerald-400/60 via-white/10 to-white/5" />
+              <div className="absolute left-[15px] top-2 bottom-2 w-0.5 bg-gradient-to-b from-[#1E4B7A]/40 via-[#1E4B7A]/10 to-transparent" />
 
               <div className="space-y-3">
                 {timeline.map((entry, index) => (
                   <div key={entry.id || index} className="relative flex gap-4">
                     {/* Dot */}
                     <div className="relative z-10 flex-shrink-0 w-[31px] flex items-start justify-center pt-3">
-                      <div className={`w-3 h-3 rounded-full ${getEventDotColor(entry.type)} ring-4 ring-[#060B1F] shadow-sm`} />
+                      <div className={`w-3 h-3 rounded-full ${getEventDotColor(entry.type)} ring-4 ring-[#F4F7FB] shadow-sm`} />
                     </div>
 
                     {/* Content */}
@@ -486,7 +473,7 @@ export default function SuiviPage() {
                       {/* Date separator */}
                       {(index === 0 || formatDate(timeline[index - 1].timestamp, lang) !== formatDate(entry.timestamp, lang)) && (
                         <div className="mb-1.5">
-                          <span className="text-[11px] font-semibold text-white/40 uppercase tracking-wide">
+                          <span className="text-[11px] font-semibold text-[#5B7088] uppercase tracking-wide">
                             {formatDate(entry.timestamp, lang)}
                           </span>
                         </div>
@@ -494,7 +481,7 @@ export default function SuiviPage() {
 
                       {/* Time */}
                       <div className="flex items-center gap-2 mb-1.5">
-                        <span className="text-xs font-bold text-white/80">
+                        <span className="text-xs font-bold text-[#1E4B7A]">
                           {formatTime(entry.timestamp, lang)}
                         </span>
                       </div>
@@ -513,7 +500,7 @@ export default function SuiviPage() {
         <div className="text-center pt-4">
           <Link
             href="/"
-            className="inline-flex items-center gap-2 text-sm text-white/60 hover:text-emerald-300 transition-colors no-underline"
+            className="inline-flex items-center gap-2 text-sm text-[#5B7088] hover:text-[#1E4B7A] transition-colors no-underline"
           >
             <Home className="w-4 h-4" />
             {t("Retour à l'accueil", 'Back to home')}
@@ -538,31 +525,38 @@ function SuiviHeader({
   onLangChange: (lang: 'fr' | 'en') => void;
 }) {
   return (
-    <header className="sticky top-0 z-50 bg-[#060B1F]/80 backdrop-blur-xl border-b border-white/10 safe-area-inset-top">
+    <header className="sticky top-0 z-50 glass-light-strong border-b border-[#1E4B7A]/10 safe-area-inset-top">
       <div className="max-w-[600px] mx-auto px-4 h-16 flex items-center justify-between">
         <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#10B981] to-[#3B6BD9] flex items-center justify-center shadow-lg shadow-emerald-500/20">
-            <QrCode className="w-5 h-5 text-white" />
+          <div className="w-9 h-9 rounded-xl bg-white border border-[#1E4B7A]/15 flex items-center justify-center overflow-hidden">
+            <Image
+              src="/brand/logo.png"
+              width={32}
+              height={32}
+              alt="QRTrans"
+              className="object-contain"
+              priority
+            />
           </div>
           <div>
-            <span className="font-display text-lg font-bold tracking-tight block leading-tight text-white">
-              QR<span className="text-gradient-emerald">Trans</span>
+            <span className="font-display text-lg font-bold tracking-tight block leading-tight text-[#0F1B2E]">
+              QR<span className="text-gradient-blue">Trans</span>
             </span>
             {reference && (
-              <span className="text-[10px] font-mono text-white/50 leading-tight">{reference}</span>
+              <span className="text-[10px] font-mono text-[#5B7088] leading-tight">{reference}</span>
             )}
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1.5 bg-emerald-500/10 border border-emerald-500/30 rounded-full px-3 py-1.5">
-            <Truck className="w-3.5 h-3.5 text-emerald-400" />
-            <span className="text-xs font-semibold text-emerald-300">
+          <div className="flex items-center gap-1.5 bg-[#1E4B7A]/10 border border-[#1E4B7A]/30 rounded-full px-3 py-1.5">
+            <Truck className="w-3.5 h-3.5 text-[#1E4B7A]" />
+            <span className="text-xs font-semibold text-[#1E4B7A]">
               {lang === 'fr' ? 'Suivi' : 'Tracking'}
             </span>
           </div>
           <button
             onClick={() => onLangChange(lang === 'fr' ? 'en' : 'fr')}
-            className="flex items-center gap-1 text-xs font-medium text-white/70 hover:text-white transition-colors px-2 py-1.5 rounded-md hover:bg-white/5"
+            className="flex items-center gap-1 text-xs font-medium text-[#5B7088] hover:text-[#1E4B7A] transition-colors px-2 py-1.5 rounded-md hover:bg-[#1E4B7A]/5"
             aria-label="Switch language"
           >
             <Globe className="w-3.5 h-3.5" />
@@ -571,10 +565,10 @@ function SuiviHeader({
         </div>
       </div>
       {/* Title bar */}
-      <div className="border-t border-white/5">
+      <div className="border-t border-[#1E4B7A]/10">
         <div className="max-w-[600px] mx-auto px-4 py-3">
-          <h1 className="font-display text-sm font-semibold text-white/80 flex items-center gap-2">
-            <ListChecks className="w-4 h-4 text-emerald-400" />
+          <h1 className="font-display text-sm font-semibold text-[#1E4B7A] flex items-center gap-2">
+            <ListChecks className="w-4 h-4 text-[#1E4B7A]" />
             {lang === 'fr' ? 'Suivi du voyage' : 'Journey tracking'}
           </h1>
         </div>
@@ -602,17 +596,17 @@ function InfoItem({
 }) {
   const Wrapper = href ? 'a' : 'div';
   const wrapperProps = href
-    ? { href, target: '_blank' as const, rel: 'noopener noreferrer' as const, className: 'flex items-start gap-2.5 no-underline hover:bg-white/5 rounded-lg p-1 -m-1 transition-colors cursor-pointer' }
+    ? { href, target: '_blank' as const, rel: 'noopener noreferrer' as const, className: 'flex items-start gap-2.5 no-underline hover:bg-[#1E4B7A]/5 rounded-lg p-1 -m-1 transition-colors cursor-pointer' }
     : { className: 'flex items-start gap-2.5' };
 
   return (
     <Wrapper {...wrapperProps}>
-      <div className="w-7 h-7 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-        <Icon className="w-3.5 h-3.5 text-emerald-300" />
+      <div className="w-7 h-7 rounded-lg bg-[#1E4B7A]/10 border border-[#1E4B7A]/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+        <Icon className="w-3.5 h-3.5 text-[#1E4B7A]" />
       </div>
       <div className="min-w-0">
-        <p className="text-[11px] text-white/50 font-medium">{label}</p>
-        <p className={`text-sm text-white font-semibold truncate ${mono ? 'font-mono' : ''}`}>
+        <p className="text-[11px] text-[#5B7088] font-medium">{label}</p>
+        <p className={`text-sm text-[#0F1B2E] font-semibold truncate ${mono ? 'font-mono' : ''}`}>
           {value}
         </p>
       </div>

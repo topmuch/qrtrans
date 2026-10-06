@@ -4,12 +4,14 @@ import { useEffect, useRef } from 'react';
 
 /**
  * Aurora blobs — animated gradient orbs for premium backgrounds.
- * Use behind dark sections for an ambient, aurora-like glow.
+ * Use behind sections for an ambient, aurora-like glow.
  */
 export default function AuroraBackground({
   className = '',
+  theme = 'light',
 }: {
   className?: string;
+  theme?: 'light' | 'dark';
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -20,7 +22,6 @@ export default function AuroraBackground({
     const container = containerRef.current;
     if (!container) return;
 
-    // Subtle parallax on mouse move
     const handleMove = (e: MouseEvent) => {
       const x = (e.clientX / window.innerWidth - 0.5) * 20;
       const y = (e.clientY / window.innerHeight - 0.5) * 20;
@@ -29,6 +30,17 @@ export default function AuroraBackground({
     window.addEventListener('mousemove', handleMove);
     return () => window.removeEventListener('mousemove', handleMove);
   }, []);
+
+  // Theme-driven blob colors
+  const blob1 = theme === 'dark'
+    ? 'radial-gradient(circle, rgba(16, 185, 129, 0.4), transparent 70%)'
+    : 'radial-gradient(circle, rgba(72, 122, 168, 0.35), transparent 70%)';
+  const blob2 = theme === 'dark'
+    ? 'radial-gradient(circle, rgba(59, 107, 217, 0.4), transparent 70%)'
+    : 'radial-gradient(circle, rgba(30, 75, 122, 0.30), transparent 70%)';
+  const blob3 = theme === 'dark'
+    ? 'radial-gradient(circle, rgba(217, 175, 55, 0.18), transparent 70%)'
+    : 'radial-gradient(circle, rgba(16, 185, 129, 0.18), transparent 70%)';
 
   return (
     <div
@@ -44,7 +56,7 @@ export default function AuroraBackground({
           left: '10%',
           width: '40vw',
           height: '40vw',
-          background: 'radial-gradient(circle, rgba(16, 185, 129, 0.4), transparent 70%)',
+          background: blob1,
           animationDelay: '0s',
         }}
       />
@@ -55,7 +67,7 @@ export default function AuroraBackground({
           right: '-5%',
           width: '35vw',
           height: '35vw',
-          background: 'radial-gradient(circle, rgba(59, 107, 217, 0.4), transparent 70%)',
+          background: blob2,
           animationDelay: '-7s',
         }}
       />
@@ -66,7 +78,7 @@ export default function AuroraBackground({
           left: '30%',
           width: '45vw',
           height: '45vw',
-          background: 'radial-gradient(circle, rgba(217, 175, 55, 0.18), transparent 70%)',
+          background: blob3,
           animationDelay: '-14s',
         }}
       />

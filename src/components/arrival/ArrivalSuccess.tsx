@@ -121,33 +121,33 @@ export default function ArrivalSuccess({
   return (
     <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
       {/* ── Success banner ── */}
-      <div className="glass-strong rounded-xl p-6 text-center relative overflow-hidden">
+      <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-6 text-center relative overflow-hidden">
         <div className="absolute -top-12 -right-12 w-32 h-32 rounded-full bg-emerald-500/20 blur-3xl" />
         <div className="absolute -bottom-12 -left-12 w-32 h-32 rounded-full bg-[#25D366]/15 blur-3xl" />
         <div className="relative">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-[#10B981] to-[#34D399] rounded-full mb-3 shadow-lg shadow-emerald-500/30">
-            <CheckCircle className="w-8 h-8 text-[#060B1F]" />
+            <CheckCircle className="w-8 h-8 text-white" />
           </div>
-          <h2 className="font-display text-xl font-bold text-white">
+          <h2 className="font-display text-xl font-bold text-emerald-800">
             {t('LIVRAISON CONFIRMÉE !', 'DELIVERY CONFIRMED!')}
           </h2>
-          <div className="mt-2 flex items-center justify-center gap-3 text-sm text-white/70">
+          <div className="mt-2 flex items-center justify-center gap-3 text-sm text-emerald-700">
             <span>{formatDateFR(arrivalDate)} {t('à', 'at')} {formatTime(arrivalTime)}</span>
           </div>
-          <div className="mt-1 text-sm text-white/60 flex items-center justify-center gap-1.5">
-            <MapPin className="w-3.5 h-3.5 text-emerald-400" />
+          <div className="mt-1 text-sm text-emerald-700 flex items-center justify-center gap-1.5">
+            <MapPin className="w-3.5 h-3.5 text-emerald-600" />
             {deliveryLocation}
           </div>
         </div>
       </div>
 
       {/* ── Section: Notifier ── */}
-      <div className="glass-card rounded-xl p-5 space-y-3">
-        <h3 className="font-display text-xs font-bold text-white/60 uppercase tracking-widest flex items-center gap-2">
-          <Send className="w-3.5 h-3.5 text-emerald-400" />
+      <div className="glass-card-light rounded-xl p-5 space-y-3">
+        <h3 className="font-display text-xs font-bold text-[#5B7088] uppercase tracking-widest flex items-center gap-2">
+          <Send className="w-3.5 h-3.5 text-[#1E4B7A]" />
           {t('Notifier les contacts', 'Notify contacts')}
         </h3>
-        <p className="text-xs text-white/60">
+        <p className="text-xs text-[#5B7088]">
           {t(
             'Informez l\'expéditeur et le destinataire de la livraison du colis.',
             'Inform the sender and receiver about the package delivery.'
@@ -160,9 +160,9 @@ export default function ArrivalSuccess({
         {/* Sender button */}
         {notified === 'sender' ? (
           /* Already notified — disabled state */
-          <div className="flex items-center justify-center gap-3 w-full h-16 bg-white/5 border border-white/10 rounded-2xl text-white/50">
-            <span className="w-8 h-8 bg-emerald-500/15 border border-emerald-500/30 rounded-lg flex items-center justify-center">
-              <CheckCircle className="w-5 h-5 text-emerald-400" />
+          <div className="flex items-center justify-center gap-3 w-full h-16 bg-emerald-50 border border-emerald-200 rounded-2xl text-emerald-700">
+            <span className="w-8 h-8 bg-emerald-100 border border-emerald-200 rounded-lg flex items-center justify-center">
+              <CheckCircle className="w-5 h-5 text-emerald-600" />
             </span>
             <span className="font-bold text-base">
               {t('EXPÉDITEUR NOTIFIÉ', 'SENDER NOTIFIED')}
@@ -181,9 +181,9 @@ export default function ArrivalSuccess({
 
         {/* Receiver button */}
         {notified === 'receiver' ? (
-          <div className="flex items-center justify-center gap-3 w-full h-16 bg-white/5 border border-white/10 rounded-2xl text-white/50">
-            <span className="w-8 h-8 bg-emerald-500/15 border border-emerald-500/30 rounded-lg flex items-center justify-center">
-              <CheckCircle className="w-5 h-5 text-emerald-400" />
+          <div className="flex items-center justify-center gap-3 w-full h-16 bg-emerald-50 border border-emerald-200 rounded-2xl text-emerald-700">
+            <span className="w-8 h-8 bg-emerald-100 border border-emerald-200 rounded-lg flex items-center justify-center">
+              <CheckCircle className="w-5 h-5 text-emerald-600" />
             </span>
             <span className="font-bold text-base">
               {t('DESTINATAIRE NOTIFIÉ', 'RECEIVER NOTIFIED')}
@@ -202,11 +202,11 @@ export default function ArrivalSuccess({
       </div>
 
       {/* ── Extra options ── */}
-      <div className="glass-card rounded-xl p-4 space-y-3">
+      <div className="glass-card-light rounded-xl p-4 space-y-3">
         <button
           type="button"
           onClick={copyLink}
-          className="flex items-center gap-2 w-full h-12 text-sm font-semibold text-white/70 hover:text-emerald-300 transition-colors"
+          className="flex items-center gap-2 w-full h-12 text-sm font-semibold text-[#5B7088] hover:text-[#1E4B7A] transition-colors"
         >
           <Copy className="w-4 h-4" />
           {copied ? t('Copié !', 'Copied!') : t('Copier le lien de suivi', 'Copy tracking link')}
@@ -215,7 +215,7 @@ export default function ArrivalSuccess({
         <button
           type="button"
           onClick={() => router.push(suiviUrl)}
-          className="flex items-center gap-2 w-full h-12 text-sm font-semibold text-white/70 hover:text-emerald-300 transition-colors"
+          className="flex items-center gap-2 w-full h-12 text-sm font-semibold text-[#5B7088] hover:text-[#1E4B7A] transition-colors"
         >
           <Package className="w-4 h-4" />
           {t('Voir le suivi du colis', 'View package tracking')}
@@ -224,7 +224,7 @@ export default function ArrivalSuccess({
         <button
           type="button"
           onClick={() => router.push('/')}
-          className="flex items-center gap-2 w-full h-12 text-sm font-semibold text-white/50 hover:text-white transition-colors"
+          className="flex items-center gap-2 w-full h-12 text-sm font-semibold text-[#5B7088] hover:text-[#1E4B7A] transition-colors"
         >
           <Home className="w-4 h-4" />
           {t("Retour à l'accueil", 'Back to home')}

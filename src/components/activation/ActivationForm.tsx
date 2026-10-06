@@ -290,14 +290,14 @@ export default function ActivationForm({ qrCode, lang }: ActivationFormProps) {
   if (errorCode === 'already_in_transit') {
     return (
       <div className="text-center py-10 sm:py-12 space-y-4 animate-in fade-in duration-300">
-        <div className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 bg-sky-500/15 border border-sky-500/30 rounded-full">
-          <Truck className="w-6 h-6 sm:w-8 sm:h-8 text-sky-300" />
+        <div className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 bg-sky-50 border border-sky-200 rounded-full">
+          <Truck className="w-6 h-6 sm:w-8 sm:h-8 text-sky-600" />
         </div>
-        <h2 className="text-lg sm:text-xl font-bold text-white">{errorMessage}</h2>
-        <p className="text-sm sm:text-base text-white/70 font-mono">#{qrCode}</p>
+        <h2 className="text-lg sm:text-xl font-bold text-[#0F1B2E]">{errorMessage}</h2>
+        <p className="text-sm sm:text-base text-[#5B7088] font-mono">#{qrCode}</p>
         <a
           href={`/retrieve/${qrCode}`}
-          className="inline-flex items-center gap-2 px-5 sm:px-6 h-12 sm:h-14 bg-gradient-to-r from-[#10B981] to-[#34D399] hover:from-[#34D399] hover:to-[#6EE7B7] text-[#060B1F] rounded-xl font-bold text-sm sm:text-base transition-colors no-underline shadow-lg shadow-emerald-500/30"
+          className="btn-brand inline-flex items-center gap-2 px-5 sm:px-6 h-12 sm:h-14 rounded-xl font-bold text-sm sm:text-base transition-colors no-underline text-white"
         >
           <Lock className="w-4 h-4 sm:w-5 sm:h-5" />
           {t('Récupérer le colis', 'Retrieve package')}
@@ -309,15 +309,15 @@ export default function ActivationForm({ qrCode, lang }: ActivationFormProps) {
   if (['already_delivered', 'already_active'].includes(errorCode || '')) {
     return (
       <div className="text-center py-10 sm:py-12 space-y-4 animate-in fade-in duration-300">
-        <div className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 bg-amber-500/15 border border-amber-500/30 rounded-full">
-          <AlertTriangle className="w-6 h-6 sm:w-8 sm:h-8 text-amber-300" />
+        <div className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 bg-amber-50 border border-amber-200 rounded-full">
+          <AlertTriangle className="w-6 h-6 sm:w-8 sm:h-8 text-amber-600" />
         </div>
-        <h2 className="text-lg sm:text-xl font-bold text-white">{errorMessage}</h2>
-        <p className="text-sm sm:text-base text-white/70 font-mono">#{qrCode}</p>
+        <h2 className="text-lg sm:text-xl font-bold text-[#0F1B2E]">{errorMessage}</h2>
+        <p className="text-sm sm:text-base text-[#5B7088] font-mono">#{qrCode}</p>
         {/* FIX: was /activate/${qrCode} (infinite loop), now correctly goes to retrieve */}
         <a
           href={`/retrieve/${qrCode}`}
-          className="inline-flex items-center gap-2 px-5 sm:px-6 h-12 sm:h-14 bg-gradient-to-r from-[#10B981] to-[#34D399] hover:from-[#34D399] hover:to-[#6EE7B7] text-[#060B1F] rounded-xl font-bold text-sm sm:text-base transition-colors no-underline shadow-lg shadow-emerald-500/30"
+          className="btn-brand inline-flex items-center gap-2 px-5 sm:px-6 h-12 sm:h-14 rounded-xl font-bold text-sm sm:text-base transition-colors no-underline text-white"
         >
           <Package className="w-4 h-4 sm:w-5 sm:h-5" />
           {t('Aller à la récupération', 'Go to retrieval')}
@@ -330,20 +330,20 @@ export default function ActivationForm({ qrCode, lang }: ActivationFormProps) {
     <form onSubmit={handleSubmit} noValidate className="space-y-3 sm:space-y-4">
       {/* Error banner */}
       {errorCode && errorMessage && (
-        <div className="glass-card border-red-500/40 rounded-xl p-3 sm:p-4 flex items-start gap-2.5 sm:gap-3 animate-in fade-in slide-in-from-top-2 duration-200">
-          <AlertTriangle className="w-5 h-5 text-red-400 mt-0.5 shrink-0" />
+        <div className="glass-card-light border border-red-200 rounded-xl p-3 sm:p-4 flex items-start gap-2.5 sm:gap-3 animate-in fade-in slide-in-from-top-2 duration-200">
+          <AlertTriangle className="w-5 h-5 text-red-500 mt-0.5 shrink-0" />
           <div className="flex-1">
-            <p className="font-display text-base font-bold text-white">
+            <p className="font-display text-base font-bold text-[#0F1B2E]">
               {errorCode === 'network' || errorCode === 'server_error'
                 ? t("Échec de l'activation", 'Activation failed')
                 : t('Erreur de validation', 'Validation error')}
             </p>
-            <p className="text-sm text-red-300 mt-0.5">{errorMessage}</p>
+            <p className="text-sm text-red-600 mt-0.5">{errorMessage}</p>
           </div>
           <button
             type="button"
             onClick={() => { setErrorCode(null); setErrorMessage(''); }}
-            className="text-red-400 hover:text-red-300 text-xl leading-none shrink-0"
+            className="text-red-500 hover:text-red-600 text-xl leading-none shrink-0"
             aria-label={t('Fermer', 'Close')}
           >
             &times;
@@ -408,7 +408,7 @@ export default function ActivationForm({ qrCode, lang }: ActivationFormProps) {
           type="button"
           onClick={handleReset}
           disabled={loading}
-          className="flex items-center justify-center w-full h-12 sm:h-14 border-2 border-white/20 hover:border-white/40 text-white hover:text-white rounded-xl font-bold text-sm sm:text-base transition-colors disabled:opacity-50 bg-white/5 hover:bg-white/10"
+          className="flex items-center justify-center w-full h-12 sm:h-14 border-2 border-[#1E4B7A]/20 hover:border-[#1E4B7A]/40 text-[#1E4B7A] hover:text-[#1E4B7A] rounded-xl font-bold text-sm sm:text-base transition-colors disabled:opacity-50 bg-[#1E4B7A]/5 hover:bg-[#1E4B7A]/10"
         >
           <X className="w-4 h-4 mr-1.5" />
           {t('Annuler', 'Cancel')}

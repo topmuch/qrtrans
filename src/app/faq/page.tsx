@@ -12,7 +12,6 @@ import {
 } from 'lucide-react';
 import SiteLayout from '@/components/site/SiteLayout';
 import AuroraBackground from '@/components/site/AuroraBackground';
-import SectionHeading from '@/components/site/SectionHeading';
 
 /* ---------------------------------------------------------------
    Static content
@@ -102,8 +101,8 @@ function FAQItem({ question, answer }: FAQ) {
   const [isOpen, setIsOpen] = useState(false);
   return (
     <div
-      className={`glass-card overflow-hidden transition-all ${
-        isOpen ? 'border-emerald-400/40' : ''
+      className={`glass-card-light overflow-hidden transition-all ${
+        isOpen ? 'border-[#1E4B7A]/40' : ''
       }`}
     >
       <button
@@ -111,27 +110,27 @@ function FAQItem({ question, answer }: FAQ) {
         className="w-full flex items-center justify-between gap-4 p-5 sm:p-6 text-left"
         aria-expanded={isOpen}
       >
-        <span className="font-medium text-base sm:text-lg text-white leading-snug">
+        <span className="font-medium text-base sm:text-lg text-[#0F1B2E] leading-snug">
           {question}
         </span>
         <div
           className={`flex-shrink-0 w-9 h-9 rounded-lg flex items-center justify-center transition-all ${
             isOpen
-              ? 'bg-emerald-400/20 border border-emerald-400/40 rotate-180'
-              : 'bg-white/5 border border-white/10'
+              ? 'bg-[#1E4B7A]/15 border border-[#1E4B7A]/40 rotate-180'
+              : 'bg-[#1E4B7A]/5 border border-[#1E4B7A]/15'
           }`}
         >
           <ChevronDown
             className={`w-4 h-4 transition-colors ${
-              isOpen ? 'text-emerald-300' : 'text-white/60'
+              isOpen ? 'text-[#1E4B7A]' : 'text-[#5B7088]'
             }`}
           />
         </div>
       </button>
       {isOpen && (
         <div className="px-5 sm:px-6 pb-5 sm:pb-6">
-          <div className="border-t border-white/10 pt-4">
-            <p className="text-white/70 leading-relaxed text-sm sm:text-base">
+          <div className="border-t border-[#1E4B7A]/10 pt-4">
+            <p className="text-[#5B7088] leading-relaxed text-sm sm:text-base">
               {answer}
             </p>
           </div>
@@ -152,44 +151,44 @@ export default function FAQPage() {
   );
 
   return (
-    <SiteLayout hasDarkHero>
+    <SiteLayout theme="light" hasDarkHero>
       {/* =====================================================
           1. HERO
          ===================================================== */}
-      <section className="relative overflow-hidden bg-hero pt-36 pb-20 lg:pt-44 lg:pb-24">
-        <AuroraBackground />
-        <div className="absolute inset-0 bg-grid bg-grid-fade opacity-40 pointer-events-none" />
+      <section className="relative overflow-hidden bg-light-hero pt-36 pb-20 lg:pt-44 lg:pb-24">
+        <AuroraBackground theme="light" />
+        <div className="absolute inset-0 bg-grid-light bg-grid-fade-light opacity-60 pointer-events-none" />
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl mx-auto text-center">
-            <div className="reveal-up inline-flex items-center gap-2.5 px-4 py-2 mb-7 rounded-full glass">
-              <MessageCircleQuestion className="w-4 h-4 text-emerald-300" />
-              <span className="text-xs sm:text-sm font-medium text-emerald-200 tracking-wide">
+            <div className="reveal-up inline-flex items-center gap-2.5 px-4 py-2 mb-7 rounded-full glass-light">
+              <MessageCircleQuestion className="w-4 h-4 text-[#1E4B7A]" />
+              <span className="text-xs sm:text-sm font-medium text-[#1E4B7A] tracking-wide">
                 FAQ
               </span>
             </div>
 
-            <h1 className="reveal-up font-display text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.08]">
+            <h1 className="reveal-up font-display text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.08] text-[#0F1B2E]">
               Questions{' '}
-              <span className="text-gradient-emerald">fréquentes</span>
+              <span className="text-gradient-blue">fréquentes</span>
             </h1>
 
-            <p className="reveal-up mt-6 text-lg sm:text-xl text-white/70 max-w-2xl mx-auto leading-relaxed">
+            <p className="reveal-up mt-6 text-lg sm:text-xl text-[#5B7088] max-w-2xl mx-auto leading-relaxed">
               Trouvez rapidement les réponses à vos questions sur QRTrans, son
               fonctionnement, son utilisation et sa sécurité.
             </p>
 
             <div className="reveal-up mt-8 flex flex-wrap items-center justify-center gap-3">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass text-sm text-white/80">
-                <HelpCircle className="w-4 h-4 text-emerald-300" />
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-light text-sm text-[#1E4B7A]">
+                <HelpCircle className="w-4 h-4 text-[#1E4B7A]" />
                 <span>
-                  <strong className="text-white">{totalQuestions}</strong> questions
+                  <strong className="text-[#0F1B2E]">{totalQuestions}</strong> questions
                 </span>
               </div>
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass text-sm text-white/80">
-                <MessageCircleQuestion className="w-4 h-4 text-emerald-300" />
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-light text-sm text-[#1E4B7A]">
+                <MessageCircleQuestion className="w-4 h-4 text-[#1E4B7A]" />
                 <span>
-                  <strong className="text-white">{FAQ_CATEGORIES.length}</strong> catégories
+                  <strong className="text-[#0F1B2E]">{FAQ_CATEGORIES.length}</strong> catégories
                 </span>
               </div>
             </div>
@@ -200,23 +199,23 @@ export default function FAQPage() {
       {/* =====================================================
           2. FAQ CATEGORIES
          ===================================================== */}
-      <section className="relative py-16 lg:py-24">
+      <section className="relative py-16 lg:py-24 bg-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
           {FAQ_CATEGORIES.map((category, catIdx) => {
             const CategoryIcon = category.icon;
             return (
               <div key={category.title} className="reveal-up" style={{ transitionDelay: `${catIdx * 60}ms` }}>
                 <div className="flex items-center gap-4 mb-6">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-400/20 to-blue-500/20 border border-emerald-400/30 flex items-center justify-center">
-                    <CategoryIcon className="w-6 h-6 text-emerald-300" />
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#1E4B7A]/15 to-[#487AA8]/5 border border-[#1E4B7A]/25 flex items-center justify-center">
+                    <CategoryIcon className="w-6 h-6 text-[#1E4B7A]" />
                   </div>
                   <div>
-                    <h2 className="font-display text-xl sm:text-2xl font-bold text-white">
+                    <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0F1B2E]">
                       {category.title}
                     </h2>
-                    <p className="text-sm text-white/60">{category.description}</p>
+                    <p className="text-sm text-[#5B7088]">{category.description}</p>
                   </div>
-                  <span className="ml-auto hidden sm:inline-flex items-center justify-center px-3 py-1 rounded-full text-xs font-semibold text-emerald-200 bg-emerald-400/10 border border-emerald-400/30">
+                  <span className="ml-auto hidden sm:inline-flex items-center justify-center px-3 py-1 rounded-full text-xs font-semibold text-[#1E4B7A] bg-[#1E4B7A]/10 border border-[#1E4B7A]/25">
                     {category.questions.length} Q
                   </span>
                 </div>
@@ -239,33 +238,33 @@ export default function FAQPage() {
       {/* =====================================================
           3. CTA BANNER
          ===================================================== */}
-      <section className="relative py-16 lg:py-24">
+      <section className="relative py-16 lg:py-24 section-light">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="glass-strong rounded-3xl p-8 sm:p-12 relative overflow-hidden">
+          <div className="glass-light-strong rounded-3xl p-8 sm:p-12 relative overflow-hidden">
             <div
               aria-hidden="true"
-              className="absolute -top-24 -right-24 w-72 h-72 rounded-full opacity-40 pointer-events-none"
+              className="absolute -top-24 -right-24 w-72 h-72 rounded-full opacity-50 pointer-events-none"
               style={{
                 background:
-                  'radial-gradient(circle, rgba(16,185,129,0.35), transparent 70%)',
+                  'radial-gradient(circle, rgba(30, 75, 122, 0.20), transparent 70%)',
                 filter: 'blur(60px)',
               }}
             />
             <div className="relative text-center">
-              <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-emerald-400/15 border border-emerald-400/30 mb-5">
-                <HelpCircle className="w-7 h-7 text-emerald-300" />
+              <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-[#1E4B7A]/10 border border-[#1E4B7A]/25 mb-5">
+                <HelpCircle className="w-7 h-7 text-[#1E4B7A]" />
               </div>
-              <h3 className="font-display text-2xl sm:text-3xl font-bold text-white mb-4 leading-tight">
+              <h3 className="font-display text-2xl sm:text-3xl font-bold text-[#0F1B2E] mb-4 leading-tight">
                 Vous n&apos;avez pas trouvé votre{' '}
-                <span className="text-gradient-emerald">réponse</span> ?
+                <span className="text-gradient-blue">réponse</span> ?
               </h3>
-              <p className="text-white/70 mb-8 max-w-xl mx-auto leading-relaxed">
+              <p className="text-[#5B7088] mb-8 max-w-xl mx-auto leading-relaxed">
                 Notre équipe est disponible pour répondre à toutes vos questions et vous
                 accompagner dans l&apos;utilisation de QRTrans.
               </p>
               <Link
                 href="/contact"
-                className="btn-magnetic inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-gradient-to-r from-[#10B981] to-[#34D399] text-[#060B1F] font-bold shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/50 transition-all"
+                className="btn-brand btn-magnetic inline-flex items-center gap-2 px-6 py-3.5 rounded-xl font-bold transition-all"
               >
                 Contactez-nous
                 <ArrowRight className="w-4 h-4" />

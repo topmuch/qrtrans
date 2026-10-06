@@ -28,27 +28,27 @@ export default function ContactsCard({
     : `Hello ${receiverName}, regarding your package #${reference}.`;
 
   return (
-    <div className="glass-card rounded-xl p-5 border-l-4 border-l-emerald-500/70">
-      <h2 className="font-display text-base font-bold text-white mb-4 flex items-center gap-2">
-        <MessageCircle className="w-4 h-4 text-emerald-400" />
+    <div className="glass-card-light rounded-xl p-5 border-l-4 border-l-[#1E4B7A]">
+      <h2 className="font-display text-base font-bold text-[#0F1B2E] mb-4 flex items-center gap-2">
+        <MessageCircle className="w-4 h-4 text-[#1E4B7A]" />
         {t('Contacts', 'Contacts')}
       </h2>
 
       <div className="space-y-4">
         {/* ENVOYEUR */}
-        <div className="bg-white/[0.04] border border-white/5 rounded-lg p-4">
-          <p className="text-xs font-bold text-emerald-300 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+        <div className="bg-[#1E4B7A]/5 border border-[#1E4B7A]/10 rounded-lg p-4">
+          <p className="text-xs font-bold text-[#1E4B7A] uppercase tracking-wider mb-2 flex items-center gap-1.5">
             <Upload className="w-3.5 h-3.5" />
             {t('Envoyeur', 'Sender')}
           </p>
-          <p className="font-semibold text-white text-sm">{senderName || '—'}</p>
-          <p className="text-sm text-white/50 font-mono mt-0.5">{senderPhone || '—'}</p>
+          <p className="font-semibold text-[#0F1B2E] text-sm">{senderName || '—'}</p>
+          <p className="text-sm text-[#5B7088] font-mono mt-0.5">{senderPhone || '—'}</p>
 
           {senderPhone && (
             <div className="flex gap-2 mt-3">
               <a
                 href={`tel:${senderPhone}`}
-                className="inline-flex items-center gap-1.5 px-3 h-10 bg-white/5 hover:bg-white/10 border border-white/10 text-white/80 rounded-lg text-xs font-semibold transition-colors no-underline"
+                className="inline-flex items-center gap-1.5 px-3 h-10 bg-[#1E4B7A]/5 hover:bg-[#1E4B7A]/10 border border-[#1E4B7A]/10 text-[#1E4B7A] rounded-lg text-xs font-semibold transition-colors no-underline"
               >
                 <Phone className="w-3.5 h-3.5" />
                 {t('Appeler', 'Call')}
@@ -67,19 +67,19 @@ export default function ContactsCard({
         </div>
 
         {/* RECEVEUR */}
-        <div className="bg-white/[0.04] border border-white/5 rounded-lg p-4">
-          <p className="text-xs font-bold text-emerald-300 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+        <div className="bg-[#1E4B7A]/5 border border-[#1E4B7A]/10 rounded-lg p-4">
+          <p className="text-xs font-bold text-[#1E4B7A] uppercase tracking-wider mb-2 flex items-center gap-1.5">
             <Download className="w-3.5 h-3.5" />
             {t('Receveur', 'Receiver')}
           </p>
-          <p className="font-semibold text-white text-sm">{receiverName || '—'}</p>
-          <p className="text-sm text-white/50 font-mono mt-0.5">{receiverPhone || '—'}</p>
+          <p className="font-semibold text-[#0F1B2E] text-sm">{receiverName || '—'}</p>
+          <p className="text-sm text-[#5B7088] font-mono mt-0.5">{receiverPhone || '—'}</p>
 
           {receiverPhone && (
             <div className="flex gap-2 mt-3">
               <a
                 href={`tel:${receiverPhone}`}
-                className="inline-flex items-center gap-1.5 px-3 h-10 bg-white/5 hover:bg-white/10 border border-white/10 text-white/80 rounded-lg text-xs font-semibold transition-colors no-underline"
+                className="inline-flex items-center gap-1.5 px-3 h-10 bg-[#1E4B7A]/5 hover:bg-[#1E4B7A]/10 border border-[#1E4B7A]/10 text-[#1E4B7A] rounded-lg text-xs font-semibold transition-colors no-underline"
               >
                 <Phone className="w-3.5 h-3.5" />
                 {t('Appeler', 'Call')}

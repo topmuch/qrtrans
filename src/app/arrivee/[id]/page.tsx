@@ -2,7 +2,8 @@
 
 import { useState, useEffect, Suspense } from 'react';
 import { useParams, useSearchParams } from 'next/navigation';
-import { QrCode, Loader2, CheckCircle, Package, AlertTriangle, Home } from 'lucide-react';
+import { Loader2, CheckCircle, Package, AlertTriangle, Home } from 'lucide-react';
+import Image from 'next/image';
 import ColisInfoCard from '@/components/arrival/ColisInfoCard';
 import ContactsCard from '@/components/arrival/ContactsCard';
 import ConfirmForm from '@/components/arrival/ConfirmForm';
@@ -85,12 +86,12 @@ function ArriveeContent() {
   // ─── Loading state ───
   if (loadingData) {
     return (
-      <div className="min-h-screen bg-[#060B1F]">
+      <div className="min-h-screen bg-[#F4F7FB]">
         <ArriveeHeader qrCode={qrCode} lang={lang} label={t("Confirmation d'Arrivée", 'Arrival Confirmation')} />
         <div className="flex items-center justify-center py-32">
           <div className="text-center">
-            <Loader2 className="w-8 h-8 text-emerald-400 animate-spin mx-auto mb-3" />
-            <p className="text-sm text-white/60">{t('Chargement...', 'Loading...')}</p>
+            <Loader2 className="w-8 h-8 text-[#1E4B7A] animate-spin mx-auto mb-3" />
+            <p className="text-sm text-[#5B7088]">{t('Chargement...', 'Loading...')}</p>
           </div>
         </div>
       </div>
@@ -104,20 +105,20 @@ function ArriveeContent() {
     : 'none';
 
   return (
-    <div className="min-h-screen bg-[#060B1F]">
+    <div className="min-h-screen bg-[#F4F7FB]">
       <ArriveeHeader qrCode={qrCode} lang={lang} label={t("Confirmation d'Arrivée", 'Arrival Confirmation')} />
 
       <main className="max-w-[600px] mx-auto px-4 py-6 pb-20">
         {/* ─── Error: not found ─── */}
         {fetchError && !colis && (
           <div className="text-center py-16 space-y-4">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-red-500/10 border border-red-500/20 rounded-full">
-              <AlertTriangle className="w-8 h-8 text-red-400" />
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-red-50 border border-red-200 rounded-full">
+              <AlertTriangle className="w-8 h-8 text-red-500" />
             </div>
-            <h2 className="text-lg font-bold text-white">{fetchError}</h2>
+            <h2 className="text-lg font-bold text-[#0F1B2E]">{fetchError}</h2>
             <Link
               href="/"
-              className="inline-flex items-center gap-2 px-5 h-11 bg-gradient-to-r from-[#10B981] to-[#34D399] hover:from-[#34D399] hover:to-[#6EE7B7] text-[#060B1F] rounded-xl font-semibold text-sm transition-colors no-underline shadow-lg shadow-emerald-500/20"
+              className="btn-brand inline-flex items-center gap-2 px-5 h-11 rounded-xl font-semibold text-sm transition-colors no-underline text-white"
             >
               <Home className="w-4 h-4" />
               {t("Retour à l'accueil", 'Back to home')}
@@ -166,16 +167,16 @@ function ArriveeContent() {
           <div className="space-y-4">
             {/* Already delivered */}
             {colis.status === 'delivered' && (
-              <div className="glass-card border border-amber-500/30 rounded-xl p-4 text-center animate-in fade-in">
-                <div className="inline-flex items-center justify-center w-12 h-12 bg-amber-500/15 border border-amber-500/30 rounded-full mb-2">
-                  <CheckCircle className="w-6 h-6 text-amber-300" />
+              <div className="glass-card-light border border-amber-200 bg-amber-50 rounded-xl p-4 text-center animate-in fade-in">
+                <div className="inline-flex items-center justify-center w-12 h-12 bg-amber-100 border border-amber-200 rounded-full mb-2">
+                  <CheckCircle className="w-6 h-6 text-amber-600" />
                 </div>
-                <p className="text-sm font-semibold text-amber-100 mt-2">
+                <p className="text-sm font-semibold text-amber-800 mt-2">
                   {t('Ce colis a déjà été livré.', 'This package has already been delivered.')}
                 </p>
                 <Link
                   href={`/suivi/${qrCode}`}
-                  className="inline-flex items-center justify-center gap-3 mt-4 px-8 h-14 bg-gradient-to-r from-[#10B981] to-[#34D399] hover:from-[#34D399] hover:to-[#6EE7B7] text-[#060B1F] rounded-xl text-lg font-bold transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-emerald-500/30 no-underline w-full max-w-xs mx-auto"
+                  className="btn-brand inline-flex items-center justify-center gap-3 mt-4 px-8 h-14 rounded-xl text-lg font-bold transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] no-underline w-full max-w-xs mx-auto text-white"
                 >
                   {t('Voir le suivi', 'View tracking')}
                 </Link>
@@ -229,21 +230,28 @@ function ArriveeContent() {
 
 function ArriveeHeader({ qrCode, lang, label }: { qrCode: string; lang: 'fr' | 'en'; label: string }) {
   return (
-    <header className="sticky top-0 z-50 bg-[#060B1F]/80 backdrop-blur-xl border-b border-white/10 safe-area-inset-top">
+    <header className="sticky top-0 z-50 glass-light-strong border-b border-[#1E4B7A]/10 safe-area-inset-top">
       <div className="max-w-[600px] mx-auto px-4 h-16 flex items-center justify-between">
         <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#10B981] to-[#3B6BD9] flex items-center justify-center shadow-lg shadow-emerald-500/20">
-            <QrCode className="w-5 h-5 text-white" />
+          <div className="w-9 h-9 rounded-xl bg-white border border-[#1E4B7A]/15 flex items-center justify-center overflow-hidden">
+            <Image
+              src="/brand/logo.png"
+              width={32}
+              height={32}
+              alt="QRTrans"
+              className="object-contain"
+              priority
+            />
           </div>
           <div>
-            <span className="font-display text-lg font-bold tracking-tight block leading-tight text-white">
-              QR<span className="text-gradient-emerald">Trans</span>
+            <span className="font-display text-lg font-bold tracking-tight block leading-tight text-[#0F1B2E]">
+              QR<span className="text-gradient-blue">Trans</span>
             </span>
-            {qrCode && <span className="text-[10px] font-mono text-white/50 leading-tight">{qrCode}</span>}
+            {qrCode && <span className="text-[10px] font-mono text-[#5B7088] leading-tight">{qrCode}</span>}
           </div>
         </div>
-        <span className="text-sm text-white/60 flex items-center gap-1.5">
-          <Package className="w-4 h-4 text-emerald-400" />
+        <span className="text-sm text-[#5B7088] flex items-center gap-1.5">
+          <Package className="w-4 h-4 text-[#1E4B7A]" />
           {label}
         </span>
       </div>
@@ -259,12 +267,12 @@ export default function ArriveePage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-[#060B1F]">
+        <div className="min-h-screen bg-[#F4F7FB]">
           <div className="max-w-[600px] mx-auto px-4 h-16 flex items-center justify-center">
-            <Loader2 className="w-6 h-6 text-emerald-400 animate-spin" />
+            <Loader2 className="w-6 h-6 text-[#1E4B7A] animate-spin" />
           </div>
           <div className="flex items-center justify-center py-32">
-            <Loader2 className="w-8 h-8 text-emerald-400 animate-spin" />
+            <Loader2 className="w-8 h-8 text-[#1E4B7A] animate-spin" />
           </div>
         </div>
       }

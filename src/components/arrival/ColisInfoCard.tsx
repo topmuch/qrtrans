@@ -29,38 +29,38 @@ export default function ColisInfoCard({
   const typeLabel = transportType === 'bus' ? 'BUS' : 'GP';
 
   return (
-    <div className="glass-card rounded-xl p-5 border-l-4 border-l-emerald-500">
-      <h2 className="font-display text-base font-bold text-white mb-4 flex items-center gap-2">
-        <Package className="w-4 h-4 text-emerald-400" />
+    <div className="glass-card-light rounded-xl p-5 border-l-4 border-l-[#1E4B7A]">
+      <h2 className="font-display text-base font-bold text-[#0F1B2E] mb-4 flex items-center gap-2">
+        <Package className="w-4 h-4 text-[#1E4B7A]" />
         {t('Détails du Colis', 'Package Details')}
       </h2>
 
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <span className="text-sm text-white/50">{t('Référence', 'Reference')}</span>
-          <span className="font-mono font-bold text-white text-sm">#{reference}</span>
+          <span className="text-sm text-[#5B7088]">{t('Référence', 'Reference')}</span>
+          <span className="font-mono font-bold text-[#0F1B2E] text-sm">#{reference}</span>
         </div>
 
         <div className="flex items-center justify-between">
-          <span className="text-sm text-white/50">{t('Statut', 'Status')}</span>
-          <span className="inline-flex items-center gap-1.5 bg-sky-500/15 text-sky-300 text-xs font-semibold px-2.5 py-1 rounded-full border border-sky-500/30">
+          <span className="text-sm text-[#5B7088]">{t('Statut', 'Status')}</span>
+          <span className="inline-flex items-center gap-1.5 bg-sky-50 text-sky-700 text-xs font-semibold px-2.5 py-1 rounded-full border border-sky-200">
             {t('En Transit', 'In Transit')}
           </span>
         </div>
 
         <div className="flex items-center justify-between">
-          <span className="text-sm text-white/50">{t('Transport', 'Transport')}</span>
-          <span className="font-semibold text-white text-sm">{typeLabel} — {company}</span>
+          <span className="text-sm text-[#5B7088]">{t('Transport', 'Transport')}</span>
+          <span className="font-semibold text-[#0F1B2E] text-sm">{typeLabel} — {company}</span>
         </div>
 
         <div className="flex items-center justify-between">
-          <span className="text-sm text-white/50">{t('Trajet', 'Route')}</span>
-          <span className="font-semibold text-white text-sm">{arrivalCity}</span>
+          <span className="text-sm text-[#5B7088]">{t('Trajet', 'Route')}</span>
+          <span className="font-semibold text-[#0F1B2E] text-sm">{arrivalCity}</span>
         </div>
 
         <div className="flex items-center justify-between">
-          <span className="text-sm text-white/50">{t('Départ', 'Departure')}</span>
-          <span className="font-medium text-white/80 text-sm">
+          <span className="text-sm text-[#5B7088]">{t('Départ', 'Departure')}</span>
+          <span className="font-medium text-[#1E4B7A] text-sm">
             {formatDate(departureDate)} {departureTime || ''}
           </span>
         </div>

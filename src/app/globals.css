@@ -973,3 +973,218 @@ body * {
     animation: none !important;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   QRTRANS LIGHT PREMIUM DESIGN SYSTEM — harmonisé avec le logo
+   (bleu acier #1E4B7A + reflets #6BA3D6 + accent émeraude)
+   Added 2026-10-06 (light variant)
+   ═══════════════════════════════════════════════════════════════ */
+
+:root {
+  /* Brand palette — light variant (steel blue from logo) */
+  --q-light-bg: #F4F7FB;          /* page background, slight blue tint */
+  --q-light-bg-2: #FFFFFF;        /* card background */
+  --q-light-bg-3: #EDF2F8;        /* subtle section bg */
+  --q-light-ink: #0F1B2E;         /* primary text — deep navy */
+  --q-light-ink-2: #1E4B7A;       /* secondary text — steel blue */
+  --q-light-muted: #5B7088;       /* muted text */
+
+  /* Brand blue (extracted from logo) */
+  --q-brand-900: #0F2D52;
+  --q-brand-800: #163556;
+  --q-brand-700: #1E4B7A;         /* main brand blue */
+  --q-brand-600: #245B8F;
+  --q-brand-500: #487AA8;         /* mid steel */
+  --q-brand-400: #6BA3D6;         /* highlight blue */
+  --q-brand-300: #89BDE0;
+  --q-brand-200: #B5D3EA;
+  --q-brand-100: #DCEAF6;
+  --q-brand-50: #EEF5FC;
+
+  /* Accent emerald (kept from dark variant for energy) */
+  --q-emerald-500: #10B981;
+  --q-emerald-600: #059669;
+
+  /* Accent orange (Hajj/omra, sparing) */
+  --q-orange-500: #F97316;
+
+  /* Light gradients */
+  --q-gradient-light-hero: radial-gradient(ellipse 80% 80% at 50% -20%, rgba(72, 122, 168, 0.18), transparent 60%), radial-gradient(ellipse 60% 50% at 80% 10%, rgba(16, 185, 129, 0.10), transparent 60%), linear-gradient(180deg, #FFFFFF 0%, #F4F7FB 40%, #EDF2F8 100%);
+  --q-gradient-light-mesh: conic-gradient(from 180deg at 50% 50%, rgba(72, 122, 168, 0.06), rgba(16, 185, 129, 0.04), rgba(217, 175, 55, 0.03), rgba(72, 122, 168, 0.06));
+  --q-gradient-blue: linear-gradient(135deg, #1E4B7A 0%, #245B8F 50%, #487AA8 100%);
+  --q-gradient-blue-soft: linear-gradient(135deg, #487AA8 0%, #6BA3D6 100%);
+  --q-gradient-emerald-blue: linear-gradient(135deg, #1E4B7A 0%, #245B8F 40%, #10B981 100%);
+  --q-gradient-text-blue: linear-gradient(135deg, #0F2D52 0%, #1E4B7A 50%, #487AA8 100%);
+  --q-gradient-text-blue-emerald: linear-gradient(135deg, #1E4B7A 0%, #245B8F 40%, #10B981 100%);
+
+  /* Light glassmorphism */
+  --q-light-glass-bg: rgba(255, 255, 255, 0.65);
+  --q-light-glass-border: rgba(72, 122, 168, 0.18);
+  --q-light-glass-shadow: 0 8px 32px rgba(15, 45, 82, 0.08);
+}
+
+/* ─── Light utility classes ─────────────────────────────────── */
+
+.text-gradient-blue {
+  background: var(--q-gradient-text-blue);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+.text-gradient-blue-emerald {
+  background: var(--q-gradient-text-blue-emerald);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+.bg-light-hero {
+  background: var(--q-gradient-light-hero);
+}
+
+.bg-light-mesh {
+  background-image: var(--q-gradient-light-mesh);
+}
+
+.bg-brand {
+  background: var(--q-gradient-blue);
+}
+
+.bg-brand-soft {
+  background: var(--q-gradient-blue-soft);
+}
+
+.bg-emerald-blue {
+  background: var(--q-gradient-emerald-blue);
+}
+
+/* Light glass cards */
+.glass-light {
+  background: var(--q-light-glass-bg);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid var(--q-light-glass-border);
+  box-shadow: var(--q-light-glass-shadow);
+}
+
+.glass-light-strong {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(28px) saturate(200%);
+  -webkit-backdrop-filter: blur(28px) saturate(200%);
+  border: 1px solid rgba(72, 122, 168, 0.22);
+  box-shadow: 0 12px 40px rgba(15, 45, 82, 0.12);
+}
+
+.glass-card-light {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(237, 242, 248, 0.8));
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid rgba(72, 122, 168, 0.15);
+  border-radius: 1.5rem;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 24px rgba(15, 45, 82, 0.06);
+}
+
+.glass-card-light:hover {
+  border-color: rgba(72, 122, 168, 0.4);
+  transform: translateY(-4px);
+  box-shadow: 0 20px 60px rgba(30, 75, 122, 0.18);
+}
+
+/* Light gradient border */
+.gradient-border-light {
+  position: relative;
+  background: linear-gradient(#FFFFFF, #FFFFFF) padding-box,
+              linear-gradient(135deg, rgba(30, 75, 122, 0.5), rgba(72, 122, 168, 0.5)) border-box;
+  border: 1px solid transparent;
+}
+
+.gradient-border-emerald-light {
+  position: relative;
+  background: linear-gradient(#FFFFFF, #FFFFFF) padding-box,
+              linear-gradient(135deg, #1E4B7A, #10B981) border-box;
+  border: 2px solid transparent;
+}
+
+/* Light grid background */
+.bg-grid-light {
+  background-image:
+    linear-gradient(rgba(72, 122, 168, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(72, 122, 168, 0.06) 1px, transparent 1px);
+  background-size: 50px 50px;
+}
+
+.bg-grid-fade-light {
+  -webkit-mask-image: radial-gradient(ellipse 60% 80% at 50% 0%, black 30%, transparent 70%);
+  mask-image: radial-gradient(ellipse 60% 80% at 50% 0%, black 30%, transparent 70%);
+}
+
+/* Light aurora blobs */
+.aurora-blob-light {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.4;
+  pointer-events: none;
+  animation: aurora-float 20s ease-in-out infinite;
+}
+
+/* Light dividers */
+.divider-blue {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(72, 122, 168, 0.4), transparent);
+}
+
+/* Premium CTA button — blue gradient */
+.btn-brand {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #1E4B7A 0%, #245B8F 50%, #487AA8 100%);
+  color: white;
+  box-shadow: 0 8px 24px rgba(30, 75, 122, 0.3);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.btn-brand:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 12px 32px rgba(30, 75, 122, 0.4);
+}
+.btn-brand:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* Premium CTA button — emerald gradient (for primary CTAs) */
+.btn-emerald {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #10B981 0%, #34D399 100%);
+  color: #0F1B2E;
+  box-shadow: 0 8px 24px rgba(16, 185, 129, 0.3);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.btn-emerald:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 12px 32px rgba(16, 185, 129, 0.4);
+}
+
+/* Subtle section background utility */
+.section-light {
+  background: linear-gradient(180deg, #FFFFFF 0%, #F4F7FB 100%);
+}
+
+.section-light-reverse {
+  background: linear-gradient(180deg, #F4F7FB 0%, #FFFFFF 100%);
+}
+
+/* Light mode text colors helper */
+.text-ink {
+  color: var(--q-light-ink);
+}
+.text-ink-2 {
+  color: var(--q-light-ink-2);
+}
+.text-muted-ink {
+  color: var(--q-light-muted);
+}

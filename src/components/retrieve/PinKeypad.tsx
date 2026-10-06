@@ -245,7 +245,7 @@ export default function PinKeypad({
       aria-modal="true"
       aria-label="Saisie du code de retrait"
     >
-      <div className="rounded-t-3xl sm:rounded-2xl w-full max-w-sm bg-white shadow-2xl animate-in slide-in-from-bottom duration-300 sm:animate-in sm:slide-in-from-bottom-4">
+      <div className="rounded-t-3xl sm:rounded-2xl w-full max-w-sm bg-white/95 backdrop-blur-xl shadow-2xl animate-in slide-in-from-bottom duration-300 sm:animate-in sm:slide-in-from-bottom-4">
         {/* ── Header ──────────────────────────────────────────── */}
         <div className="relative p-6 pb-4">
           {/* Close button */}

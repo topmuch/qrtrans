@@ -9,11 +9,14 @@ import { useEffect, useRef } from 'react';
 export default function ParticleBackground({
   density = 80,
   className = '',
+  theme = 'light',
 }: {
   density?: number;
   className?: string;
+  theme?: 'light' | 'dark';
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const particleColor = theme === 'dark' ? '110, 231, 183' : '72, 122, 168';
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -82,7 +85,7 @@ export default function ParticleBackground({
 
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(110, 231, 183, ${alpha})`;
+        ctx.fillStyle = `rgba(${particleColor}, ${alpha})`;
         ctx.fill();
       }
 
@@ -97,7 +100,7 @@ export default function ParticleBackground({
             ctx.beginPath();
             ctx.moveTo(particles[i].x, particles[i].y);
             ctx.lineTo(particles[j].x, particles[j].y);
-            ctx.strokeStyle = `rgba(110, 231, 183, ${lineAlpha})`;
+            ctx.strokeStyle = `rgba(${particleColor}, ${lineAlpha})`;
             ctx.lineWidth = 0.5;
             ctx.stroke();
           }
