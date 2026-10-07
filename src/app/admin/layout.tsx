@@ -1,14 +1,14 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
 import {
   LayoutDashboard, Users, Building2, QrCode, Layers,
   MessageSquare, Search, UserPlus, TrendingUp, Megaphone,
   BarChart3, Shield, Globe, Mail, Settings, Activity, Newspaper,
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import DashboardShell, { NavCategory } from '@/components/dashboard/DashboardShell';
+import DashboardShell, { NavCategory, NavItem } from '@/components/dashboard/DashboardShell';
 import { PERMISSIONS, ROLES, Permission } from '@/lib/permissions';
 
 // Types
@@ -24,10 +24,15 @@ interface MenuItemDef {
 
 export default function AdminRootLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
+  const pathname = usePathname();
   const { user, loading, logout, isSuperAdmin, isAdmin, isAgent, can } = useAuth();
-
-  // State
   const [unreadMessages, setUnreadMessages] = useState<number>(0);
+  const [mounted, setMounted] = useState(false);
+
+  // Set mounted flag on client to avoid hydration mismatch
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Auth guard
   useEffect(() => {
@@ -59,17 +64,24 @@ export default function AdminRootLayout({ children }: { children: React.ReactNod
     return () => clearInterval(interval);
   }, [user]);
 
-  // Skip layout for login page
-  if (typeof window !== 'undefined' && window.location.pathname === '/admin/connexion') {
-    return <>{children}</>;
-  }
+  // Skip layout for login page — use pathname from hook instead of window.location
+  const isLoginPage = pathname === '/admin/connexion';
 
-  if (loading || !user) {
+  // During SSR or before mount, show a neutral loading state to avoid hydration mismatch
+  if (!mounted || loading || !user) {
+    if (isLoginPage) {
+      return <>{children}</>;
+    }
     return (
       <div className="min-h-screen flex items-center justify-center bg-[var(--dash-bg)]">
         <div className="w-8 h-8 border-2 border-[var(--dash-brand)] border-t-transparent rounded-full animate-spin" />
       </div>
     );
+  }
+
+  // If on login page after mount, skip the shell
+  if (isLoginPage) {
+    return <>{children}</>;
   }
 
   const userRole = user.role || 'agent';
