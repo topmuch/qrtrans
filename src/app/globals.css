@@ -1213,13 +1213,13 @@ body * {
   --dash-brand-soft: #EEF5FC;
   --dash-emerald: #10B981;
   --dash-emerald-soft: #ECFDF5;
-  --dash-sidebar-bg: #FFFFFF;
-  --dash-sidebar-border: #E2E8F0;
-  --dash-sidebar-text: #475569;
-  --dash-sidebar-text-active: #0F172A;
-  --dash-sidebar-hover: #F1F5F9;
-  --dash-sidebar-active-bg: #EEF5FC;
-  --dash-sidebar-active-accent: #1E4B7A;
+  --dash-sidebar-bg: #1E4B7A;
+  --dash-sidebar-border: rgba(255,255,255,0.12);
+  --dash-sidebar-text: rgba(255,255,255,0.75);
+  --dash-sidebar-text-active: #FFFFFF;
+  --dash-sidebar-hover: rgba(255,255,255,0.08);
+  --dash-sidebar-active-bg: rgba(255,255,255,0.15);
+  --dash-sidebar-active-accent: #FFFFFF;
   --dash-header-bg: #FFFFFF;
   --dash-header-border: #E2E8F0;
 }
@@ -1241,13 +1241,13 @@ body * {
   --dash-brand-soft: rgba(107, 163, 214, 0.1);
   --dash-emerald: #34D399;
   --dash-emerald-soft: rgba(52, 211, 153, 0.1);
-  --dash-sidebar-bg: #0F172A;
-  --dash-sidebar-border: #1E293B;
-  --dash-sidebar-text: #94A3B8;
-  --dash-sidebar-text-active: #F1F5F9;
-  --dash-sidebar-hover: #1E293B;
-  --dash-sidebar-active-bg: rgba(107, 163, 214, 0.1);
-  --dash-sidebar-active-accent: #6BA3D6;
+  --dash-sidebar-bg: #0F2D52;
+  --dash-sidebar-border: rgba(255,255,255,0.10);
+  --dash-sidebar-text: rgba(255,255,255,0.75);
+  --dash-sidebar-text-active: #FFFFFF;
+  --dash-sidebar-hover: rgba(255,255,255,0.08);
+  --dash-sidebar-active-bg: rgba(255,255,255,0.15);
+  --dash-sidebar-active-accent: #FFFFFF;
   --dash-header-bg: #0F172A;
   --dash-header-border: #1E293B;
 }

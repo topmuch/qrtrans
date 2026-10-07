@@ -146,7 +146,7 @@ export default function DashboardShell({
           </button>
           <button
             onClick={onLogout}
-            className="dash-nav-item w-full justify-center text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10"
+            className="dash-nav-item w-full justify-center text-red-300 hover:bg-red-500/20"
             title="Déconnexion"
           >
             <LogOut className="w-5 h-5 shrink-0" />
@@ -193,7 +193,7 @@ export default function DashboardShell({
               ))}
             </nav>
             <div className="border-t border-[var(--dash-sidebar-border)] p-2">
-              <button onClick={onLogout} className="dash-nav-item w-full text-red-500">
+              <button onClick={onLogout} className="dash-nav-item w-full text-red-300">
                 <LogOut className="w-5 h-5" />
                 <span>Déconnexion</span>
               </button>
