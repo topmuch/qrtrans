@@ -3,10 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRequireAuth } from '@/contexts/AuthContext';
 import { fetchWithAuth } from '@/lib/fetchWithAuth';
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
   DialogContent,
@@ -28,6 +25,9 @@ import {
   ChevronRight,
   Luggage,
   Plane,
+  Train,
+  Ship,
+  Bus,
   MapPin,
   Clock,
   Building2,
@@ -35,6 +35,7 @@ import {
   CalendarDays,
   Filter,
 } from "lucide-react";
+import KpiCard from '@/components/dashboard/KpiCard';
 
 /* ══════════════════════════════════════════════
    Types
@@ -104,9 +105,9 @@ function buildRenewalMessage(name: string, reference: string, expiryDate: string
 }
 
 function statusBadgeClass(status: string): string {
-  if (status === 'active') return 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400';
-  if (status === 'expired') return 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400';
-  return 'bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-400';
+  if (status === 'active') return 'dash-badge dash-badge-success';
+  if (status === 'expired') return 'dash-badge dash-badge-danger';
+  return 'dash-badge dash-badge-warning';
 }
 
 function statusBadgeLabel(status: string): string {
@@ -206,132 +207,92 @@ export default function MarketingPage() {
   return (
     <div className="max-w-7xl mx-auto">
       {/* ─── Page Header ─── */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800 dark:text-white flex items-center gap-2">
-            <TrendingUp className="w-6 h-6 text-emerald-500" />
+          <h1 className="font-display text-2xl font-bold text-[var(--dash-ink)] flex items-center gap-2">
+            <TrendingUp className="w-6 h-6 text-[var(--dash-emerald)]" />
             Marketing &amp; Relances
           </h1>
-          <p className="text-slate-500 dark:text-slate-400 mt-1">
+          <p className="text-sm text-[var(--dash-muted)] mt-1">
             Gérez les utilisateurs et relances de renouvellement
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <Button
+          <button
             onClick={fetchData}
-            variant="outline"
-            className="border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium border border-[var(--dash-border)] bg-[var(--dash-card)] text-[var(--dash-ink-2)] hover:bg-[var(--dash-bg-3)] transition-colors"
           >
-            <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
             Actualiser
-          </Button>
-          <Button
+          </button>
+          <button
             onClick={exportCSV}
-            variant="outline"
-            className="border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl"
+            className="btn-emerald btn-magnetic inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium"
             disabled={!data || data.pagination.total === 0}
           >
-            <Download className="w-4 h-4 mr-2" />
+            <Download className="w-4 h-4" />
             Exporter CSV
-          </Button>
+          </button>
         </div>
       </div>
 
       {/* ─── Error Banner ─── */}
       {error && (
-        <div className="mb-6 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 px-4 py-3 rounded-xl text-sm">
+        <div className="mb-6 bg-[var(--dash-bg-3)] border border-[var(--dash-badge-danger)] text-[var(--dash-ink-2)] px-4 py-3 rounded-xl text-sm">
           {error}
         </div>
       )}
 
       {/* ─── Stats Cards ─── */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <Card className="bg-white dark:bg-slate-800 border-slate-100 dark:border-slate-700 shadow-sm rounded-2xl">
-          <CardContent className="p-4 lg:p-5">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-slate-500 dark:text-slate-400 text-sm">Total utilisateurs</p>
-                <p className="text-2xl lg:text-3xl font-bold text-slate-800 dark:text-white mt-1">
-                  {data?.stats.totalUsers ?? '—'}
-                </p>
-              </div>
-              <div className="w-12 h-12 bg-blue-50 dark:bg-blue-900/30 rounded-xl flex items-center justify-center">
-                <Users className="w-6 h-6 text-blue-500" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-white dark:bg-slate-800 border-slate-100 dark:border-slate-700 shadow-sm rounded-2xl">
-          <CardContent className="p-4 lg:p-5">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-slate-500 dark:text-slate-400 text-sm">Colis actifs</p>
-                <p className="text-2xl lg:text-3xl font-bold text-emerald-600 dark:text-emerald-400 mt-1">
-                  {data?.stats.activeBaggages ?? '—'}
-                </p>
-              </div>
-              <div className="w-12 h-12 bg-emerald-50 dark:bg-emerald-900/30 rounded-xl flex items-center justify-center">
-                <ShieldCheck className="w-6 h-6 text-emerald-500" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-white dark:bg-slate-800 border-slate-100 dark:border-slate-700 shadow-sm rounded-2xl">
-          <CardContent className="p-4 lg:p-5">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-slate-500 dark:text-slate-400 text-sm">Colis expirés</p>
-                <div className="flex items-center gap-2">
-                  <p className="text-2xl lg:text-3xl font-bold text-red-600 dark:text-red-400 mt-1">
-                    {data?.stats.expiredBaggages ?? '—'}
-                  </p>
-                  {(data?.stats.expiredBaggages ?? 0) > 0 && (
-                    <Badge className="bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-400 text-[10px] px-1.5 py-0">
-                      Alerte
-                    </Badge>
-                  )}
-                </div>
-              </div>
-              <div className="w-12 h-12 bg-red-50 dark:bg-red-900/30 rounded-xl flex items-center justify-center">
-                <ShieldX className="w-6 h-6 text-red-500" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-white dark:bg-slate-800 border-slate-100 dark:border-slate-700 shadow-sm rounded-2xl">
-          <CardContent className="p-4 lg:p-5">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-slate-500 dark:text-slate-400 text-sm">Taux de renouvellement</p>
-                <p className="text-2xl lg:text-3xl font-bold text-slate-800 dark:text-white mt-1">
-                  {data?.stats.renewalRate ?? '—'}%
-                </p>
-              </div>
-              <div className="w-12 h-12 bg-amber-50 dark:bg-amber-900/30 rounded-xl flex items-center justify-center">
-                <TrendingUp className="w-6 h-6 text-amber-500" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <KpiCard
+          label="Total utilisateurs"
+          value={data?.stats.totalUsers ?? '—'}
+          subtitle="Tous statuts confondus"
+          icon={Users}
+          color="brand"
+          loading={loading}
+        />
+        <KpiCard
+          label="Colis actifs"
+          value={data?.stats.activeBaggages ?? '—'}
+          subtitle="En service"
+          icon={ShieldCheck}
+          color="emerald"
+          loading={loading}
+        />
+        <KpiCard
+          label="Colis expirés"
+          value={data?.stats.expiredBaggages ?? '—'}
+          subtitle="À relancer"
+          icon={ShieldX}
+          color="rose"
+          loading={loading}
+        />
+        <KpiCard
+          label="Taux de renouvellement"
+          value={`${data?.stats.renewalRate ?? '—'}%`}
+          subtitle="Conversion"
+          icon={TrendingUp}
+          color="amber"
+          loading={loading}
+        />
       </div>
 
       {/* ─── Filters Bar ─── */}
-      <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-4 mb-6">
+      <div className="dash-card p-4 mb-6">
         <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
           {/* Filter Tabs */}
-          <div className="flex items-center gap-2">
-            <Filter className="w-4 h-4 text-slate-400 hidden sm:block" />
+          <div className="flex items-center gap-2 flex-wrap">
+            <Filter className="w-4 h-4 text-[var(--dash-muted-2)] hidden sm:block" />
             {(['all', 'active', 'expired', 'pending'] as const).map((f) => (
               <button
                 key={f}
                 onClick={() => setFilter(f)}
-                className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                   filter === f
-                    ? 'bg-black text-white'
-                    : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600'
+                    ? 'bg-[var(--dash-brand)] text-white'
+                    : 'bg-[var(--dash-bg-3)] text-[var(--dash-muted)] hover:bg-[var(--dash-border)]'
                 }`}
               >
                 {f === 'all' ? 'Tous' : f === 'active' ? 'Actifs' : f === 'expired' ? 'Expirés' : 'En attente'}
@@ -342,17 +303,20 @@ export default function MarketingPage() {
           {/* Search */}
           <form onSubmit={handleSearch} className="flex items-center gap-2 w-full lg:w-auto">
             <div className="relative flex-1 lg:w-72">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--dash-muted-2)]" />
               <Input
                 placeholder="Rechercher par nom, email, réf..."
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
-                className="pl-10 bg-slate-50 dark:bg-slate-700 border-slate-200 dark:border-slate-600 text-slate-800 dark:text-white rounded-xl"
+                className="pl-10 bg-[var(--dash-bg-3)] border-[var(--dash-border)] text-[var(--dash-ink)] rounded-lg"
               />
             </div>
-            <Button type="submit" variant="outline" className="rounded-xl border-slate-200 dark:border-slate-700">
+            <button
+              type="submit"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium border border-[var(--dash-border)] bg-[var(--dash-card)] text-[var(--dash-ink-2)] hover:bg-[var(--dash-bg-3)] transition-colors"
+            >
               Rechercher
-            </Button>
+            </button>
           </form>
         </div>
       </div>
@@ -360,23 +324,25 @@ export default function MarketingPage() {
       {/* ─── Loading ─── */}
       {authLoading && (
         <div className="flex items-center justify-center py-16">
-          <div className="w-8 h-8 border-2 border-[#FF1D8D]/30 border-t-[#FF1D8D] rounded-full animate-spin" />
-          <span className="ml-3 text-slate-500">Vérification des permissions...</span>
+          <div className="w-8 h-8 border-2 border-[var(--dash-brand)]/30 border-t-[var(--dash-brand)] rounded-full animate-spin" />
+          <span className="ml-3 text-[var(--dash-muted)]">Vérification des permissions...</span>
         </div>
       )}
 
       {!authLoading && loading && (
         <div className="flex items-center justify-center py-16">
-          <div className="w-8 h-8 border-2 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin" />
+          <div className="w-8 h-8 border-2 border-[var(--dash-emerald)]/30 border-t-[var(--dash-emerald)] rounded-full animate-spin" />
         </div>
       )}
 
       {/* ─── Empty State ─── */}
       {!loading && data && data.pagination.total === 0 && (
-        <div className="text-center py-16">
-          <Users className="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
-          <p className="text-slate-500 dark:text-slate-400 text-lg">Aucun utilisateur trouvé</p>
-          <p className="text-slate-400 dark:text-slate-500 text-sm mt-1">
+        <div className="dash-card p-12 text-center">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[var(--dash-bg-3)] mb-4">
+            <Users className="w-8 h-8 text-[var(--dash-muted)]" />
+          </div>
+          <p className="text-[var(--dash-ink)] font-medium">Aucun utilisateur trouvé</p>
+          <p className="text-sm text-[var(--dash-muted-2)] mt-2">
             {search ? 'Essayez un autre terme de recherche' : 'Les données apparaîtront une fois les colis activés'}
           </p>
         </div>
@@ -386,21 +352,21 @@ export default function MarketingPage() {
       {!loading && data && data.pagination.total > 0 && (
         <>
           {/* Desktop (hidden on mobile) */}
-          <div className="hidden md:block bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
+          <div className="hidden md:block dash-card overflow-hidden">
             <div className="overflow-x-auto">
-              <table className="w-full">
+              <table className="dash-table">
                 <thead>
-                  <tr className="border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50">
-                    <th className="text-left px-5 py-3.5 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Nom</th>
-                    <th className="text-left px-5 py-3.5 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Email</th>
-                    <th className="text-left px-5 py-3.5 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">WhatsApp</th>
-                    <th className="text-left px-5 py-3.5 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Inscription</th>
-                    <th className="text-left px-5 py-3.5 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Statut</th>
-                    <th className="text-left px-5 py-3.5 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Expiration</th>
-                    <th className="text-right px-5 py-3.5 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Actions</th>
+                  <tr>
+                    <th>Nom</th>
+                    <th>Email</th>
+                    <th>WhatsApp</th>
+                    <th>Inscription</th>
+                    <th>Statut</th>
+                    <th>Expiration</th>
+                    <th className="text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
+                <tbody>
                   {data.travelers.map((traveler) => (
                     <TravelerRow
                       key={`${traveler.name}-${traveler.whatsapp}`}
@@ -427,33 +393,29 @@ export default function MarketingPage() {
           {/* ─── Pagination ─── */}
           {data.pagination.totalPages > 1 && (
             <div className="flex flex-col sm:flex-row items-center justify-between mt-6 gap-3">
-              <p className="text-sm text-slate-500 dark:text-slate-400">
+              <p className="text-sm text-[var(--dash-muted)]">
                 Page {data.pagination.page} sur {data.pagination.totalPages} — {data.pagination.total} résultat{data.pagination.total > 1 ? 's' : ''}
               </p>
               <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
+                <button
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
                   disabled={page <= 1}
-                  className="rounded-xl border-slate-200 dark:border-slate-700"
+                  className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm font-medium border border-[var(--dash-border)] bg-[var(--dash-card)] text-[var(--dash-ink-2)] hover:bg-[var(--dash-bg-3)] disabled:opacity-50 transition-colors"
                 >
                   <ChevronLeft className="w-4 h-4" />
-                  <span className="hidden sm:inline ml-1">Précédent</span>
-                </Button>
-                <span className="px-3 py-1 text-sm font-medium bg-slate-100 dark:bg-slate-700 rounded-lg">
+                  <span className="hidden sm:inline">Précédent</span>
+                </button>
+                <span className="px-3 py-1 text-sm font-medium bg-[var(--dash-bg-3)] text-[var(--dash-ink)] rounded-lg">
                   {page}
                 </span>
-                <Button
-                  variant="outline"
-                  size="sm"
+                <button
                   onClick={() => setPage((p) => Math.min(data.pagination.totalPages, p + 1))}
                   disabled={page >= data.pagination.totalPages}
-                  className="rounded-xl border-slate-200 dark:border-slate-700"
+                  className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm font-medium border border-[var(--dash-border)] bg-[var(--dash-card)] text-[var(--dash-ink-2)] hover:bg-[var(--dash-bg-3)] disabled:opacity-50 transition-colors"
                 >
-                  <span className="hidden sm:inline mr-1">Suivant</span>
+                  <span className="hidden sm:inline">Suivant</span>
                   <ChevronRight className="w-4 h-4" />
-                </Button>
+                </button>
               </div>
             </div>
           )}
@@ -462,9 +424,9 @@ export default function MarketingPage() {
 
       {/* ─── Detail Modal ─── */}
       <Dialog open={!!selectedTraveler} onOpenChange={(open) => !open && setSelectedTraveler(null)}>
-        <DialogContent className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white max-w-lg max-h-[85vh] overflow-y-auto">
+        <DialogContent className="bg-[var(--dash-card)] border-[var(--dash-border)] text-[var(--dash-ink)] max-w-lg max-h-[85vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="text-lg">Détails du voyageur</DialogTitle>
+            <DialogTitle className="text-[var(--dash-ink)] text-lg">Détails du voyageur</DialogTitle>
           </DialogHeader>
           {selectedTraveler && (
             <DetailModalContent traveler={selectedTraveler} />
@@ -496,46 +458,46 @@ function TravelerRow({ traveler, onView }: { traveler: Traveler; onView: () => v
     : null;
 
   return (
-    <tr className="hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
-      <td className="px-5 py-4">
+    <tr>
+      <td>
         <div>
-          <p className="font-medium text-slate-800 dark:text-white">{traveler.name}</p>
-          <p className="text-xs text-slate-400 mt-0.5">{traveler.totalBaggages} colis</p>
+          <p className="font-medium text-[var(--dash-ink)]">{traveler.name}</p>
+          <p className="text-xs text-[var(--dash-muted-2)] mt-0.5">{traveler.totalBaggages} colis</p>
         </div>
       </td>
-      <td className="px-5 py-4">
+      <td>
         {traveler.email ? (
-          <a href={mailtoUrl!} className="text-sm text-blue-600 dark:text-blue-400 hover:underline">
+          <a href={mailtoUrl!} className="text-sm text-[var(--dash-brand)] hover:underline">
             {traveler.email}
           </a>
         ) : (
-          <span className="text-sm text-slate-400">—</span>
+          <span className="text-sm text-[var(--dash-muted-2)]">—</span>
         )}
       </td>
-      <td className="px-5 py-4">
-        <span className="text-sm text-slate-600 dark:text-slate-300 font-mono">
+      <td>
+        <span className="text-sm text-[var(--dash-ink-2)] font-mono">
           {traveler.whatsapp || '—'}
         </span>
       </td>
-      <td className="px-5 py-4 text-sm text-slate-600 dark:text-slate-300">
+      <td className="text-sm text-[var(--dash-ink-2)]">
         {formatDate(traveler.registeredAt)}
       </td>
-      <td className="px-5 py-4">
-        <Badge className={statusBadgeClass(traveler.status)}>
+      <td>
+        <span className={statusBadgeClass(traveler.status)}>
           {statusBadgeLabel(traveler.status)}
-        </Badge>
+        </span>
       </td>
-      <td className="px-5 py-4 text-sm text-slate-600 dark:text-slate-300">
+      <td className="text-sm text-[var(--dash-ink-2)]">
         {expiryStr}
       </td>
-      <td className="px-5 py-4">
+      <td>
         <div className="flex items-center justify-end gap-1.5">
           {traveler.whatsapp && (
             <a
               href={getWhatsAppUrl(traveler.whatsapp, whatsappMsg)}
               target="_blank"
               rel="noopener noreferrer"
-              className="p-2 rounded-lg bg-green-500 hover:bg-green-600 text-white transition-colors"
+              className="p-2 rounded-lg bg-[var(--dash-emerald)] hover:opacity-90 text-white transition-opacity"
               title="Envoyer un WhatsApp"
             >
               <MessageCircle className="w-4 h-4" />
@@ -544,7 +506,7 @@ function TravelerRow({ traveler, onView }: { traveler: Traveler; onView: () => v
           {mailtoUrl && (
             <a
               href={mailtoUrl}
-              className="p-2 rounded-lg bg-blue-500 hover:bg-blue-600 text-white transition-colors"
+              className="p-2 rounded-lg bg-[var(--dash-brand)] hover:opacity-90 text-white transition-opacity"
               title="Envoyer un Email"
             >
               <Mail className="w-4 h-4" />
@@ -552,7 +514,7 @@ function TravelerRow({ traveler, onView }: { traveler: Traveler; onView: () => v
           )}
           <button
             onClick={onView}
-            className="p-2 rounded-lg bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300 transition-colors"
+            className="p-2 rounded-lg bg-[var(--dash-bg-3)] hover:bg-[var(--dash-border)] text-[var(--dash-ink-2)] transition-colors"
             title="Voir détails"
           >
             <Eye className="w-4 h-4" />
@@ -583,50 +545,50 @@ function TravelerCard({ traveler, onView }: { traveler: Traveler; onView: () => 
     : null;
 
   return (
-    <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-4">
+    <div className="dash-card p-4">
       {/* Top: Name + Status */}
       <div className="flex items-start justify-between mb-3">
         <div>
-          <p className="font-semibold text-slate-800 dark:text-white">{traveler.name}</p>
-          <p className="text-xs text-slate-400 mt-0.5">{traveler.totalBaggages} colis</p>
+          <p className="font-semibold text-[var(--dash-ink)]">{traveler.name}</p>
+          <p className="text-xs text-[var(--dash-muted-2)] mt-0.5">{traveler.totalBaggages} colis</p>
         </div>
-        <Badge className={statusBadgeClass(traveler.status)}>
+        <span className={statusBadgeClass(traveler.status)}>
           {statusBadgeLabel(traveler.status)}
-        </Badge>
+        </span>
       </div>
 
       {/* Info */}
       <div className="space-y-1.5 mb-4 text-sm">
         {traveler.email && (
-          <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
-            <Mail className="w-3.5 h-3.5 text-slate-400" />
+          <div className="flex items-center gap-2 text-[var(--dash-ink-2)]">
+            <Mail className="w-3.5 h-3.5 text-[var(--dash-muted-2)]" />
             <span>{traveler.email}</span>
           </div>
         )}
         {traveler.whatsapp && (
-          <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
-            <Phone className="w-3.5 h-3.5 text-slate-400" />
+          <div className="flex items-center gap-2 text-[var(--dash-ink-2)]">
+            <Phone className="w-3.5 h-3.5 text-[var(--dash-muted-2)]" />
             <span className="font-mono">{traveler.whatsapp}</span>
           </div>
         )}
-        <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400">
+        <div className="flex items-center gap-2 text-[var(--dash-muted)]">
           <CalendarDays className="w-3.5 h-3.5" />
           Inscription : {formatDate(traveler.registeredAt)}
         </div>
-        <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400">
+        <div className="flex items-center gap-2 text-[var(--dash-muted)]">
           <Clock className="w-3.5 h-3.5" />
           Expiration : {expiryStr}
         </div>
       </div>
 
       {/* Actions */}
-      <div className="flex items-center gap-2 pt-3 border-t border-slate-100 dark:border-slate-700">
+      <div className="flex items-center gap-2 pt-3 border-t border-[var(--dash-border)]">
         {traveler.whatsapp && (
           <a
             href={getWhatsAppUrl(traveler.whatsapp, whatsappMsg)}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-green-500 hover:bg-green-600 text-white rounded-xl text-sm font-medium transition-colors"
+            className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-[var(--dash-emerald)] hover:opacity-90 text-white rounded-lg text-sm font-medium transition-opacity"
           >
             <MessageCircle className="w-4 h-4" />
             WhatsApp
@@ -635,7 +597,7 @@ function TravelerCard({ traveler, onView }: { traveler: Traveler; onView: () => 
         {mailtoUrl && (
           <a
             href={mailtoUrl}
-            className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-blue-500 hover:bg-blue-600 text-white rounded-xl text-sm font-medium transition-colors"
+            className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-[var(--dash-brand)] hover:opacity-90 text-white rounded-lg text-sm font-medium transition-opacity"
           >
             <Mail className="w-4 h-4" />
             Email
@@ -643,7 +605,7 @@ function TravelerCard({ traveler, onView }: { traveler: Traveler; onView: () => 
         )}
         <button
           onClick={onView}
-          className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 rounded-xl text-sm font-medium transition-colors"
+          className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-[var(--dash-bg-3)] hover:bg-[var(--dash-border)] text-[var(--dash-ink-2)] rounded-lg text-sm font-medium transition-colors"
         >
           <Eye className="w-4 h-4" />
           Détails
@@ -677,66 +639,66 @@ function DetailModalContent({ traveler }: { traveler: Traveler }) {
       {/* Traveler Info */}
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Nom</p>
-          <p className="font-medium text-slate-800 dark:text-white">{traveler.name}</p>
+          <p className="text-xs font-semibold text-[var(--dash-muted-2)] uppercase tracking-wider mb-1">Nom</p>
+          <p className="font-medium text-[var(--dash-ink)]">{traveler.name}</p>
         </div>
         <div>
-          <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Email</p>
+          <p className="text-xs font-semibold text-[var(--dash-muted-2)] uppercase tracking-wider mb-1">Email</p>
           {traveler.email ? (
-            <a href={mailtoUrl!} className="font-medium text-blue-600 dark:text-blue-400 hover:underline">{traveler.email}</a>
+            <a href={mailtoUrl!} className="font-medium text-[var(--dash-brand)] hover:underline">{traveler.email}</a>
           ) : (
-            <p className="font-medium text-slate-400">—</p>
+            <p className="font-medium text-[var(--dash-muted-2)]">—</p>
           )}
         </div>
         <div>
-          <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">WhatsApp</p>
-          <p className="font-medium text-slate-800 dark:text-white font-mono">{traveler.whatsapp || '—'}</p>
+          <p className="text-xs font-semibold text-[var(--dash-muted-2)] uppercase tracking-wider mb-1">WhatsApp</p>
+          <p className="font-medium text-[var(--dash-ink)] font-mono">{traveler.whatsapp || '—'}</p>
         </div>
         <div>
-          <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Inscription</p>
-          <p className="font-medium text-slate-800 dark:text-white">{formatDate(traveler.registeredAt)}</p>
+          <p className="text-xs font-semibold text-[var(--dash-muted-2)] uppercase tracking-wider mb-1">Inscription</p>
+          <p className="font-medium text-[var(--dash-ink)]">{formatDate(traveler.registeredAt)}</p>
         </div>
         <div>
-          <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Statut</p>
-          <Badge className={statusBadgeClass(traveler.status)}>
+          <p className="text-xs font-semibold text-[var(--dash-muted-2)] uppercase tracking-wider mb-1">Statut</p>
+          <span className={statusBadgeClass(traveler.status)}>
             {statusBadgeLabel(traveler.status)}
-          </Badge>
+          </span>
         </div>
         <div>
-          <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Expiration</p>
-          <p className="font-medium text-slate-800 dark:text-white">{expiryStr}</p>
+          <p className="text-xs font-semibold text-[var(--dash-muted-2)] uppercase tracking-wider mb-1">Expiration</p>
+          <p className="font-medium text-[var(--dash-ink)]">{expiryStr}</p>
         </div>
         <div>
-          <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Nb colis</p>
-          <p className="font-medium text-slate-800 dark:text-white">{traveler.totalBaggages}</p>
+          <p className="text-xs font-semibold text-[var(--dash-muted-2)] uppercase tracking-wider mb-1">Nb colis</p>
+          <p className="font-medium text-[var(--dash-ink)]">{traveler.totalBaggages}</p>
         </div>
       </div>
 
       {/* Baggages List */}
       <div>
-        <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Colis</p>
+        <p className="text-xs font-semibold text-[var(--dash-muted-2)] uppercase tracking-wider mb-3">Colis</p>
         <div className="space-y-2 max-h-48 overflow-y-auto">
           {traveler.baggages.map((b) => (
-            <div key={b.reference} className="bg-slate-50 dark:bg-slate-700/50 rounded-xl p-3">
+            <div key={b.reference} className="bg-[var(--dash-bg-3)] rounded-xl p-3">
               <div className="flex items-center justify-between mb-1.5">
-                <span className="font-mono text-sm font-semibold text-slate-800 dark:text-white">{b.reference}</span>
-                <Badge variant="outline" className="text-[10px] px-2 py-0">
+                <span className="font-mono text-sm font-semibold text-[var(--dash-ink)]">{b.reference}</span>
+                <span className="dash-badge dash-badge-neutral text-[10px]">
                   {b.type === 'hajj' ? 'Hajj' : 'Voyageur'}
-                </Badge>
+                </span>
               </div>
-              <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500 dark:text-slate-400">
+              <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-[var(--dash-muted)]">
                 {/* TRANSPORT-FEATURE: Dynamic transport info */}
                 {b.transportMode === 'flight' && b.flightNumber && (
                   <span className="flex items-center gap-1"><Plane className="w-3 h-3" />{b.flightNumber}</span>
                 )}
                 {b.transportMode === 'train' && b.trainNumber && (
-                  <span className="flex items-center gap-1">🚆 {b.trainNumber}</span>
+                  <span className="flex items-center gap-1"><Train className="w-3 h-3" />{b.trainNumber}</span>
                 )}
                 {b.transportMode === 'boat' && b.shipName && (
-                  <span className="flex items-center gap-1">🚢 {b.shipName}</span>
+                  <span className="flex items-center gap-1"><Ship className="w-3 h-3" />{b.shipName}</span>
                 )}
                 {b.transportMode === 'bus' && b.busLineNumber && (
-                  <span className="flex items-center gap-1">🚌 {b.busLineNumber}</span>
+                  <span className="flex items-center gap-1"><Bus className="w-3 h-3" />{b.busLineNumber}</span>
                 )}
                 {!b.transportMode && b.flightNumber && (
                   <span className="flex items-center gap-1"><Plane className="w-3 h-3" />{b.flightNumber}</span>
@@ -761,7 +723,7 @@ function DetailModalContent({ traveler }: { traveler: Traveler }) {
             href={getWhatsAppUrl(traveler.whatsapp, whatsappMsg)}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex-1 flex items-center justify-center gap-2 py-3 bg-green-500 hover:bg-green-600 text-white rounded-xl font-medium transition-colors"
+            className="flex-1 flex items-center justify-center gap-2 py-3 bg-[var(--dash-emerald)] hover:opacity-90 text-white rounded-lg font-medium transition-opacity"
           >
             <MessageCircle className="w-5 h-5" />
             WhatsApp
@@ -770,7 +732,7 @@ function DetailModalContent({ traveler }: { traveler: Traveler }) {
         {mailtoUrl ? (
           <a
             href={mailtoUrl}
-            className="flex-1 flex items-center justify-center gap-2 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-xl font-medium transition-colors"
+            className="flex-1 flex items-center justify-center gap-2 py-3 bg-[var(--dash-brand)] hover:opacity-90 text-white rounded-lg font-medium transition-opacity"
           >
             <Mail className="w-5 h-5" />
             Email
@@ -780,7 +742,7 @@ function DetailModalContent({ traveler }: { traveler: Traveler }) {
             onClick={() => {
               window.location.href = getMailtoUrl('contact@qrtrans.com', 'Renouvellement QRTrans', emailBody);
             }}
-            className="flex-1 flex items-center justify-center gap-2 py-3 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 rounded-xl font-medium transition-colors"
+            className="flex-1 flex items-center justify-center gap-2 py-3 bg-[var(--dash-bg-3)] hover:bg-[var(--dash-border)] text-[var(--dash-ink-2)] rounded-lg font-medium transition-colors"
           >
             <Mail className="w-5 h-5" />
             Email

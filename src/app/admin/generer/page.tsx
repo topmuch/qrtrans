@@ -23,8 +23,8 @@ import {
   Shield,
   Layers,
   Zap,
+  Info,
 } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 
@@ -196,7 +196,7 @@ export default function GenererQRPage() {
       const data = await response.json();
 
       if (response.ok) {
-        setSuccessMessage(`✅ ${data.generated} codes QR générés avec succès !`);
+        setSuccessMessage(`${data.generated} codes QR générés avec succès !`);
         if (data.setId) setGeneratedSetId(data.setId);
         // Reset forms
         if (context === 'individual') {
@@ -218,25 +218,25 @@ export default function GenererQRPage() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="max-w-5xl mx-auto">
       {/* Page Header */}
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-slate-800 dark:text-white">Génération de QR Codes</h1>
-        <p className="text-slate-500 dark:text-slate-400 mt-1">Créez des QR codes anti-fraude pour vos colis et voyageurs</p>
+        <h1 className="font-display text-2xl font-bold text-[var(--dash-ink)]">Génération de QR Codes</h1>
+        <p className="text-sm text-[var(--dash-muted)] mt-1">Créez des QR codes anti-fraude pour vos colis et voyageurs</p>
       </div>
 
       {/* Success Message */}
       {successMessage && (
-        <div className="mb-6 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400 px-4 py-3 rounded-xl flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
+        <div className="mb-6 dash-card flex items-center justify-between gap-3 !p-4 !bg-[var(--dash-emerald-soft)] !border-[var(--dash-emerald)]">
+          <div className="flex items-center gap-2 text-[var(--dash-emerald)]">
             <CheckCircle className="w-5 h-5 flex-shrink-0" />
-            <span>{successMessage}</span>
+            <span className="font-medium">{successMessage}</span>
           </div>
           {generatedSetId && (
             <Button
               variant="outline"
               size="sm"
-              className="border-emerald-300 text-emerald-700 hover:bg-emerald-100 dark:border-emerald-700 dark:text-emerald-400 dark:hover:bg-emerald-500/20"
+              className="btn-emerald btn-magnetic !h-9 !px-3"
               onClick={() => router.push('/admin/etiquettes')}
             >
               <Package className="w-4 h-4 mr-1" />
@@ -248,7 +248,7 @@ export default function GenererQRPage() {
 
       {/* Context Selector — 3 modes */}
       <div className="mb-6">
-        <Label className="text-slate-700 dark:text-slate-300 mb-3">Mode de génération</Label>
+        <Label className="text-sm font-medium text-[var(--dash-ink-2)] mb-3">Mode de génération</Label>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-2">
           {/* Bulk mode (default) */}
           <button
@@ -256,14 +256,14 @@ export default function GenererQRPage() {
             className={cn(
               "flex items-center gap-3 p-4 rounded-xl border transition-all text-left",
               context === 'bulk'
-                ? "bg-emerald-600 border-emerald-600 text-white"
-                : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-slate-300"
+                ? "bg-[var(--dash-emerald)] border-[var(--dash-emerald)] text-white shadow-lg shadow-[var(--dash-emerald)]/20"
+                : "bg-[var(--dash-card)] border-[var(--dash-border)] text-[var(--dash-ink-2)] hover:border-[var(--dash-border-strong)] hover:bg-[var(--dash-bg-3)]"
             )}
           >
-            <Layers className={cn("w-5 h-5 flex-shrink-0", context === 'bulk' ? 'text-white' : 'text-emerald-600')} />
+            <Layers className={cn("w-5 h-5 flex-shrink-0", context === 'bulk' ? 'text-white' : 'text-[var(--dash-emerald)]')} />
             <div>
               <p className="font-medium">Génération en masse</p>
-              <p className="text-xs opacity-80">Jusqu'à 2000 QR en un clic</p>
+              <p className="text-xs opacity-80">Jusqu&apos;à 2000 QR en un clic</p>
             </div>
           </button>
 
@@ -273,11 +273,11 @@ export default function GenererQRPage() {
             className={cn(
               "flex items-center gap-3 p-4 rounded-xl border transition-all text-left",
               context === 'individual'
-                ? "bg-[#ff7f00] border-[#ff7f00] text-white"
-                : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-slate-300"
+                ? "bg-[var(--dash-brand)] border-[var(--dash-brand)] text-white shadow-lg shadow-[var(--dash-brand)]/20"
+                : "bg-[var(--dash-card)] border-[var(--dash-border)] text-[var(--dash-ink-2)] hover:border-[var(--dash-border-strong)] hover:bg-[var(--dash-bg-3)]"
             )}
           >
-            <User className={cn("w-5 h-5 flex-shrink-0", context === 'individual' ? 'text-white' : 'text-orange-500')} />
+            <User className={cn("w-5 h-5 flex-shrink-0", context === 'individual' ? 'text-white' : 'text-[var(--dash-brand)]')} />
             <div>
               <p className="font-medium">Voyageur individuel</p>
               <p className="text-xs opacity-80">1 voyageur, sans agence</p>
@@ -290,11 +290,11 @@ export default function GenererQRPage() {
             className={cn(
               "flex items-center gap-3 p-4 rounded-xl border transition-all text-left",
               context === 'agency'
-                ? "bg-[#ff7f00] border-[#ff7f00] text-white"
-                : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-slate-300"
+                ? "bg-[var(--dash-brand)] border-[var(--dash-brand)] text-white shadow-lg shadow-[var(--dash-brand)]/20"
+                : "bg-[var(--dash-card)] border-[var(--dash-border)] text-[var(--dash-ink-2)] hover:border-[var(--dash-border-strong)] hover:bg-[var(--dash-bg-3)]"
             )}
           >
-            <Building2 className={cn("w-5 h-5 flex-shrink-0", context === 'agency' ? 'text-white' : 'text-orange-500')} />
+            <Building2 className={cn("w-5 h-5 flex-shrink-0", context === 'agency' ? 'text-white' : 'text-[var(--dash-brand)]')} />
             <div>
               <p className="font-medium">Agence (par voyageur)</p>
               <p className="text-xs opacity-80">Voyageurs × colis</p>
@@ -305,10 +305,10 @@ export default function GenererQRPage() {
 
       <div className="grid lg:grid-cols-2 gap-6">
         {/* Main Form Card */}
-        <Card className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-sm rounded-2xl">
+        <Card className="dash-card !rounded-2xl">
           <CardHeader>
-            <CardTitle className="text-slate-800 dark:text-white flex items-center gap-2">
-              <QrCode className="w-5 h-5 text-emerald-500" />
+            <CardTitle className="text-[var(--dash-ink)] flex items-center gap-2">
+              <QrCode className="w-5 h-5 text-[var(--dash-emerald)]" />
               {context === 'bulk' ? 'Génération en masse' : context === 'individual' ? 'Voyageur individuel' : 'Génération agence'}
             </CardTitle>
           </CardHeader>
@@ -318,15 +318,15 @@ export default function GenererQRPage() {
             {context === 'bulk' && (
               <>
                 <div className="space-y-2">
-                  <Label className="text-slate-700 dark:text-slate-300">Agence (optionnel)</Label>
+                  <Label className="text-[var(--dash-ink-2)]">Agence (optionnel)</Label>
                   <Select
                     value={bulkForm.agencyId}
                     onValueChange={(v) => setBulkForm({ ...bulkForm, agencyId: v })}
                   >
-                    <SelectTrigger className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white">
+                    <SelectTrigger className="bg-[var(--dash-card)] border-[var(--dash-border)] text-[var(--dash-ink)]">
                       <SelectValue placeholder="Sans agence" />
                     </SelectTrigger>
-                    <SelectContent className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800">
+                    <SelectContent className="bg-[var(--dash-card)] border-[var(--dash-border)]">
                       <SelectItem value="none">Sans agence</SelectItem>
                       {agencies.filter(a => a.active).map((agency) => (
                         <SelectItem key={agency.id} value={agency.id}>
@@ -338,7 +338,7 @@ export default function GenererQRPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-slate-700 dark:text-slate-300">
+                  <Label className="text-[var(--dash-ink-2)]">
                     Nombre total de QR codes *
                   </Label>
                   <Input
@@ -347,9 +347,9 @@ export default function GenererQRPage() {
                     max={2000}
                     value={bulkForm.totalQrCount}
                     onChange={(e) => setBulkForm({ ...bulkForm, totalQrCount: Math.min(2000, Math.max(1, parseInt(e.target.value) || 1)) })}
-                    className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white text-lg font-bold h-14"
+                    className="bg-[var(--dash-card)] border-[var(--dash-border)] text-[var(--dash-ink)] text-lg font-bold h-14"
                   />
-                  <p className="text-xs text-slate-400">Min: 1 • Max: 2000 • Tous dans un seul set</p>
+                  <p className="text-xs text-[var(--dash-muted-2)]">Min: 1 • Max: 2000 • Tous dans un seul set</p>
                 </div>
 
                 {/* Quick select buttons */}
@@ -362,8 +362,8 @@ export default function GenererQRPage() {
                       className={cn(
                         "py-2 rounded-lg text-sm font-medium transition-all border",
                         bulkForm.totalQrCount === n
-                          ? "bg-emerald-600 border-emerald-600 text-white"
-                          : "bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-emerald-50 dark:hover:bg-emerald-500/10"
+                          ? "bg-[var(--dash-emerald)] border-[var(--dash-emerald)] text-white"
+                          : "bg-[var(--dash-bg-3)] border-[var(--dash-border)] text-[var(--dash-muted)] hover:bg-[var(--dash-emerald-soft)] hover:text-[var(--dash-emerald)]"
                       )}
                     >
                       {n >= 1000 ? `${n / 1000}k` : n}
@@ -371,7 +371,7 @@ export default function GenererQRPage() {
                   ))}
                 </div>
 
-                <div className="bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-800 rounded-xl p-4 text-sm text-emerald-700 dark:text-emerald-400">
+                <div className="bg-[var(--dash-emerald-soft)] border border-[var(--dash-emerald)] rounded-xl p-4 text-sm text-[var(--dash-emerald)]">
                   <div className="flex items-center gap-2 font-medium mb-1">
                     <Zap className="w-4 h-4" />
                     Mode rapide
@@ -386,61 +386,61 @@ export default function GenererQRPage() {
               <>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label className="text-slate-700 dark:text-slate-300">Prénom *</Label>
+                    <Label className="text-[var(--dash-ink-2)]">Prénom *</Label>
                     <Input
                       value={individualForm.firstName}
                       onChange={(e) => setIndividualForm({ ...individualForm, firstName: e.target.value })}
                       placeholder="Ahmed"
-                      className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white"
+                      className="bg-[var(--dash-card)] border-[var(--dash-border)] text-[var(--dash-ink)]"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-slate-700 dark:text-slate-300">Nom *</Label>
+                    <Label className="text-[var(--dash-ink-2)]">Nom *</Label>
                     <Input
                       value={individualForm.lastName}
                       onChange={(e) => setIndividualForm({ ...individualForm, lastName: e.target.value })}
                       placeholder="Diop"
-                      className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white"
+                      className="bg-[var(--dash-card)] border-[var(--dash-border)] text-[var(--dash-ink)]"
                     />
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-slate-700 dark:text-slate-300">WhatsApp *</Label>
+                  <Label className="text-[var(--dash-ink-2)]">WhatsApp *</Label>
                   <Input
                     value={individualForm.whatsapp}
                     onChange={(e) => setIndividualForm({ ...individualForm, whatsapp: e.target.value })}
                     placeholder="+33612345678"
-                    className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white"
+                    className="bg-[var(--dash-card)] border-[var(--dash-border)] text-[var(--dash-ink)]"
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label className="text-slate-700 dark:text-slate-300">Durée</Label>
+                    <Label className="text-[var(--dash-ink-2)]">Durée</Label>
                     <Select
                       value={individualForm.duration}
                       onValueChange={(v) => setIndividualForm({ ...individualForm, duration: v as '7d' | '1y' })}
                     >
-                      <SelectTrigger className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white">
+                      <SelectTrigger className="bg-[var(--dash-card)] border-[var(--dash-border)] text-[var(--dash-ink)]">
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800">
+                      <SelectContent className="bg-[var(--dash-card)] border-[var(--dash-border)]">
                         <SelectItem value="7d">7 jours</SelectItem>
                         <SelectItem value="1y">1 an</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-slate-700 dark:text-slate-300">Colis</Label>
+                    <Label className="text-[var(--dash-ink-2)]">Colis</Label>
                     <Select
                       value={String(individualForm.baggageCount)}
                       onValueChange={(v) => setIndividualForm({ ...individualForm, baggageCount: parseInt(v) as 1 | 3 })}
                     >
-                      <SelectTrigger className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white">
+                      <SelectTrigger className="bg-[var(--dash-card)] border-[var(--dash-border)] text-[var(--dash-ink)]">
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800">
+                      <SelectContent className="bg-[var(--dash-card)] border-[var(--dash-border)]">
                         <SelectItem value="1">1 colis</SelectItem>
                         <SelectItem value="3">3 colis</SelectItem>
                       </SelectContent>
@@ -448,8 +448,11 @@ export default function GenererQRPage() {
                   </div>
                 </div>
 
-                <div className="bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-800 rounded-xl p-4 text-sm text-amber-700 dark:text-amber-400">
-                  <p className="font-medium">ℹ️ Le QR sera actif immédiatement avec les informations du voyageur.</p>
+                <div className="bg-[var(--dash-brand-soft)] border border-[var(--dash-brand)] rounded-xl p-4 text-sm text-[var(--dash-brand)]">
+                  <p className="font-medium flex items-center gap-2">
+                    <Info className="w-4 h-4" />
+                    Le QR sera actif immédiatement avec les informations du voyageur.
+                  </p>
                 </div>
               </>
             )}
@@ -458,15 +461,15 @@ export default function GenererQRPage() {
             {context === 'agency' && (
               <>
                 <div className="space-y-2">
-                  <Label className="text-slate-700 dark:text-slate-300">Agence partenaire *</Label>
+                  <Label className="text-[var(--dash-ink-2)]">Agence partenaire *</Label>
                   <Select
                     value={agencyForm.agencyId}
                     onValueChange={(v) => setAgencyForm({ ...agencyForm, agencyId: v })}
                   >
-                    <SelectTrigger className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white">
+                    <SelectTrigger className="bg-[var(--dash-card)] border-[var(--dash-border)] text-[var(--dash-ink)]">
                       <SelectValue placeholder="Sélectionner une agence" />
                     </SelectTrigger>
-                    <SelectContent className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800">
+                    <SelectContent className="bg-[var(--dash-card)] border-[var(--dash-border)]">
                       {agencies.filter(a => a.active).map((agency) => (
                         <SelectItem key={agency.id} value={agency.id}>
                           {agency.name}
@@ -478,7 +481,7 @@ export default function GenererQRPage() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label className="text-slate-700 dark:text-slate-300">
+                    <Label className="text-[var(--dash-ink-2)]">
                       Nombre de voyageurs
                     </Label>
                     <Input
@@ -487,19 +490,19 @@ export default function GenererQRPage() {
                       max={1000}
                       value={agencyForm.travelerCount}
                       onChange={(e) => setAgencyForm({ ...agencyForm, travelerCount: parseInt(e.target.value) || 1 })}
-                      className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white"
+                      className="bg-[var(--dash-card)] border-[var(--dash-border)] text-[var(--dash-ink)]"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-slate-700 dark:text-slate-300">Colis par voyageur</Label>
+                    <Label className="text-[var(--dash-ink-2)]">Colis par voyageur</Label>
                     <Select
                       value={String(agencyForm.baggagePerTraveler)}
                       onValueChange={(v) => setAgencyForm({ ...agencyForm, baggagePerTraveler: parseInt(v) as 1 | 3 })}
                     >
-                      <SelectTrigger className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white">
+                      <SelectTrigger className="bg-[var(--dash-card)] border-[var(--dash-border)] text-[var(--dash-ink)]">
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800">
+                      <SelectContent className="bg-[var(--dash-card)] border-[var(--dash-border)]">
                         <SelectItem value="1">1 colis</SelectItem>
                         <SelectItem value="3">3 colis</SelectItem>
                       </SelectContent>
@@ -510,7 +513,7 @@ export default function GenererQRPage() {
             )}
 
             {errorMessage && (
-              <div className="bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-800 text-rose-600 dark:text-rose-400 px-4 py-3 rounded-xl text-sm flex items-center gap-2">
+              <div className="bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 px-4 py-3 rounded-xl text-sm flex items-center gap-2">
                 <AlertCircle className="w-4 h-4" />
                 {errorMessage}
               </div>
@@ -518,10 +521,10 @@ export default function GenererQRPage() {
 
             <Button
               className={cn(
-                "w-full rounded-xl text-white font-bold h-14 text-base",
+                "w-full rounded-xl text-white font-bold h-14 text-base btn-magnetic",
                 context === 'bulk'
-                  ? "bg-emerald-600 hover:bg-emerald-700"
-                  : "bg-[#ff7f00] hover:bg-[#e57200]"
+                  ? "btn-emerald"
+                  : "btn-brand"
               )}
               onClick={handleGenerateQR}
               disabled={qrGenerating}
@@ -536,10 +539,10 @@ export default function GenererQRPage() {
         </Card>
 
         {/* Preview Card */}
-        <Card className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-sm rounded-2xl">
+        <Card className="dash-card !rounded-2xl">
           <CardHeader>
-            <CardTitle className="text-slate-800 dark:text-white flex items-center gap-2">
-              <Package className="w-5 h-5 text-slate-600" />
+            <CardTitle className="text-[var(--dash-ink)] flex items-center gap-2">
+              <Package className="w-5 h-5 text-[var(--dash-muted)]" />
               Récapitulatif
             </CardTitle>
           </CardHeader>
@@ -548,29 +551,29 @@ export default function GenererQRPage() {
             <div className={cn(
               "rounded-xl p-6 text-center",
               context === 'bulk'
-                ? "bg-gradient-to-br from-emerald-500 to-emerald-600"
-                : "bg-gradient-to-br from-orange-500 to-orange-600"
+                ? "bg-gradient-to-br from-[var(--dash-emerald)] to-emerald-700"
+                : "bg-gradient-to-br from-[var(--dash-brand)] to-[var(--dash-brand-2)]"
             )}>
               <p className="text-5xl font-black text-white">{getQrCount()}</p>
               <p className="text-sm text-white/80 mt-1">QR codes à générer</p>
             </div>
 
-            <div className="bg-slate-50 dark:bg-slate-800 rounded-xl p-4 text-sm text-slate-600 dark:text-slate-300 space-y-2">
+            <div className="bg-[var(--dash-bg-3)] rounded-xl p-4 text-sm text-[var(--dash-ink-2)] space-y-2">
               <div className="flex items-center justify-between">
                 <span>Mode</span>
-                <span className="font-medium text-slate-800 dark:text-white">
+                <span className="font-medium text-[var(--dash-ink)]">
                   {context === 'bulk' ? 'En masse' : context === 'individual' ? 'Individuel' : 'Agence'}
                 </span>
               </div>
               <div className="flex items-center justify-between">
                 <span>Type</span>
-                <span className="font-medium text-slate-800 dark:text-white">
+                <span className="font-medium text-[var(--dash-ink)]">
                   {context === 'bulk' ? 'Voyageur' : context === 'individual' ? 'Voyageur' : (agencyForm.type === 'hajj' ? 'Hajj' : 'Voyageur')}
                 </span>
               </div>
               <div className="flex items-center justify-between">
                 <span>Agence</span>
-                <span className="font-medium text-slate-800 dark:text-white">
+                <span className="font-medium text-[var(--dash-ink)]">
                   {context === 'bulk'
                     ? (agencies.find(a => a.id === bulkForm.agencyId)?.name || 'Aucune')
                     : context === 'individual'
@@ -581,19 +584,19 @@ export default function GenererQRPage() {
               </div>
               <div className="flex items-center justify-between">
                 <span>Statut</span>
-                <span className="font-medium text-slate-800 dark:text-white">
+                <span className="font-medium text-[var(--dash-ink)]">
                   {context === 'individual' ? 'Actif immédiat' : 'En attente'}
                 </span>
               </div>
             </div>
 
             {context === 'bulk' && (
-              <div className="bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-800 rounded-xl p-4 text-sm text-emerald-700 dark:text-emerald-400 space-y-2">
+              <div className="bg-[var(--dash-emerald-soft)] border border-[var(--dash-emerald)] rounded-xl p-4 text-sm text-[var(--dash-emerald)] space-y-2">
                 <p className="font-medium">Après génération :</p>
                 <ol className="list-decimal list-inside space-y-1 text-xs">
                   <li>Allez sur la page <strong>Étiquettes</strong></li>
                   <li>Trouvez votre set de {bulkForm.totalQrCount} QR codes</li>
-                  <li>Cliquez sur <strong>📦 Télécharger tout en ZIP</strong></li>
+                  <li>Cliquez sur <strong>Télécharger tout en ZIP</strong></li>
                   <li>Obtenez {bulkForm.totalQrCount} fichiers PNG individuels</li>
                 </ol>
               </div>
@@ -604,7 +607,7 @@ export default function GenererQRPage() {
 
       {/* Info Cards */}
       <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-2xl p-5 text-white">
+        <div className="bg-gradient-to-r from-[var(--dash-emerald)] to-emerald-700 rounded-2xl p-5 text-white">
           <div className="flex items-center gap-3">
             <QrCode className="w-8 h-8" />
             <div>
@@ -613,7 +616,7 @@ export default function GenererQRPage() {
             </div>
           </div>
         </div>
-        <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl p-5 text-white">
+        <div className="bg-gradient-to-r from-[var(--dash-brand)] to-[var(--dash-brand-2)] rounded-2xl p-5 text-white">
           <div className="flex items-center gap-3">
             <Building2 className="w-8 h-8" />
             <div>

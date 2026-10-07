@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import {
   Shield,
   Users,
@@ -15,6 +14,7 @@ import {
   AlertTriangle,
   Activity,
 } from 'lucide-react';
+import KpiCard from '@/components/dashboard/KpiCard';
 
 interface LoginLog {
   id: string;
@@ -55,7 +55,7 @@ export default function SecurityAuditPage() {
     try {
       // Fetch login logs
       const logsRes = await fetch('/api/admin/security/logs', { credentials: 'same-origin' });
-      
+
       if (logsRes.status === 401 || logsRes.status === 403) {
         setError('Session expirée ou non autorisé — Veuillez vous reconnecter');
         return;
@@ -64,7 +64,7 @@ export default function SecurityAuditPage() {
 
       // Fetch active sessions
       const sessionsRes = await fetch('/api/admin/security/sessions', { credentials: 'same-origin' });
-      
+
       if (sessionsRes.status === 401 || sessionsRes.status === 403) {
         setError('Session expirée ou non autorisé — Veuillez vous reconnecter');
         return;
@@ -134,84 +134,57 @@ export default function SecurityAuditPage() {
   const uniqueIPs = new Set(loginLogs.map(l => l.ipAddress).filter(Boolean)).size;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-w-7xl mx-auto">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800 dark:text-white flex items-center gap-3">
-            <Shield className="w-7 h-7 text-[#ff7f00]" />
+          <h1 className="font-display text-2xl font-bold text-[var(--dash-ink)] flex items-center gap-3">
+            <Shield className="w-7 h-7 text-[var(--dash-brand)]" />
             Sécurité & Audit
           </h1>
-          <p className="text-slate-500 dark:text-slate-400 mt-1">
+          <p className="text-sm text-[var(--dash-muted)] mt-1">
             Surveillez les connexions et sessions actives
           </p>
         </div>
         <button
           onClick={fetchData}
           disabled={loading}
-          className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+          className="p-2 rounded-xl bg-[var(--dash-bg-3)] hover:bg-[var(--dash-border)] transition-colors"
         >
-          <RefreshCw className={`w-5 h-5 text-slate-600 dark:text-slate-400 ${loading ? 'animate-spin' : ''}`} />
+          <RefreshCw className={`w-5 h-5 text-[var(--dash-muted)] ${loading ? 'animate-spin' : ''}`} />
         </button>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800">
-          <CardContent className="p-6">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-emerald-100 dark:bg-emerald-500/20 flex items-center justify-center">
-                <CheckCircle className="w-6 h-6 text-emerald-600" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-slate-800 dark:text-white">{successfulLogins}</p>
-                <p className="text-sm text-slate-500 dark:text-slate-400">Connexions réussies</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800">
-          <CardContent className="p-6">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-red-100 dark:bg-red-500/20 flex items-center justify-center">
-                <XCircle className="w-6 h-6 text-red-600" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-slate-800 dark:text-white">{failedLogins}</p>
-                <p className="text-sm text-slate-500 dark:text-slate-400">Tentatives échouées</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800">
-          <CardContent className="p-6">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-500/20 flex items-center justify-center">
-                <Users className="w-6 h-6 text-blue-600" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-slate-800 dark:text-white">{activeSessions.length}</p>
-                <p className="text-sm text-slate-500 dark:text-slate-400">Sessions actives</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800">
-          <CardContent className="p-6">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-purple-100 dark:bg-purple-500/20 flex items-center justify-center">
-                <Globe className="w-6 h-6 text-purple-600" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-slate-800 dark:text-white">{uniqueIPs}</p>
-                <p className="text-sm text-slate-500 dark:text-slate-400">Adresses IP uniques</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <KpiCard
+          label="Connexions réussies"
+          value={successfulLogins}
+          icon={CheckCircle}
+          color="emerald"
+          loading={loading}
+        />
+        <KpiCard
+          label="Tentatives échouées"
+          value={failedLogins}
+          icon={XCircle}
+          color="rose"
+          loading={loading}
+        />
+        <KpiCard
+          label="Sessions actives"
+          value={activeSessions.length}
+          icon={Users}
+          color="brand"
+          loading={loading}
+        />
+        <KpiCard
+          label="Adresses IP uniques"
+          value={uniqueIPs}
+          icon={Globe}
+          color="violet"
+          loading={loading}
+        />
       </div>
 
       {error && (
@@ -221,20 +194,20 @@ export default function SecurityAuditPage() {
       )}
 
       {/* Active Sessions */}
-      <Card className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800">
+      <Card className="dash-card !rounded-2xl">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Activity className="w-5 h-5 text-[#ff7f00]" />
+          <CardTitle className="text-[var(--dash-ink)] flex items-center gap-2">
+            <Activity className="w-5 h-5 text-[var(--dash-brand)]" />
             Sessions actives
           </CardTitle>
         </CardHeader>
         <CardContent>
           {loading ? (
             <div className="flex items-center justify-center py-8">
-              <RefreshCw className="w-6 h-6 animate-spin text-slate-400" />
+              <RefreshCw className="w-6 h-6 animate-spin text-[var(--dash-muted)]" />
             </div>
           ) : activeSessions.length === 0 ? (
-            <p className="text-center text-slate-500 dark:text-slate-400 py-8">
+            <p className="text-center text-[var(--dash-muted)] py-8">
               Aucune session active
             </p>
           ) : (
@@ -244,29 +217,29 @@ export default function SecurityAuditPage() {
                 return (
                   <div
                     key={session.id}
-                    className="bg-white dark:bg-slate-800 rounded-2xl p-5 border border-slate-200 dark:border-slate-700 hover:shadow-md transition-all"
+                    className="dash-card p-5"
                   >
                     <div className="flex items-center justify-between mb-3">
                       <div>
-                        <p className="font-medium text-slate-800 dark:text-white">{session.user.name || 'N/A'}</p>
-                        <p className="text-xs text-slate-500 dark:text-slate-400">{session.user.email}</p>
+                        <p className="font-medium text-[var(--dash-ink)]">{session.user.name || 'N/A'}</p>
+                        <p className="text-xs text-[var(--dash-muted)]">{session.user.email}</p>
                       </div>
-                      <Badge variant={session.user.role === 'superadmin' ? 'default' : 'secondary'}>
+                      <span className={session.user.role === 'superadmin' ? 'dash-badge dash-badge-info' : 'dash-badge dash-badge-neutral'}>
                         {session.user.role === 'superadmin' ? 'SuperAdmin' : 'Agence'}
-                      </Badge>
+                      </span>
                     </div>
                     <div className="space-y-2 text-sm">
-                      <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
-                        <span className="text-slate-400 dark:text-slate-500 w-20 shrink-0 text-xs">IP</span>
-                        <code className="text-xs bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded">
+                      <div className="flex items-center gap-2 text-[var(--dash-ink-2)]">
+                        <span className="text-[var(--dash-muted-2)] w-20 shrink-0 text-xs">IP</span>
+                        <code className="text-xs bg-[var(--dash-bg-3)] px-2 py-0.5 rounded">
                           {session.ipAddress || 'N/A'}
                         </code>
                       </div>
-                      <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
-                        <Monitor className="w-3 h-3 text-slate-400 shrink-0" />
+                      <div className="flex items-center gap-2 text-[var(--dash-ink-2)]">
+                        <Monitor className="w-3 h-3 text-[var(--dash-muted-2)] shrink-0" />
                         <span className="text-xs">{browser} / {os}</span>
                       </div>
-                      <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400">
+                      <div className="flex items-center gap-2 text-[var(--dash-muted)]">
                         <Clock className="w-3 h-3 shrink-0" />
                         <span className="text-xs">{getTimeAgo(session.lastActivity)}</span>
                       </div>
@@ -280,20 +253,20 @@ export default function SecurityAuditPage() {
       </Card>
 
       {/* Login Logs */}
-      <Card className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800">
+      <Card className="dash-card !rounded-2xl">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Clock className="w-5 h-5 text-[#ff7f00]" />
+          <CardTitle className="text-[var(--dash-ink)] flex items-center gap-2">
+            <Clock className="w-5 h-5 text-[var(--dash-brand)]" />
             Historique des connexions
           </CardTitle>
         </CardHeader>
         <CardContent>
           {loading ? (
             <div className="flex items-center justify-center py-8">
-              <RefreshCw className="w-6 h-6 animate-spin text-slate-400" />
+              <RefreshCw className="w-6 h-6 animate-spin text-[var(--dash-muted)]" />
             </div>
           ) : loginLogs.length === 0 ? (
-            <p className="text-center text-slate-500 dark:text-slate-400 py-8">
+            <p className="text-center text-[var(--dash-muted)] py-8">
               Aucune connexion enregistrée
             </p>
           ) : (
@@ -303,13 +276,13 @@ export default function SecurityAuditPage() {
                 return (
                   <div
                     key={log.id}
-                    className="bg-white dark:bg-slate-800 rounded-2xl p-5 border border-slate-200 dark:border-slate-700 hover:shadow-md transition-all"
+                    className="dash-card p-5"
                   >
                     <div className="flex items-center justify-between mb-3">
                       {log.success ? (
                         <div className="flex items-center gap-2">
-                          <CheckCircle className="w-4 h-4 text-emerald-500" />
-                          <span className="text-emerald-600 dark:text-emerald-400 font-medium text-sm">Réussie</span>
+                          <CheckCircle className="w-4 h-4 text-[var(--dash-emerald)]" />
+                          <span className="text-[var(--dash-emerald)] font-medium text-sm">Réussie</span>
                         </div>
                       ) : (
                         <div className="flex items-center gap-2">
@@ -317,21 +290,21 @@ export default function SecurityAuditPage() {
                           <span className="text-red-600 dark:text-red-400 font-medium text-sm">Échouée</span>
                         </div>
                       )}
-                      <span className="text-xs text-slate-400 dark:text-slate-500">{formatDate(log.createdAt)}</span>
+                      <span className="text-xs text-[var(--dash-muted-2)]">{formatDate(log.createdAt)}</span>
                     </div>
                     <div className="space-y-2 text-sm">
-                      <div className="flex items-center gap-2 text-slate-800 dark:text-white">
-                        <span className="text-slate-400 dark:text-slate-500 w-16 shrink-0 text-xs">Email</span>
+                      <div className="flex items-center gap-2 text-[var(--dash-ink)]">
+                        <span className="text-[var(--dash-muted-2)] w-16 shrink-0 text-xs">Email</span>
                         <span className="truncate text-sm">{log.email}</span>
                       </div>
-                      <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
-                        <span className="text-slate-400 dark:text-slate-500 w-16 shrink-0 text-xs">IP</span>
-                        <code className="text-xs bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded">
+                      <div className="flex items-center gap-2 text-[var(--dash-ink-2)]">
+                        <span className="text-[var(--dash-muted-2)] w-16 shrink-0 text-xs">IP</span>
+                        <code className="text-xs bg-[var(--dash-bg-3)] px-2 py-0.5 rounded">
                           {log.ipAddress || 'N/A'}
                         </code>
                       </div>
-                      <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
-                        <Monitor className="w-3 h-3 text-slate-400 shrink-0" />
+                      <div className="flex items-center gap-2 text-[var(--dash-ink-2)]">
+                        <Monitor className="w-3 h-3 text-[var(--dash-muted-2)] shrink-0" />
                         <span className="text-xs">{browser} / {os}</span>
                       </div>
                       {log.failureReason && (

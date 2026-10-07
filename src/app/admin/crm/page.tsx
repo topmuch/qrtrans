@@ -7,14 +7,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from "@/components/ui/table";
 import {
   Dialog,
   DialogContent,
@@ -28,7 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { 
+import {
   Plus,
   Trash2,
   UserPlus,
@@ -44,6 +36,7 @@ import {
 } from "lucide-react";
 import { useAuth } from '@/contexts/AuthContext';
 import { PERMISSIONS } from '@/lib/permissions';
+import KpiCard from '@/components/dashboard/KpiCard';
 
 // Extended status type
 type LeadStatus = 'new' | 'contacted' | 'in_discussion' | 'qualified' | 'converted' | 'lost';
@@ -64,14 +57,14 @@ interface Lead {
   updatedAt: string;
 }
 
-// Extended status configuration
+// Extended status configuration — uses dash-badge utility classes
 const STATUS_CONFIG: Record<LeadStatus, { label: string; className: string }> = {
-  new: { label: 'Nouveau', className: 'bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300' },
-  contacted: { label: 'Contacté', className: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-500/20 dark:text-yellow-300' },
-  in_discussion: { label: 'En discussion', className: 'bg-orange-100 text-orange-700 dark:bg-orange-500/20 dark:text-orange-300' },
-  qualified: { label: 'Qualifié', className: 'bg-purple-100 text-purple-700 dark:bg-purple-500/20 dark:text-purple-300' },
-  converted: { label: 'Converti', className: 'bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-300' },
-  lost: { label: 'Perdu', className: 'bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-300' },
+  new: { label: 'Nouveau', className: 'dash-badge dash-badge-info' },
+  contacted: { label: 'Contacté', className: 'dash-badge dash-badge-warning' },
+  in_discussion: { label: 'En discussion', className: 'dash-badge dash-badge-info' },
+  qualified: { label: 'Qualifié', className: 'dash-badge dash-badge-neutral' },
+  converted: { label: 'Converti', className: 'dash-badge dash-badge-success' },
+  lost: { label: 'Perdu', className: 'dash-badge dash-badge-danger' },
 };
 
 const SOURCE_LABELS: Record<string, string> = {
@@ -157,7 +150,7 @@ export default function CRMPage() {
 
   const handleUpdateLead = async () => {
     if (!editForm.id) return;
-    
+
     try {
       const response = await fetch('/api/admin/crm/leads', {
         method: 'PUT',
@@ -253,7 +246,7 @@ export default function CRMPage() {
   // Filter leads - search works on name, email, company, phone
   const filteredLeads = leads.filter(lead => {
     const searchLower = searchQuery.toLowerCase();
-    const matchesSearch = 
+    const matchesSearch =
       lead.name.toLowerCase().includes(searchLower) ||
       lead.email.toLowerCase().includes(searchLower) ||
       lead.company.toLowerCase().includes(searchLower) ||
@@ -267,77 +260,46 @@ export default function CRMPage() {
   return (
     <div className="max-w-7xl mx-auto">
       {/* Page Header */}
-      <div className="mb-8">
+      <div className="mb-6">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-green-500 rounded-xl flex items-center justify-center">
+          <div className="w-10 h-10 bg-[var(--dash-emerald)] rounded-xl flex items-center justify-center">
             <UserPlus className="w-5 h-5 text-white" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-slate-800 dark:text-white">CRM</h1>
-            <p className="text-slate-500 dark:text-slate-400">Gestion des prospects et leads</p>
+            <h1 className="font-display text-2xl font-bold text-[var(--dash-ink)]">CRM</h1>
+            <p className="text-sm text-[var(--dash-muted)]">Gestion des prospects et leads</p>
           </div>
         </div>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-6 gap-4 mb-6">
-        <Card className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800">
-          <CardContent className="p-4">
-            <p className="text-xs text-slate-500 dark:text-slate-400">Total</p>
-            <p className="text-2xl font-bold text-slate-800 dark:text-white">{leads.length}</p>
-          </CardContent>
-        </Card>
-        <Card className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800">
-          <CardContent className="p-4">
-            <p className="text-xs text-slate-500 dark:text-slate-400">Nouveaux</p>
-            <p className="text-2xl font-bold text-blue-600">{leads.filter(l => l.status === 'new').length}</p>
-          </CardContent>
-        </Card>
-        <Card className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800">
-          <CardContent className="p-4">
-            <p className="text-xs text-slate-500 dark:text-slate-400">En discussion</p>
-            <p className="text-2xl font-bold text-orange-600">{leads.filter(l => l.status === 'in_discussion').length}</p>
-          </CardContent>
-        </Card>
-        <Card className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800">
-          <CardContent className="p-4">
-            <p className="text-xs text-slate-500 dark:text-slate-400">Qualifiés</p>
-            <p className="text-2xl font-bold text-purple-600">{leads.filter(l => l.status === 'qualified').length}</p>
-          </CardContent>
-        </Card>
-        <Card className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800">
-          <CardContent className="p-4">
-            <p className="text-xs text-slate-500 dark:text-slate-400">Convertis</p>
-            <p className="text-2xl font-bold text-green-600">{leads.filter(l => l.status === 'converted').length}</p>
-          </CardContent>
-        </Card>
-        <Card className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800">
-          <CardContent className="p-4">
-            <p className="text-xs text-slate-500 dark:text-slate-400">Perdus</p>
-            <p className="text-2xl font-bold text-red-600">{leads.filter(l => l.status === 'lost').length}</p>
-          </CardContent>
-        </Card>
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
+        <KpiCard label="Total" value={leads.length} icon={UserPlus} color="brand" loading={loading} />
+        <KpiCard label="Nouveaux" value={leads.filter(l => l.status === 'new').length} icon={Mail} color="cyan" loading={loading} />
+        <KpiCard label="En discussion" value={leads.filter(l => l.status === 'in_discussion').length} icon={Phone} color="amber" loading={loading} />
+        <KpiCard label="Qualifiés" value={leads.filter(l => l.status === 'qualified').length} icon={Building} color="violet" loading={loading} />
+        <KpiCard label="Convertis" value={leads.filter(l => l.status === 'converted').length} icon={UserPlus} color="emerald" loading={loading} />
+        <KpiCard label="Perdus" value={leads.filter(l => l.status === 'lost').length} icon={Trash2} color="rose" loading={loading} />
       </div>
 
       {/* Filters & Actions */}
       <div className="flex flex-wrap items-center gap-4 mb-6">
         <div className="flex-1 min-w-[200px]">
-          <div className="relative">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-            <Input
+          <div className="dash-search">
+            <Search className="w-4 h-4 text-[var(--dash-muted)]" />
+            <input
               placeholder="Rechercher par nom, email, entreprise..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700"
             />
           </div>
         </div>
 
         <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="w-[180px] bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
+          <SelectTrigger className="w-[180px] bg-[var(--dash-card)] border-[var(--dash-border)] text-[var(--dash-ink)]">
             <SelectValue placeholder="Tous les statuts" />
           </SelectTrigger>
-          <SelectContent className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800">
+          <SelectContent className="bg-[var(--dash-card)] border-[var(--dash-border)]">
             <SelectItem value="all">Tous les statuts</SelectItem>
             <SelectItem value="new">Nouveaux</SelectItem>
             <SelectItem value="contacted">Contactés</SelectItem>
@@ -348,92 +310,90 @@ export default function CRMPage() {
           </SelectContent>
         </Select>
 
-        <Button
-          variant="outline"
+        <button
           onClick={fetchLeads}
-          className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700"
+          className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg border border-[var(--dash-border)] bg-[var(--dash-card)] text-sm font-medium text-[var(--dash-ink)] hover:bg-[var(--dash-bg-3)] transition-colors"
         >
-          <RefreshCw className="w-4 h-4 mr-2" />
+          <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
           Actualiser
-        </Button>
+        </button>
 
-        <Button
-          variant="outline"
+        <button
           onClick={handleExportCSV}
-          className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700"
+          className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg border border-[var(--dash-border)] bg-[var(--dash-card)] text-sm font-medium text-[var(--dash-ink)] hover:bg-[var(--dash-bg-3)] transition-colors"
         >
-          <Download className="w-4 h-4 mr-2" />
+          <Download className="w-4 h-4" />
           Export CSV
-        </Button>
+        </button>
 
         {canManage && (
-          <Button 
-            className="bg-green-500 hover:bg-green-600 text-white rounded-xl"
+          <button
+            className="btn-emerald btn-magnetic inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium"
             onClick={() => setCreateDialogOpen(true)}
           >
-            <Plus className="w-4 h-4 mr-2" />
+            <Plus className="w-4 h-4" />
             Nouveau lead
-          </Button>
+          </button>
         )}
       </div>
 
       {/* Leads Table */}
-      <Card className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-sm rounded-2xl">
-        <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow className="border-slate-200 dark:border-slate-800 hover:bg-transparent">
-                <TableHead className="text-slate-500 dark:text-slate-400">Nom</TableHead>
-                <TableHead className="text-slate-500 dark:text-slate-400">Contact</TableHead>
-                <TableHead className="text-slate-500 dark:text-slate-400">Entreprise</TableHead>
-                <TableHead className="text-slate-500 dark:text-slate-400">Statut</TableHead>
-                <TableHead className="text-slate-500 dark:text-slate-400">Source</TableHead>
-                <TableHead className="text-slate-500 dark:text-slate-400">Date</TableHead>
-                <TableHead className="text-slate-500 dark:text-slate-400">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
+      <div className="dash-card overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="dash-table">
+            <thead>
+              <tr>
+                <th>Nom</th>
+                <th>Contact</th>
+                <th>Entreprise</th>
+                <th>Statut</th>
+                <th>Source</th>
+                <th>Date</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
               {loading ? (
-                <TableRow>
-                  <TableCell colSpan={7} className="text-center text-slate-500 dark:text-slate-400 py-8">
+                <tr>
+                  <td colSpan={7} className="text-center text-[var(--dash-muted)] py-8">
                     Chargement...
-                  </TableCell>
-                </TableRow>
+                  </td>
+                </tr>
               ) : filteredLeads.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={7} className="text-center text-slate-500 dark:text-slate-400 py-8">
+                <tr>
+                  <td colSpan={7} className="text-center text-[var(--dash-muted)] py-8">
                     Aucun lead trouvé
-                  </TableCell>
-                </TableRow>
+                  </td>
+                </tr>
               ) : (
                 filteredLeads.map((lead) => (
-                  <TableRow key={lead.id} className="border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50">
-                    <TableCell className="text-slate-800 dark:text-white font-medium">{lead.name}</TableCell>
-                    <TableCell>
+                  <tr key={lead.id}>
+                    <td className="text-[var(--dash-ink)] font-medium">{lead.name}</td>
+                    <td>
                       <div className="flex flex-col gap-1">
-                        <div className="flex items-center gap-1 text-sm text-slate-600 dark:text-slate-300">
+                        <div className="flex items-center gap-1 text-sm text-[var(--dash-ink-2)]">
                           <Mail className="w-3 h-3" />
                           {lead.email}
                         </div>
                         {lead.phone && (
-                          <div className="flex items-center gap-1 text-sm text-slate-500 dark:text-slate-400">
+                          <div className="flex items-center gap-1 text-sm text-[var(--dash-muted)]">
                             <Phone className="w-3 h-3" />
                             {lead.phone}
                           </div>
                         )}
                       </div>
-                    </TableCell>
-                    <TableCell>
+                    </td>
+                    <td>
                       <div className="flex items-center gap-2">
-                        <Building className="w-4 h-4 text-slate-400" />
+                        <Building className="w-4 h-4 text-[var(--dash-muted-2)]" />
                         {lead.company ? (
-                          <span className="text-slate-600 dark:text-slate-300">{lead.company}</span>
+                          <span className="text-[var(--dash-ink-2)]">{lead.company}</span>
                         ) : (
-                          <span className="text-slate-400 dark:text-slate-500 italic text-sm">Non attribué</span>
+                          <span className="text-[var(--dash-muted-2)] italic text-sm">Non attribué</span>
                         )}
                       </div>
-                    </TableCell>
-                    <TableCell>
+                    </td>
+                    <td>
                       {canManage ? (
                         <Select
                           value={lead.status}
@@ -444,7 +404,7 @@ export default function CRMPage() {
                               {STATUS_CONFIG[lead.status]?.label}
                             </Badge>
                           </SelectTrigger>
-                          <SelectContent className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800">
+                          <SelectContent className="bg-[var(--dash-card)] border-[var(--dash-border)]">
                             <SelectItem value="new">Nouveau</SelectItem>
                             <SelectItem value="contacted">Contacté</SelectItem>
                             <SelectItem value="in_discussion">En discussion</SelectItem>
@@ -458,59 +418,53 @@ export default function CRMPage() {
                           {STATUS_CONFIG[lead.status]?.label}
                         </Badge>
                       )}
-                    </TableCell>
-                    <TableCell className="text-slate-600 dark:text-slate-300">
+                    </td>
+                    <td className="text-[var(--dash-ink-2)]">
                       {SOURCE_LABELS[lead.source] || lead.source || '-'}
-                    </TableCell>
-                    <TableCell className="text-slate-600 dark:text-slate-300 text-sm">
+                    </td>
+                    <td className="text-[var(--dash-ink-2)] text-sm">
                       {new Date(lead.createdAt).toLocaleDateString('fr-FR')}
-                    </TableCell>
-                    <TableCell>
+                    </td>
+                    <td>
                       <div className="flex items-center gap-1">
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          className="text-blue-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-500/10 rounded-lg h-8 w-8 p-0"
+                        <button
+                          className="p-2 text-[var(--dash-muted)] hover:text-[var(--dash-brand)] hover:bg-[var(--dash-brand-soft)] rounded-lg transition-colors"
                           onClick={() => router.push(`/admin/crm/leads/${lead.id}`)}
                           title="Voir les détails"
                         >
                           <Eye className="w-4 h-4" />
-                        </Button>
+                        </button>
                         {canManage && (
                           <>
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              className="text-amber-500 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-500/10 rounded-lg h-8 w-8 p-0"
+                            <button
+                              className="p-2 text-[var(--dash-muted)] hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-500/10 rounded-lg transition-colors"
                               onClick={() => openEditDialog(lead)}
                               title="Modifier"
                             >
                               <Pencil className="w-4 h-4" />
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              className="text-rose-500 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-lg h-8 w-8 p-0"
+                            </button>
+                            <button
+                              className="p-2 text-[var(--dash-muted)] hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors"
                               onClick={() => handleDeleteLead(lead.id)}
                               title="Supprimer"
                             >
                               <Trash2 className="w-4 h-4" />
-                            </Button>
+                            </button>
                           </>
                         )}
                       </div>
-                    </TableCell>
-                  </TableRow>
+                    </td>
+                  </tr>
                 ))
               )}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+            </tbody>
+          </table>
+        </div>
+      </div>
 
       {/* Create Lead Dialog */}
       <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
-        <DialogContent className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-800 dark:text-white max-w-md">
+        <DialogContent className="bg-[var(--dash-card)] border-[var(--dash-border)] text-[var(--dash-ink)] max-w-md">
           <DialogHeader>
             <DialogTitle>Ajouter un lead</DialogTitle>
           </DialogHeader>
@@ -521,7 +475,7 @@ export default function CRMPage() {
                 placeholder="Jean Dupont"
                 value={leadForm.name}
                 onChange={(e) => setLeadForm({ ...leadForm, name: e.target.value })}
-                className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700"
+                className="bg-[var(--dash-card)] border-[var(--dash-border)] text-[var(--dash-ink)]"
               />
             </div>
             <div className="space-y-2">
@@ -531,7 +485,7 @@ export default function CRMPage() {
                 placeholder="email@exemple.com"
                 value={leadForm.email}
                 onChange={(e) => setLeadForm({ ...leadForm, email: e.target.value })}
-                className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700"
+                className="bg-[var(--dash-card)] border-[var(--dash-border)] text-[var(--dash-ink)]"
               />
             </div>
             <div className="space-y-2">
@@ -540,7 +494,7 @@ export default function CRMPage() {
                 placeholder="+33 6 12 34 56 78"
                 value={leadForm.phone}
                 onChange={(e) => setLeadForm({ ...leadForm, phone: e.target.value })}
-                className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700"
+                className="bg-[var(--dash-card)] border-[var(--dash-border)] text-[var(--dash-ink)]"
               />
             </div>
             <div className="space-y-2">
@@ -549,7 +503,7 @@ export default function CRMPage() {
                 placeholder="Nom de l'entreprise"
                 value={leadForm.company}
                 onChange={(e) => setLeadForm({ ...leadForm, company: e.target.value })}
-                className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700"
+                className="bg-[var(--dash-card)] border-[var(--dash-border)] text-[var(--dash-ink)]"
               />
             </div>
             <div className="space-y-2">
@@ -558,10 +512,10 @@ export default function CRMPage() {
                 value={leadForm.source}
                 onValueChange={(v) => setLeadForm({ ...leadForm, source: v })}
               >
-                <SelectTrigger className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
+                <SelectTrigger className="bg-[var(--dash-card)] border-[var(--dash-border)] text-[var(--dash-ink)]">
                   <SelectValue placeholder="Sélectionner" />
                 </SelectTrigger>
-                <SelectContent className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800">
+                <SelectContent className="bg-[var(--dash-card)] border-[var(--dash-border)]">
                   <SelectItem value="website">Site web</SelectItem>
                   <SelectItem value="referral">Recommandation</SelectItem>
                   <SelectItem value="social">Réseaux sociaux</SelectItem>
@@ -576,30 +530,30 @@ export default function CRMPage() {
                 placeholder="Notes additionnelles..."
                 value={leadForm.notes}
                 onChange={(e) => setLeadForm({ ...leadForm, notes: e.target.value })}
-                className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700"
+                className="bg-[var(--dash-card)] border-[var(--dash-border)] text-[var(--dash-ink)]"
               />
             </div>
-            <Button
-              className="w-full bg-green-500 hover:bg-green-600 text-white rounded-xl"
+            <button
+              className="btn-emerald btn-magnetic w-full inline-flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium disabled:opacity-50"
               onClick={handleCreateLead}
               disabled={!leadForm.name || !leadForm.email}
             >
               Ajouter le lead
-            </Button>
+            </button>
           </div>
         </DialogContent>
       </Dialog>
 
       {/* View Lead Dialog */}
       <Dialog open={viewDialogOpen} onOpenChange={setViewDialogOpen}>
-        <DialogContent className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-800 dark:text-white max-w-md">
+        <DialogContent className="bg-[var(--dash-card)] border-[var(--dash-border)] text-[var(--dash-ink)] max-w-md">
           <DialogHeader>
             <DialogTitle>Détails du lead</DialogTitle>
           </DialogHeader>
           {selectedLead && (
             <div className="space-y-4 pt-4">
-              <div className="flex items-center gap-3 p-4 bg-slate-50 dark:bg-slate-800 rounded-xl">
-                <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-white font-bold text-lg">
+              <div className="flex items-center gap-3 p-4 bg-[var(--dash-bg-3)] rounded-xl">
+                <div className="w-12 h-12 bg-[var(--dash-emerald)] rounded-full flex items-center justify-center text-white font-bold text-lg">
                   {selectedLead.name.charAt(0).toUpperCase()}
                 </div>
                 <div>
@@ -609,36 +563,36 @@ export default function CRMPage() {
                   </Badge>
                 </div>
               </div>
-              
+
               <div className="space-y-3">
                 <div className="flex items-center gap-3">
-                  <Mail className="w-4 h-4 text-slate-400" />
-                  <a href={`mailto:${selectedLead.email}`} className="text-blue-500 hover:underline">
+                  <Mail className="w-4 h-4 text-[var(--dash-muted-2)]" />
+                  <a href={`mailto:${selectedLead.email}`} className="text-[var(--dash-brand)] hover:underline">
                     {selectedLead.email}
                   </a>
                 </div>
                 {selectedLead.phone && (
                   <div className="flex items-center gap-3">
-                    <Phone className="w-4 h-4 text-slate-400" />
-                    <a href={`tel:${selectedLead.phone}`} className="text-blue-500 hover:underline">
+                    <Phone className="w-4 h-4 text-[var(--dash-muted-2)]" />
+                    <a href={`tel:${selectedLead.phone}`} className="text-[var(--dash-brand)] hover:underline">
                       {selectedLead.phone}
                     </a>
                   </div>
                 )}
                 <div className="flex items-center gap-3">
-                  <Building className="w-4 h-4 text-slate-400" />
+                  <Building className="w-4 h-4 text-[var(--dash-muted-2)]" />
                   <span>{selectedLead.company || 'Non attribué'}</span>
                 </div>
               </div>
 
               {selectedLead.notes && (
-                <div className="p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
-                  <p className="text-sm text-slate-500 dark:text-slate-400 mb-1">Notes</p>
+                <div className="p-3 bg-[var(--dash-bg-3)] rounded-lg">
+                  <p className="text-sm text-[var(--dash-muted)] mb-1">Notes</p>
                   <p className="text-sm">{selectedLead.notes}</p>
                 </div>
               )}
 
-              <div className="text-xs text-slate-400 flex justify-between">
+              <div className="text-xs text-[var(--dash-muted-2)] flex justify-between">
                 <span>Créé: {new Date(selectedLead.createdAt).toLocaleDateString('fr-FR')}</span>
                 <span>Source: {SOURCE_LABELS[selectedLead.source] || selectedLead.source || 'N/A'}</span>
               </div>
@@ -649,7 +603,7 @@ export default function CRMPage() {
 
       {/* Edit Lead Dialog */}
       <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
-        <DialogContent className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-800 dark:text-white max-w-md">
+        <DialogContent className="bg-[var(--dash-card)] border-[var(--dash-border)] text-[var(--dash-ink)] max-w-md">
           <DialogHeader>
             <DialogTitle>Modifier le lead</DialogTitle>
           </DialogHeader>
@@ -659,7 +613,7 @@ export default function CRMPage() {
               <Input
                 value={editForm.name}
                 onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
-                className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700"
+                className="bg-[var(--dash-card)] border-[var(--dash-border)] text-[var(--dash-ink)]"
               />
             </div>
             <div className="space-y-2">
@@ -668,7 +622,7 @@ export default function CRMPage() {
                 type="email"
                 value={editForm.email}
                 onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
-                className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700"
+                className="bg-[var(--dash-card)] border-[var(--dash-border)] text-[var(--dash-ink)]"
               />
             </div>
             <div className="space-y-2">
@@ -676,7 +630,7 @@ export default function CRMPage() {
               <Input
                 value={editForm.phone}
                 onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
-                className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700"
+                className="bg-[var(--dash-card)] border-[var(--dash-border)] text-[var(--dash-ink)]"
               />
             </div>
             <div className="space-y-2">
@@ -684,7 +638,7 @@ export default function CRMPage() {
               <Input
                 value={editForm.company}
                 onChange={(e) => setEditForm({ ...editForm, company: e.target.value })}
-                className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700"
+                className="bg-[var(--dash-card)] border-[var(--dash-border)] text-[var(--dash-ink)]"
               />
             </div>
             <div className="space-y-2">
@@ -693,10 +647,10 @@ export default function CRMPage() {
                 value={editForm.status}
                 onValueChange={(v) => setEditForm({ ...editForm, status: v as LeadStatus })}
               >
-                <SelectTrigger className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
+                <SelectTrigger className="bg-[var(--dash-card)] border-[var(--dash-border)] text-[var(--dash-ink)]">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800">
+                <SelectContent className="bg-[var(--dash-card)] border-[var(--dash-border)]">
                   <SelectItem value="new">Nouveau</SelectItem>
                   <SelectItem value="contacted">Contacté</SelectItem>
                   <SelectItem value="in_discussion">En discussion</SelectItem>
@@ -712,10 +666,10 @@ export default function CRMPage() {
                 value={editForm.source}
                 onValueChange={(v) => setEditForm({ ...editForm, source: v })}
               >
-                <SelectTrigger className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
+                <SelectTrigger className="bg-[var(--dash-card)] border-[var(--dash-border)] text-[var(--dash-ink)]">
                   <SelectValue placeholder="Sélectionner" />
                 </SelectTrigger>
-                <SelectContent className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800">
+                <SelectContent className="bg-[var(--dash-card)] border-[var(--dash-border)]">
                   <SelectItem value="website">Site web</SelectItem>
                   <SelectItem value="referral">Recommandation</SelectItem>
                   <SelectItem value="social">Réseaux sociaux</SelectItem>
@@ -729,15 +683,15 @@ export default function CRMPage() {
               <Input
                 value={editForm.notes}
                 onChange={(e) => setEditForm({ ...editForm, notes: e.target.value })}
-                className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700"
+                className="bg-[var(--dash-card)] border-[var(--dash-border)] text-[var(--dash-ink)]"
               />
             </div>
-            <Button
-              className="w-full bg-amber-500 hover:bg-amber-600 text-white rounded-xl"
+            <button
+              className="btn-brand btn-magnetic w-full inline-flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium"
               onClick={handleUpdateLead}
             >
               Enregistrer les modifications
-            </Button>
+            </button>
           </div>
         </DialogContent>
       </Dialog>

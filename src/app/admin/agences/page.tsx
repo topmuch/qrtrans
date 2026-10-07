@@ -1,11 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
   DialogContent,
@@ -23,7 +20,10 @@ import {
   Mail,
   Phone,
   Users,
+  Package,
+  AlertCircle,
 } from "lucide-react";
+import KpiCard from '@/components/dashboard/KpiCard';
 
 // Types
 interface Agency {
@@ -47,7 +47,7 @@ export default function AgencesPage() {
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [dialogOpen, setDialogOpen] = useState(false);
-  
+
   const [agencyForm, setAgencyForm] = useState({
     name: '',
     slug: '',
@@ -95,10 +95,10 @@ export default function AgencesPage() {
       setErrorMessage('Les mots de passe ne correspondent pas');
       return;
     }
-    
+
     setAgencyCreating(true);
     setErrorMessage('');
-    
+
     try {
       const agencyResponse = await fetch('/api/admin/agencies', {
         method: 'POST',
@@ -110,10 +110,10 @@ export default function AgencesPage() {
           phone: agencyForm.phone,
         }),
       });
-      
+
       if (agencyResponse.ok) {
         const agencyData = await agencyResponse.json();
-        
+
         await fetch('/api/admin/users', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -125,7 +125,7 @@ export default function AgencesPage() {
             agencyId: agencyData.agency.id,
           }),
         });
-        
+
         setSuccessMessage(`Agence "${agencyForm.name}" créée avec succès !`);
         fetchAgencies();
         setDialogOpen(false);
@@ -145,12 +145,12 @@ export default function AgencesPage() {
 
   const handleDeleteAgency = async (id: string) => {
     if (!confirm('Êtes-vous sûr de vouloir supprimer cette agence ?')) return;
-    
+
     try {
       const response = await fetch(`/api/admin/agencies?id=${id}`, {
         method: 'DELETE',
       });
-      
+
       if (response.ok) {
         fetchAgencies();
       }
@@ -162,112 +162,112 @@ export default function AgencesPage() {
   return (
     <div className="max-w-6xl mx-auto">
       {/* Page Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800 dark:text-white">Agences Partenaires</h1>
-          <p className="text-slate-500 dark:text-slate-400 mt-1">Gérez les agences de voyage partenaires</p>
+          <h1 className="font-display text-2xl font-bold text-[var(--dash-ink)]">Agences Partenaires</h1>
+          <p className="text-sm text-[var(--dash-muted)] mt-1">Gérez les agences de voyage partenaires</p>
         </div>
         <div className="flex items-center gap-3">
-          <Button
+          <button
             onClick={fetchAgencies}
-            variant="outline"
-            className="border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl"
+            className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg border border-[var(--dash-border)] bg-[var(--dash-card)] text-sm font-medium text-[var(--dash-ink)] hover:bg-[var(--dash-bg-3)] transition-colors"
           >
-            <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
             Actualiser
-          </Button>
+          </button>
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>
-              <Button className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl">
-                <Plus className="w-4 h-4 mr-2" />
+              <button className="btn-brand inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium">
+                <Plus className="w-4 h-4" />
                 Nouvelle agence
-              </Button>
+              </button>
             </DialogTrigger>
-            <DialogContent className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white">
+            <DialogContent className="bg-[var(--dash-card)] border-[var(--dash-border)] text-[var(--dash-ink)]">
               <DialogHeader>
-                <DialogTitle>Créer une agence</DialogTitle>
+                <DialogTitle className="text-[var(--dash-ink)]">Créer une agence</DialogTitle>
               </DialogHeader>
               <div className="space-y-4 pt-4">
                 {errorMessage && (
-                  <div className="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 px-4 py-3 rounded-xl text-sm">
-                    {errorMessage}
+                  <div className="flex items-start gap-2 bg-[var(--dash-bg-3)] border border-[var(--dash-border-strong)] text-[var(--dash-ink-2)] px-4 py-3 rounded-xl text-sm">
+                    <AlertCircle className="w-5 h-5 text-[var(--dash-badge-danger,#DC2626)] shrink-0 mt-0.5" style={{ color: '#DC2626' }} />
+                    <span>{errorMessage}</span>
                   </div>
                 )}
                 <div className="space-y-2">
-                  <Label className="text-slate-700 dark:text-slate-300">Nom de l&apos;agence *</Label>
-                  <Input 
+                  <Label className="text-[var(--dash-ink-2)]">Nom de l&apos;agence *</Label>
+                  <Input
                     placeholder="Ashraf Voyages"
                     value={agencyForm.name}
                     onChange={(e) => {
                       const name = e.target.value;
-                      setAgencyForm({ 
-                        ...agencyForm, 
+                      setAgencyForm({
+                        ...agencyForm,
                         name,
                         slug: name.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '')
                       });
                     }}
-                    className="bg-white dark:bg-slate-700 border-slate-200 dark:border-slate-600 text-slate-800 dark:text-white" 
+                    className="bg-[var(--dash-card)] border-[var(--dash-border)] text-[var(--dash-ink)]"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-slate-700 dark:text-slate-300">Slug *</Label>
-                  <Input 
+                  <Label className="text-[var(--dash-ink-2)]">Slug *</Label>
+                  <Input
                     placeholder="ashraf_voyages"
                     value={agencyForm.slug}
                     onChange={(e) => setAgencyForm({ ...agencyForm, slug: e.target.value })}
-                    className="bg-white dark:bg-slate-700 border-slate-200 dark:border-slate-600 text-slate-800 dark:text-white" 
+                    className="bg-[var(--dash-card)] border-[var(--dash-border)] text-[var(--dash-ink)]"
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label className="text-slate-700 dark:text-slate-300">Email *</Label>
-                    <Input 
+                    <Label className="text-[var(--dash-ink-2)]">Email *</Label>
+                    <Input
                       type="email"
                       placeholder="contact@agence.com"
                       value={agencyForm.email}
                       onChange={(e) => setAgencyForm({ ...agencyForm, email: e.target.value })}
-                      className="bg-white dark:bg-slate-700 border-slate-200 dark:border-slate-600 text-slate-800 dark:text-white" 
+                      className="bg-[var(--dash-card)] border-[var(--dash-border)] text-[var(--dash-ink)]"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-slate-700 dark:text-slate-300">Téléphone</Label>
-                    <Input 
+                    <Label className="text-[var(--dash-ink-2)]">Téléphone</Label>
+                    <Input
                       placeholder="+33 6 00 00 00 00"
                       value={agencyForm.phone}
                       onChange={(e) => setAgencyForm({ ...agencyForm, phone: e.target.value })}
-                      className="bg-white dark:bg-slate-700 border-slate-200 dark:border-slate-600 text-slate-800 dark:text-white" 
+                      className="bg-[var(--dash-card)] border-[var(--dash-border)] text-[var(--dash-ink)]"
                     />
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label className="text-slate-700 dark:text-slate-300">Mot de passe *</Label>
-                    <Input 
+                    <Label className="text-[var(--dash-ink-2)]">Mot de passe *</Label>
+                    <Input
                       type="password"
                       placeholder="Min 8 car., 1 maj, 1 chiffre"
                       value={agencyForm.password}
                       onChange={(e) => setAgencyForm({ ...agencyForm, password: e.target.value })}
-                      className="bg-white dark:bg-slate-700 border-slate-200 dark:border-slate-600 text-slate-800 dark:text-white" 
+                      className="bg-[var(--dash-card)] border-[var(--dash-border)] text-[var(--dash-ink)]"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-slate-700 dark:text-slate-300">Confirmer *</Label>
-                    <Input 
+                    <Label className="text-[var(--dash-ink-2)]">Confirmer *</Label>
+                    <Input
                       type="password"
                       placeholder="Confirmer le mot de passe"
                       value={agencyForm.confirmPassword}
                       onChange={(e) => setAgencyForm({ ...agencyForm, confirmPassword: e.target.value })}
-                      className="bg-white dark:bg-slate-700 border-slate-200 dark:border-slate-600 text-slate-800 dark:text-white" 
+                      className="bg-[var(--dash-card)] border-[var(--dash-border)] text-[var(--dash-ink)]"
                     />
                   </div>
                 </div>
-                <Button
-                  className="w-full bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl"
+                <button
+                  className="btn-brand w-full inline-flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-medium"
                   onClick={handleCreateAgency}
                   disabled={agencyCreating}
                 >
                   {agencyCreating ? 'Création en cours...' : "Créer l'agence"}
-                </Button>
+                </button>
               </div>
             </DialogContent>
           </Dialog>
@@ -276,105 +276,119 @@ export default function AgencesPage() {
 
       {/* Success Message */}
       {successMessage && (
-        <div className="mb-6 bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400 px-4 py-3 rounded-xl flex items-center gap-2">
+        <div className="mb-6 flex items-center gap-2 px-4 py-3 rounded-xl bg-[var(--dash-emerald-soft)] border border-[var(--dash-emerald)] text-[var(--dash-emerald)]">
           <CheckCircle className="w-5 h-5" />
           {successMessage}
         </div>
       )}
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <Card className="bg-white dark:bg-slate-800 border-slate-100 dark:border-slate-700 shadow-sm rounded-2xl">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-slate-500 dark:text-slate-400 text-sm">Total agences</p>
-                <p className="text-3xl font-bold text-slate-800 dark:text-white">{agencies.length}</p>
-              </div>
-              <div className="w-12 h-12 bg-[#ff7f00]/10 dark:bg-[#ff7f00]/20 rounded-xl flex items-center justify-center">
-                <Building className="w-6 h-6 text-[#ff7f00]" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card className="bg-white dark:bg-slate-800 border-slate-100 dark:border-slate-700 shadow-sm rounded-2xl">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-slate-500 dark:text-slate-400 text-sm">Agences actives</p>
-                <p className="text-3xl font-bold text-slate-800 dark:text-white">{agencies.filter(a => a.active).length}</p>
-              </div>
-              <div className="w-12 h-12 bg-emerald-100 dark:bg-emerald-900/30 rounded-xl flex items-center justify-center">
-                <CheckCircle className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <KpiCard
+          label="Total agences"
+          value={agencies.length}
+          subtitle="Partenaires enregistrés"
+          icon={Building}
+          color="brand"
+          loading={loading}
+        />
+        <KpiCard
+          label="Agences actives"
+          value={agencies.filter(a => a.active).length}
+          subtitle="Opérationnelles"
+          icon={CheckCircle}
+          color="emerald"
+          loading={loading}
+        />
+        <KpiCard
+          label="Total colis"
+          value={agencies.reduce((sum, a) => sum + (a._count?.baggages || 0), 0)}
+          subtitle="Toutes agences"
+          icon={Package}
+          color="violet"
+          loading={loading}
+        />
+        <KpiCard
+          label="Utilisateurs"
+          value={agencies.reduce((sum, a) => sum + (a._count?.users || 0), 0)}
+          subtitle="Comptes liés"
+          icon={Users}
+          color="cyan"
+          loading={loading}
+        />
       </div>
 
       {/* Agencies Grid */}
       {loading ? (
-        <div className="flex items-center justify-center py-12">
-          <div className="w-8 h-8 border-2 border-[#16a34a]/30 border-t-[#16a34a] rounded-full animate-spin" />
+        <div className="dash-card p-12 flex items-center justify-center">
+          <div className="w-8 h-8 border-2 border-[var(--dash-brand)]/30 border-t-[var(--dash-brand)] rounded-full animate-spin" />
         </div>
       ) : agencies.length === 0 ? (
-        <div className="text-center py-12 text-slate-500 dark:text-slate-400">Aucune agence</div>
+        <div className="dash-card p-12 text-center">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[var(--dash-bg-3)] mb-4">
+            <Building className="w-8 h-8 text-[var(--dash-muted)]" />
+          </div>
+          <p className="text-[var(--dash-muted)]">Aucune agence</p>
+          <p className="text-sm text-[var(--dash-muted-2)] mt-2">Créez votre première agence partenaire</p>
+        </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
           {agencies.map((agency) => (
-            <div key={agency.id} className="bg-white dark:bg-slate-800 rounded-2xl p-5 border border-slate-200 dark:border-slate-700 hover:shadow-md transition-all">
+            <div key={agency.id} className="dash-card p-5 flex flex-col">
               {/* Header */}
               <div className="flex items-start justify-between mb-4">
-                <div className="w-12 h-12 bg-emerald-100 dark:bg-emerald-900/30 rounded-xl flex items-center justify-center">
-                  <Building className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
+                <div className="w-12 h-12 bg-[var(--dash-emerald-soft)] rounded-xl flex items-center justify-center">
+                  <Building className="w-6 h-6 text-[var(--dash-emerald)]" />
                 </div>
-                <Badge className={agency.active ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400' : 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400'}>
+                <span className={agency.active ? 'dash-badge dash-badge-success' : 'dash-badge dash-badge-danger'}>
                   {agency.active ? 'Actif' : 'Inactif'}
-                </Badge>
+                </span>
               </div>
 
               {/* Name + Slug */}
-              <h3 className="font-semibold text-slate-800 dark:text-white text-lg">{agency.name}</h3>
-              <p className="text-sm text-slate-400 font-mono mb-4">@{agency.slug}</p>
+              <h3 className="font-semibold text-[var(--dash-ink)] text-lg truncate">{agency.name}</h3>
+              <p className="text-sm text-[var(--dash-muted-2)] font-mono mb-4 truncate">@{agency.slug}</p>
 
               {/* Contact */}
               <div className="space-y-2 mb-4">
                 {agency.email && (
-                  <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300">
-                    <Mail className="w-4 h-4 text-slate-400" />
-                    {agency.email}
+                  <div className="flex items-center gap-2 text-sm text-[var(--dash-ink-2)]">
+                    <Mail className="w-4 h-4 text-[var(--dash-muted-2)]" />
+                    <span className="truncate">{agency.email}</span>
                   </div>
                 )}
                 {agency.phone && (
-                  <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300">
-                    <Phone className="w-4 h-4 text-slate-400" />
-                    {agency.phone}
+                  <div className="flex items-center gap-2 text-sm text-[var(--dash-ink-2)]">
+                    <Phone className="w-4 h-4 text-[var(--dash-muted-2)]" />
+                    <span className="truncate">{agency.phone}</span>
                   </div>
                 )}
               </div>
 
               {/* Baggage count */}
-              <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 mb-4">
+              <div className="flex items-center gap-2 text-sm text-[var(--dash-muted)] mb-4">
                 <Users className="w-4 h-4" />
                 {agency._count?.baggages || 0} baggages · {agency._count?.users || 0} utilisateur(s)
               </div>
 
               {/* Actions */}
-              <div className="flex gap-2 pt-4 border-t border-slate-100 dark:border-slate-700">
-                <Button size="sm" variant="ghost" className="text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-700 rounded-xl flex-1">
-                  <Edit className="w-4 h-4 mr-1" />
-                  Modifier
-                </Button>
-                <Button
+              <div className="flex gap-2 pt-4 border-t border-[var(--dash-border)] mt-auto">
+                <button
                   size="sm"
-                  variant="ghost"
-                  className="text-red-500 dark:text-red-400 hover:text-red-600 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl flex-1"
-                  onClick={() => handleDeleteAgency(agency.id)}
+                  className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-[var(--dash-muted)] hover:bg-[var(--dash-bg-3)] hover:text-[var(--dash-ink)] transition-colors"
+                  title="Modifier"
                 >
-                  <Trash2 className="w-4 h-4 mr-1" />
+                  <Edit className="w-4 h-4" />
+                  Modifier
+                </button>
+                <button
+                  onClick={() => handleDeleteAgency(agency.id)}
+                  className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-[var(--dash-muted)] hover:bg-red-50 dark:hover:bg-red-500/10 hover:text-red-600 dark:hover:text-red-400 transition-colors"
+                  title="Supprimer"
+                >
+                  <Trash2 className="w-4 h-4" />
                   Supprimer
-                </Button>
+                </button>
               </div>
             </div>
           ))}

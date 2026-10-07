@@ -6,14 +6,16 @@ import {
   Luggage,
   CheckCircle,
   AlertTriangle,
-  Clock,
   TrendingUp,
   QrCode,
   Plane,
+  Share2,
   Calendar,
-  Share2
+  Globe,
 } from 'lucide-react';
 import { useAgency } from '../layout';
+import KpiCard from '@/components/dashboard/KpiCard';
+import AreaChartCard from '@/components/dashboard/AreaChartCard';
 
 interface Stats {
   total: number;
@@ -82,43 +84,45 @@ export default function AgencyReportsPage() {
     alert(`Lien copié ! ${url}`);
   };
 
-  // Calculate max for chart
-  const maxDaily = data?.dailyStats ? Math.max(...data.dailyStats.map(d => d.count), 1) : 1;
-  const maxWeekly = data?.weeklyStats ? Math.max(...data.weeklyStats.map(d => d.count), 1) : 1;
+  const dailyChartData = (data?.dailyStats || []).map(d => ({ label: d.label, value: d.count }));
+  const weeklyChartData = (data?.weeklyStats || []).map(w => ({ label: w.label, value: w.count }));
 
   return (
     <div className="max-w-7xl mx-auto">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800 dark:text-white">Rapports</h1>
-          <p className="text-slate-500 dark:text-slate-400 mt-1">Statistiques de {agencyName}</p>
+          <h1 className="font-display text-2xl font-bold text-[var(--dash-ink)] flex items-center gap-2">
+            <TrendingUp className="w-6 h-6 text-[var(--dash-brand)]" />
+            Rapports
+          </h1>
+          <p className="text-sm text-[var(--dash-muted)] mt-1">Statistiques de {agencyName}</p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 flex-wrap">
           {/* Period Selector */}
           <select
             value={period}
             onChange={(e) => setPeriod(e.target.value)}
-            className="px-4 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-700 dark:text-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#ff7f00]"
+            className="px-4 py-2 bg-[var(--dash-card)] border border-[var(--dash-border)] rounded-lg text-[var(--dash-ink)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--dash-brand)]"
           >
             <option value="week">7 derniers jours</option>
             <option value="month">Ce mois</option>
             <option value="year">Cette année</option>
           </select>
-          
+
           {/* Share Public Page */}
           <button
             onClick={handleSharePublicPage}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-xl text-sm font-medium transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium border border-[var(--dash-border)] bg-[var(--dash-card)] text-[var(--dash-ink-2)] hover:bg-[var(--dash-bg-3)] transition-colors"
           >
             <Share2 className="w-4 h-4" />
             Partager
           </button>
-          
+
           {/* Export Button */}
           <button
             onClick={handleExport}
-            className="flex items-center gap-2 px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-sm font-medium transition-colors"
+            className="btn-emerald btn-magnetic inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium"
           >
             <Download className="w-4 h-4" />
             Exporter CSV
@@ -128,119 +132,87 @@ export default function AgencyReportsPage() {
 
       {loading ? (
         <div className="flex items-center justify-center py-20">
-          <div className="w-8 h-8 border-2 border-[#ff7f00]/30 border-t-[#ff7f00] rounded-full animate-spin" />
+          <div className="w-8 h-8 border-2 border-[var(--dash-brand)]/30 border-t-[var(--dash-brand)] rounded-full animate-spin" />
         </div>
       ) : data ? (
         <div className="space-y-6">
           {/* Main Stats Cards */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="kpi-card kpi-card-green p-5">
-              <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center mb-3">
-                <Luggage className="w-5 h-5 text-white" />
-              </div>
-              <p className="text-3xl font-bold text-white">{data.stats.total}</p>
-              <p className="text-sm text-white/80">Total colis</p>
-            </div>
-            
-            <div className="kpi-card kpi-card-blue p-5">
-              <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center mb-3">
-                <CheckCircle className="w-5 h-5 text-white" />
-              </div>
-              <p className="text-3xl font-bold text-white">{data.stats.active}</p>
-              <p className="text-sm text-white/80">Actifs</p>
-            </div>
-            
-            <div className="kpi-card kpi-card-orange p-5">
-              <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center mb-3">
-                <QrCode className="w-5 h-5 text-white" />
-              </div>
-              <p className="text-3xl font-bold text-white">{data.stats.scanned}</p>
-              <p className="text-sm text-white/80">Scannés</p>
-            </div>
-            
-            <div className="kpi-card kpi-card-red p-5">
-              <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center mb-3">
-                <AlertTriangle className="w-5 h-5 text-white" />
-              </div>
-              <p className="text-3xl font-bold text-white">{data.stats.lost}</p>
-              <p className="text-sm text-white/80">Perdus</p>
-            </div>
+            <KpiCard
+              label="Total colis"
+              value={data.stats.total}
+              subtitle="Tous statuts confondus"
+              icon={Luggage}
+              color="brand"
+            />
+            <KpiCard
+              label="Actifs"
+              value={data.stats.active}
+              subtitle="En service"
+              icon={CheckCircle}
+              color="emerald"
+            />
+            <KpiCard
+              label="Scannés"
+              value={data.stats.scanned}
+              subtitle="Au moins un scan"
+              icon={QrCode}
+              color="amber"
+            />
+            <KpiCard
+              label="Perdus"
+              value={data.stats.lost}
+              subtitle="À retrouver"
+              icon={AlertTriangle}
+              color="rose"
+            />
           </div>
 
           {/* Charts Row */}
           <div className="grid lg:grid-cols-2 gap-6">
-            {/* Daily Evolution Chart */}
-            <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800">
-              <h3 className="text-lg font-semibold text-slate-800 dark:text-white mb-6 flex items-center gap-2">
-                <Calendar className="w-5 h-5 text-[#ff7f00]" />
-                Évolution quotidienne
-              </h3>
-              <div className="space-y-3">
-                {data.dailyStats.map((day, i) => (
-                  <div key={i} className="flex items-center gap-4">
-                    <span className="text-sm text-slate-500 dark:text-slate-400 w-20">{day.label}</span>
-                    <div className="flex-1 h-6 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                      <div 
-                        className="h-full bg-gradient-to-r from-[#ff7f00] to-[#ff9f00] rounded-full transition-all duration-500"
-                        style={{ width: `${(day.count / maxDaily) * 100}%` }}
-                      />
-                    </div>
-                    <span className="text-sm font-medium text-slate-800 dark:text-white w-8 text-right">{day.count}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Weekly Evolution Chart */}
-            <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800">
-              <h3 className="text-lg font-semibold text-slate-800 dark:text-white mb-6 flex items-center gap-2">
-                <TrendingUp className="w-5 h-5 text-[#ff7f00]" />
-                Évolution hebdomadaire
-              </h3>
-              <div className="space-y-3">
-                {data.weeklyStats.map((week, i) => (
-                  <div key={i} className="flex items-center gap-4">
-                    <span className="text-sm text-slate-500 dark:text-slate-400 w-24">{week.label}</span>
-                    <div className="flex-1 h-6 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                      <div 
-                        className="h-full bg-gradient-to-r from-emerald-400 to-emerald-500 rounded-full transition-all duration-500"
-                        style={{ width: `${(week.count / maxWeekly) * 100}%` }}
-                      />
-                    </div>
-                    <span className="text-sm font-medium text-slate-800 dark:text-white w-8 text-right">{week.count}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
+            <AreaChartCard
+              title="Évolution quotidienne"
+              subtitle="Création de colis par jour"
+              data={dailyChartData}
+              color="#1E4B7A"
+              loading={loading}
+            />
+            <AreaChartCard
+              title="Évolution hebdomadaire"
+              subtitle="Création de colis par semaine"
+              data={weeklyChartData}
+              color="#10B981"
+              loading={loading}
+            />
           </div>
 
           {/* Bottom Row */}
           <div className="grid lg:grid-cols-3 gap-6">
             {/* Status Distribution */}
-            <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800">
-              <h3 className="text-lg font-semibold text-slate-800 dark:text-white mb-4">Répartition par statut</h3>
+            <div className="dash-card p-6">
+              <h3 className="font-display text-lg font-bold text-[var(--dash-ink)] mb-4">Répartition par statut</h3>
               <div className="space-y-3">
                 <StatusRow label="En attente" count={data.stats.pending_activation} total={data.stats.total} color="amber" />
                 <StatusRow label="Actifs" count={data.stats.active} total={data.stats.total} color="emerald" />
-                <StatusRow label="Scannés" count={data.stats.scanned} total={data.stats.total} color="blue" />
+                <StatusRow label="Scannés" count={data.stats.scanned} total={data.stats.total} color="brand" />
                 <StatusRow label="Perdus" count={data.stats.lost} total={data.stats.total} color="rose" />
-                <StatusRow label="Retrouvés" count={data.stats.found} total={data.stats.total} color="green" />
+                <StatusRow label="Retrouvés" count={data.stats.found} total={data.stats.total} color="emerald" />
               </div>
             </div>
 
             {/* Type Distribution */}
-            <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800">
-              <h3 className="text-lg font-semibold text-slate-800 dark:text-white mb-4">Par type</h3>
+            <div className="dash-card p-6">
+              <h3 className="font-display text-lg font-bold text-[var(--dash-ink)] mb-4">Par type</h3>
               <div className="space-y-4">
-                <div className="flex items-center gap-4 p-4 bg-emerald-50 dark:bg-emerald-500/10 rounded-xl">
-                  <div className="w-12 h-12 bg-emerald-500/20 rounded-xl flex items-center justify-center">
-                    <Plane className="w-6 h-6 text-emerald-500" />
+                <div className="flex items-center gap-4 p-4 bg-[var(--dash-emerald-soft)] rounded-xl">
+                  <div className="w-12 h-12 bg-[var(--dash-emerald)]/20 rounded-xl flex items-center justify-center">
+                    <Plane className="w-6 h-6 text-[var(--dash-emerald)]" />
                   </div>
                   <div className="flex-1">
-                    <p className="text-slate-500 dark:text-slate-400 text-sm">Hajj</p>
-                    <p className="text-2xl font-bold text-slate-800 dark:text-white">{data.stats.hajj}</p>
+                    <p className="text-[var(--dash-muted)] text-sm">Hajj</p>
+                    <p className="text-2xl font-bold text-[var(--dash-ink)]">{data.stats.hajj}</p>
                   </div>
-                  <span className="text-sm text-emerald-500 font-medium">
+                  <span className="text-sm text-[var(--dash-emerald)] font-medium">
                     {data.stats.total > 0 ? Math.round((data.stats.hajj / data.stats.total) * 100) : 0}%
                   </span>
                 </div>
@@ -249,8 +221,8 @@ export default function AgencyReportsPage() {
                     <Luggage className="w-6 h-6 text-amber-500" />
                   </div>
                   <div className="flex-1">
-                    <p className="text-slate-500 dark:text-slate-400 text-sm">Voyageur</p>
-                    <p className="text-2xl font-bold text-slate-800 dark:text-white">{data.stats.voyageur}</p>
+                    <p className="text-[var(--dash-muted)] text-sm">Voyageur</p>
+                    <p className="text-2xl font-bold text-[var(--dash-ink)]">{data.stats.voyageur}</p>
                   </div>
                   <span className="text-sm text-amber-500 font-medium">
                     {data.stats.total > 0 ? Math.round((data.stats.voyageur / data.stats.total) * 100) : 0}%
@@ -260,49 +232,49 @@ export default function AgencyReportsPage() {
             </div>
 
             {/* Key Metrics */}
-            <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800">
-              <h3 className="text-lg font-semibold text-slate-800 dark:text-white mb-4">Indicateurs clés</h3>
+            <div className="dash-card p-6">
+              <h3 className="font-display text-lg font-bold text-[var(--dash-ink)] mb-4">Indicateurs clés</h3>
               <div className="space-y-4">
-                <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-xl">
+                <div className="p-4 bg-[var(--dash-bg-3)] rounded-xl">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-slate-500 dark:text-slate-400 text-sm">Taux de récupération</span>
-                    <TrendingUp className="w-4 h-4 text-emerald-500" />
+                    <span className="text-[var(--dash-muted)] text-sm">Taux de récupération</span>
+                    <CheckCircle className="w-4 h-4 text-[var(--dash-emerald)]" />
                   </div>
-                  <p className="text-3xl font-bold text-emerald-500">{data.recoveryRate}%</p>
-                  <p className="text-xs text-slate-400 mt-1">Colis retrouvés / perdus</p>
+                  <p className="text-3xl font-bold text-[var(--dash-emerald)]">{data.recoveryRate}%</p>
+                  <p className="text-xs text-[var(--dash-muted-2)] mt-1">Colis retrouvés / perdus</p>
                 </div>
-                <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-xl">
+                <div className="p-4 bg-[var(--dash-bg-3)] rounded-xl">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-slate-500 dark:text-slate-400 text-sm">Scans enregistrés</span>
-                    <QrCode className="w-4 h-4 text-[#ff7f00]" />
+                    <span className="text-[var(--dash-muted)] text-sm">Scans enregistrés</span>
+                    <QrCode className="w-4 h-4 text-[var(--dash-brand)]" />
                   </div>
-                  <p className="text-3xl font-bold text-[#ff7f00]">{data.scanLogsCount}</p>
-                  <p className="text-xs text-slate-400 mt-1">Total sur la période</p>
+                  <p className="text-3xl font-bold text-[var(--dash-brand)]">{data.scanLogsCount}</p>
+                  <p className="text-xs text-[var(--dash-muted-2)] mt-1">Total sur la période</p>
                 </div>
               </div>
             </div>
           </div>
 
           {/* Public Page Info */}
-          <div className="bg-gradient-to-r from-[#ff7f00]/10 to-[#ff9f00]/10 rounded-2xl p-6 border border-[#ff7f00]/20">
-            <div className="flex items-start gap-4">
-              <div className="w-12 h-12 bg-[#ff7f00]/20 rounded-xl flex items-center justify-center">
-                <Share2 className="w-6 h-6 text-[#ff7f00]" />
+          <div className="dash-card p-6 border-l-4 border-l-[var(--dash-brand)]">
+            <div className="flex items-start gap-4 flex-wrap">
+              <div className="w-12 h-12 bg-[var(--dash-brand-soft)] rounded-xl flex items-center justify-center">
+                <Share2 className="w-6 h-6 text-[var(--dash-brand)]" />
               </div>
-              <div className="flex-1">
-                <h3 className="text-lg font-semibold text-slate-800 dark:text-white mb-2">
+              <div className="flex-1 min-w-[200px]">
+                <h3 className="font-display text-lg font-semibold text-[var(--dash-ink)] mb-2">
                   Page publique de votre agence
                 </h3>
-                <p className="text-slate-500 dark:text-slate-400 text-sm mb-3">
+                <p className="text-[var(--dash-muted)] text-sm mb-3">
                   Partagez ce lien avec vos clients pour leur montrer les colis que vous protégez :
                 </p>
-                <code className="bg-white dark:bg-slate-900 px-3 py-1.5 rounded-lg text-sm text-[#ff7f00] border border-slate-200 dark:border-slate-700">
+                <code className="bg-[var(--dash-bg-3)] px-3 py-1.5 rounded-lg text-sm text-[var(--dash-brand)] border border-[var(--dash-border)] break-all">
                   {typeof window !== 'undefined' ? window.location.origin : ''}/agency/{agencyData?.slug || 'agency'}
                 </code>
               </div>
               <button
                 onClick={handleSharePublicPage}
-                className="px-4 py-2 bg-[#ff7f00] hover:bg-[#ff9f00] text-white rounded-xl text-sm font-medium transition-colors"
+                className="btn-brand btn-magnetic px-4 py-2 rounded-lg text-sm font-medium"
               >
                 Copier le lien
               </button>
@@ -310,7 +282,7 @@ export default function AgencyReportsPage() {
           </div>
         </div>
       ) : (
-        <div className="text-center py-20 text-slate-500">
+        <div className="text-center py-20 text-[var(--dash-muted)]">
           Aucune donnée disponible
         </div>
       )}
@@ -323,23 +295,22 @@ function StatusRow({ label, count, total, color }: { label: string; count: numbe
   const percentage = total > 0 ? (count / total) * 100 : 0;
   const colorClasses: Record<string, string> = {
     amber: 'bg-amber-500',
-    emerald: 'bg-emerald-500',
-    blue: 'bg-blue-500',
-    rose: 'bg-rose-500',
-    green: 'bg-green-500',
-    slate: 'bg-slate-400',
+    emerald: 'bg-[var(--dash-emerald)]',
+    brand: 'bg-[var(--dash-brand)]',
+    rose: 'bg-red-500',
+    neutral: 'bg-[var(--dash-muted-2)]',
   };
 
   return (
     <div className="flex items-center gap-3">
-      <span className="text-sm text-slate-500 dark:text-slate-400 w-24">{label}</span>
-      <div className="flex-1 h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-        <div 
+      <span className="text-sm text-[var(--dash-muted)] w-24">{label}</span>
+      <div className="flex-1 h-2 bg-[var(--dash-bg-3)] rounded-full overflow-hidden">
+        <div
           className={`h-full ${colorClasses[color]} rounded-full transition-all duration-500`}
           style={{ width: `${percentage}%` }}
         />
       </div>
-      <span className="text-sm font-medium text-slate-800 dark:text-white w-8 text-right">{count}</span>
+      <span className="text-sm font-medium text-[var(--dash-ink)] w-8 text-right">{count}</span>
     </div>
   );
 }

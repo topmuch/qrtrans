@@ -1,11 +1,21 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { useTranslation } from '@/hooks/useTranslation';
-import { Activity, Database, AlertTriangle, RefreshCw, Trash2, Search, ChevronDown, ChevronUp } from 'lucide-react';
+import {
+  Activity,
+  Database,
+  AlertTriangle,
+  RefreshCw,
+  Trash2,
+  ChevronLeft,
+  ChevronRight,
+  CheckCircle,
+  XCircle,
+  Filter,
+  Terminal,
+} from 'lucide-react';
+import KpiCard from '@/components/dashboard/KpiCard';
 
 interface DiagnosticCheck {
   name: string;
@@ -75,9 +85,9 @@ export default function MonitoringPage() {
       if (filterLevel) params.set('level', filterLevel);
       if (filterSource) params.set('source', filterSource);
       const res = await fetch(`/api/admin/system-logs?${params}`, { credentials: 'same-origin' });
-      
+
       if (res.status === 401 || res.status === 403) return;
-      
+
       const data = await res.json();
       setLogs(data.logs || []);
       setTotalLogs(data.pagination?.total || 0);
@@ -123,143 +133,172 @@ export default function MonitoringPage() {
     };
   }, [autoRefresh, runDiagnostic, fetchLogs]);
 
-  const statusColors: Record<string, string> = {
-    healthy: 'bg-green-100 text-green-800 border-green-200',
-    degraded: 'bg-yellow-100 text-yellow-800 border-yellow-200',
-    critical: 'bg-red-100 text-red-800 border-red-200',
+  const statusBadgeClass = (status: string): string => {
+    if (status === 'healthy' || status === 'ok') return 'dash-badge dash-badge-success';
+    if (status === 'degraded' || status === 'warn') return 'dash-badge dash-badge-warning';
+    return 'dash-badge dash-badge-danger';
   };
 
-  const levelColors: Record<string, string> = {
-    info: 'bg-blue-100 text-blue-800',
-    warn: 'bg-yellow-100 text-yellow-800',
-    error: 'bg-red-100 text-red-800',
-    fatal: 'bg-purple-100 text-purple-800',
+  const statusLabel = (status: string): string => {
+    if (status === 'healthy' || status === 'ok') return 'OK';
+    if (status === 'degraded' || status === 'warn') return 'WARN';
+    if (status === 'critical' || status === 'error') return 'ERROR';
+    return status.toUpperCase();
   };
 
-  const levelBg: Record<string, string> = {
-    info: 'border-l-blue-400',
-    warn: 'border-l-yellow-400',
-    error: 'border-l-red-400',
-    fatal: 'border-l-purple-500',
+  const levelBadge: Record<string, string> = {
+    info: 'dash-badge dash-badge-info',
+    warn: 'dash-badge dash-badge-warning',
+    error: 'dash-badge dash-badge-danger',
+    fatal: 'dash-badge dash-badge-danger',
+  };
+
+  const levelBorder: Record<string, string> = {
+    info: 'border-l-[var(--dash-brand)]',
+    warn: 'border-l-amber-400',
+    error: 'border-l-red-500',
+    fatal: 'border-l-red-600',
   };
 
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Monitoring</h1>
-          <p className="text-gray-500 text-sm">Diagnostic système et logs centralisés</p>
+          <h1 className="font-display text-2xl font-bold text-[var(--dash-ink)] flex items-center gap-2">
+            <Activity className="w-6 h-6 text-[var(--dash-brand)]" />
+            Monitoring
+          </h1>
+          <p className="text-sm text-[var(--dash-muted)] mt-1">Diagnostic système et logs centralisés</p>
         </div>
         <div className="flex items-center gap-2">
-          <Button
-            variant={autoRefresh ? 'default' : 'outline'}
-            size="sm"
+          <button
             onClick={() => setAutoRefresh(!autoRefresh)}
+            className={`inline-flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium border transition-colors ${
+              autoRefresh
+                ? 'btn-brand border-transparent text-white'
+                : 'border-[var(--dash-border)] bg-[var(--dash-card)] text-[var(--dash-ink-2)] hover:bg-[var(--dash-bg-3)]'
+            }`}
           >
-            <RefreshCw className={`w-4 h-4 mr-1 ${refreshing ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
             {autoRefresh ? `Auto-refresh ON (30s)` : 'Auto-refresh'}
-          </Button>
-          <Button onClick={runDiagnostic} disabled={loading} size="sm">
-            <Activity className={`w-4 h-4 mr-1 ${loading ? 'animate-pulse' : ''}`} />
+          </button>
+          <button
+            onClick={runDiagnostic}
+            disabled={loading}
+            className="btn-emerald btn-magnetic inline-flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium"
+          >
+            <Activity className={`w-4 h-4 ${loading ? 'animate-pulse' : ''}`} />
             {loading ? 'Analyse...' : 'Lancer diagnostic'}
-          </Button>
+          </button>
         </div>
       </div>
 
       {/* Diagnostic Error */}
       {diagnosticError && (
-        <Card className="border-red-200 bg-red-50 dark:bg-red-500/10 dark:border-red-800">
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-2 text-red-700 dark:text-red-400">
-              <AlertTriangle className="w-5 h-5" />
-              <p className="font-medium">Erreur de diagnostic</p>
-            </div>
-            <p className="text-sm text-red-600 dark:text-red-400 mt-1">{diagnosticError}</p>
-          </CardContent>
-        </Card>
+        <div className="dash-card p-5 border-l-4 border-l-red-500">
+          <div className="flex items-center gap-2 text-red-700 dark:text-red-400">
+            <AlertTriangle className="w-5 h-5" />
+            <p className="font-medium">Erreur de diagnostic</p>
+          </div>
+          <p className="text-sm text-[var(--dash-ink-2)] mt-1">{diagnosticError}</p>
+        </div>
       )}
 
       {/* Diagnostic Result */}
       {diagnostic && (
-        <Card className={statusColors[diagnostic.status] + ' border'}>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-lg flex items-center gap-2">
-              <Activity className="w-5 h-5" />
-              Status: {diagnostic.status.toUpperCase()}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              {diagnostic.checks.map((check, i) => (
-                <div key={i} className="flex items-center justify-between text-sm">
-                  <span className="font-medium">{check.name}</span>
-                  <div className="flex items-center gap-2">
-                    <span className="text-gray-600">{check.detail}</span>
-                    <Badge variant={
-                      check.status === 'ok' ? 'default' : 
-                      check.status === 'warn' ? 'secondary' : 'destructive'
-                    }>
-                      {check.status}
-                    </Badge>
-                  </div>
+        <div className="dash-card p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-display text-lg font-bold text-[var(--dash-ink)] flex items-center gap-2">
+              <Activity className="w-5 h-5 text-[var(--dash-brand)]" />
+              Statut système
+            </h3>
+            <span className={statusBadgeClass(diagnostic.status)}>
+              {statusLabel(diagnostic.status)}
+            </span>
+          </div>
+          <div className="space-y-2">
+            {diagnostic.checks.map((check, i) => (
+              <div key={i} className="flex items-center justify-between text-sm border-b border-[var(--dash-border)] last:border-0 pb-2 last:pb-0">
+                <span className="font-medium text-[var(--dash-ink)]">{check.name}</span>
+                <div className="flex items-center gap-3">
+                  <span className="text-[var(--dash-muted)]">{check.detail}</span>
+                  {typeof check.latencyMs === 'number' && (
+                    <span className="text-xs text-[var(--dash-muted-2)] font-mono">
+                      {check.latencyMs}ms
+                    </span>
+                  )}
+                  <span className={statusBadgeClass(check.status)}>
+                    {statusLabel(check.status)}
+                  </span>
                 </div>
-              ))}
-            </div>
-            <p className="text-xs text-gray-500 mt-3">
-              Dernière vérification: {new Date(diagnostic.timestamp).toLocaleString('fr-FR')}
-            </p>
-          </CardContent>
-        </Card>
+              </div>
+            ))}
+          </div>
+          <p className="text-xs text-[var(--dash-muted-2)] mt-3">
+            Dernière vérification : {new Date(diagnostic.timestamp).toLocaleString('fr-FR')}
+          </p>
+        </div>
       )}
 
       {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="pt-6 text-center">
-            <Database className="w-8 h-8 mx-auto mb-2 text-blue-500" />
-            <p className="text-2xl font-bold">{totalLogs}</p>
-            <p className="text-xs text-gray-500">Logs totaux</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6 text-center">
-            <AlertTriangle className="w-8 h-8 mx-auto mb-2 text-red-500" />
-            <p className="text-2xl font-bold">{logs.filter(l => l.level === 'error').length}</p>
-            <p className="text-xs text-gray-500">Erreurs (cette page)</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6 text-center">
-            <Activity className="w-8 h-8 mx-auto mb-2 text-purple-500" />
-            <p className="text-2xl font-bold">{logs.filter(l => l.level === 'fatal').length}</p>
-            <p className="text-xs text-gray-500">Fatals (cette page)</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6 text-center">
-            <div className="w-8 h-8 mx-auto mb-2 text-green-500 font-bold text-lg">✓</div>
-            <p className="text-2xl font-bold">{logs.filter(l => l.level === 'info').length}</p>
-            <p className="text-xs text-gray-500">Info (cette page)</p>
-          </CardContent>
-        </Card>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <KpiCard
+          label="Logs totaux"
+          value={totalLogs}
+          subtitle="Enregistrés"
+          icon={Database}
+          color="brand"
+          loading={loading}
+        />
+        <KpiCard
+          label="Erreurs"
+          value={logs.filter(l => l.level === 'error').length}
+          subtitle="Cette page"
+          icon={XCircle}
+          color="rose"
+          loading={loading}
+        />
+        <KpiCard
+          label="Fatals"
+          value={logs.filter(l => l.level === 'fatal').length}
+          subtitle="Cette page"
+          icon={AlertTriangle}
+          color="rose"
+          loading={loading}
+        />
+        <KpiCard
+          label="Info"
+          value={logs.filter(l => l.level === 'info').length}
+          subtitle="Cette page"
+          icon={CheckCircle}
+          color="emerald"
+          loading={loading}
+        />
       </div>
 
       {/* Logs */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-lg">Logs système</CardTitle>
-            <Button variant="outline" size="sm" onClick={purgeLogs}>
-              <Trash2 className="w-4 h-4 mr-1" />
-              Purge 30j
-            </Button>
-          </div>
-          <div className="flex gap-2 mt-3">
+      <div className="dash-card p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="font-display text-lg font-bold text-[var(--dash-ink)] flex items-center gap-2">
+            <Terminal className="w-5 h-5 text-[var(--dash-brand)]" />
+            Logs système
+          </h3>
+          <button
+            onClick={purgeLogs}
+            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium border border-[var(--dash-border)] bg-[var(--dash-card)] text-[var(--dash-ink-2)] hover:bg-[var(--dash-bg-3)] transition-colors"
+          >
+            <Trash2 className="w-4 h-4" />
+            Purge 30j
+          </button>
+        </div>
+        <div className="flex flex-col sm:flex-row gap-2 mb-4">
+          <div className="flex items-center gap-2">
+            <Filter className="w-4 h-4 text-[var(--dash-muted-2)] hidden sm:block" />
             <select
               value={filterLevel}
               onChange={(e) => { setFilterLevel(e.target.value); setPage(1); }}
-              className="text-sm border rounded-md px-2 py-1"
+              className="text-sm border border-[var(--dash-border)] bg-[var(--dash-card)] text-[var(--dash-ink)] rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-[var(--dash-brand)]"
             >
               <option value="">Tous niveaux</option>
               <option value="info">Info</option>
@@ -267,57 +306,77 @@ export default function MonitoringPage() {
               <option value="error">Error</option>
               <option value="fatal">Fatal</option>
             </select>
-            <input
-              value={filterSource}
-              onChange={(e) => { setFilterSource(e.target.value); setPage(1); }}
-              placeholder="Filtrer par source..."
-              className="text-sm border rounded-md px-2 py-1 flex-1"
-            />
           </div>
-        </CardHeader>
-        <CardContent>
-          {logs.length === 0 ? (
-            <p className="text-center text-gray-400 py-8">Aucun log trouvé</p>
-          ) : (
-            <div className="space-y-1">
-              {logs.map((log) => (
-                <div
-                  key={log.id}
-                  className={`border-l-4 ${levelBg[log.level] || 'border-l-gray-300'} bg-gray-50 rounded-r-lg px-3 py-2`}
-                >
-                  <div className="flex items-center gap-2">
-                    <span className={`text-xs px-1.5 py-0.5 rounded font-medium ${levelColors[log.level]}`}>
-                      {log.level}
-                    </span>
-                    <span className="text-xs text-gray-400 font-mono">{log.source}</span>
-                    <span className="text-xs text-gray-400 ml-auto">
-                      {new Date(log.createdAt).toLocaleString('fr-FR')}
-                    </span>
-                  </div>
-                  <p className="text-sm text-gray-800 mt-0.5">{log.message}</p>
-                  {log.metadata && (
-                    <details className="mt-1">
-                      <summary className="text-xs text-gray-400 cursor-pointer">Metadata</summary>
-                      <pre className="text-xs text-gray-500 bg-gray-100 p-2 mt-1 rounded overflow-x-auto max-h-32">
-                        {log.metadata}
-                      </pre>
-                    </details>
-                  )}
+          <input
+            value={filterSource}
+            onChange={(e) => { setFilterSource(e.target.value); setPage(1); }}
+            placeholder="Filtrer par source..."
+            className="text-sm border border-[var(--dash-border)] bg-[var(--dash-card)] text-[var(--dash-ink)] rounded-lg px-3 py-1.5 flex-1 focus:outline-none focus:ring-2 focus:ring-[var(--dash-brand)]"
+          />
+        </div>
+
+        {logs.length === 0 ? (
+          <div className="text-center py-12">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[var(--dash-bg-3)] mb-3">
+              <Terminal className="w-8 h-8 text-[var(--dash-muted)]" />
+            </div>
+            <p className="text-[var(--dash-muted)]">Aucun log trouvé</p>
+          </div>
+        ) : (
+          <div className="space-y-1">
+            {logs.map((log) => (
+              <div
+                key={log.id}
+                className={`border-l-4 ${levelBorder[log.level] || 'border-l-[var(--dash-border)]'} bg-[var(--dash-bg-3)] rounded-r-lg px-3 py-2`}
+              >
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className={levelBadge[log.level] || 'dash-badge dash-badge-neutral'}>
+                    {log.level}
+                  </span>
+                  <span className="text-xs text-[var(--dash-muted-2)] font-mono">{log.source}</span>
+                  <span className="text-xs text-[var(--dash-muted-2)] ml-auto">
+                    {new Date(log.createdAt).toLocaleString('fr-FR')}
+                  </span>
                 </div>
-              ))}
-            </div>
-          )}
-          {/* Pagination */}
-          <div className="flex items-center justify-between mt-4 pt-4 border-t">
-            <p className="text-sm text-gray-500">{totalLogs} logs au total</p>
-            <div className="flex gap-1">
-              <Button size="sm" variant="outline" disabled={page <= 1} onClick={() => setPage(page - 1)}>Préc.</Button>
-              <span className="px-3 py-1 text-sm">Page {page}</span>
-              <Button size="sm" variant="outline" onClick={() => setPage(page + 1)}>Suiv.</Button>
-            </div>
+                <p className="text-sm text-[var(--dash-ink)] mt-0.5">{log.message}</p>
+                {log.metadata && (
+                  <details className="mt-1">
+                    <summary className="text-xs text-[var(--dash-muted-2)] cursor-pointer">Metadata</summary>
+                    <pre className="text-xs text-[var(--dash-muted)] bg-[var(--dash-card)] border border-[var(--dash-border)] p-2 mt-1 rounded overflow-x-auto max-h-32">
+                      {log.metadata}
+                    </pre>
+                  </details>
+                )}
+              </div>
+            ))}
           </div>
-        </CardContent>
-      </Card>
+        )}
+
+        {/* Pagination */}
+        <div className="flex items-center justify-between mt-4 pt-4 border-t border-[var(--dash-border)]">
+          <p className="text-sm text-[var(--dash-muted)]">{totalLogs} logs au total</p>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setPage(page - 1)}
+              disabled={page <= 1}
+              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm font-medium border border-[var(--dash-border)] bg-[var(--dash-card)] text-[var(--dash-ink-2)] hover:bg-[var(--dash-bg-3)] disabled:opacity-50 transition-colors"
+            >
+              <ChevronLeft className="w-4 h-4" />
+              Préc.
+            </button>
+            <span className="px-3 py-1 text-sm font-medium bg-[var(--dash-bg-3)] text-[var(--dash-ink)] rounded-lg">
+              Page {page}
+            </span>
+            <button
+              onClick={() => setPage(page + 1)}
+              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm font-medium border border-[var(--dash-border)] bg-[var(--dash-card)] text-[var(--dash-ink-2)] hover:bg-[var(--dash-bg-3)] transition-colors"
+            >
+              Suiv.
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

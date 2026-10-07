@@ -1,18 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from "@/components/ui/table";
-import { 
+import {
   Building,
   Users,
   QrCode,
@@ -20,9 +9,10 @@ import {
   AlertTriangle,
   RefreshCw,
   ChevronDown,
-  ChevronRight,
-  Package
+  Package,
+  Search,
 } from "lucide-react";
+import KpiCard from '@/components/dashboard/KpiCard';
 
 // Types
 interface Baggage {
@@ -48,34 +38,30 @@ interface AgencyWithBaggages {
   travelerCount: number;
 }
 
-// Status Badge Component
+// Status Badge Component — uses dash-badge utility classes
 function StatusBadge({ status }: { status: string }) {
-  const config: Record<string, { label: string; className: string }> = {
-    pending_activation: { label: 'En attente', className: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' },
-    active: { label: 'Actif', className: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' },
-    scanned: { label: 'Scanné', className: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' },
-    lost: { label: 'Perdu', className: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' },
-    found: { label: 'Retrouvé', className: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' },
-    blocked: { label: 'Bloqué', className: 'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-400' },
+  const config: Record<string, { label: string; cls: string }> = {
+    pending_activation: { label: 'En attente', cls: 'dash-badge dash-badge-warning' },
+    active: { label: 'Actif', cls: 'dash-badge dash-badge-success' },
+    scanned: { label: 'Scanné', cls: 'dash-badge dash-badge-info' },
+    lost: { label: 'Perdu', cls: 'dash-badge dash-badge-danger' },
+    found: { label: 'Retrouvé', cls: 'dash-badge dash-badge-success' },
+    blocked: { label: 'Bloqué', cls: 'dash-badge dash-badge-neutral' },
   };
 
-  const { label, className } = config[status] || { label: status, className: 'bg-slate-100 text-slate-600' };
+  const { label, cls } = config[status] || { label: status, cls: 'dash-badge dash-badge-neutral' };
 
-  return (
-    <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${className}`}>
-      {label}
-    </span>
-  );
+  return <span className={cls}>{label}</span>;
 }
 
-// Agency Card Component
-function AgencyCard({ 
-  agency, 
-  isExpanded, 
-  onToggle 
-}: { 
-  agency: AgencyWithBaggages; 
-  isExpanded: boolean; 
+// Agency Card Component — premium dashboard card
+function AgencyCard({
+  agency,
+  isExpanded,
+  onToggle,
+}: {
+  agency: AgencyWithBaggages;
+  isExpanded: boolean;
   onToggle: () => void;
 }) {
   const activeCount = agency.baggages.filter(b => b.status === 'active' || b.status === 'scanned').length;
@@ -83,118 +69,115 @@ function AgencyCard({
   const pendingCount = agency.baggages.filter(b => b.status === 'pending_activation').length;
 
   return (
-    <Card className="bg-white dark:bg-slate-800 border-slate-100 dark:border-slate-700 shadow-sm rounded-2xl overflow-hidden">
+    <div className="dash-card overflow-hidden">
       {/* Agency Header - Clickable */}
       <button
         onClick={onToggle}
-        className="w-full p-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors text-left"
+        className="w-full p-4 sm:p-5 flex items-center justify-between hover:bg-[var(--dash-bg-3)] transition-colors text-left"
       >
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-[#ff7f00]/10 dark:bg-[#ff7f00]/20 flex items-center justify-center">
-            <Building className="w-6 h-6 text-[#ff7f00]" />
+        <div className="flex items-center gap-4 min-w-0">
+          <div className="w-12 h-12 rounded-xl bg-[var(--dash-brand-soft)] flex items-center justify-center shrink-0">
+            <Building className="w-6 h-6 text-[var(--dash-brand)]" />
           </div>
-          <div>
-            <h3 className="text-lg font-semibold text-slate-800 dark:text-white">{agency.name}</h3>
-            <p className="text-sm text-slate-500 dark:text-slate-400">
+          <div className="min-w-0">
+            <h3 className="text-lg font-semibold text-[var(--dash-ink)] truncate">{agency.name}</h3>
+            <p className="text-sm text-[var(--dash-muted)]">
               {agency.travelerCount} voyageur{agency.travelerCount > 1 ? 's' : ''} • {agency.baggages.length} colis
             </p>
           </div>
         </div>
-        
-        <div className="flex items-center gap-4">
+
+        <div className="flex items-center gap-3 shrink-0">
           {/* Quick Stats */}
           <div className="hidden sm:flex items-center gap-2">
             {activeCount > 0 && (
-              <Badge variant="outline" className="border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400">
+              <span className="dash-badge dash-badge-success">
                 {activeCount} actif{activeCount > 1 ? 's' : ''}
-              </Badge>
+              </span>
             )}
             {lostCount > 0 && (
-              <Badge variant="outline" className="border-red-200 dark:border-red-800 text-red-700 dark:text-red-400">
+              <span className="dash-badge dash-badge-danger">
                 {lostCount} perdu{lostCount > 1 ? 's' : ''}
-              </Badge>
+              </span>
             )}
             {pendingCount > 0 && (
-              <Badge variant="outline" className="border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-400">
+              <span className="dash-badge dash-badge-warning">
                 {pendingCount} en attente
-              </Badge>
+              </span>
             )}
           </div>
-          
+
           {/* Expand Icon */}
-          <div className={`w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-700 flex items-center justify-center transition-transform ${isExpanded ? 'rotate-180' : ''}`}>
-            <ChevronDown className="w-5 h-5 text-slate-500 dark:text-slate-400" />
+          <div className={`w-8 h-8 rounded-lg bg-[var(--dash-bg-3)] flex items-center justify-center transition-transform ${isExpanded ? 'rotate-180' : ''}`}>
+            <ChevronDown className="w-5 h-5 text-[var(--dash-muted)]" />
           </div>
         </div>
       </button>
 
       {/* Expanded Content - Baggages List */}
       {isExpanded && (
-        <div className="border-t border-slate-100 dark:border-slate-700">
+        <div className="border-t border-[var(--dash-border)]">
           <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow className="bg-slate-50 dark:bg-slate-700/50 hover:bg-transparent">
-                  <TableHead className="text-slate-500 dark:text-slate-400 font-medium">Référence</TableHead>
-                  <TableHead className="text-slate-500 dark:text-slate-400 font-medium">Voyageur</TableHead>
-                  <TableHead className="text-slate-500 dark:text-slate-400 font-medium hidden md:table-cell">Type</TableHead>
-                  <TableHead className="text-slate-500 dark:text-slate-400 font-medium hidden lg:table-cell">WhatsApp</TableHead>
-                  <TableHead className="text-slate-500 dark:text-slate-400 font-medium">Statut</TableHead>
-                  <TableHead className="text-slate-500 dark:text-slate-400 font-medium hidden xl:table-cell">Dernier scan</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
+            <table className="dash-table">
+              <thead>
+                <tr>
+                  <th>Référence</th>
+                  <th>Voyageur</th>
+                  <th className="hidden md:table-cell">Type</th>
+                  <th className="hidden lg:table-cell">WhatsApp</th>
+                  <th>Statut</th>
+                  <th className="hidden xl:table-cell">Dernier scan</th>
+                </tr>
+              </thead>
+              <tbody>
                 {agency.baggages.map((baggage) => (
-                  <TableRow
+                  <tr
                     key={baggage.id}
-                    className={`border-slate-100 dark:border-slate-700 ${
-                      baggage.status === 'lost' ? 'bg-red-50/50 dark:bg-red-900/10' : ''
-                    }`}
+                    className={baggage.status === 'lost' ? 'bg-[var(--dash-bg-3)]' : ''}
                   >
-                    <TableCell>
+                    <td>
                       <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-lg bg-[#ff7f00]/10 dark:bg-[#ff7f00]/20 flex items-center justify-center">
-                          <QrCode className="w-4 h-4 text-[#ff7f00]" />
+                        <div className="w-8 h-8 rounded-lg bg-[var(--dash-brand-soft)] flex items-center justify-center">
+                          <QrCode className="w-4 h-4 text-[var(--dash-brand)]" />
                         </div>
-                        <span className="text-slate-800 dark:text-white font-mono font-medium text-sm">
+                        <span className="text-[var(--dash-ink)] font-mono font-medium text-sm">
                           {baggage.reference}
                         </span>
                       </div>
-                    </TableCell>
-                    <TableCell>
-                      <span className="text-slate-800 dark:text-white font-medium">
+                    </td>
+                    <td>
+                      <span className="text-[var(--dash-ink)] font-medium">
                         {baggage.travelerFirstName} {baggage.travelerLastName}
                       </span>
-                    </TableCell>
-                    <TableCell className="hidden md:table-cell">
-                      <span className="text-slate-600 dark:text-slate-300 text-sm">
+                    </td>
+                    <td className="hidden md:table-cell">
+                      <span className="text-[var(--dash-ink-2)] text-sm">
                         {baggage.baggageType} #{baggage.baggageIndex}
                       </span>
-                    </TableCell>
-                    <TableCell className="hidden lg:table-cell">
-                      <span className="text-slate-600 dark:text-slate-300 text-sm">
+                    </td>
+                    <td className="hidden lg:table-cell">
+                      <span className="text-[var(--dash-ink-2)] text-sm">
                         {baggage.whatsappOwner || '—'}
                       </span>
-                    </TableCell>
-                    <TableCell>
+                    </td>
+                    <td>
                       <StatusBadge status={baggage.status} />
-                    </TableCell>
-                    <TableCell className="hidden xl:table-cell">
-                      <span className="text-slate-500 dark:text-slate-400 text-sm">
-                        {baggage.lastScanDate 
+                    </td>
+                    <td className="hidden xl:table-cell">
+                      <span className="text-[var(--dash-muted)] text-sm">
+                        {baggage.lastScanDate
                           ? new Date(baggage.lastScanDate).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' })
-                          : 'Jamais'
-                        }
+                          : 'Jamais'}
                       </span>
-                    </TableCell>
-                  </TableRow>
+                    </td>
+                  </tr>
                 ))}
-              </TableBody>
-            </Table>
+              </tbody>
+            </table>
           </div>
         </div>
       )}
-    </Card>
+    </div>
   );
 }
 
@@ -214,10 +197,10 @@ export default function VoyageursAdminPage() {
     try {
       const response = await fetch('/api/admin/voyageurs');
       const data = await response.json();
-      
+
       // Group by agency
       const agencyMap = new Map<string, AgencyWithBaggages>();
-      
+
       data.travelers?.forEach((traveler: {
         agencyId: string | null;
         agency: { id: string; name: string } | null;
@@ -225,7 +208,7 @@ export default function VoyageursAdminPage() {
       }) => {
         const agencyId = traveler.agencyId || 'no-agency';
         const agencyName = traveler.agency?.name || 'Sans agence';
-        
+
         if (!agencyMap.has(agencyId)) {
           agencyMap.set(agencyId, {
             id: agencyId,
@@ -234,19 +217,19 @@ export default function VoyageursAdminPage() {
             travelerCount: 0,
           });
         }
-        
+
         const agency = agencyMap.get(agencyId)!;
         agency.baggages.push(...traveler.baggages);
         agency.travelerCount++;
       });
-      
+
       // Sort agencies alphabetically, "Sans agence" at the end
       const sortedAgencies = Array.from(agencyMap.values()).sort((a, b) => {
         if (a.id === 'no-agency') return 1;
         if (b.id === 'no-agency') return -1;
         return a.name.localeCompare(b.name);
       });
-      
+
       setAgencies(sortedAgencies);
     } catch (error) {
       console.error('Error fetching voyageurs:', error);
@@ -279,12 +262,12 @@ export default function VoyageursAdminPage() {
   const filteredAgencies = agencies.filter(agency => {
     if (!searchFilter) return true;
     const searchLower = searchFilter.toLowerCase();
-    
+
     // Search in agency name
     if (agency.name.toLowerCase().includes(searchLower)) return true;
-    
+
     // Search in baggages
-    return agency.baggages.some(b => 
+    return agency.baggages.some(b =>
       b.reference.toLowerCase().includes(searchLower) ||
       `${b.travelerFirstName || ''} ${b.travelerLastName || ''}`.toLowerCase().includes(searchLower)
     );
@@ -299,126 +282,99 @@ export default function VoyageursAdminPage() {
   return (
     <div className="max-w-7xl mx-auto">
       {/* Page Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800 dark:text-white">Colis</h1>
-          <p className="text-slate-500 dark:text-slate-400 mt-1">QR codes organisés par agence</p>
+          <h1 className="font-display text-2xl font-bold text-[var(--dash-ink)]">Colis</h1>
+          <p className="text-sm text-[var(--dash-muted)] mt-1">QR codes organisés par agence</p>
         </div>
-        <Button
+        <button
           onClick={fetchVoyageurs}
           disabled={loading}
-          variant="outline"
-          className="border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl"
+          className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg border border-[var(--dash-border)] bg-[var(--dash-card)] text-sm font-medium text-[var(--dash-ink)] hover:bg-[var(--dash-bg-3)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+          <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
           Actualiser
-        </Button>
+        </button>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <Card className="bg-white dark:bg-slate-800 border-slate-100 dark:border-slate-700 shadow-sm rounded-2xl">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-slate-500 dark:text-slate-400 text-sm">Total agences</p>
-                <p className="text-3xl font-bold text-slate-800 dark:text-white">{agencies.length}</p>
-              </div>
-              <div className="w-12 h-12 bg-[#ff7f00]/10 dark:bg-[#ff7f00]/20 rounded-xl flex items-center justify-center">
-                <Building className="w-6 h-6 text-[#ff7f00]" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card className="bg-white dark:bg-slate-800 border-slate-100 dark:border-slate-700 shadow-sm rounded-2xl">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-slate-500 dark:text-slate-400 text-sm">Total colis</p>
-                <p className="text-3xl font-bold text-slate-800 dark:text-white">{totalTravelers}</p>
-              </div>
-              <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-xl flex items-center justify-center">
-                <Users className="w-6 h-6 text-blue-600 dark:text-blue-400" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card className="bg-white dark:bg-slate-800 border-slate-100 dark:border-slate-700 shadow-sm rounded-2xl">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-slate-500 dark:text-slate-400 text-sm">Colis actifs</p>
-                <p className="text-3xl font-bold text-slate-800 dark:text-white">{totalActive}</p>
-              </div>
-              <div className="w-12 h-12 bg-emerald-100 dark:bg-emerald-900/30 rounded-xl flex items-center justify-center">
-                <CheckCircle className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card className="bg-white dark:bg-slate-800 border-slate-100 dark:border-slate-700 shadow-sm rounded-2xl">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-slate-500 dark:text-slate-400 text-sm">Colis perdus</p>
-                <p className="text-3xl font-bold text-slate-800 dark:text-white">{totalLost}</p>
-              </div>
-              <div className="w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-xl flex items-center justify-center">
-                <AlertTriangle className="w-6 h-6 text-red-600 dark:text-red-400" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <KpiCard
+          label="Total agences"
+          value={agencies.length}
+          subtitle="Partenaires"
+          icon={Building}
+          color="brand"
+          loading={loading}
+        />
+        <KpiCard
+          label="Total colis"
+          value={totalBaggages}
+          subtitle={`${totalTravelers} voyageurs`}
+          icon={Users}
+          color="violet"
+          loading={loading}
+        />
+        <KpiCard
+          label="Colis actifs"
+          value={totalActive}
+          subtitle="En service"
+          icon={CheckCircle}
+          color="emerald"
+          loading={loading}
+        />
+        <KpiCard
+          label="Colis perdus"
+          value={totalLost}
+          subtitle="À retrouver"
+          icon={AlertTriangle}
+          color="rose"
+          loading={loading}
+        />
       </div>
 
       {/* Search and Actions */}
-      <div className="flex flex-col sm:flex-row gap-4 mb-6">
-        <div className="relative flex-1">
+      <div className="flex flex-col sm:flex-row gap-3 mb-6">
+        <div className="dash-search flex-1">
+          <Search className="w-4 h-4 text-[var(--dash-muted)]" />
           <input
             type="text"
             placeholder="Rechercher par agence, voyageur ou référence..."
             value={searchFilter}
             onChange={(e) => setSearchFilter(e.target.value)}
-            className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl py-3 px-4 text-slate-700 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#ff7f00]/20 focus:border-[#ff7f00] transition-all"
           />
         </div>
         <div className="flex gap-2">
-          <Button
+          <button
             onClick={expandAll}
-            className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl"
+            className="btn-emerald inline-flex items-center justify-center px-4 py-2 rounded-lg text-sm font-medium"
           >
             Tout ouvrir
-          </Button>
-          <Button
+          </button>
+          <button
             onClick={collapseAll}
-            variant="outline"
-            className="border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl"
+            className="inline-flex items-center justify-center px-4 py-2 rounded-lg border border-[var(--dash-border)] bg-[var(--dash-card)] text-sm font-medium text-[var(--dash-ink)] hover:bg-[var(--dash-bg-3)] transition-colors"
           >
             Tout fermer
-          </Button>
+          </button>
         </div>
       </div>
 
       {/* Agencies List */}
       {loading ? (
-        <div className="flex items-center justify-center py-12">
-          <div className="w-8 h-8 border-2 border-[#ff7f00]/30 border-t-[#ff7f00] rounded-full animate-spin" />
+        <div className="dash-card p-12 flex items-center justify-center">
+          <div className="w-8 h-8 border-2 border-[var(--dash-brand)]/30 border-t-[var(--dash-brand)] rounded-full animate-spin" />
         </div>
       ) : filteredAgencies.length === 0 ? (
-        <Card className="bg-white dark:bg-slate-800 border-slate-100 dark:border-slate-700 shadow-sm rounded-2xl">
-          <CardContent className="p-12 text-center">
-            <div className="w-16 h-16 bg-slate-100 dark:bg-slate-700 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Package className="w-8 h-8 text-slate-400" />
-            </div>
-            <p className="text-slate-500 dark:text-slate-400">Aucun colis trouvé</p>
-            <p className="text-sm text-slate-400 dark:text-slate-500 mt-2">
-              {searchFilter ? 'Modifiez vos critères de recherche' : 'Les colis apparaîtront ici une fois les QR codes générés'}
-            </p>
-          </CardContent>
-        </Card>
+        <div className="dash-card p-12 text-center">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[var(--dash-bg-3)] mb-4">
+            <Package className="w-8 h-8 text-[var(--dash-muted)]" />
+          </div>
+          <p className="text-[var(--dash-muted)]">Aucun colis trouvé</p>
+          <p className="text-sm text-[var(--dash-muted-2)] mt-2">
+            {searchFilter ? 'Modifiez vos critères de recherche' : 'Les colis apparaîtront ici une fois les QR codes générés'}
+          </p>
+        </div>
       ) : (
         <div className="space-y-4">
           {filteredAgencies.map((agency) => (

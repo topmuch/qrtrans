@@ -1,8 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import {
   Select,
   SelectContent,
@@ -21,11 +19,16 @@ import {
   Send,
   XCircle,
   MessageSquare,
+  Inbox,
+  Handshake,
+  Package,
+  Reply,
+  Crown,
   AlertCircle,
   CheckCheck,
-  Inbox
 } from "lucide-react";
 import { AIBadge } from '@/components/ai/AIIndicators';
+import KpiCard from '@/components/dashboard/KpiCard';
 
 // Types
 interface Message {
@@ -43,30 +46,31 @@ interface Message {
   updatedAt: string;
 }
 
-// Type labels
-const TYPE_LABELS: Record<string, { label: string; icon: string; color: string }> = {
-  contact: { label: 'Contact', icon: '📩', color: 'text-blue-600 dark:text-blue-400' },
-  partenaire: { label: 'Partenaire', icon: '🤝', color: 'text-violet-600 dark:text-violet-400' },
-  commande_agence: { label: 'Commande', icon: '📦', color: 'text-amber-600 dark:text-amber-400' },
-  assistance_agence: { label: 'Assistance', icon: '💬', color: 'text-amber-600 dark:text-amber-400' },
-  reponse_assistance: { label: 'Réponse', icon: '↩️', color: 'text-emerald-600 dark:text-emerald-400' },
-  message_superadmin: { label: 'SuperAdmin', icon: '👑', color: 'text-red-600 dark:text-red-400' },
+// Type labels — lucide icons instead of emojis
+type LucideIcon = typeof Mail;
+const TYPE_LABELS: Record<string, { label: string; icon: LucideIcon; cls: string }> = {
+  contact: { label: 'Contact', icon: Mail, cls: 'dash-badge dash-badge-info' },
+  partenaire: { label: 'Partenaire', icon: Handshake, cls: 'dash-badge dash-badge-info' },
+  commande_agence: { label: 'Commande', icon: Package, cls: 'dash-badge dash-badge-warning' },
+  assistance_agence: { label: 'Assistance', icon: MessageSquare, cls: 'dash-badge dash-badge-warning' },
+  reponse_assistance: { label: 'Réponse', icon: Reply, cls: 'dash-badge dash-badge-success' },
+  message_superadmin: { label: 'SuperAdmin', icon: Crown, cls: 'dash-badge dash-badge-danger' },
 };
 
-// Status config
-const STATUS_CONFIG: Record<string, { label: string; className: string }> = {
-  non_lu: { label: 'Non lu', className: 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400' },
-  lu: { label: 'Lu', className: 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300' },
-  traite: { label: 'Traité', className: 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400' },
+// Status config — uses dash-badge classes
+const STATUS_CONFIG: Record<string, { label: string; cls: string }> = {
+  non_lu: { label: 'Non lu', cls: 'dash-badge dash-badge-danger' },
+  lu: { label: 'Lu', cls: 'dash-badge dash-badge-neutral' },
+  traite: { label: 'Traité', cls: 'dash-badge dash-badge-success' },
 };
 
 // Format message content for display
 function formatMessageContent(content: string, messageType: string): string {
   if (!content) return '';
-  
+
   try {
     const parsed = JSON.parse(content);
-    
+
     // Handle commande_agence type
     if (messageType === 'commande_agence') {
       const typeLabel = parsed.type === 'hajj' ? 'Hajj (3 QR/pèlerin)' : 'Voyageur (1 ou 3 QR)';
@@ -74,7 +78,7 @@ function formatMessageContent(content: string, messageType: string): string {
       const notes = parsed.notes ? `\nNotes: ${parsed.notes}` : '';
       return `Commande: ${parsed.count} ${countLabel}\nType: ${typeLabel}${notes}`;
     }
-    
+
     // Handle assistance_agence type (contains message, priority, agencyName, agencyEmail)
     if (messageType === 'assistance_agence' && parsed.message) {
       const parts = [parsed.message];
@@ -86,7 +90,7 @@ function formatMessageContent(content: string, messageType: string): string {
       }
       return parts.join('\n');
     }
-    
+
     // Handle old contact/partenaire format (content was JSON with phone, subject, message)
     if (typeof parsed === 'object' && parsed !== null) {
       if (parsed.message && parsed.phone && parsed.subject) {
@@ -107,10 +111,10 @@ function formatMessageContent(content: string, messageType: string): string {
         return parts.join(' - ');
       }
     }
-    
+
     // Default: try to extract meaningful text
     if (typeof parsed === 'string') return parsed;
-    
+
     return content;
   } catch {
     // Not JSON — return plain text content
@@ -123,26 +127,26 @@ function parseMessageFields(content: string, messageType: string) {
   const fields: { phone?: string; subject?: string; message: string; agencyName?: string; priority?: string } = {
     message: content,
   };
-  
+
   try {
     const parsed = JSON.parse(content);
     if (typeof parsed !== 'object' || parsed === null) return fields;
-    
+
     // Old contact format: {phone, subject, message}
     if (parsed.phone) fields.phone = parsed.phone;
     if (parsed.subject) fields.subject = parsed.subject;
     if (parsed.message) fields.message = parsed.message;
-    
+
     // Old partenaire format: {agence, message}
     if (parsed.agence) fields.agencyName = parsed.agence;
-    
+
     // Assistance format
     if (parsed.priority) fields.priority = parsed.priority;
     if (parsed.agencyName) fields.agencyName = parsed.agencyName;
   } catch {
     // Not JSON, content is already plain text
   }
-  
+
   return fields;
 }
 
@@ -178,7 +182,7 @@ function MessageSummaryCell({ content, messageType }: { content: string; message
           body: JSON.stringify({ text, maxLength: 50 })
         });
         const data = await res.json();
-        
+
         if (data.success) {
           setSummary(data.summary);
           setWasSummarized(data.wasSummarized);
@@ -196,11 +200,11 @@ function MessageSummaryCell({ content, messageType }: { content: string; message
   };
 
   if (loading) {
-    return <span className="text-slate-400 dark:text-slate-500 animate-pulse">Résumé...</span>;
+    return <span className="text-[var(--dash-muted-2)] animate-pulse">Résumé...</span>;
   }
 
   return (
-    <span className="text-slate-700 dark:text-slate-300 text-sm flex items-center gap-1">
+    <span className="text-[var(--dash-ink-2)] text-sm flex items-center gap-1">
       {wasSummarized && (
         <span className="shrink-0">
           <AIBadge tooltip="Résumé généré par IA - Désactivable dans Paramètres" />
@@ -273,7 +277,7 @@ export default function MessagesPage() {
 
   const handleDelete = async (id: string) => {
     if (!confirm('Êtes-vous sûr de vouloir supprimer ce message ?')) return;
-    
+
     try {
       await fetch(`/api/messages?id=${id}`, {
         method: 'DELETE',
@@ -313,101 +317,78 @@ export default function MessagesPage() {
     unread: messages.filter(m => m.status === 'non_lu').length,
     processed: messages.filter(m => m.status === 'traite').length,
   };
+  const assistanceCount = messages.filter(m => m.type === 'assistance_agence').length;
 
   return (
     <div className="max-w-6xl mx-auto">
       {/* Page Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800 dark:text-white">Messages</h1>
-          <p className="text-slate-500 dark:text-slate-400 mt-1">Gérez vos messages et demandes</p>
+          <h1 className="font-display text-2xl font-bold text-[var(--dash-ink)]">Messages</h1>
+          <p className="text-sm text-[var(--dash-muted)] mt-1">Gérez vos messages et demandes</p>
         </div>
         <div className="flex items-center gap-3">
           {unreadCount > 0 && (
-            <span className="bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 text-sm px-3 py-1 rounded-full flex items-center gap-1">
-              <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+            <span className="dash-badge dash-badge-danger">
+              <span className="w-2 h-2 bg-current rounded-full animate-pulse" />
               {unreadCount} nouveaux
             </span>
           )}
-          <Button
+          <button
             onClick={fetchMessages}
-            variant="outline"
-            className="border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl"
+            className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg border border-[var(--dash-border)] bg-[var(--dash-card)] text-sm font-medium text-[var(--dash-ink)] hover:bg-[var(--dash-bg-3)] transition-colors"
           >
-            <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
             Actualiser
-          </Button>
+          </button>
         </div>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <Card className="bg-white dark:bg-slate-800 border-slate-100 dark:border-slate-700 shadow-sm rounded-2xl">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-slate-500 dark:text-slate-400 text-sm">Total messages</p>
-                <p className="text-3xl font-bold text-slate-800 dark:text-white">{stats.total === 0 ? '—' : stats.total}</p>
-              </div>
-              <div className="w-12 h-12 bg-[#ff7f00]/10 dark:bg-[#ff7f00]/20 rounded-xl flex items-center justify-center">
-                <Inbox className="w-6 h-6 text-[#ff7f00]" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card className="bg-white dark:bg-slate-800 border-slate-100 dark:border-slate-700 shadow-sm rounded-2xl">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-slate-500 dark:text-slate-400 text-sm">Non lus</p>
-                <p className="text-3xl font-bold text-slate-800 dark:text-white">{stats.unread === 0 ? '—' : stats.unread}</p>
-              </div>
-              <div className="w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-xl flex items-center justify-center">
-                <Mail className="w-6 h-6 text-red-600 dark:text-red-400" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card className="bg-white dark:bg-slate-800 border-slate-100 dark:border-slate-700 shadow-sm rounded-2xl">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-slate-500 dark:text-slate-400 text-sm">Traités</p>
-                <p className="text-3xl font-bold text-slate-800 dark:text-white">{stats.processed === 0 ? '—' : stats.processed}</p>
-              </div>
-              <div className="w-12 h-12 bg-emerald-100 dark:bg-emerald-900/30 rounded-xl flex items-center justify-center">
-                <CheckCheck className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card className="bg-white dark:bg-slate-800 border-slate-100 dark:border-slate-700 shadow-sm rounded-2xl">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-slate-500 dark:text-slate-400 text-sm">Assistance</p>
-                <p className="text-3xl font-bold text-slate-800 dark:text-white">{messages.filter(m => m.type === 'assistance_agence').length === 0 ? '—' : messages.filter(m => m.type === 'assistance_agence').length}</p>
-              </div>
-              <div className="w-12 h-12 bg-amber-100 dark:bg-amber-900/30 rounded-xl flex items-center justify-center">
-                <MessageSquare className="w-6 h-6 text-amber-600 dark:text-amber-400" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <KpiCard
+          label="Total messages"
+          value={stats.total === 0 ? '—' : stats.total}
+          subtitle="Tous types"
+          icon={Inbox}
+          color="brand"
+          loading={loading}
+        />
+        <KpiCard
+          label="Non lus"
+          value={stats.unread === 0 ? '—' : stats.unread}
+          subtitle="À traiter"
+          icon={Mail}
+          color="rose"
+          loading={loading}
+        />
+        <KpiCard
+          label="Traités"
+          value={stats.processed === 0 ? '—' : stats.processed}
+          subtitle="Clôturés"
+          icon={CheckCheck}
+          color="emerald"
+          loading={loading}
+        />
+        <KpiCard
+          label="Assistance"
+          value={assistanceCount === 0 ? '—' : assistanceCount}
+          subtitle="Demandes agences"
+          icon={MessageSquare}
+          color="amber"
+          loading={loading}
+        />
       </div>
 
       {/* Filters */}
-      <div className="flex flex-wrap gap-4 mb-6">
+      <div className="flex flex-wrap gap-3 mb-6 items-center">
         <div className="flex items-center gap-2">
-          <span className="text-slate-500 dark:text-slate-400 text-sm">Type:</span>
+          <span className="text-[var(--dash-muted)] text-sm">Type:</span>
           <Select value={typeFilter} onValueChange={setTypeFilter}>
-            <SelectTrigger className="w-40 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white">
+            <SelectTrigger className="w-40 bg-[var(--dash-card)] border-[var(--dash-border)] text-[var(--dash-ink)]">
               <SelectValue />
             </SelectTrigger>
-            <SelectContent className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
+            <SelectContent className="bg-[var(--dash-card)] border-[var(--dash-border)] text-[var(--dash-ink)]">
               <SelectItem value="all">Tous</SelectItem>
               <SelectItem value="contact">Contact</SelectItem>
               <SelectItem value="partenaire">Partenaire</SelectItem>
@@ -418,12 +399,12 @@ export default function MessagesPage() {
           </Select>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-slate-500 dark:text-slate-400 text-sm">Statut:</span>
+          <span className="text-[var(--dash-muted)] text-sm">Statut:</span>
           <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-40 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white">
+            <SelectTrigger className="w-40 bg-[var(--dash-card)] border-[var(--dash-border)] text-[var(--dash-ink)]">
               <SelectValue />
             </SelectTrigger>
-            <SelectContent className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
+            <SelectContent className="bg-[var(--dash-card)] border-[var(--dash-border)] text-[var(--dash-ink)]">
               <SelectItem value="all">Tous</SelectItem>
               <SelectItem value="non_lu">Non lus</SelectItem>
               <SelectItem value="lu">Lus</SelectItem>
@@ -431,72 +412,71 @@ export default function MessagesPage() {
             </SelectContent>
           </Select>
         </div>
-        <Button
+        <button
           onClick={handleExportPDF}
-          variant="outline"
-          className="ml-auto border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl"
+          className="ml-auto inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-[var(--dash-border)] bg-[var(--dash-card)] text-sm font-medium text-[var(--dash-ink)] hover:bg-[var(--dash-bg-3)] transition-colors"
         >
-          <Download className="w-4 h-4 mr-2" />
+          <Download className="w-4 h-4" />
           Export PDF
-        </Button>
+        </button>
       </div>
 
       {/* Messages Grid */}
       {loading ? (
-        <div className="text-center py-12">
-          <div className="flex items-center justify-center gap-3">
-            <div className="w-6 h-6 border-2 border-[#ff7f00]/30 border-t-[#ff7f00] rounded-full animate-spin" />
-            <span className="text-slate-500 dark:text-slate-400">Chargement...</span>
-          </div>
+        <div className="dash-card p-12 flex items-center justify-center gap-3">
+          <div className="w-6 h-6 border-2 border-[var(--dash-brand)]/30 border-t-[var(--dash-brand)] rounded-full animate-spin" />
+          <span className="text-[var(--dash-muted)]">Chargement...</span>
         </div>
       ) : messages.length === 0 ? (
-        <div className="flex flex-col items-center py-12">
-          <div className="w-16 h-16 bg-slate-100 dark:bg-slate-700 rounded-full flex items-center justify-center mb-4">
-            <Mail className="w-8 h-8 text-slate-400" />
+        <div className="dash-card p-12 text-center">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[var(--dash-bg-3)] mb-4">
+            <Mail className="w-8 h-8 text-[var(--dash-muted)]" />
           </div>
-          <p className="text-slate-500 dark:text-slate-400">Aucun message</p>
+          <p className="text-[var(--dash-muted)]">Aucun message</p>
+          <p className="text-sm text-[var(--dash-muted-2)] mt-2">Les nouveaux messages apparaîtront ici</p>
         </div>
       ) : (
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
             {messages.map((message) => {
-              const typeConfig = TYPE_LABELS[message.type] || { label: message.type, icon: '📨', color: 'text-slate-600 dark:text-slate-400' };
-              const statusConfig = STATUS_CONFIG[message.status] || { label: message.status, className: 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300' };
-              
+              const typeConfig = TYPE_LABELS[message.type] || { label: message.type, icon: Mail, cls: 'dash-badge dash-badge-neutral' };
+              const statusConfig = STATUS_CONFIG[message.status] || { label: message.status, cls: 'dash-badge dash-badge-neutral' };
+              const TypeIcon = typeConfig.icon;
+
               return (
                 <div
                   key={message.id}
-                  className={`bg-white dark:bg-slate-800 rounded-2xl p-5 border border-slate-200 dark:border-slate-700 hover:shadow-md transition-all ${
-                    message.status === 'non_lu' ? 'ring-2 ring-red-200 dark:ring-red-800' : ''
+                  className={`dash-card p-5 flex flex-col ${
+                    message.status === 'non_lu' ? 'ring-2 ring-[var(--dash-emerald)]/40' : ''
                   }`}
                 >
                   {/* Header with date + status */}
                   <div className="flex items-start justify-between mb-3">
-                    <div className="flex items-center gap-1.5 text-xs text-slate-400 dark:text-slate-500">
+                    <div className="flex items-center gap-1.5 text-xs text-[var(--dash-muted-2)]">
                       <Clock className="w-3.5 h-3.5" aria-hidden="true" />
                       {formatDate(message.createdAt)}
                     </div>
-                    <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${statusConfig.className}`}>
+                    <span className={statusConfig.cls}>
                       {statusConfig.label}
                     </span>
                   </div>
                   {/* Sender info */}
-                  <h3 className="font-semibold text-slate-800 dark:text-white mb-0.5">{message.senderName || 'Anonyme'}</h3>
-                  {message.senderEmail && <p className="text-sm text-slate-500 dark:text-slate-400 mb-2">{message.senderEmail}</p>}
+                  <h3 className="font-semibold text-[var(--dash-ink)] mb-0.5 truncate">{message.senderName || 'Anonyme'}</h3>
+                  {message.senderEmail && <p className="text-sm text-[var(--dash-muted)] mb-2 truncate">{message.senderEmail}</p>}
                   {/* Type badge */}
-                  <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 mb-3 ${typeConfig.color}`}>
-                    <span>{typeConfig.icon}</span>
+                  <span className={`${typeConfig.cls} self-start mb-3`}>
+                    <TypeIcon className="w-3 h-3" />
                     {typeConfig.label}
                   </span>
                   {/* Content preview */}
-                  <div className="text-sm text-slate-600 dark:text-slate-300 line-clamp-3 mb-4">
+                  <div className="text-sm line-clamp-3 mb-4">
                     <MessageSummaryCell content={message.content} messageType={message.type} />
                   </div>
                   {/* Actions */}
-                  <div className="flex gap-2 pt-3 border-t border-slate-100 dark:border-slate-700">
+                  <div className="flex gap-2 pt-3 border-t border-[var(--dash-border)] mt-auto">
                     <button
                       onClick={() => openMessageDetails(message)}
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-[#ff7f00]/10 hover:text-[#ff7f00] dark:hover:bg-[#ff7f00]/20 dark:hover:text-[#ff7f00] transition-colors"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-[var(--dash-bg-3)] text-[var(--dash-ink)] hover:bg-[var(--dash-brand-soft)] hover:text-[var(--dash-brand)] transition-colors"
                       title="Voir détails"
                     >
                       <Eye className="w-3.5 h-3.5" aria-hidden="true" />
@@ -505,7 +485,7 @@ export default function MessagesPage() {
                     {message.status === 'non_lu' && (
                       <button
                         onClick={() => handleMarkAsRead(message.id)}
-                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-emerald-50 hover:text-emerald-600 dark:hover:bg-emerald-900/20 dark:hover:text-emerald-400 transition-colors"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-[var(--dash-bg-3)] text-[var(--dash-ink)] hover:bg-[var(--dash-emerald-soft)] hover:text-[var(--dash-emerald)] transition-colors"
                         title="Marquer comme lu"
                       >
                         <CheckCircle className="w-3.5 h-3.5" aria-hidden="true" />
@@ -514,7 +494,7 @@ export default function MessagesPage() {
                     )}
                     <button
                       onClick={() => handleDelete(message.id)}
-                      className="ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium text-slate-400 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20 dark:hover:text-red-400 transition-colors"
+                      className="ml-auto inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-[var(--dash-muted)] hover:bg-red-50 dark:hover:bg-red-500/10 hover:text-red-600 dark:hover:text-red-400 transition-colors"
                       title="Supprimer"
                     >
                       <Trash2 className="w-3.5 h-3.5" aria-hidden="true" />
@@ -527,7 +507,7 @@ export default function MessagesPage() {
 
           {/* Footer */}
           <div className="mt-4 px-2 py-3 flex justify-between items-center">
-            <span className="text-slate-500 dark:text-slate-400 text-sm">
+            <span className="text-[var(--dash-muted)] text-sm">
               {messages.length} message(s)
             </span>
           </div>
@@ -537,13 +517,13 @@ export default function MessagesPage() {
       {/* Message Details Modal */}
       {showModal && selectedMessage && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
-          <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
+          <div className="bg-[var(--dash-card)] border border-[var(--dash-border)] rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
             {/* Modal Header */}
-            <div className="flex items-center justify-between p-6 border-b border-slate-100 dark:border-slate-700">
-              <h2 className="text-xl font-bold text-slate-800 dark:text-white">Détails du message</h2>
+            <div className="flex items-center justify-between p-6 border-b border-[var(--dash-border)]">
+              <h2 className="text-xl font-bold text-[var(--dash-ink)]">Détails du message</h2>
               <button
                 onClick={() => setShowModal(false)}
-                className="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
+                className="p-2 rounded-xl hover:bg-[var(--dash-bg-3)] text-[var(--dash-muted)] hover:text-[var(--dash-ink)] transition-colors"
               >
                 <XCircle className="w-5 h-5" aria-hidden="true" />
               </button>
@@ -554,14 +534,19 @@ export default function MessagesPage() {
               {/* Meta Info */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <p className="text-slate-500 dark:text-slate-400 text-sm">Type</p>
-                  <p className="text-slate-800 dark:text-white font-medium">
-                    {TYPE_LABELS[selectedMessage.type]?.icon} {TYPE_LABELS[selectedMessage.type]?.label || selectedMessage.type}
+                  <p className="text-[var(--dash-muted)] text-sm">Type</p>
+                  <p className="text-[var(--dash-ink)] font-medium flex items-center gap-1.5">
+                    {(() => {
+                      const cfg = TYPE_LABELS[selectedMessage.type] || { label: selectedMessage.type, icon: Mail };
+                      const Icon = cfg.icon;
+                      return <Icon className="w-4 h-4" />;
+                    })()}
+                    {TYPE_LABELS[selectedMessage.type]?.label || selectedMessage.type}
                   </p>
                 </div>
                 <div>
-                  <p className="text-slate-500 dark:text-slate-400 text-sm">Statut</p>
-                  <span className={`px-3 py-1 rounded-full text-xs font-medium ${STATUS_CONFIG[selectedMessage.status]?.className}`}>
+                  <p className="text-[var(--dash-muted)] text-sm">Statut</p>
+                  <span className={`${STATUS_CONFIG[selectedMessage.status]?.cls || 'dash-badge dash-badge-neutral'}`}>
                     {STATUS_CONFIG[selectedMessage.status]?.label || selectedMessage.status}
                   </span>
                 </div>
@@ -569,75 +554,75 @@ export default function MessagesPage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <p className="text-slate-500 dark:text-slate-400 text-sm">Nom</p>
-                  <p className="text-slate-800 dark:text-white">{selectedMessage.senderName || '—'}</p>
+                  <p className="text-[var(--dash-muted)] text-sm">Nom</p>
+                  <p className="text-[var(--dash-ink)]">{selectedMessage.senderName || '—'}</p>
                 </div>
                 <div>
-                  <p className="text-slate-500 dark:text-slate-400 text-sm">Email</p>
-                  <p className="text-slate-800 dark:text-white">{selectedMessage.senderEmail || '—'}</p>
+                  <p className="text-[var(--dash-muted)] text-sm">Email</p>
+                  <p className="text-[var(--dash-ink)] truncate">{selectedMessage.senderEmail || '—'}</p>
                 </div>
               </div>
 
               {(selectedMessage.senderPhone || parseContent(selectedMessage.content).phone) && (
                 <div>
-                  <p className="text-slate-500 dark:text-slate-400 text-sm">Téléphone</p>
-                  <p className="text-slate-800 dark:text-white">{selectedMessage.senderPhone || parseContent(selectedMessage.content).phone}</p>
+                  <p className="text-[var(--dash-muted)] text-sm">Téléphone</p>
+                  <p className="text-[var(--dash-ink)]">{selectedMessage.senderPhone || parseContent(selectedMessage.content).phone}</p>
                 </div>
               )}
-              
+
               {(selectedMessage.subject || parseContent(selectedMessage.content).subject) && (
                 <div>
-                  <p className="text-slate-500 dark:text-slate-400 text-sm">Sujet</p>
-                  <p className="text-slate-800 dark:text-white font-medium">{selectedMessage.subject || parseContent(selectedMessage.content).subject}</p>
+                  <p className="text-[var(--dash-muted)] text-sm">Sujet</p>
+                  <p className="text-[var(--dash-ink)] font-medium">{selectedMessage.subject || parseContent(selectedMessage.content).subject}</p>
                 </div>
               )}
 
               {parseContent(selectedMessage.content).priority && parseContent(selectedMessage.content).priority !== 'normal' && (
                 <div>
-                  <p className="text-slate-500 dark:text-slate-400 text-sm">Priorité</p>
-                  <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                    parseContent(selectedMessage.content).priority === 'urgent' ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400' :
-                    parseContent(selectedMessage.content).priority === 'high' ? 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400' :
-                    'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400'
-                  }`}>
+                  <p className="text-[var(--dash-muted)] text-sm">Priorité</p>
+                  <span className={
+                    parseContent(selectedMessage.content).priority === 'urgent' ? 'dash-badge dash-badge-danger' :
+                    parseContent(selectedMessage.content).priority === 'high' ? 'dash-badge dash-badge-warning' :
+                    'dash-badge dash-badge-info'
+                  }>
                     {parseContent(selectedMessage.content).priority}
                   </span>
                 </div>
               )}
 
               <div>
-                <p className="text-slate-500 dark:text-slate-400 text-sm mb-2">Contenu</p>
-                <div className="bg-slate-50 dark:bg-slate-700/50 rounded-xl p-4 border border-slate-200 dark:border-slate-600">
-                  <p className="text-slate-700 dark:text-slate-300 text-sm whitespace-pre-wrap">
+                <p className="text-[var(--dash-muted)] text-sm mb-2">Contenu</p>
+                <div className="bg-[var(--dash-bg-3)] rounded-xl p-4 border border-[var(--dash-border)]">
+                  <p className="text-[var(--dash-ink-2)] text-sm whitespace-pre-wrap">
                     {formatMessageContent(selectedMessage.content, selectedMessage.type)}
                   </p>
                 </div>
               </div>
 
               <div>
-                <p className="text-slate-500 dark:text-slate-400 text-sm">Date</p>
-                <p className="text-slate-800 dark:text-white">{new Date(selectedMessage.createdAt).toLocaleString('fr-FR')}</p>
+                <p className="text-[var(--dash-muted)] text-sm">Date</p>
+                <p className="text-[var(--dash-ink)]">{new Date(selectedMessage.createdAt).toLocaleString('fr-FR')}</p>
               </div>
             </div>
 
             {/* Modal Actions */}
-            <div className="p-6 border-t border-slate-100 dark:border-slate-700 flex flex-wrap gap-3">
+            <div className="p-6 border-t border-[var(--dash-border)] flex flex-wrap gap-3">
               {selectedMessage.type === 'assistance_agence' && selectedMessage.agencyId && (
                 <button
                   onClick={() => {
                     setShowModal(false);
                     setShowReplyModal(true);
                   }}
-                  className="flex items-center gap-2 px-4 py-2 bg-emerald-500 text-white rounded-xl hover:bg-emerald-600 transition-colors"
+                  className="btn-emerald inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium"
                 >
                   <Send className="w-4 h-4" aria-hidden="true" />
-                  Répondre à l'agence
+                  Répondre à l&apos;agence
                 </button>
               )}
               {selectedMessage.senderEmail && selectedMessage.type !== 'assistance_agence' && (
                 <a
                   href={`mailto:${selectedMessage.senderEmail}?subject=Re: Votre message sur QRTrans`}
-                  className="flex items-center gap-2 px-4 py-2 bg-[#ff7f00] text-white rounded-xl hover:bg-[#ff9f00] transition-colors"
+                  className="btn-brand inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium"
                 >
                   <Send className="w-4 h-4" aria-hidden="true" />
                   Répondre par email
@@ -649,7 +634,7 @@ export default function MessagesPage() {
                     handleMarkAsProcessed(selectedMessage.id);
                     setShowModal(false);
                   }}
-                  className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 transition-colors"
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-[var(--dash-emerald-soft)] text-[var(--dash-emerald)] hover:opacity-90 transition-colors"
                 >
                   <CheckCircle className="w-4 h-4" aria-hidden="true" />
                   Marquer comme traité
@@ -660,7 +645,7 @@ export default function MessagesPage() {
                   handleDelete(selectedMessage.id);
                   setShowModal(false);
                 }}
-                className="flex items-center gap-2 px-4 py-2 bg-slate-100 dark:bg-slate-700 text-red-600 dark:text-red-400 rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors ml-auto"
+                className="ml-auto inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-red-600 dark:text-red-400 bg-[var(--dash-bg-3)] hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
               >
                 <Trash2 className="w-4 h-4" aria-hidden="true" />
                 Supprimer
@@ -673,26 +658,26 @@ export default function MessagesPage() {
       {/* Reply Modal */}
       {showReplyModal && selectedMessage && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
-          <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl max-w-lg w-full">
+          <div className="bg-[var(--dash-card)] border border-[var(--dash-border)] rounded-2xl max-w-lg w-full">
             {/* Modal Header */}
-            <div className="flex items-center justify-between p-6 border-b border-slate-100 dark:border-slate-700">
-              <h2 className="text-xl font-bold text-slate-800 dark:text-white">Répondre à {selectedMessage.senderName || 'l\'agence'}</h2>
+            <div className="flex items-center justify-between p-6 border-b border-[var(--dash-border)]">
+              <h2 className="text-xl font-bold text-[var(--dash-ink)]">Répondre à {selectedMessage.senderName || 'l\'agence'}</h2>
               <button
                 onClick={() => {
                   setShowReplyModal(false);
                   setReplyContent('');
                 }}
-                className="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
+                className="p-2 rounded-xl hover:bg-[var(--dash-bg-3)] text-[var(--dash-muted)] hover:text-[var(--dash-ink)] transition-colors"
               >
                 <XCircle className="w-5 h-5" aria-hidden="true" />
               </button>
             </div>
 
             {/* Original Message */}
-            <div className="p-6 border-b border-slate-100 dark:border-slate-700">
-              <p className="text-slate-500 dark:text-slate-400 text-sm mb-2">Message original :</p>
-              <div className="bg-slate-50 dark:bg-slate-700/50 rounded-xl p-3 border border-slate-200 dark:border-slate-600">
-                <p className="text-slate-700 dark:text-slate-300 text-sm whitespace-pre-wrap">
+            <div className="p-6 border-b border-[var(--dash-border)]">
+              <p className="text-[var(--dash-muted)] text-sm mb-2">Message original :</p>
+              <div className="bg-[var(--dash-bg-3)] rounded-xl p-3 border border-[var(--dash-border)]">
+                <p className="text-[var(--dash-ink-2)] text-sm whitespace-pre-wrap">
                   {selectedMessage.subject && <strong className="block mb-1">{selectedMessage.subject}</strong>}
                   {formatMessageContent(selectedMessage.content, selectedMessage.type)}
                 </p>
@@ -701,22 +686,22 @@ export default function MessagesPage() {
 
             {/* Reply Form */}
             <div className="p-6">
-              <label className="block text-slate-500 dark:text-slate-400 text-sm mb-2">Votre réponse :</label>
+              <label className="block text-[var(--dash-muted)] text-sm mb-2">Votre réponse :</label>
               <textarea
                 value={replyContent}
                 onChange={(e) => setReplyContent(e.target.value)}
                 rows={6}
-                className="w-full bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl p-4 text-slate-800 dark:text-white placeholder-slate-400 focus:outline-none focus:border-[#ff7f00] resize-none"
+                className="w-full bg-[var(--dash-card)] border border-[var(--dash-border)] rounded-xl p-4 text-[var(--dash-ink)] placeholder-[var(--dash-muted-2)] focus:outline-none focus:border-[var(--dash-brand)] focus:ring-2 focus:ring-[var(--dash-brand-soft)] resize-none"
                 placeholder="Écrivez votre réponse ici..."
               />
-              
+
               <div className="flex gap-3 mt-4">
                 <button
                   onClick={() => {
                     setShowReplyModal(false);
                     setReplyContent('');
                   }}
-                  className="flex-1 py-3 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors"
+                  className="flex-1 py-3 bg-[var(--dash-bg-3)] text-[var(--dash-ink)] rounded-lg hover:bg-[var(--dash-border)] transition-colors"
                 >
                   Annuler
                 </button>
@@ -736,13 +721,13 @@ export default function MessagesPage() {
                           senderName: 'Support QRTrans',
                         }),
                       });
-                      
+
                       await fetch('/api/messages', {
                         method: 'PUT',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ id: selectedMessage.id, status: 'traite' }),
                       });
-                      
+
                       setShowReplyModal(false);
                       setReplyContent('');
                       fetchMessages();
@@ -753,7 +738,7 @@ export default function MessagesPage() {
                     }
                   }}
                   disabled={replySubmitting || !replyContent.trim()}
-                  className="flex-1 py-3 bg-emerald-500 text-white rounded-xl font-bold hover:bg-emerald-600 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+                  className="btn-emerald flex-1 py-3 rounded-lg font-bold inline-flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {replySubmitting ? (
                     <>
@@ -762,7 +747,7 @@ export default function MessagesPage() {
                     </>
                   ) : (
                     <>
-                      <Send className="w-4 h-4" aria-hidden="true" />
+                      <Send className="w-4 h-4" />
                       Envoyer la réponse
                     </>
                   )}

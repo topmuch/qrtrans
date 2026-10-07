@@ -1,8 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -30,8 +28,10 @@ import {
   X,
   Save,
   ExternalLink,
-  Info
+  Info,
+  KeyRound,
 } from "lucide-react";
+import KpiCard from '@/components/dashboard/KpiCard';
 
 // Icon mapping
 const ICON_MAP: Record<string, React.ElementType> = {
@@ -177,7 +177,7 @@ const CONFIG_FIELDS: Record<string, {
   },
   // ─── Wakit (WhatsApp Business API) ───
   wakit_api: {
-    title: '🔑 Configuration Wakit API',
+    title: 'Configuration Wakit API',
     description: 'Connectez votre API WhatsApp Business Wakit pour l\'envoi automatisé de messages aux voyageurs.',
     fields: [
       {
@@ -223,7 +223,7 @@ const CONFIG_FIELDS: Record<string, {
   },
   // ─── Groq (AI Inference API) ───
   groq_api: {
-    title: '🧠 Configuration Groq API',
+    title: 'Configuration Groq API',
     description: 'Connectez l\'API Groq pour les fonctionnalités d\'intelligence artificielle: analyse de colis, détection de fraude, traduction, résumés.',
     fields: [
       {
@@ -313,7 +313,7 @@ export default function FonctionnalitesPage() {
   const [testing, setTesting] = useState<string | null>(null);
   const [testResult, setTestResult] = useState<TestResult | null>(null);
   const [showTestModal, setShowTestModal] = useState(false);
-  
+
   // Configuration modal state
   const [showConfigModal, setShowConfigModal] = useState(false);
   const [configFeatureKey, setConfigFeatureKey] = useState<string | null>(null);
@@ -330,7 +330,7 @@ export default function FonctionnalitesPage() {
     try {
       const response = await fetch('/api/admin/features');
       const result = await response.json();
-      
+
       if (result && result.categories && result.flags) {
         setData(result);
       } else {
@@ -421,12 +421,12 @@ export default function FonctionnalitesPage() {
 
   const openConfigModal = async (key: string) => {
     setConfigFeatureKey(key);
-    
+
     // Load current settings
     try {
       const response = await fetch('/api/admin/settings');
       const result = await response.json();
-      
+
       if (result.settings) {
         const config = CONFIG_FIELDS[key];
         if (config) {
@@ -445,13 +445,13 @@ export default function FonctionnalitesPage() {
       console.error('Error loading settings:', error);
       setConfigValues({});
     }
-    
+
     setShowConfigModal(true);
   };
 
   const saveConfig = async () => {
     if (!configFeatureKey) return;
-    
+
     setSavingConfig(true);
     try {
       const settings: Record<string, string> = {};
@@ -488,8 +488,8 @@ export default function FonctionnalitesPage() {
       className={`
         relative w-14 h-7 rounded-full transition-all duration-300
         ${enabled
-          ? 'bg-emerald-500'
-          : 'bg-slate-300 dark:bg-slate-600 hover:bg-slate-400 dark:hover:bg-slate-500'
+          ? 'bg-[var(--dash-emerald)]'
+          : 'bg-[var(--dash-border-strong)] hover:bg-[var(--dash-muted-2)]'
         }
         ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
         shadow-lg
@@ -517,110 +517,104 @@ export default function FonctionnalitesPage() {
     const showConfigWarning = feature.enabled && needsConfig && status && !status.configured;
 
     return (
-      <Card className={`
-        transition-all duration-300 rounded-xl
-        ${feature.enabled
-          ? 'bg-white dark:bg-slate-800 border-emerald-200 dark:border-emerald-800 shadow-sm'
-          : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
-        }
-      `}>
-        <CardContent className="p-4">
-          {/* Single row: Icon + Label + Description + Badges + Toggle */}
-          <div className="flex items-center gap-4">
-            {/* Icon */}
-            <div className={`
-              w-9 h-9 rounded-lg flex items-center justify-center shrink-0
-              ${feature.enabled
-                ? 'bg-emerald-100 dark:bg-emerald-900/30'
-                : 'bg-slate-100 dark:bg-slate-700'
-              }
-            `}>
-              <IconComponent
-                className={`w-4 h-4 ${feature.enabled ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400 dark:text-slate-500'}`}
-                aria-hidden="true"
-              />
-            </div>
-
-            {/* Label + Description + Badges */}
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 flex-wrap">
-                <h3 className="text-slate-800 dark:text-white font-semibold text-sm">
-                  {feature.label}
-                </h3>
-                {feature.enabled ? (
-                  <span className="flex items-center gap-1 text-[10px] bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 px-1.5 py-0.5 rounded-full">
-                    <CheckCircle className="w-2.5 h-2.5" />
-                    Activé
-                  </span>
-                ) : (
-                  <span className="flex items-center gap-1 text-[10px] bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 px-1.5 py-0.5 rounded-full">
-                    <AlertCircle className="w-2.5 h-2.5" />
-                    Désactivé
-                  </span>
-                )}
-                {showConfigWarning && (
-                  <button
-                    onClick={() => openConfigModal(feature.key)}
-                    className="flex items-center gap-1 text-[10px] bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 px-1.5 py-0.5 rounded-full hover:bg-amber-200 cursor-pointer"
-                  >
-                    <AlertTriangle className="w-2.5 h-2.5" />
-                    Configurer
-                  </button>
-                )}
-                {feature.enabled && needsConfig && status?.configured && (
-                  <span className="flex items-center gap-1 text-[10px] bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 px-1.5 py-0.5 rounded-full">
-                    <CheckCircle className="w-2.5 h-2.5" />
-                    Configuré
-                  </span>
-                )}
-              </div>
-              <p className="text-slate-500 dark:text-slate-400 text-xs mt-0.5 truncate">
-                {feature.description}
-              </p>
-            </div>
-
-            {/* Actions */}
-            <div className="flex items-center gap-2 shrink-0">
-              {feature.enabled && needsConfig && (
-                <Button
-                  onClick={() => openConfigModal(feature.key)}
-                  variant="outline"
-                  size="sm"
-                  className="border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-lg h-7 px-2.5 text-xs"
-                >
-                  <Settings className="w-3 h-3 mr-1" />
-                  Config
-                </Button>
-              )}
-              {isTestable && feature.enabled && (
-                <Button
-                  onClick={() => testFeature(feature.key)}
-                  disabled={isTesting}
-                  variant="outline"
-                  size="sm"
-                  className="border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-lg h-7 px-2.5 text-xs"
-                >
-                  {isTesting ? (
-                    <RefreshCw className="w-3 h-3 animate-spin mr-1" />
-                  ) : (
-                    <Play className="w-3 h-3 mr-1" />
-                  )}
-                  Tester
-                </Button>
-              )}
-              {isUpdating ? (
-                <RefreshCw className="w-5 h-5 text-emerald-500 animate-spin shrink-0" />
-              ) : (
-                <ToggleSwitch
-                  enabled={feature.enabled}
-                  onChange={() => toggleFeature(feature.key, feature.enabled)}
-                  disabled={isUpdating}
-                />
-              )}
-            </div>
+      <div
+        className={`dash-card p-4 transition-all duration-300 ${
+          feature.enabled
+            ? 'border-l-4 border-l-[var(--dash-emerald)]'
+            : ''
+        }`}
+      >
+        {/* Single row: Icon + Label + Description + Badges + Toggle */}
+        <div className="flex items-center gap-4">
+          {/* Icon */}
+          <div className={`
+            w-9 h-9 rounded-lg flex items-center justify-center shrink-0
+            ${feature.enabled
+              ? 'bg-[var(--dash-emerald-soft)]'
+              : 'bg-[var(--dash-bg-3)]'
+            }
+          `}>
+            <IconComponent
+              className={`w-4 h-4 ${feature.enabled ? 'text-[var(--dash-emerald)]' : 'text-[var(--dash-muted-2)]'}`}
+              aria-hidden="true"
+            />
           </div>
-        </CardContent>
-      </Card>
+
+          {/* Label + Description + Badges */}
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 flex-wrap">
+              <h3 className="text-[var(--dash-ink)] font-semibold text-sm">
+                {feature.label}
+              </h3>
+              {feature.enabled ? (
+                <span className="dash-badge dash-badge-success text-[10px]">
+                  <CheckCircle className="w-2.5 h-2.5" />
+                  Activé
+                </span>
+              ) : (
+                <span className="dash-badge dash-badge-neutral text-[10px]">
+                  <AlertCircle className="w-2.5 h-2.5" />
+                  Désactivé
+                </span>
+              )}
+              {showConfigWarning && (
+                <button
+                  onClick={() => openConfigModal(feature.key)}
+                  className="dash-badge dash-badge-warning text-[10px] hover:opacity-80 cursor-pointer"
+                >
+                  <AlertTriangle className="w-2.5 h-2.5" />
+                  Configurer
+                </button>
+              )}
+              {feature.enabled && needsConfig && status?.configured && (
+                <span className="dash-badge dash-badge-success text-[10px]">
+                  <CheckCircle className="w-2.5 h-2.5" />
+                  Configuré
+                </span>
+              )}
+            </div>
+            <p className="text-[var(--dash-muted)] text-xs mt-0.5 truncate">
+              {feature.description}
+            </p>
+          </div>
+
+          {/* Actions */}
+          <div className="flex items-center gap-2 shrink-0">
+            {feature.enabled && needsConfig && (
+              <button
+                onClick={() => openConfigModal(feature.key)}
+                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium border border-[var(--dash-border)] bg-[var(--dash-card)] text-[var(--dash-ink-2)] hover:bg-[var(--dash-bg-3)] transition-colors h-7"
+              >
+                <Settings className="w-3 h-3" />
+                Config
+              </button>
+            )}
+            {isTestable && feature.enabled && (
+              <button
+                onClick={() => testFeature(feature.key)}
+                disabled={isTesting}
+                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium border border-[var(--dash-border)] bg-[var(--dash-card)] text-[var(--dash-ink-2)] hover:bg-[var(--dash-bg-3)] transition-colors h-7 disabled:opacity-50"
+              >
+                {isTesting ? (
+                  <RefreshCw className="w-3 h-3 animate-spin" />
+                ) : (
+                  <Play className="w-3 h-3" />
+                )}
+                Tester
+              </button>
+            )}
+            {isUpdating ? (
+              <RefreshCw className="w-5 h-5 text-[var(--dash-emerald)] animate-spin shrink-0" />
+            ) : (
+              <ToggleSwitch
+                enabled={feature.enabled}
+                onChange={() => toggleFeature(feature.key, feature.enabled)}
+                disabled={isUpdating}
+              />
+            )}
+          </div>
+        </div>
+      </div>
     );
   };
 
@@ -638,90 +632,105 @@ export default function FonctionnalitesPage() {
   return (
     <div className="max-w-5xl mx-auto">
       {/* Page Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800 dark:text-white">Clés et API</h1>
-          <p className="text-slate-500 dark:text-slate-400 mt-1">Configurez les clés API et activez les fonctionnalités</p>
+          <h1 className="font-display text-2xl font-bold text-[var(--dash-ink)] flex items-center gap-2">
+            <KeyRound className="w-6 h-6 text-[var(--dash-brand)]" />
+            Clés et API
+          </h1>
+          <p className="text-sm text-[var(--dash-muted)] mt-1">Configurez les clés API et activez les fonctionnalités</p>
         </div>
-        <Button
+        <button
           onClick={() => { fetchFeatures(); fetchConfigStatus(); }}
-          variant="outline"
-          className="border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium border border-[var(--dash-border)] bg-[var(--dash-card)] text-[var(--dash-ink-2)] hover:bg-[var(--dash-bg-3)] transition-colors"
         >
-          <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} aria-hidden="true" />
+          <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} aria-hidden="true" />
           Actualiser
-        </Button>
+        </button>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
-        <Card className="bg-white dark:bg-slate-800 border-slate-100 dark:border-slate-700 shadow-sm rounded-2xl">
-          <CardContent className="p-4 text-center">
-            <p className="text-3xl font-bold text-slate-800 dark:text-white">{stats.total === 0 ? '—' : stats.total}</p>
-            <p className="text-slate-500 dark:text-slate-400 text-sm">Total</p>
-          </CardContent>
-        </Card>
-        <Card className="bg-white dark:bg-slate-800 border-emerald-200 dark:border-emerald-800 shadow-sm rounded-2xl">
-          <CardContent className="p-4 text-center">
-            <p className="text-3xl font-bold text-emerald-600 dark:text-emerald-400">{stats.enabled === 0 ? '—' : stats.enabled}</p>
-            <p className="text-slate-500 dark:text-slate-400 text-sm">Activées</p>
-          </CardContent>
-        </Card>
-        <Card className="bg-white dark:bg-slate-800 border-slate-100 dark:border-slate-700 shadow-sm rounded-2xl">
-          <CardContent className="p-4 text-center">
-            <p className="text-3xl font-bold text-slate-400 dark:text-slate-500">{stats.disabled === 0 ? '—' : stats.disabled}</p>
-            <p className="text-slate-500 dark:text-slate-400 text-sm">Désactivées</p>
-          </CardContent>
-        </Card>
-        {stats.needsAttention > 0 && (
-          <Card className="bg-white dark:bg-slate-800 border-amber-200 dark:border-amber-800 shadow-sm rounded-2xl">
-            <CardContent className="p-4 text-center">
-              <p className="text-3xl font-bold text-amber-600 dark:text-amber-400">{stats.needsAttention}</p>
-              <p className="text-slate-500 dark:text-slate-400 text-sm">À configurer</p>
-            </CardContent>
-          </Card>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <KpiCard
+          label="Total"
+          value={stats.total}
+          subtitle="Fonctionnalités"
+          icon={Zap}
+          color="brand"
+          loading={loading}
+        />
+        <KpiCard
+          label="Activées"
+          value={stats.enabled}
+          subtitle="En service"
+          icon={CheckCircle}
+          color="emerald"
+          loading={loading}
+        />
+        <KpiCard
+          label="Désactivées"
+          value={stats.disabled}
+          subtitle="Inactives"
+          icon={AlertCircle}
+          color="amber"
+          loading={loading}
+        />
+        {stats.needsAttention > 0 ? (
+          <KpiCard
+            label="À configurer"
+            value={stats.needsAttention}
+            subtitle="Action requise"
+            icon={AlertTriangle}
+            color="rose"
+            loading={loading}
+          />
+        ) : (
+          <KpiCard
+            label="Configurées"
+            value={stats.configured}
+            subtitle="Prêtes à l'emploi"
+            icon={Shield}
+            color="cyan"
+            loading={loading}
+          />
         )}
       </div>
 
       {/* Warning Banner for unconfigured features */}
       {stats.needsAttention > 0 && (
-        <Card className="bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800 rounded-2xl mb-8">
-          <CardContent className="p-4">
-            <div className="flex items-start gap-3">
-              <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-400 mt-0.5 shrink-0" aria-hidden="true" />
-              <div>
-                <h3 className="text-slate-800 dark:text-white font-medium mb-1">
-                  {stats.needsAttention} fonctionnalité{stats.needsAttention > 1 ? 's' : ''} nécessite{stats.needsAttention > 1 ? 'nt' : ''} une configuration
-                </h3>
-                <p className="text-slate-600 dark:text-slate-300 text-sm">
-                  Cliquez sur le badge <strong>"Configurer"</strong> pour paramétrer les API externes.
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Info Banner */}
-      <Card className="bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800 rounded-2xl mb-8">
-        <CardContent className="p-4">
+        <div className="dash-card p-4 border-l-4 border-l-amber-400 mb-6">
           <div className="flex items-start gap-3">
-            <Zap className="w-5 h-5 text-emerald-600 dark:text-emerald-400 mt-0.5 shrink-0" aria-hidden="true" />
+            <AlertTriangle className="w-5 h-5 text-amber-500 mt-0.5 shrink-0" aria-hidden="true" />
             <div>
-              <h3 className="text-slate-800 dark:text-white font-medium mb-1">Feature Flags modulaires</h3>
-              <p className="text-slate-600 dark:text-slate-300 text-sm">
-                Activez les fonctionnalités et configurez les API externes selon vos besoins.
-                Les fonctionnalités IA sont prêtes à l'emploi sans configuration.
+              <h3 className="text-[var(--dash-ink)] font-medium mb-1">
+                {stats.needsAttention} fonctionnalité{stats.needsAttention > 1 ? 's' : ''} nécessite{stats.needsAttention > 1 ? 'nt' : ''} une configuration
+              </h3>
+              <p className="text-[var(--dash-muted)] text-sm">
+                Cliquez sur le badge <strong>Configurer</strong> pour paramétrer les API externes.
               </p>
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      )}
+
+      {/* Info Banner */}
+      <div className="dash-card p-4 border-l-4 border-l-[var(--dash-emerald)] mb-6">
+        <div className="flex items-start gap-3">
+          <Zap className="w-5 h-5 text-[var(--dash-emerald)] mt-0.5 shrink-0" aria-hidden="true" />
+          <div>
+            <h3 className="text-[var(--dash-ink)] font-medium mb-1">Feature Flags modulaires</h3>
+            <p className="text-[var(--dash-muted)] text-sm">
+              Activez les fonctionnalités et configurez les API externes selon vos besoins.
+              Les fonctionnalités IA sont prêtes à l&apos;emploi sans configuration.
+            </p>
+          </div>
+        </div>
+      </div>
 
       {/* Loading State */}
       {loading && !data && (
         <div className="flex items-center justify-center py-20">
-          <div className="w-8 h-8 border-2 border-[#ff7f00]/30 border-t-[#ff7f00] rounded-full animate-spin" />
+          <div className="w-8 h-8 border-2 border-[var(--dash-brand)]/30 border-t-[var(--dash-brand)] rounded-full animate-spin" />
         </div>
       )}
 
@@ -730,10 +739,10 @@ export default function FonctionnalitesPage() {
         <div className="space-y-8">
           {Object.entries(data.categories).map(([category, features]) => (
             <div key={category}>
-              <h2 className="text-slate-500 dark:text-slate-400 text-sm uppercase tracking-wider mb-4 flex items-center gap-2">
-                <span className="w-8 h-px bg-slate-200 dark:bg-slate-700" />
+              <h2 className="text-[var(--dash-muted-2)] text-sm uppercase tracking-wider mb-4 flex items-center gap-2">
+                <span className="w-8 h-px bg-[var(--dash-border)]" />
                 {data.categoryLabels?.[category] || category}
-                <span className="flex-1 h-px bg-slate-200 dark:bg-slate-700" />
+                <span className="flex-1 h-px bg-[var(--dash-border)]" />
               </h2>
               <div className="flex flex-col gap-3">
                 {features.map((feature) => (
@@ -747,201 +756,190 @@ export default function FonctionnalitesPage() {
 
       {/* No features message */}
       {data && Object.keys(data.categories || {}).length === 0 && !loading && (
-        <Card className="bg-white dark:bg-slate-800 border-slate-100 dark:border-slate-700 shadow-sm rounded-2xl">
-          <CardContent className="py-12 text-center">
-            <div className="w-16 h-16 bg-slate-100 dark:bg-slate-700 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Zap className="w-8 h-8 text-slate-400" aria-hidden="true" />
-            </div>
-            <p className="text-slate-500 dark:text-slate-400">Aucune fonctionnalité disponible</p>
-          </CardContent>
-        </Card>
+        <div className="dash-card p-12 text-center">
+          <div className="w-16 h-16 bg-[var(--dash-bg-3)] rounded-full flex items-center justify-center mx-auto mb-4">
+            <Zap className="w-8 h-8 text-[var(--dash-muted)]" aria-hidden="true" />
+          </div>
+          <p className="text-[var(--dash-muted)]">Aucune fonctionnalité disponible</p>
+        </div>
       )}
 
       {/* Test Result Modal */}
       {showTestModal && testResult && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <Card className="bg-white dark:bg-slate-800 rounded-2xl max-w-md w-full shadow-2xl">
-            <CardContent className="p-6">
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex items-center gap-3">
-                  {testResult.success ? (
-                    <div className="w-10 h-10 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
-                      <CheckCircle className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-                    </div>
-                  ) : (
-                    <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
-                      <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400" />
-                    </div>
-                  )}
-                  <h3 className="text-lg font-semibold text-slate-800 dark:text-white">
-                    {testResult.success ? 'Test réussi' : 'Test échoué'}
-                  </h3>
-                </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setShowTestModal(false)}
-                  className="h-8 w-8 p-0 rounded-full"
-                >
-                  <X className="w-4 h-4" />
-                </Button>
-              </div>
-
-              <div className="space-y-3">
-                <div>
-                  <p className="text-sm font-medium text-slate-600 dark:text-slate-400">Résultat</p>
-                  <p className="text-slate-800 dark:text-white">{testResult.message}</p>
-                </div>
-
-                {testResult.details && (
-                  <div>
-                    <p className="text-sm font-medium text-slate-600 dark:text-slate-400 mb-1">Détails</p>
-                    <div className="bg-slate-100 dark:bg-slate-700 rounded-lg p-3 text-sm text-slate-700 dark:text-slate-300 whitespace-pre-wrap">
-                      {testResult.details}
-                    </div>
+          <div className="bg-[var(--dash-card)] border border-[var(--dash-border)] rounded-2xl max-w-md w-full shadow-2xl p-6">
+            <div className="flex items-start justify-between mb-4">
+              <div className="flex items-center gap-3">
+                {testResult.success ? (
+                  <div className="w-10 h-10 rounded-full bg-[var(--dash-emerald-soft)] flex items-center justify-center">
+                    <CheckCircle className="w-5 h-5 text-[var(--dash-emerald)]" />
+                  </div>
+                ) : (
+                  <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-500/15 flex items-center justify-center">
+                    <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400" />
                   </div>
                 )}
+                <h3 className="text-lg font-semibold text-[var(--dash-ink)]">
+                  {testResult.success ? 'Test réussi' : 'Test échoué'}
+                </h3>
+              </div>
+              <button
+                onClick={() => setShowTestModal(false)}
+                className="p-2 rounded-full hover:bg-[var(--dash-bg-3)] text-[var(--dash-muted)] transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="space-y-3">
+              <div>
+                <p className="text-sm font-medium text-[var(--dash-muted)]">Résultat</p>
+                <p className="text-[var(--dash-ink)]">{testResult.message}</p>
               </div>
 
-              <div className="mt-6 flex justify-end">
-                <Button
-                  onClick={() => setShowTestModal(false)}
-                  className="bg-[#ff7f00] hover:bg-[#ff7f00]/90 text-white rounded-xl"
-                >
-                  Fermer
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+              {testResult.details && (
+                <div>
+                  <p className="text-sm font-medium text-[var(--dash-muted)] mb-1">Détails</p>
+                  <div className="bg-[var(--dash-bg-3)] rounded-lg p-3 text-sm text-[var(--dash-ink-2)] whitespace-pre-wrap">
+                    {testResult.details}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="mt-6 flex justify-end">
+              <button
+                onClick={() => setShowTestModal(false)}
+                className="btn-brand btn-magnetic inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium"
+              >
+                Fermer
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
       {/* Configuration Modal */}
       {showConfigModal && currentConfig && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <Card className="bg-white dark:bg-slate-800 rounded-2xl max-w-lg w-full shadow-2xl max-h-[90vh] overflow-y-auto">
-            <CardContent className="p-6">
-              <div className="flex items-start justify-between mb-4">
-                <div>
-                  <h3 className="text-lg font-semibold text-slate-800 dark:text-white">
-                    {currentConfig.title}
-                  </h3>
-                  <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-                    {currentConfig.description}
-                  </p>
-                </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setShowConfigModal(false)}
-                  className="h-8 w-8 p-0 rounded-full"
-                >
-                  <X className="w-4 h-4" />
-                </Button>
+          <div className="bg-[var(--dash-card)] border border-[var(--dash-border)] rounded-2xl max-w-lg w-full shadow-2xl max-h-[90vh] overflow-y-auto p-6">
+            <div className="flex items-start justify-between mb-4">
+              <div>
+                <h3 className="text-lg font-semibold text-[var(--dash-ink)]">
+                  {currentConfig.title}
+                </h3>
+                <p className="text-sm text-[var(--dash-muted)] mt-1">
+                  {currentConfig.description}
+                </p>
               </div>
+              <button
+                onClick={() => setShowConfigModal(false)}
+                className="p-2 rounded-full hover:bg-[var(--dash-bg-3)] text-[var(--dash-muted)] transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
 
-              <div className="space-y-4 mt-6">
-                {currentConfig.fields.map((field) => (
-                  <div key={field.key}>
-                    <div className="flex items-center justify-between mb-2">
-                      <Label htmlFor={field.key} className="text-slate-700 dark:text-slate-300">
-                        {field.label}
-                      </Label>
-                      {field.type === 'switch' && (
-                        <Switch
-                          id={field.key}
-                          checked={configValues[field.key] === true}
-                          onCheckedChange={(checked) => 
-                            setConfigValues({ ...configValues, [field.key]: checked })
-                          }
-                        />
-                      )}
-                    </div>
-                    
-                    {field.type === 'text' && (
-                      <Input
+            <div className="space-y-4 mt-6">
+              {currentConfig.fields.map((field) => (
+                <div key={field.key}>
+                  <div className="flex items-center justify-between mb-2">
+                    <Label htmlFor={field.key} className="text-[var(--dash-ink-2)]">
+                      {field.label}
+                    </Label>
+                    {field.type === 'switch' && (
+                      <Switch
                         id={field.key}
-                        type="text"
-                        placeholder={field.placeholder}
-                        value={(configValues[field.key] as string) || ''}
-                        onChange={(e) => 
-                          setConfigValues({ ...configValues, [field.key]: e.target.value })
+                        checked={configValues[field.key] === true}
+                        onCheckedChange={(checked) =>
+                          setConfigValues({ ...configValues, [field.key]: checked })
                         }
-                        className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700"
                       />
-                    )}
-                    
-                    {field.type === 'password' && (
-                      <Input
-                        id={field.key}
-                        type="password"
-                        placeholder={field.placeholder}
-                        value={(configValues[field.key] as string) || ''}
-                        onChange={(e) => 
-                          setConfigValues({ ...configValues, [field.key]: e.target.value })
-                        }
-                        className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700"
-                      />
-                    )}
-                    
-                    {field.type === 'textarea' && (
-                      <Textarea
-                        id={field.key}
-                        placeholder={field.placeholder}
-                        value={(configValues[field.key] as string) || ''}
-                        onChange={(e) => 
-                          setConfigValues({ ...configValues, [field.key]: e.target.value })
-                        }
-                        rows={3}
-                        className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700"
-                      />
-                    )}
-                    
-                    {field.help && (
-                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-1">
-                        <Info className="w-3 h-3" />
-                        {field.help}
-                      </p>
                     )}
                   </div>
-                ))}
-              </div>
 
-              {currentConfig.helpLink && (
-                <a
-                  href={currentConfig.helpLink.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 text-sm text-[#ff7f00] hover:underline mt-4"
-                >
-                  <ExternalLink className="w-3 h-3" />
-                  {currentConfig.helpLink.label}
-                </a>
-              )}
-
-              <div className="mt-6 flex justify-end gap-3">
-                <Button
-                  variant="outline"
-                  onClick={() => setShowConfigModal(false)}
-                  className="border-slate-200 dark:border-slate-700"
-                >
-                  Annuler
-                </Button>
-                <Button
-                  onClick={saveConfig}
-                  disabled={savingConfig}
-                  className="bg-[#ff7f00] hover:bg-[#ff7f00]/90 text-white"
-                >
-                  {savingConfig ? (
-                    <RefreshCw className="w-4 h-4 animate-spin mr-2" />
-                  ) : (
-                    <Save className="w-4 h-4 mr-2" />
+                  {field.type === 'text' && (
+                    <Input
+                      id={field.key}
+                      type="text"
+                      placeholder={field.placeholder}
+                      value={(configValues[field.key] as string) || ''}
+                      onChange={(e) =>
+                        setConfigValues({ ...configValues, [field.key]: e.target.value })
+                      }
+                      className="bg-[var(--dash-card)] border-[var(--dash-border)] text-[var(--dash-ink)]"
+                    />
                   )}
-                  Enregistrer
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+
+                  {field.type === 'password' && (
+                    <Input
+                      id={field.key}
+                      type="password"
+                      placeholder={field.placeholder}
+                      value={(configValues[field.key] as string) || ''}
+                      onChange={(e) =>
+                        setConfigValues({ ...configValues, [field.key]: e.target.value })
+                      }
+                      className="bg-[var(--dash-card)] border-[var(--dash-border)] text-[var(--dash-ink)]"
+                    />
+                  )}
+
+                  {field.type === 'textarea' && (
+                    <Textarea
+                      id={field.key}
+                      placeholder={field.placeholder}
+                      value={(configValues[field.key] as string) || ''}
+                      onChange={(e) =>
+                        setConfigValues({ ...configValues, [field.key]: e.target.value })
+                      }
+                      rows={3}
+                      className="bg-[var(--dash-card)] border-[var(--dash-border)] text-[var(--dash-ink)]"
+                    />
+                  )}
+
+                  {field.help && (
+                    <p className="text-xs text-[var(--dash-muted)] mt-1 flex items-center gap-1">
+                      <Info className="w-3 h-3" />
+                      {field.help}
+                    </p>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {currentConfig.helpLink && (
+              <a
+                href={currentConfig.helpLink.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 text-sm text-[var(--dash-brand)] hover:underline mt-4"
+              >
+                <ExternalLink className="w-3 h-3" />
+                {currentConfig.helpLink.label}
+              </a>
+            )}
+
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                onClick={() => setShowConfigModal(false)}
+                className="px-4 py-2 rounded-lg text-sm font-medium border border-[var(--dash-border)] bg-[var(--dash-card)] text-[var(--dash-ink-2)] hover:bg-[var(--dash-bg-3)] transition-colors"
+              >
+                Annuler
+              </button>
+              <button
+                onClick={saveConfig}
+                disabled={savingConfig}
+                className="btn-brand btn-magnetic inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium disabled:opacity-60"
+              >
+                {savingConfig ? (
+                  <RefreshCw className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Save className="w-4 h-4" />
+                )}
+                Enregistrer
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

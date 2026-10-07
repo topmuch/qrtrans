@@ -1,19 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from "@/components/ui/table";
 import {
   Dialog,
   DialogContent,
@@ -28,11 +17,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { 
+import {
   Plus,
   Trash2,
-  Users
+  Users,
+  Shield,
+  UserCog,
+  Building2,
+  Crown,
 } from "lucide-react";
+import KpiCard from '@/components/dashboard/KpiCard';
 
 // Types
 interface Agency {
@@ -51,12 +45,31 @@ interface User {
   } | null;
 }
 
+// Role badge configuration — maps to dash-badge variants + icons
+const ROLE_CONFIG: Record<string, { label: string; cls: string; icon: typeof Crown }> = {
+  superadmin: { label: 'SuperAdmin', cls: 'dash-badge dash-badge-danger', icon: Crown },
+  admin:      { label: 'Admin',      cls: 'dash-badge dash-badge-info',    icon: Shield },
+  agent:      { label: 'Agent',      cls: 'dash-badge dash-badge-success', icon: UserCog },
+  agency:     { label: 'Agence',     cls: 'dash-badge dash-badge-warning',  icon: Building2 },
+};
+
+function RoleBadge({ role }: { role: string }) {
+  const cfg = ROLE_CONFIG[role] || { label: role, cls: 'dash-badge dash-badge-neutral', icon: UserCog };
+  const Icon = cfg.icon;
+  return (
+    <span className={cfg.cls}>
+      <Icon className="w-3 h-3" />
+      {cfg.label}
+    </span>
+  );
+}
+
 export default function UtilisateursPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [agencies, setAgencies] = useState<Agency[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
-  
+
   const [userForm, setUserForm] = useState({
     email: '',
     name: '',
@@ -100,7 +113,7 @@ export default function UtilisateursPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(userForm),
       });
-      
+
       if (response.ok) {
         fetchUsers();
         setDialogOpen(false);
@@ -113,12 +126,12 @@ export default function UtilisateursPage() {
 
   const handleDeleteUser = async (id: string) => {
     if (!confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?')) return;
-    
+
     try {
       const response = await fetch(`/api/admin/users?id=${id}`, {
         method: 'DELETE',
       });
-      
+
       if (response.ok) {
         fetchUsers();
       }
@@ -127,77 +140,71 @@ export default function UtilisateursPage() {
     }
   };
 
-  const getRoleBadge = (role: string) => {
-    const config: Record<string, { label: string; className: string }> = {
-      superadmin: { label: 'SuperAdmin', className: 'bg-purple-100 text-purple-700 dark:bg-purple-500/20 dark:text-purple-300' },
-      admin: { label: 'Admin', className: 'bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300' },
-      agent: { label: 'Agent', className: 'bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-300' },
-      agency: { label: 'Agence', className: 'bg-orange-100 text-orange-700 dark:bg-orange-500/20 dark:text-orange-300' },
-    };
-    const { label, className } = config[role] || { label: role, className: 'bg-slate-100 text-slate-600' };
-    return <Badge className={className}>{label}</Badge>;
-  };
+  // Stats
+  const totalUsers = users.length;
+  const adminCount = users.filter(u => u.role === 'admin' || u.role === 'superadmin').length;
+  const agencyCount = users.filter(u => u.role === 'agency').length;
+  const agentCount = users.filter(u => u.role === 'agent').length;
 
   return (
     <div className="max-w-6xl mx-auto">
       {/* Page Header */}
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-slate-800 dark:text-white">Utilisateurs</h1>
-        <p className="text-slate-500 dark:text-slate-400 mt-1">Gérez les utilisateurs et leurs accès</p>
-      </div>
-
-      <div className="flex items-center justify-end mb-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+        <div>
+          <h1 className="font-display text-2xl font-bold text-[var(--dash-ink)]">Utilisateurs</h1>
+          <p className="text-sm text-[var(--dash-muted)] mt-1">Gérez les utilisateurs et leurs accès</p>
+        </div>
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
-            <Button className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl">
-              <Plus className="w-4 h-4 mr-2" />
+            <button className="btn-brand inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium">
+              <Plus className="w-4 h-4" />
               Nouvel utilisateur
-            </Button>
+            </button>
           </DialogTrigger>
-          <DialogContent className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-800 dark:text-white">
+          <DialogContent className="bg-[var(--dash-card)] border-[var(--dash-border)] text-[var(--dash-ink)]">
             <DialogHeader>
-              <DialogTitle>Créer un utilisateur</DialogTitle>
+              <DialogTitle className="text-[var(--dash-ink)]">Créer un utilisateur</DialogTitle>
             </DialogHeader>
             <div className="space-y-4 pt-4">
               <div className="space-y-2">
-                <Label>Nom</Label>
-                <Input 
+                <Label className="text-[var(--dash-ink-2)]">Nom</Label>
+                <Input
                   placeholder="Jean Dupont"
                   value={userForm.name}
                   onChange={(e) => setUserForm({ ...userForm, name: e.target.value })}
-                  className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700" 
+                  className="bg-[var(--dash-card)] border-[var(--dash-border)] text-[var(--dash-ink)]"
                 />
               </div>
               <div className="space-y-2">
-                <Label>Email *</Label>
-                <Input 
+                <Label className="text-[var(--dash-ink-2)]">Email *</Label>
+                <Input
                   type="email"
                   placeholder="email@exemple.com"
                   value={userForm.email}
                   onChange={(e) => setUserForm({ ...userForm, email: e.target.value })}
-                  className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700" 
+                  className="bg-[var(--dash-card)] border-[var(--dash-border)] text-[var(--dash-ink)]"
                 />
               </div>
               <div className="space-y-2">
-                <Label>Mot de passe *</Label>
-                <Input 
+                <Label className="text-[var(--dash-ink-2)]">Mot de passe *</Label>
+                <Input
                   type="password"
                   placeholder="Mot de passe"
                   value={userForm.password}
                   onChange={(e) => setUserForm({ ...userForm, password: e.target.value })}
-                  className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700" 
+                  className="bg-[var(--dash-card)] border-[var(--dash-border)] text-[var(--dash-ink)]"
                 />
               </div>
               <div className="space-y-2">
-                <Label>Rôle</Label>
-                <Select 
-                  value={userForm.role} 
+                <Label className="text-[var(--dash-ink-2)]">Rôle</Label>
+                <Select
+                  value={userForm.role}
                   onValueChange={(v) => setUserForm({ ...userForm, role: v })}
                 >
-                  <SelectTrigger className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
+                  <SelectTrigger className="bg-[var(--dash-card)] border-[var(--dash-border)] text-[var(--dash-ink)]">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800">
+                  <SelectContent className="bg-[var(--dash-card)] border-[var(--dash-border)] text-[var(--dash-ink)]">
                     <SelectItem value="agent">Agent</SelectItem>
                     <SelectItem value="agency">Agence</SelectItem>
                     <SelectItem value="admin">Admin</SelectItem>
@@ -207,15 +214,15 @@ export default function UtilisateursPage() {
               </div>
               {userForm.role === 'agency' && (
                 <div className="space-y-2">
-                  <Label>Agence</Label>
-                  <Select 
-                    value={userForm.agencyId} 
+                  <Label className="text-[var(--dash-ink-2)]">Agence</Label>
+                  <Select
+                    value={userForm.agencyId}
                     onValueChange={(v) => setUserForm({ ...userForm, agencyId: v })}
                   >
-                    <SelectTrigger className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
+                    <SelectTrigger className="bg-[var(--dash-card)] border-[var(--dash-border)] text-[var(--dash-ink)]">
                       <SelectValue placeholder="Sélectionner une agence" />
                     </SelectTrigger>
-                    <SelectContent className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800">
+                    <SelectContent className="bg-[var(--dash-card)] border-[var(--dash-border)] text-[var(--dash-ink)]">
                       {agencies.map((agency) => (
                         <SelectItem key={agency.id} value={agency.id}>
                           {agency.name}
@@ -225,31 +232,66 @@ export default function UtilisateursPage() {
                   </Select>
                 </div>
               )}
-              <Button 
-                className="w-full bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl" 
+              <button
+                className="btn-brand w-full inline-flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-medium"
                 onClick={handleCreateUser}
               >
                 Créer l&apos;utilisateur
-              </Button>
+              </button>
             </div>
           </DialogContent>
         </Dialog>
       </div>
 
+      {/* Stats Cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <KpiCard
+          label="Total utilisateurs"
+          value={totalUsers}
+          subtitle="Tous rôles confondus"
+          icon={Users}
+          color="brand"
+          loading={loading}
+        />
+        <KpiCard
+          label="Administrateurs"
+          value={adminCount}
+          subtitle="Admins + SuperAdmins"
+          icon={Shield}
+          color="violet"
+          loading={loading}
+        />
+        <KpiCard
+          label="Comptes agences"
+          value={agencyCount}
+          subtitle="Partenaires"
+          icon={Building2}
+          color="amber"
+          loading={loading}
+        />
+        <KpiCard
+          label="Agents"
+          value={agentCount}
+          subtitle="Équipe terrain"
+          icon={UserCog}
+          color="emerald"
+          loading={loading}
+        />
+      </div>
+
       {/* Users Grid */}
       {loading ? (
-        <div className="text-center py-12">
-          <div className="flex items-center justify-center gap-3">
-            <div className="w-6 h-6 border-2 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin" />
-            <span className="text-slate-500 dark:text-slate-400">Chargement...</span>
-          </div>
+        <div className="dash-card p-12 flex items-center justify-center gap-3">
+          <div className="w-6 h-6 border-2 border-[var(--dash-brand)]/30 border-t-[var(--dash-brand)] rounded-full animate-spin" />
+          <span className="text-[var(--dash-muted)]">Chargement...</span>
         </div>
       ) : users.length === 0 ? (
-        <div className="flex flex-col items-center py-12">
-          <div className="w-16 h-16 bg-slate-100 dark:bg-slate-700 rounded-full flex items-center justify-center mb-4">
-            <Users className="w-8 h-8 text-slate-400" />
+        <div className="dash-card p-12 text-center">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[var(--dash-bg-3)] mb-4">
+            <Users className="w-8 h-8 text-[var(--dash-muted)]" />
           </div>
-          <p className="text-slate-500 dark:text-slate-400">Aucun utilisateur</p>
+          <p className="text-[var(--dash-muted)]">Aucun utilisateur</p>
+          <p className="text-sm text-[var(--dash-muted-2)] mt-2">Créez votre premier utilisateur</p>
         </div>
       ) : (
         <>
@@ -257,29 +299,31 @@ export default function UtilisateursPage() {
             {users.map((user) => (
               <div
                 key={user.id}
-                className="bg-white dark:bg-slate-800 rounded-2xl p-5 border border-slate-200 dark:border-slate-700 hover:shadow-md transition-all"
+                className="dash-card p-5 flex flex-col"
               >
                 {/* Header with role + created date */}
                 <div className="flex items-start justify-between mb-3">
-                  {getRoleBadge(user.role)}
-                  <span className="text-xs text-slate-400 dark:text-slate-500">
+                  <RoleBadge role={user.role} />
+                  <span className="text-xs text-[var(--dash-muted-2)]">
                     {new Date(user.createdAt).toLocaleDateString('fr-FR')}
                   </span>
                 </div>
                 {/* User info */}
-                <h3 className="font-semibold text-slate-800 dark:text-white mb-0.5">{user.name || 'Sans nom'}</h3>
-                <p className="text-sm text-slate-500 dark:text-slate-400 mb-2">{user.email}</p>
+                <h3 className="font-semibold text-[var(--dash-ink)] mb-0.5 truncate">{user.name || 'Sans nom'}</h3>
+                <p className="text-sm text-[var(--dash-muted)] mb-2 truncate">{user.email}</p>
                 {/* Agency */}
                 {user.agency?.name && (
-                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 mb-4">
+                  <span className="dash-badge dash-badge-neutral self-start mb-4">
+                    <Building2 className="w-3 h-3" />
                     {user.agency.name}
                   </span>
                 )}
+                {!user.agency?.name && <div className="mb-4" />}
                 {/* Actions */}
-                <div className="flex gap-2 pt-3 border-t border-slate-100 dark:border-slate-700 mt-auto">
+                <div className="flex gap-2 pt-3 border-t border-[var(--dash-border)] mt-auto">
                   <button
                     onClick={() => handleDeleteUser(user.id)}
-                    className="ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium text-slate-400 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20 dark:hover:text-red-400 transition-colors"
+                    className="ml-auto inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-[var(--dash-muted)] hover:bg-red-50 dark:hover:bg-red-500/10 hover:text-red-600 dark:hover:text-red-400 transition-colors"
                     title="Supprimer"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
@@ -292,7 +336,7 @@ export default function UtilisateursPage() {
 
           {/* Footer */}
           <div className="mt-4 px-2 py-3">
-            <span className="text-slate-500 dark:text-slate-400 text-sm">
+            <span className="text-[var(--dash-muted)] text-sm">
               {users.length} utilisateur(s)
             </span>
           </div>

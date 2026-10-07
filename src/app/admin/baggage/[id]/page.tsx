@@ -9,12 +9,14 @@ import {
   User,
   Phone,
   MapPin,
-  Clock,
   AlertTriangle,
   CheckCircle,
-  Building,
+  Building2,
   Luggage,
-  Send
+  Plane,
+  Train,
+  Ship,
+  Bus,
 } from 'lucide-react';
 
 interface BaggageData {
@@ -85,7 +87,7 @@ export default function AdminBaggageDetailPage() {
   };
 
   const handleMarkFound = async () => {
-    if (!confirm('✅ Marquer ce colis comme retrouvé ?')) return;
+    if (!confirm('Marquer ce colis comme retrouvé ?')) return;
 
     setActionLoading(true);
     try {
@@ -116,30 +118,30 @@ export default function AdminBaggageDetailPage() {
 
   const getStatusBadge = (status: string) => {
     const config: Record<string, { label: string; className: string }> = {
-      pending_activation: { label: 'En attente', className: 'bg-amber-100 text-amber-700' },
-      active: { label: 'Actif', className: 'bg-emerald-100 text-emerald-700' },
-      scanned: { label: 'Scanné', className: 'bg-blue-100 text-blue-700' },
-      lost: { label: 'Perdu', className: 'bg-rose-100 text-rose-700' },
-      found: { label: 'Retrouvé', className: 'bg-green-100 text-green-700' },
+      pending_activation: { label: 'En attente', className: 'dash-badge dash-badge-warning' },
+      active: { label: 'Actif', className: 'dash-badge dash-badge-success' },
+      scanned: { label: 'Scanné', className: 'dash-badge dash-badge-info' },
+      lost: { label: 'Perdu', className: 'dash-badge dash-badge-danger' },
+      found: { label: 'Retrouvé', className: 'dash-badge dash-badge-success' },
     };
-    const { label, className } = config[status] || { label: status, className: 'bg-slate-100 text-slate-600' };
-    return <span className={`px-3 py-1 rounded-full text-sm font-medium ${className}`}>{label}</span>;
+    const { label, className } = config[status] || { label: status, className: 'dash-badge dash-badge-neutral' };
+    return <span className={className}>{label}</span>;
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#080c1a] flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-[#b8860b]/30 border-t-[#b8860b] rounded-full animate-spin" />
+      <div className="min-h-[60vh] flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-[var(--dash-brand)]/30 border-t-[var(--dash-brand)] rounded-full animate-spin" />
       </div>
     );
   }
 
   if (!baggage) {
     return (
-      <div className="min-h-screen bg-[#080c1a] flex items-center justify-center">
+      <div className="min-h-[60vh] flex items-center justify-center">
         <div className="text-center">
-          <p className="text-white">Colis non trouvé</p>
-          <Link href="/admin/qrcodes" className="text-[#b8860b] hover:underline mt-4 block">
+          <p className="text-[var(--dash-ink)]">Colis non trouvé</p>
+          <Link href="/admin/qrcodes" className="text-[var(--dash-brand)] hover:underline mt-4 block">
             Retour aux QR codes
           </Link>
         </div>
@@ -149,20 +151,39 @@ export default function AdminBaggageDetailPage() {
 
   const isLost = baggage.status === 'lost' && baggage.declaredLostAt && !baggage.foundAt;
 
+  const transportIcon = (mode?: string) => {
+    switch (mode) {
+      case 'flight': return <Plane className="w-4 h-4" />;
+      case 'train': return <Train className="w-4 h-4" />;
+      case 'boat': return <Ship className="w-4 h-4" />;
+      case 'bus': return <Bus className="w-4 h-4" />;
+      default: return <Plane className="w-4 h-4" />;
+    }
+  };
+  const transportLabel = (mode?: string) => {
+    switch (mode) {
+      case 'flight': return 'Avion';
+      case 'train': return 'Train';
+      case 'boat': return 'Bateau';
+      case 'bus': return 'Bus';
+      default: return 'Avion';
+    }
+  };
+
   return (
     <div className="max-w-4xl mx-auto">
       {/* Header */}
-      <div className="mb-8">
+      <div className="mb-6">
         <Link
           href="/admin/qrcodes"
-          className="inline-flex items-center gap-2 text-[#a0a8b8] hover:text-white transition-colors mb-4"
+          className="inline-flex items-center gap-2 text-[var(--dash-muted)] hover:text-[var(--dash-ink)] transition-colors mb-4"
         >
           <ArrowLeft className="w-4 h-4" />
           Retour aux QR codes
         </Link>
-        <h1 className="text-2xl font-bold text-white flex items-center gap-3">
-          <div className="w-10 h-10 bg-[#b8860b] rounded-lg flex items-center justify-center">
-            <Luggage className="w-5 h-5 text-white" />
+        <h1 className="font-display text-2xl font-bold text-[var(--dash-ink)] flex items-center gap-3">
+          <div className="w-10 h-10 bg-[var(--dash-brand-soft)] rounded-lg flex items-center justify-center">
+            <Luggage className="w-5 h-5 text-[var(--dash-brand)]" />
           </div>
           Détails du colis
         </h1>
@@ -170,11 +191,11 @@ export default function AdminBaggageDetailPage() {
 
       {/* Lost Alert */}
       {isLost && (
-        <div className="mb-6 p-4 bg-rose-500/10 border border-rose-500/30 rounded-xl flex items-start gap-3">
-          <AlertTriangle className="w-6 h-6 text-rose-400 shrink-0 mt-0.5" />
+        <div className="mb-6 p-4 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-800 rounded-xl flex items-start gap-3">
+          <AlertTriangle className="w-6 h-6 text-red-500 shrink-0 mt-0.5" />
           <div>
-            <h3 className="font-semibold text-rose-400">Colis déclaré perdu</h3>
-            <p className="text-rose-300/80 text-sm mt-1">
+            <h3 className="font-semibold text-red-700 dark:text-red-400">Colis déclaré perdu</h3>
+            <p className="text-red-600 dark:text-red-300 text-sm mt-1">
               Déclaré perdu le {formatDate(baggage.declaredLostAt)}
             </p>
           </div>
@@ -182,13 +203,13 @@ export default function AdminBaggageDetailPage() {
       )}
 
       {/* Main Card */}
-      <div className="bg-[#0d152a] border border-[#1a2238] rounded-xl overflow-hidden">
+      <div className="dash-card overflow-hidden">
         {/* Reference Header */}
-        <div className="p-6 border-b border-[#1a2238] bg-[#080c1a]">
-          <div className="flex items-center justify-between">
+        <div className="p-6 border-b border-[var(--dash-border)] bg-[var(--dash-bg-3)]">
+          <div className="flex items-center justify-between flex-wrap gap-3">
             <div>
-              <p className="text-[#b8860b] text-sm font-medium">{baggage.type === 'hajj' ? 'Hajj 2026' : 'Voyageur'}</p>
-              <h2 className="text-xl font-bold text-white font-mono">{baggage.reference}</h2>
+              <p className="text-[var(--dash-brand)] text-sm font-medium">{baggage.type === 'hajj' ? 'Hajj 2026' : 'Voyageur'}</p>
+              <h2 className="text-xl font-bold text-[var(--dash-ink)] font-mono">{baggage.reference}</h2>
             </div>
             {getStatusBadge(baggage.status)}
           </div>
@@ -198,21 +219,21 @@ export default function AdminBaggageDetailPage() {
         <div className="p-6 space-y-6">
           {/* Traveler Info */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-white flex items-center gap-2">
-              <User className="w-5 h-5 text-[#b8860b]" />
+            <h3 className="text-lg font-semibold text-[var(--dash-ink)] flex items-center gap-2">
+              <User className="w-5 h-5 text-[var(--dash-brand)]" />
               Informations du voyageur
             </h3>
             <div className="grid md:grid-cols-2 gap-4">
-              <div className="bg-[#111827] rounded-lg p-4">
-                <p className="text-[#a0a8b8] text-sm">Nom complet</p>
-                <p className="text-white font-medium mt-1">
+              <div className="bg-[var(--dash-bg-3)] rounded-lg p-4">
+                <p className="text-[var(--dash-muted)] text-sm">Nom complet</p>
+                <p className="text-[var(--dash-ink)] font-medium mt-1">
                   {baggage.travelerFirstName} {baggage.travelerLastName}
                 </p>
               </div>
-              <div className="bg-[#111827] rounded-lg p-4">
-                <p className="text-[#a0a8b8] text-sm">WhatsApp</p>
-                <p className="text-white font-medium mt-1 flex items-center gap-2">
-                  <Phone className="w-4 h-4 text-[#b8860b]" />
+              <div className="bg-[var(--dash-bg-3)] rounded-lg p-4">
+                <p className="text-[var(--dash-muted)] text-sm">WhatsApp</p>
+                <p className="text-[var(--dash-ink)] font-medium mt-1 flex items-center gap-2">
+                  <Phone className="w-4 h-4 text-[var(--dash-brand)]" />
                   {baggage.whatsappOwner || 'Non renseigné'}
                 </p>
               </div>
@@ -222,13 +243,13 @@ export default function AdminBaggageDetailPage() {
           {/* Agency Info */}
           {baggage.agency && (
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-white flex items-center gap-2">
-                <Building className="w-5 h-5 text-[#b8860b]" />
+              <h3 className="text-lg font-semibold text-[var(--dash-ink)] flex items-center gap-2">
+                <Building2 className="w-5 h-5 text-[var(--dash-brand)]" />
                 Agence
               </h3>
-              <div className="bg-[#111827] rounded-lg p-4">
-                <p className="text-white font-medium">{baggage.agency.name}</p>
-                <div className="mt-2 flex flex-wrap gap-4 text-sm text-[#a0a8b8]">
+              <div className="bg-[var(--dash-bg-3)] rounded-lg p-4">
+                <p className="text-[var(--dash-ink)] font-medium">{baggage.agency.name}</p>
+                <div className="mt-2 flex flex-wrap gap-4 text-sm text-[var(--dash-muted)]">
                   {baggage.agency.email && (
                     <span>{baggage.agency.email}</span>
                   )}
@@ -242,24 +263,24 @@ export default function AdminBaggageDetailPage() {
 
           {/* Baggage Details */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-white flex items-center gap-2">
-              <Luggage className="w-5 h-5 text-[#b8860b]" />
+            <h3 className="text-lg font-semibold text-[var(--dash-ink)] flex items-center gap-2">
+              <Luggage className="w-5 h-5 text-[var(--dash-brand)]" />
               Détails du colis
             </h3>
             <div className="grid md:grid-cols-3 gap-4">
-              <div className="bg-[#111827] rounded-lg p-4">
-                <p className="text-[#a0a8b8] text-sm">Type</p>
-                <p className="text-white font-medium mt-1">
+              <div className="bg-[var(--dash-bg-3)] rounded-lg p-4">
+                <p className="text-[var(--dash-muted)] text-sm">Type</p>
+                <p className="text-[var(--dash-ink)] font-medium mt-1">
                   {baggage.baggageType} #{baggage.baggageIndex}
                 </p>
               </div>
-              <div className="bg-[#111827] rounded-lg p-4">
-                <p className="text-[#a0a8b8] text-sm">Créé le</p>
-                <p className="text-white font-medium mt-1">{formatDate(baggage.createdAt)}</p>
+              <div className="bg-[var(--dash-bg-3)] rounded-lg p-4">
+                <p className="text-[var(--dash-muted)] text-sm">Créé le</p>
+                <p className="text-[var(--dash-ink)] font-medium mt-1">{formatDate(baggage.createdAt)}</p>
               </div>
-              <div className="bg-[#111827] rounded-lg p-4">
-                <p className="text-[#a0a8b8] text-sm">Dernier scan</p>
-                <p className="text-white font-medium mt-1">{formatDate(baggage.lastScanDate)}</p>
+              <div className="bg-[var(--dash-bg-3)] rounded-lg p-4">
+                <p className="text-[var(--dash-muted)] text-sm">Dernier scan</p>
+                <p className="text-[var(--dash-ink)] font-medium mt-1">{formatDate(baggage.lastScanDate)}</p>
               </div>
             </div>
           </div>
@@ -267,56 +288,54 @@ export default function AdminBaggageDetailPage() {
           {/* TRANSPORT-FEATURE: Transport mode info */}
           {baggage.transportMode && (
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-white flex items-center gap-2">
-                <MapPin className="w-5 h-5 text-[#b8860b]" />
+              <h3 className="text-lg font-semibold text-[var(--dash-ink)] flex items-center gap-2">
+                <MapPin className="w-5 h-5 text-[var(--dash-brand)]" />
                 Informations de transport
               </h3>
               <div className="grid md:grid-cols-3 gap-4">
-                <div className="bg-[#111827] rounded-lg p-4">
-                  <p className="text-[#a0a8b8] text-sm">Mode</p>
-                  <p className="text-white font-medium mt-1">
-                    {(() => {
-                      const icons: Record<string, string> = { flight: '✈️ Avion', train: '🚆 Train', boat: '🚢 Bateau', bus: '🚌 Bus' };
-                      return icons[baggage.transportMode || 'flight'] || '✈️ Avion';
-                    })()}
+                <div className="bg-[var(--dash-bg-3)] rounded-lg p-4">
+                  <p className="text-[var(--dash-muted)] text-sm">Mode</p>
+                  <p className="text-[var(--dash-ink)] font-medium mt-1 flex items-center gap-1.5">
+                    {transportIcon(baggage.transportMode)}
+                    {transportLabel(baggage.transportMode)}
                   </p>
                 </div>
                 {baggage.transportMode === 'flight' && (baggage.airlineName || baggage.flightNumber) && (
-                  <div className="bg-[#111827] rounded-lg p-4">
-                    <p className="text-[#a0a8b8] text-sm">Vol</p>
-                    <p className="text-white font-medium mt-1">
+                  <div className="bg-[var(--dash-bg-3)] rounded-lg p-4">
+                    <p className="text-[var(--dash-muted)] text-sm">Vol</p>
+                    <p className="text-[var(--dash-ink)] font-medium mt-1">
                       {baggage.airlineName}{baggage.flightNumber ? ` — ${baggage.flightNumber}` : ''}
                     </p>
                   </div>
                 )}
                 {baggage.transportMode === 'train' && (baggage.trainCompany || baggage.trainNumber) && (
-                  <div className="bg-[#111827] rounded-lg p-4">
-                    <p className="text-[#a0a8b8] text-sm">Train</p>
-                    <p className="text-white font-medium mt-1">
+                  <div className="bg-[var(--dash-bg-3)] rounded-lg p-4">
+                    <p className="text-[var(--dash-muted)] text-sm">Train</p>
+                    <p className="text-[var(--dash-ink)] font-medium mt-1">
                       {baggage.trainCompany}{baggage.trainNumber ? ` — ${baggage.trainNumber}` : ''}
                     </p>
                   </div>
                 )}
                 {baggage.transportMode === 'boat' && (baggage.shipName || baggage.shipCabin) && (
-                  <div className="bg-[#111827] rounded-lg p-4">
-                    <p className="text-[#a0a8b8] text-sm">Navire</p>
-                    <p className="text-white font-medium mt-1">
+                  <div className="bg-[var(--dash-bg-3)] rounded-lg p-4">
+                    <p className="text-[var(--dash-muted)] text-sm">Navire</p>
+                    <p className="text-[var(--dash-ink)] font-medium mt-1">
                       {baggage.shipName}{baggage.shipCabin ? ` — ${baggage.shipCabin}` : ''}
                     </p>
                   </div>
                 )}
                 {baggage.transportMode === 'bus' && (baggage.busCompany || baggage.busLineNumber) && (
-                  <div className="bg-[#111827] rounded-lg p-4">
-                    <p className="text-[#a0a8b8] text-sm">Bus</p>
-                    <p className="text-white font-medium mt-1">
+                  <div className="bg-[var(--dash-bg-3)] rounded-lg p-4">
+                    <p className="text-[var(--dash-muted)] text-sm">Bus</p>
+                    <p className="text-[var(--dash-ink)] font-medium mt-1">
                       {baggage.busCompany}{baggage.busLineNumber ? ` — ${baggage.busLineNumber}` : ''}
                     </p>
                   </div>
                 )}
                 {baggage.destination && (
-                  <div className="bg-[#111827] rounded-lg p-4">
-                    <p className="text-[#a0a8b8] text-sm">Destination</p>
-                    <p className="text-white font-medium mt-1">{baggage.destination}</p>
+                  <div className="bg-[var(--dash-bg-3)] rounded-lg p-4">
+                    <p className="text-[var(--dash-muted)] text-sm">Destination</p>
+                    <p className="text-[var(--dash-ink)] font-medium mt-1">{baggage.destination}</p>
                   </div>
                 )}
               </div>
@@ -325,23 +344,23 @@ export default function AdminBaggageDetailPage() {
 
           {/* Location */}
           {baggage.lastLocation && (
-            <div className="bg-[#111827] rounded-lg p-4">
-              <p className="text-[#a0a8b8] text-sm flex items-center gap-2">
+            <div className="bg-[var(--dash-bg-3)] rounded-lg p-4">
+              <p className="text-[var(--dash-muted)] text-sm flex items-center gap-2">
                 <MapPin className="w-4 h-4" />
                 Dernière position connue
               </p>
-              <p className="text-white font-medium mt-1">{baggage.lastLocation}</p>
+              <p className="text-[var(--dash-ink)] font-medium mt-1">{baggage.lastLocation}</p>
             </div>
           )}
         </div>
 
         {/* Actions */}
-        <div className="p-6 border-t border-[#1a2238] bg-[#080c1a] flex flex-wrap gap-3">
+        <div className="p-6 border-t border-[var(--dash-border)] bg-[var(--dash-bg-3)] flex flex-wrap gap-3">
           {isLost && (
             <button
               onClick={handleMarkFound}
               disabled={actionLoading}
-              className="flex-1 py-3 bg-emerald-500 text-white rounded-lg font-medium hover:bg-emerald-600 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+              className="btn-emerald btn-magnetic flex-1 py-3 rounded-lg font-medium inline-flex items-center justify-center gap-2 disabled:opacity-50"
             >
               {actionLoading ? (
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -355,7 +374,7 @@ export default function AdminBaggageDetailPage() {
           )}
           <Link
             href={`/scan/${baggage.reference}`}
-            className="flex-1 py-3 bg-[#b8860b] text-white rounded-lg font-medium hover:bg-[#d4af37] transition-colors flex items-center justify-center gap-2"
+            className="btn-brand btn-magnetic flex-1 py-3 rounded-lg font-medium inline-flex items-center justify-center gap-2"
           >
             <QrCode className="w-5 h-5" />
             Voir la page de scan

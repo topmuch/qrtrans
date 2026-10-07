@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { QRCodeSVG } from 'qrcode.react';
 import {
   Search,
@@ -14,12 +13,14 @@ import {
   Luggage,
   QrCode,
   Plus,
-  ArrowLeft,
   X,
   AlertTriangle,
-  CheckCircle,
-  Clock
+  User,
+  Hash,
+  Calendar,
+  Building2,
 } from "lucide-react";
+import KpiCard from '@/components/dashboard/KpiCard';
 
 interface QRSet {
   id: string;
@@ -42,9 +43,8 @@ interface Stats {
 }
 
 export default function QRCodesPage() {
-  const router = useRouter();
   const qrRef = useRef<HTMLDivElement>(null);
-  
+
   const [sets, setSets] = useState<QRSet[]>([]);
   const [stats, setStats] = useState<Stats>({
     totalSets: 0,
@@ -55,7 +55,7 @@ export default function QRCodesPage() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState('all');
-  
+
   // Modals
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -122,7 +122,7 @@ export default function QRCodesPage() {
       canvas.height = headerHeight + rows * qrSize + (rows + 1) * padding + footerHeight;
 
       // Background
-      ctx.fillStyle = '#080c1a';
+      ctx.fillStyle = '#0F172A';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       // Header
@@ -132,7 +132,7 @@ export default function QRCodesPage() {
       ctx.fillText('QRTrans - QR Codes', canvas.width / 2, 40);
 
       ctx.font = '16px Arial';
-      ctx.fillStyle = '#a0a8b8';
+      ctx.fillStyle = '#94A3B8';
       ctx.fillText(`${set.setId} | ${set.type === 'hajj' ? 'Hajj 2026' : 'Voyageur'} | ${set.qrCount} QR`, canvas.width / 2, 70);
 
       // Generate QR codes as images
@@ -161,13 +161,13 @@ export default function QRCodesPage() {
         await new Promise<void>((resolve) => {
           img.onload = () => {
             ctx.drawImage(img, x + 20, y + 20, qrSize - 40, qrSize - 40);
-            
+
             // Draw reference text
-            ctx.fillStyle = set.type === 'hajj' ? '#0d5e34' : '#d35400';
+            ctx.fillStyle = set.type === 'hajj' ? '#0d5e34' : '#1E4B7A';
             ctx.font = 'bold 14px Arial';
             ctx.textAlign = 'center';
             ctx.fillText(set.references[i], x + qrSize / 2, y + qrSize - 15);
-            
+
             URL.revokeObjectURL(url);
             resolve();
           };
@@ -180,7 +180,7 @@ export default function QRCodesPage() {
       }
 
       // Footer
-      ctx.fillStyle = '#a0a8b8';
+      ctx.fillStyle = '#94A3B8';
       ctx.font = '12px Arial';
       ctx.textAlign = 'center';
       ctx.fillText('QRTrans - Protégez vos colis, en toute sérénité.', canvas.width / 2, canvas.height - 20);
@@ -202,7 +202,7 @@ export default function QRCodesPage() {
 
   // Simple QR code SVG generator (fallback)
   const generateQRCodeSVG = (url: string, type: string) => {
-    const color = type === 'hajj' ? '#0d5e34' : '#d35400';
+    const color = type === 'hajj' ? '#0d5e34' : '#1E4B7A';
     return `<rect width="200" height="200" fill="white"/>
       <text x="100" y="100" text-anchor="middle" fill="${color}" font-size="10">${url.slice(-20)}</text>`;
   };
@@ -241,216 +241,217 @@ export default function QRCodesPage() {
     { id: 'voyageur', label: 'Voyageur' },
   ];
 
-  // KPI Cards
-  const kpiCards = [
-    { title: 'Total Sets', value: stats.totalSets, icon: QrCode, color: 'text-[#b8860b]' },
-    { title: 'Total QR', value: stats.totalQr, icon: Luggage, color: 'text-white' },
-    { title: 'Hajj', value: stats.hajjSets, icon: Plane, color: 'text-green-400' },
-    { title: 'Voyageur', value: stats.voyageurSets, icon: Luggage, color: 'text-orange-400' },
-  ];
-
   return (
-    <div className="min-h-screen bg-[#080c1a]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
-          <div className="flex items-center gap-4">
-            <Link
-              href="/admin"
-              className="p-2 rounded-lg bg-[#0d152a] hover:bg-[#1a2238] transition-colors"
-            >
-              <ArrowLeft className="w-5 h-5 text-[#a0a8b8]" />
-            </Link>
-            <div>
-              <h1 className="text-2xl font-bold text-white">QR Codes Générés</h1>
-              <p className="text-[#a0a8b8] text-sm">Gérez vos sets de QR codes</p>
-            </div>
-          </div>
-          <Link
-            href="/admin"
-            className="inline-flex items-center gap-2 px-4 py-2 bg-[#b8860b] text-white rounded-lg hover:bg-[#d4af37] transition-colors"
-          >
-            <Plus className="w-4 h-4" />
-            Générer nouveau
-          </Link>
+    <div className="max-w-7xl mx-auto">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+        <div>
+          <h1 className="font-display text-2xl font-bold text-[var(--dash-ink)] flex items-center gap-2">
+            <QrCode className="w-6 h-6 text-[var(--dash-brand)]" />
+            QR Codes Générés
+          </h1>
+          <p className="text-sm text-[var(--dash-muted)] mt-1">Gérez vos sets de QR codes</p>
         </div>
+        <Link
+          href="/admin/generer"
+          className="btn-brand btn-magnetic inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium"
+        >
+          <Plus className="w-4 h-4" />
+          Générer nouveau
+        </Link>
+      </div>
 
-        {/* KPI Cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          {kpiCards.map((card, index) => (
-            <div
-              key={index}
-              className="bg-[#0d152a] border border-[#1a2238] rounded-xl p-5 shadow-sm"
+      {/* KPI Cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <KpiCard
+          label="Total Sets"
+          value={stats.totalSets}
+          subtitle="Lots générés"
+          icon={QrCode}
+          color="brand"
+          loading={loading}
+        />
+        <KpiCard
+          label="Total QR"
+          value={stats.totalQr}
+          subtitle="Codes générés"
+          icon={Hash}
+          color="emerald"
+          loading={loading}
+        />
+        <KpiCard
+          label="Hajj"
+          value={stats.hajjSets}
+          subtitle="Sets pèlerins"
+          icon={Plane}
+          color="cyan"
+          loading={loading}
+        />
+        <KpiCard
+          label="Voyageur"
+          value={stats.voyageurSets}
+          subtitle="Sets standards"
+          icon={Luggage}
+          color="amber"
+          loading={loading}
+        />
+      </div>
+
+      {/* Search & Filters */}
+      <div className="flex flex-col sm:flex-row gap-4 mb-6">
+        <div className="relative flex-1">
+          <input
+            type="text"
+            placeholder="Rechercher par référence ou set..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full bg-[var(--dash-card)] border border-[var(--dash-border)] rounded-lg py-3 px-4 text-[var(--dash-ink)] placeholder-[var(--dash-muted-2)] focus:outline-none focus:border-[var(--dash-brand)] focus:ring-2 focus:ring-[var(--dash-brand-soft)]"
+          />
+          <Search className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--dash-muted-2)]" />
+        </div>
+        <div className="flex gap-2">
+          {filterButtons.map((btn) => (
+            <button
+              key={btn.id}
+              onClick={() => setTypeFilter(btn.id)}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                typeFilter === btn.id
+                  ? 'bg-[var(--dash-brand)] text-white'
+                  : 'bg-[var(--dash-card)] text-[var(--dash-muted)] border border-[var(--dash-border)] hover:bg-[var(--dash-bg-3)]'
+              }`}
             >
-              <div className="flex items-center justify-between mb-2">
-                <card.icon className={`w-5 h-5 ${card.color}`} />
-              </div>
-              <p className="text-2xl font-bold text-white">{card.value}</p>
-              <p className="text-[#a0a8b8] text-sm">{card.title}</p>
-            </div>
+              {btn.label}
+            </button>
           ))}
         </div>
+      </div>
 
-        {/* Search & Filters */}
-        <div className="flex flex-col sm:flex-row gap-4 mb-6">
-          <div className="relative flex-1">
-            <input
-              type="text"
-              placeholder="Rechercher par référence ou set..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-full bg-[#0d152a] border border-[#1a2238] rounded-lg py-3 px-4 text-[#e0e6f0] placeholder-[#a0a8b8] focus:outline-none focus:border-[#b8860b]/50"
-            />
-            <Search className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#a0a8b8]" />
+      {/* QR Sets List */}
+      <div className="space-y-4">
+        {loading ? (
+          <div className="dash-card p-12 text-center">
+            <div className="w-12 h-12 border-2 border-[var(--dash-brand)]/30 border-t-[var(--dash-brand)] rounded-full animate-spin mx-auto mb-4" />
+            <p className="text-[var(--dash-muted)]">Chargement...</p>
           </div>
-          <div className="flex gap-2">
-            {filterButtons.map((btn) => (
-              <button
-                key={btn.id}
-                onClick={() => setTypeFilter(btn.id)}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  typeFilter === btn.id
-                    ? 'bg-[#b8860b] text-white'
-                    : 'bg-[#0d152a] text-[#a0a8b8] hover:bg-[#1a2238]'
-                }`}
-              >
-                {btn.label}
-              </button>
-            ))}
+        ) : sets.length === 0 ? (
+          <div className="dash-card p-12 text-center">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[var(--dash-bg-3)] mb-4">
+              <QrCode className="w-8 h-8 text-[var(--dash-muted)]" />
+            </div>
+            <p className="text-[var(--dash-muted)]">Aucun QR code généré</p>
+            <p className="text-sm text-[var(--dash-muted-2)] mt-2">
+              Générez vos premiers QR codes pour commencer.
+            </p>
           </div>
-        </div>
-
-        {/* QR Sets List */}
-        <div className="space-y-4">
-          {loading ? (
-            <div className="text-center py-12">
-              <div className="w-12 h-12 border-2 border-[#b8860b]/30 border-t-[#b8860b] rounded-full animate-spin mx-auto mb-4" />
-              <p className="text-[#a0a8b8]">Chargement...</p>
-            </div>
-          ) : sets.length === 0 ? (
-            <div className="text-center py-12">
-              <div className="w-16 h-16 bg-[#0d152a] rounded-full flex items-center justify-center mx-auto mb-4">
-                <QrCode className="w-8 h-8 text-[#a0a8b8]" />
-              </div>
-              <p className="text-[#a0a8b8]">Aucun QR code généré</p>
-              <p className="text-sm text-[#a0a8b8]/60 mt-2">
-                Générez vos premiers QR codes pour commencer.
-              </p>
-            </div>
-          ) : (
-            sets.map((set) => (
-              <div
-                key={set.id}
-                className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-5 bg-[#0a0f2c] rounded-xl border border-[#1a1a3a] gap-4"
-              >
-                {/* Left: Info */}
-                <div className="flex items-start gap-4">
-                  <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                    set.type === 'hajj' ? 'bg-[#0d5e34]' : 'bg-[#7a3e00]'
-                  }`}>
-                    {set.type === 'hajj' ? (
-                      <Plane className="h-5 w-5 text-white" />
-                    ) : (
-                      <Luggage className="h-5 w-5 text-white" />
-                    )}
-                  </div>
-
-                  <div>
-                    <div className="flex items-center gap-2 mb-1">
-                      <h3 className="font-bold text-white">{set.setId}</h3>
-                      <span className="px-2 py-0.5 bg-[#0d5e34] text-[#e0e6f0] text-xs rounded">
-                        Nouveau
-                      </span>
-                    </div>
-                    <div className="text-[#a0a8b8] text-sm flex flex-wrap gap-3">
-                      <span>👤 {set.travelerName || '1 voyageur'}</span>
-                      <span>🔢 {set.qrCount} QR</span>
-                      <span>📅 {formatDate(set.createdAt)}</span>
-                      {set.agencyName && <span>{set.agencyName}</span>}
-                    </div>
-                  </div>
+        ) : (
+          sets.map((set) => (
+            <div
+              key={set.id}
+              className="dash-card p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
+            >
+              {/* Left: Info */}
+              <div className="flex items-start gap-4 flex-1 min-w-0">
+                <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${
+                  set.type === 'hajj'
+                    ? 'bg-[var(--dash-emerald-soft)]'
+                    : 'bg-[var(--dash-brand-soft)]'
+                }`}>
+                  {set.type === 'hajj' ? (
+                    <Plane className="h-5 w-5 text-[var(--dash-emerald)]" />
+                  ) : (
+                    <Luggage className="h-5 w-5 text-[var(--dash-brand)]" />
+                  )}
                 </div>
 
-                {/* Right: Actions */}
-                <div className="flex items-center gap-2 w-full sm:w-auto">
-                  <span className="px-2 py-1 bg-[#0d152a] text-[#a0a8b8] text-xs rounded hidden sm:inline">
-                    {set.status}
-                  </span>
-                  
-                  {/* View Button */}
-                  <button
-                    onClick={() => {
-                      setSelectedSet(set);
-                      setShowDetailModal(true);
-                    }}
-                    className="w-10 h-10 rounded-lg bg-[#0d5e34] flex items-center justify-center text-white hover:bg-[#1e7e34] transition-colors"
-                    title="Voir détails"
-                  >
-                    <Eye className="h-4 w-4" />
-                  </button>
-
-                  {/* Download Button */}
-                  <button
-                    onClick={() => handleDownloadSet(set)}
-                    disabled={isDownloading && selectedSet?.id === set.id}
-                    className="w-10 h-10 rounded-lg bg-[#b8860b] flex items-center justify-center text-white hover:bg-[#d4af37] transition-colors disabled:opacity-50"
-                    title="Télécharger"
-                  >
-                    {isDownloading && selectedSet?.id === set.id ? (
-                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    ) : (
-                      <Download className="h-4 w-4" />
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1 flex-wrap">
+                    <h3 className="font-bold text-[var(--dash-ink)] font-mono">{set.setId}</h3>
+                    <span className="dash-badge dash-badge-success">Nouveau</span>
+                  </div>
+                  <div className="text-[var(--dash-muted)] text-sm flex flex-wrap gap-x-4 gap-y-1">
+                    <span className="flex items-center gap-1"><User className="w-3 h-3" />{set.travelerName || '1 voyageur'}</span>
+                    <span className="flex items-center gap-1"><Hash className="w-3 h-3" />{set.qrCount} QR</span>
+                    <span className="flex items-center gap-1"><Calendar className="w-3 h-3" />{formatDate(set.createdAt)}</span>
+                    {set.agencyName && (
+                      <span className="flex items-center gap-1"><Building2 className="w-3 h-3" />{set.agencyName}</span>
                     )}
-                  </button>
-
-                  {/* Share Button */}
-                  <button
-                    onClick={() => handleShareSet(set)}
-                    className="w-10 h-10 rounded-lg bg-[#1e7e34] flex items-center justify-center text-white hover:bg-[#228b22] transition-colors"
-                    title="Partager"
-                  >
-                    <Share2 className="h-4 w-4" />
-                  </button>
-
-                  {/* Delete Button */}
-                  <button
-                    onClick={() => {
-                      setSelectedSet(set);
-                      setShowDeleteModal(true);
-                    }}
-                    className="w-10 h-10 rounded-lg bg-[#7a1e1e] flex items-center justify-center text-white hover:bg-[#9c2727] transition-colors"
-                    title="Supprimer"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </button>
+                  </div>
                 </div>
               </div>
-            ))
-          )}
-        </div>
 
-        {/* Footer */}
-        <div className="mt-6 px-6 py-4 bg-[#0d152a] border border-[#1a2238] rounded-xl flex justify-between items-center">
-          <span className="text-[#a0a8b8] text-sm">
-            {sets.length} set(s) affiché(s)
-          </span>
-          <Link
-            href="/admin"
-            className="text-[#b8860b] text-sm hover:underline"
-          >
-            ← Retour au dashboard
-          </Link>
-        </div>
+              {/* Right: Actions */}
+              <div className="flex items-center gap-2 w-full sm:w-auto">
+                <span className="dash-badge dash-badge-neutral hidden sm:inline">
+                  {set.status}
+                </span>
+
+                {/* View Button */}
+                <button
+                  onClick={() => {
+                    setSelectedSet(set);
+                    setShowDetailModal(true);
+                  }}
+                  className="w-10 h-10 rounded-lg bg-[var(--dash-bg-3)] flex items-center justify-center text-[var(--dash-ink-2)] hover:bg-[var(--dash-border)] transition-colors"
+                  title="Voir détails"
+                >
+                  <Eye className="h-4 w-4" />
+                </button>
+
+                {/* Download Button */}
+                <button
+                  onClick={() => handleDownloadSet(set)}
+                  disabled={isDownloading && selectedSet?.id === set.id}
+                  className="w-10 h-10 rounded-lg bg-[var(--dash-brand)] flex items-center justify-center text-white hover:opacity-90 transition-opacity disabled:opacity-50"
+                  title="Télécharger"
+                >
+                  {isDownloading && selectedSet?.id === set.id ? (
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  ) : (
+                    <Download className="h-4 w-4" />
+                  )}
+                </button>
+
+                {/* Share Button */}
+                <button
+                  onClick={() => handleShareSet(set)}
+                  className="w-10 h-10 rounded-lg bg-[var(--dash-emerald)] flex items-center justify-center text-white hover:opacity-90 transition-opacity"
+                  title="Partager"
+                >
+                  <Share2 className="h-4 w-4" />
+                </button>
+
+                {/* Delete Button */}
+                <button
+                  onClick={() => {
+                    setSelectedSet(set);
+                    setShowDeleteModal(true);
+                  }}
+                  className="w-10 h-10 rounded-lg bg-red-100 dark:bg-red-500/15 flex items-center justify-center text-red-600 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-500/25 transition-colors"
+                  title="Supprimer"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </button>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+
+      {/* Footer */}
+      <div className="mt-6 px-2 py-3">
+        <span className="text-[var(--dash-muted)] text-sm">
+          {sets.length} set(s) affiché(s)
+        </span>
       </div>
 
       {/* Detail Modal */}
       {showDetailModal && selectedSet && (
-        <div className="fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50">
-          <div className="bg-[#0d152a] border border-[#1a2238] rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between p-6 border-b border-[#1a2238]">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="bg-[var(--dash-card)] border border-[var(--dash-border)] rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between p-6 border-b border-[var(--dash-border)]">
               <div>
-                <h2 className="text-lg font-bold text-white">{selectedSet.setId}</h2>
-                <p className="text-[#a0a8b8] text-sm">
+                <h2 className="font-display text-lg font-bold text-[var(--dash-ink)]">{selectedSet.setId}</h2>
+                <p className="text-[var(--dash-muted)] text-sm">
                   {selectedSet.type === 'hajj' ? 'Hajj 2026' : 'Voyageur'} • {selectedSet.qrCount} QR codes
                 </p>
               </div>
@@ -459,14 +460,14 @@ export default function QRCodesPage() {
                   setShowDetailModal(false);
                   setSelectedSet(null);
                 }}
-                className="p-2 rounded-lg hover:bg-[#1a2238] transition-colors"
+                className="p-2 rounded-lg hover:bg-[var(--dash-bg-3)] text-[var(--dash-muted)] transition-colors"
               >
-                <X className="w-5 h-5 text-[#a0a8b8]" />
+                <X className="w-5 h-5" />
               </button>
             </div>
             <div className="p-6">
               {/* QR Codes Grid */}
-              <div 
+              <div
                 ref={qrRef}
                 className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"
               >
@@ -481,12 +482,12 @@ export default function QRCodesPage() {
                       level="H"
                       includeMargin={true}
                       bgColor="#ffffff"
-                      fgColor={selectedSet.type === 'hajj' ? '#0d5e34' : '#d35400'}
+                      fgColor={selectedSet.type === 'hajj' ? '#0d5e34' : '#1E4B7A'}
                     />
-                    <p className="text-gray-800 font-mono font-bold mt-2 text-sm">
+                    <p className="text-slate-800 font-mono font-bold mt-2 text-sm">
                       {ref}
                     </p>
-                    <p className="text-gray-500 text-xs">
+                    <p className="text-slate-500 text-xs">
                       {index === 0 ? 'Cabine' : 'Soute'} #{index + 1}
                     </p>
                   </div>
@@ -495,13 +496,13 @@ export default function QRCodesPage() {
 
               {/* Info */}
               <div className="mt-6 grid grid-cols-2 gap-4">
-                <div className="bg-[#0a0f2c] rounded-lg p-4">
-                  <p className="text-[#a0a8b8] text-sm">Créé le</p>
-                  <p className="text-white font-medium">{formatDate(selectedSet.createdAt)}</p>
+                <div className="bg-[var(--dash-bg-3)] rounded-lg p-4">
+                  <p className="text-[var(--dash-muted)] text-sm">Créé le</p>
+                  <p className="text-[var(--dash-ink)] font-medium">{formatDate(selectedSet.createdAt)}</p>
                 </div>
-                <div className="bg-[#0a0f2c] rounded-lg p-4">
-                  <p className="text-[#a0a8b8] text-sm">Agence</p>
-                  <p className="text-white font-medium">{selectedSet.agencyName || 'N/A'}</p>
+                <div className="bg-[var(--dash-bg-3)] rounded-lg p-4">
+                  <p className="text-[var(--dash-muted)] text-sm">Agence</p>
+                  <p className="text-[var(--dash-ink)] font-medium">{selectedSet.agencyName || 'N/A'}</p>
                 </div>
               </div>
 
@@ -509,14 +510,14 @@ export default function QRCodesPage() {
               <div className="mt-6 flex gap-3">
                 <button
                   onClick={() => handleDownloadSet(selectedSet)}
-                  className="flex-1 py-3 bg-[#b8860b] text-white rounded-lg hover:bg-[#d4af37] transition-colors flex items-center justify-center gap-2"
+                  className="btn-brand btn-magnetic flex-1 py-3 rounded-lg inline-flex items-center justify-center gap-2 text-sm font-medium"
                 >
                   <Download className="w-4 h-4" />
                   Télécharger tout
                 </button>
                 <button
                   onClick={() => handleShareSet(selectedSet)}
-                  className="flex-1 py-3 bg-[#0d5e34] text-white rounded-lg hover:bg-[#1e7e34] transition-colors flex items-center justify-center gap-2"
+                  className="btn-emerald btn-magnetic flex-1 py-3 rounded-lg inline-flex items-center justify-center gap-2 text-sm font-medium"
                 >
                   <Share2 className="w-4 h-4" />
                   Partager
@@ -529,38 +530,36 @@ export default function QRCodesPage() {
 
       {/* Delete Confirmation Modal */}
       {showDeleteModal && selectedSet && (
-        <div className="fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50">
-          <div className="bg-[#0d152a] border border-[#1a2238] rounded-xl max-w-sm w-full">
-            <div className="p-6">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-[#7a1e1e]/20 rounded-lg flex items-center justify-center">
-                  <AlertTriangle className="w-5 h-5 text-red-400" />
-                </div>
-                <div>
-                  <h3 className="text-white font-bold">Supprimer ce set ?</h3>
-                  <p className="text-[#a0a8b8] text-sm">{selectedSet.setId}</p>
-                </div>
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="bg-[var(--dash-card)] border border-[var(--dash-border)] rounded-2xl max-w-sm w-full p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 bg-red-100 dark:bg-red-500/15 rounded-lg flex items-center justify-center">
+                <AlertTriangle className="w-5 h-5 text-red-600 dark:text-red-400" />
               </div>
-              <p className="text-[#a0a8b8] text-sm mb-6">
-                Cette action supprimera définitivement les {selectedSet.qrCount} QR codes de ce set.
-              </p>
-              <div className="flex gap-3">
-                <button
-                  onClick={() => {
-                    setShowDeleteModal(false);
-                    setSelectedSet(null);
-                  }}
-                  className="flex-1 py-2 px-4 bg-[#1a2238] text-[#e0e6f0] rounded-lg hover:bg-[#2a2a3a] transition-colors"
-                >
-                  Annuler
-                </button>
-                <button
-                  onClick={handleDeleteSet}
-                  className="flex-1 py-2 px-4 bg-[#7a1e1e] text-white rounded-lg hover:bg-[#8a2e2e] transition-colors"
-                >
-                  Supprimer
-                </button>
+              <div>
+                <h3 className="text-[var(--dash-ink)] font-bold">Supprimer ce set ?</h3>
+                <p className="text-[var(--dash-muted)] text-sm font-mono">{selectedSet.setId}</p>
               </div>
+            </div>
+            <p className="text-[var(--dash-muted)] text-sm mb-6">
+              Cette action supprimera définitivement les {selectedSet.qrCount} QR codes de ce set.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  setShowDeleteModal(false);
+                  setSelectedSet(null);
+                }}
+                className="flex-1 py-2 px-4 bg-[var(--dash-bg-3)] text-[var(--dash-ink-2)] rounded-lg hover:bg-[var(--dash-border)] transition-colors text-sm font-medium"
+              >
+                Annuler
+              </button>
+              <button
+                onClick={handleDeleteSet}
+                className="flex-1 py-2 px-4 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm font-medium"
+              >
+                Supprimer
+              </button>
             </div>
           </div>
         </div>

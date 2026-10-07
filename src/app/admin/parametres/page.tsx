@@ -29,6 +29,13 @@ import {
   EyeOff,
   Package,
   Bell,
+  Terminal,
+  Rocket,
+  ShieldAlert,
+  Search as SearchIcon,
+  Building,
+  MessageSquare,
+  UserPlus,
 } from "lucide-react";
 
 interface SettingsData {
@@ -63,14 +70,13 @@ interface EmailSettingsData {
 }
 
 const EMAIL_PROVIDERS = [
-  { id: 'console', name: 'Console (Développement)', description: 'Affiche les emails dans la console du serveur', icon: '💻' },
-  { id: 'smtp', name: 'Serveur SMTP Personnalisé', description: 'Configurez votre propre serveur email', icon: '🖥️' },
+  { id: 'console', name: 'Console (Développement)', description: 'Affiche les emails dans la console du serveur', icon: Terminal },
+  { id: 'smtp', name: 'Serveur SMTP Personnalisé', description: 'Configurez votre propre serveur email', icon: Server },
 ];
 
 const ENCRYPTION_OPTIONS = [
   { id: 'tls', name: 'TLS (Recommandé)' },
   { id: 'ssl', name: 'SSL' },
-  { id: 'none', name: 'Aucun' },
 ];
 
 const CURRENCIES = [
@@ -83,11 +89,11 @@ const CURRENCIES = [
 ];
 
 const AVAILABLE_LANGUAGES = [
-  { code: 'fr', name: 'Français', flag: '🇫🇷' },
-  { code: 'en', name: 'English', flag: '🇬🇧' },
-  { code: 'ar', name: 'العربية', flag: '🇸🇦' },
-  { code: 'es', name: 'Español', flag: '🇪🇸' },
-  { code: 'de', name: 'Deutsch', flag: '🇩🇪' },
+  { code: 'fr', name: 'Français' },
+  { code: 'en', name: 'English' },
+  { code: 'ar', name: 'العربية' },
+  { code: 'es', name: 'Español' },
+  { code: 'de', name: 'Deutsch' },
 ];
 
 // Backup Section Component
@@ -102,7 +108,7 @@ function BackupSection() {
     try {
       const response = await fetch('/api/admin/backup/export');
       if (!response.ok) throw new Error('Export failed');
-      
+
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -139,9 +145,9 @@ function BackupSection() {
       const result = await response.json();
 
       if (response.ok) {
-        setImportStatus({ 
-          success: true, 
-          message: `Import réussi ! ${result.imported?.baggages || 0} colis, ${result.imported?.users || 0} utilisateurs` 
+        setImportStatus({
+          success: true,
+          message: `Import réussi ! ${result.imported?.baggages || 0} colis, ${result.imported?.users || 0} utilisateurs`
         });
       } else {
         setImportStatus({ success: false, message: result.error || 'Erreur lors de l\'import' });
@@ -156,14 +162,14 @@ function BackupSection() {
   };
 
   return (
-    <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800">
+    <div className="dash-card p-6">
       <div className="flex items-center gap-3 mb-5">
-        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center">
+        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[var(--dash-emerald)] to-emerald-700 flex items-center justify-center">
           <Database className="w-5 h-5 text-white" />
         </div>
         <div>
-          <h3 className="text-lg font-semibold text-slate-800 dark:text-white">Sauvegarde des données</h3>
-          <p className="text-sm text-slate-500 dark:text-slate-400">Exportez ou importez votre base de données</p>
+          <h3 className="font-display text-lg font-bold text-[var(--dash-ink)]">Sauvegarde des données</h3>
+          <p className="text-sm text-[var(--dash-muted)]">Exportez ou importez votre base de données</p>
         </div>
       </div>
 
@@ -171,7 +177,7 @@ function BackupSection() {
         <button
           onClick={handleExport}
           disabled={isExporting}
-          className="flex items-center justify-center gap-2 px-4 py-3 bg-black text-white rounded-xl font-medium hover:bg-slate-800 transition-colors disabled:opacity-50"
+          className="inline-flex items-center justify-center gap-2 px-4 py-3 bg-[var(--dash-ink)] text-white rounded-xl font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
         >
           {isExporting ? (
             <>
@@ -197,7 +203,7 @@ function BackupSection() {
           />
           <label
             htmlFor="backup-import"
-            className={`flex items-center justify-center gap-2 px-4 py-3 bg-emerald-500 text-white rounded-xl font-medium hover:bg-emerald-600 transition-colors cursor-pointer ${isImporting ? 'opacity-50 cursor-not-allowed' : ''}`}
+            className={`btn-emerald inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-medium cursor-pointer ${isImporting ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
             {isImporting ? (
               <>
@@ -213,16 +219,16 @@ function BackupSection() {
           </label>
         </div>
 
-        <div className="flex items-center justify-center gap-2 px-4 py-3 bg-slate-100 dark:bg-slate-800 rounded-xl">
-          <HardDrive className="w-5 h-5 text-slate-400" />
-          <span className="text-sm text-slate-600 dark:text-slate-300">
+        <div className="flex items-center justify-center gap-2 px-4 py-3 bg-[var(--dash-bg-3)] rounded-xl">
+          <HardDrive className="w-5 h-5 text-[var(--dash-muted)]" />
+          <span className="text-sm text-[var(--dash-ink-2)]">
             Dernière: {new Date().toLocaleDateString('fr-FR')}
           </span>
         </div>
       </div>
 
       {importStatus && (
-        <div className={`mt-4 p-3 rounded-xl flex items-center gap-2 ${importStatus.success ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' : 'bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400'}`}>
+        <div className={`mt-4 p-3 rounded-xl flex items-center gap-2 ${importStatus.success ? 'bg-[var(--dash-emerald-soft)] text-[var(--dash-emerald)]' : 'bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400'}`}>
           {importStatus.success ? (
             <CheckCircle className="w-5 h-5" />
           ) : (
@@ -238,7 +244,7 @@ function BackupSection() {
 export default function ParametresPage() {
   const searchParams = useSearchParams();
   const tabParam = searchParams.get('tab');
-  
+
   const [settings, setSettings] = useState<SettingsData>({
     company_name: '',
     company_address: '',
@@ -253,7 +259,7 @@ export default function ParametresPage() {
     default_language: 'fr',
     currency: 'EUR',
   });
-  
+
   const [emailSettings, setEmailSettings] = useState<EmailSettingsData>({
     provider: 'console',
     fromEmail: 'noreply@qrtrans.com',
@@ -266,12 +272,12 @@ export default function ParametresPage() {
     smtpPassword: null,
     smtpEncryption: 'tls',
   });
-  
+
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [activeTab, setActiveTab] = useState(tabParam || 'company');
-  
+
   // Email-specific states
   const [showPassword, setShowPassword] = useState(false);
   const [testEmail, setTestEmail] = useState('');
@@ -327,7 +333,7 @@ export default function ParametresPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ settings }),
       });
-      
+
       if (response.ok) {
         setSaved(true);
         setTimeout(() => setSaved(false), 3000);
@@ -369,9 +375,9 @@ export default function ParametresPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
-      
+
       const data = await response.json();
-      
+
       if (response.ok) {
         setEmailSaved(true);
         setTimeout(() => setEmailSaved(false), 4000);
@@ -397,16 +403,16 @@ export default function ParametresPage() {
 
     setSendingTest(true);
     setTestResult(null);
-    
+
     try {
       const response = await fetch('/api/admin/email-settings/test', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ to: testEmail }),
       });
-      
+
       const data = await response.json();
-      
+
       if (data.success) {
         if (data.consoleMode) {
           setTestResult({ success: true, message: data.message, warning: true });
@@ -452,8 +458,8 @@ export default function ParametresPage() {
     const currentLangs = settings.languages.split(',').filter(l => l);
     if (currentLangs.includes(code)) {
       const newLangs = currentLangs.filter(l => l !== code);
-      setSettings({ 
-        ...settings, 
+      setSettings({
+        ...settings,
         languages: newLangs.join(','),
         default_language: settings.default_language === code ? newLangs[0] || 'fr' : settings.default_language
       });
@@ -474,15 +480,15 @@ export default function ParametresPage() {
     <>
       {/* Page Header */}
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-slate-800 dark:text-white">Paramètres</h1>
-        <p className="text-slate-500 dark:text-slate-400 mt-1">Configurez votre application QRTrans</p>
+        <h1 className="font-display text-2xl font-bold text-[var(--dash-ink)]">Paramètres</h1>
+        <p className="text-sm text-[var(--dash-muted)] mt-1">Configurez votre application QRTrans</p>
       </div>
       <div className="max-w-4xl mx-auto">
         {/* Header */}
-        <div className="flex items-center justify-end mb-8">
+        <div className="flex items-center justify-end mb-6">
           <button
             onClick={fetchSettings}
-            className="p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-xl transition-colors"
+            className="p-2 text-[var(--dash-muted)] hover:text-[var(--dash-ink)] hover:bg-[var(--dash-bg-3)] rounded-xl transition-colors"
           >
             <RefreshCw className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} />
           </button>
@@ -498,8 +504,8 @@ export default function ParametresPage() {
                 flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium
                 transition-all whitespace-nowrap
                 ${activeTab === tab.id
-                  ? 'bg-black text-white'
-                  : 'bg-white border border-slate-200 text-slate-600 hover:text-slate-800 hover:bg-slate-50 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-700'
+                  ? 'bg-[var(--dash-brand)] text-white shadow-md'
+                  : 'bg-[var(--dash-card)] border border-[var(--dash-border)] text-[var(--dash-ink-2)] hover:bg-[var(--dash-bg-3)]'
                 }
               `}
             >
@@ -512,7 +518,7 @@ export default function ParametresPage() {
         {/* Loading State */}
         {loading && (
           <div className="flex items-center justify-center py-20">
-            <RefreshCw className="w-8 h-8 text-[#ff7f00] animate-spin" />
+            <RefreshCw className="w-8 h-8 text-[var(--dash-brand)] animate-spin" />
           </div>
         )}
 
@@ -520,21 +526,21 @@ export default function ParametresPage() {
         {!loading && activeTab === 'company' && (
           <div className="space-y-6">
             {/* Logo Section */}
-            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6">
-              <h3 className="text-lg font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
-                <ImageIcon className="w-5 h-5 text-[#ff7f00]" />
+            <div className="dash-card p-6">
+              <h3 className="font-display text-lg font-bold text-[var(--dash-ink)] mb-4 flex items-center gap-2">
+                <ImageIcon className="w-5 h-5 text-[var(--dash-brand)]" />
                 Logo de l&apos;entreprise
               </h3>
               <div className="flex items-start gap-6">
-                <div className="w-32 h-32 bg-slate-100 dark:bg-slate-800 rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-700 flex items-center justify-center overflow-hidden">
+                <div className="w-32 h-32 bg-[var(--dash-bg-3)] rounded-2xl border-2 border-dashed border-[var(--dash-border)] flex items-center justify-center overflow-hidden">
                   {settings.company_logo ? (
                     <img src={settings.company_logo} alt="Logo" className="w-full h-full object-contain" />
                   ) : (
-                    <QrCode className="w-12 h-12 text-slate-300" />
+                    <QrCode className="w-12 h-12 text-[var(--dash-muted-2)]" />
                   )}
                 </div>
                 <div className="flex-1">
-                  <p className="text-slate-500 dark:text-slate-400 text-sm mb-3">
+                  <p className="text-[var(--dash-muted)] text-sm mb-3">
                     Uploadez le logo de votre entreprise. Format recommandé: PNG ou SVG, 200x200px minimum.
                   </p>
                   <label className="cursor-pointer">
@@ -544,7 +550,7 @@ export default function ParametresPage() {
                       onChange={handleLogoUpload}
                       className="hidden"
                     />
-                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl transition-colors">
+                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-[var(--dash-bg-3)] hover:bg-[var(--dash-border)] text-[var(--dash-ink-2)] rounded-xl transition-colors">
                       <Upload className="w-4 h-4" />
                       Choisir une image
                     </div>
@@ -552,7 +558,7 @@ export default function ParametresPage() {
                   {settings.company_logo && (
                     <button
                       onClick={() => setSettings({ ...settings, company_logo: '' })}
-                      className="ml-3 text-rose-500 hover:text-rose-600 text-sm"
+                      className="ml-3 text-red-500 hover:text-red-600 text-sm"
                     >
                       Supprimer
                     </button>
@@ -562,25 +568,25 @@ export default function ParametresPage() {
             </div>
 
             {/* Company Info */}
-            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6">
-              <h3 className="text-lg font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
-                <Building2 className="w-5 h-5 text-[#ff7f00]" />
+            <div className="dash-card p-6">
+              <h3 className="font-display text-lg font-bold text-[var(--dash-ink)] mb-4 flex items-center gap-2">
+                <Building2 className="w-5 h-5 text-[var(--dash-brand)]" />
                 Informations de l&apos;entreprise
               </h3>
               <div className="grid gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-2">
+                  <label className="block text-sm font-medium text-[var(--dash-muted)] mb-2">
                     Nom de l&apos;entreprise
                   </label>
                   <input
                     type="text"
                     value={settings.company_name}
                     onChange={(e) => setSettings({ ...settings, company_name: e.target.value })}
-                    className="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-[#ff7f00]"
+                    className="w-full px-4 py-3 bg-[var(--dash-card)] border border-[var(--dash-border)] rounded-xl text-[var(--dash-ink)] focus:outline-none focus:border-[var(--dash-brand)]"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-2">
+                  <label className="block text-sm font-medium text-[var(--dash-muted)] mb-2">
                     <MapPin className="w-4 h-4 inline mr-1" />
                     Adresse
                   </label>
@@ -588,12 +594,12 @@ export default function ParametresPage() {
                     type="text"
                     value={settings.company_address}
                     onChange={(e) => setSettings({ ...settings, company_address: e.target.value })}
-                    className="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-[#ff7f00]"
+                    className="w-full px-4 py-3 bg-[var(--dash-card)] border border-[var(--dash-border)] rounded-xl text-[var(--dash-ink)] focus:outline-none focus:border-[var(--dash-brand)]"
                   />
                 </div>
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-2">
+                    <label className="block text-sm font-medium text-[var(--dash-muted)] mb-2">
                       <Phone className="w-4 h-4 inline mr-1" />
                       Numéro de téléphone
                     </label>
@@ -601,11 +607,11 @@ export default function ParametresPage() {
                       type="tel"
                       value={settings.company_phone}
                       onChange={(e) => setSettings({ ...settings, company_phone: e.target.value })}
-                      className="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-[#ff7f00]"
+                      className="w-full px-4 py-3 bg-[var(--dash-card)] border border-[var(--dash-border)] rounded-xl text-[var(--dash-ink)] focus:outline-none focus:border-[var(--dash-brand)]"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-2">
+                    <label className="block text-sm font-medium text-[var(--dash-muted)] mb-2">
                       <Mail className="w-4 h-4 inline mr-1" />
                       Email
                     </label>
@@ -613,7 +619,7 @@ export default function ParametresPage() {
                       type="email"
                       value={settings.company_email}
                       onChange={(e) => setSettings({ ...settings, company_email: e.target.value })}
-                      className="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-[#ff7f00]"
+                      className="w-full px-4 py-3 bg-[var(--dash-card)] border border-[var(--dash-border)] rounded-xl text-[var(--dash-ink)] focus:outline-none focus:border-[var(--dash-brand)]"
                     />
                   </div>
                 </div>
@@ -626,21 +632,21 @@ export default function ParametresPage() {
         {!loading && activeTab === 'seo' && (
           <div className="space-y-6">
             {/* SEO Image */}
-            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6">
-              <h3 className="text-lg font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
-                <ImageIcon className="w-5 h-5 text-[#ff7f00]" />
+            <div className="dash-card p-6">
+              <h3 className="font-display text-lg font-bold text-[var(--dash-ink)] mb-4 flex items-center gap-2">
+                <ImageIcon className="w-5 h-5 text-[var(--dash-brand)]" />
                 Image SEO (Open Graph)
               </h3>
               <div className="flex items-start gap-6">
-                <div className="w-48 h-32 bg-slate-100 dark:bg-slate-800 rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-700 flex items-center justify-center overflow-hidden">
+                <div className="w-48 h-32 bg-[var(--dash-bg-3)] rounded-2xl border-2 border-dashed border-[var(--dash-border)] flex items-center justify-center overflow-hidden">
                   {settings.seo_image ? (
                     <img src={settings.seo_image} alt="SEO" className="w-full h-full object-cover" />
                   ) : (
-                    <ImageIcon className="w-10 h-10 text-slate-300" />
+                    <ImageIcon className="w-10 h-10 text-[var(--dash-muted-2)]" />
                   )}
                 </div>
                 <div className="flex-1">
-                  <p className="text-slate-500 dark:text-slate-400 text-sm mb-3">
+                  <p className="text-[var(--dash-muted)] text-sm mb-3">
                     Image affichée lors du partage sur les réseaux sociaux. Recommandé: 1200x630px.
                   </p>
                   <label className="cursor-pointer">
@@ -650,7 +656,7 @@ export default function ParametresPage() {
                       onChange={handleSeoImageUpload}
                       className="hidden"
                     />
-                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl transition-colors">
+                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-[var(--dash-bg-3)] hover:bg-[var(--dash-border)] text-[var(--dash-ink-2)] rounded-xl transition-colors">
                       <Upload className="w-4 h-4" />
                       Choisir une image
                     </div>
@@ -658,7 +664,7 @@ export default function ParametresPage() {
                   {settings.seo_image && (
                     <button
                       onClick={() => setSettings({ ...settings, seo_image: '' })}
-                      className="ml-3 text-rose-500 hover:text-rose-600 text-sm"
+                      className="ml-3 text-red-500 hover:text-red-600 text-sm"
                     >
                       Supprimer
                     </button>
@@ -668,49 +674,49 @@ export default function ParametresPage() {
             </div>
 
             {/* SEO Info */}
-            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6">
-              <h3 className="text-lg font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
-                <Search className="w-5 h-5 text-[#ff7f00]" />
+            <div className="dash-card p-6">
+              <h3 className="font-display text-lg font-bold text-[var(--dash-ink)] mb-4 flex items-center gap-2">
+                <Search className="w-5 h-5 text-[var(--dash-brand)]" />
                 Référencement (SEO)
               </h3>
               <div className="grid gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-2">
+                  <label className="block text-sm font-medium text-[var(--dash-muted)] mb-2">
                     Titre SEO
                   </label>
                   <input
                     type="text"
                     value={settings.seo_title}
                     onChange={(e) => setSettings({ ...settings, seo_title: e.target.value })}
-                    className="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-[#ff7f00]"
+                    className="w-full px-4 py-3 bg-[var(--dash-card)] border border-[var(--dash-border)] rounded-xl text-[var(--dash-ink)] focus:outline-none focus:border-[var(--dash-brand)]"
                   />
-                  <p className="text-slate-400 text-xs mt-1">
+                  <p className="text-[var(--dash-muted-2)] text-xs mt-1">
                     {settings.seo_title.length}/60 caractères (recommandé)
                   </p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-2">
+                  <label className="block text-sm font-medium text-[var(--dash-muted)] mb-2">
                     Description SEO
                   </label>
                   <textarea
                     value={settings.seo_description}
                     onChange={(e) => setSettings({ ...settings, seo_description: e.target.value })}
                     rows={3}
-                    className="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-[#ff7f00] resize-none"
+                    className="w-full px-4 py-3 bg-[var(--dash-card)] border border-[var(--dash-border)] rounded-xl text-[var(--dash-ink)] focus:outline-none focus:border-[var(--dash-brand)] resize-none"
                   />
-                  <p className="text-slate-400 text-xs mt-1">
+                  <p className="text-[var(--dash-muted-2)] text-xs mt-1">
                     {settings.seo_description.length}/160 caractères (recommandé)
                   </p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-2">
+                  <label className="block text-sm font-medium text-[var(--dash-muted)] mb-2">
                     Mots-clés (séparés par des virgules)
                   </label>
                   <input
                     type="text"
                     value={settings.seo_keywords}
                     onChange={(e) => setSettings({ ...settings, seo_keywords: e.target.value })}
-                    className="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-[#ff7f00]"
+                    className="w-full px-4 py-3 bg-[var(--dash-card)] border border-[var(--dash-border)] rounded-xl text-[var(--dash-ink)] focus:outline-none focus:border-[var(--dash-brand)]"
                   />
                 </div>
               </div>
@@ -722,9 +728,9 @@ export default function ParametresPage() {
         {!loading && activeTab === 'localization' && (
           <div className="space-y-6">
             {/* Currency */}
-            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6">
-              <h3 className="text-lg font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
-                <DollarSign className="w-5 h-5 text-[#ff7f00]" />
+            <div className="dash-card p-6">
+              <h3 className="font-display text-lg font-bold text-[var(--dash-ink)] mb-4 flex items-center gap-2">
+                <DollarSign className="w-5 h-5 text-[var(--dash-brand)]" />
                 Devise
               </h3>
               <div className="grid md:grid-cols-2 gap-4">
@@ -735,17 +741,17 @@ export default function ParametresPage() {
                     className={`
                       flex items-center gap-3 p-4 rounded-2xl border transition-all
                       ${settings.currency === currency.code
-                        ? 'border-[#ff7f00] bg-[#ff7f00]/10 text-slate-800 dark:text-white'
-                        : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 text-slate-600 dark:text-slate-400 hover:text-slate-800'
+                        ? 'border-[var(--dash-brand)] bg-[var(--dash-brand-soft)] text-[var(--dash-ink)]'
+                        : 'border-[var(--dash-border)] hover:border-[var(--dash-border-strong)] text-[var(--dash-muted)] hover:text-[var(--dash-ink-2)]'
                       }
                     `}
                   >
-                    <span className="w-10 h-10 bg-slate-100 dark:bg-slate-800 rounded-xl flex items-center justify-center text-lg font-bold">
+                    <span className="w-10 h-10 bg-[var(--dash-bg-3)] rounded-xl flex items-center justify-center text-lg font-bold">
                       {currency.symbol}
                     </span>
                     <span className="text-sm">{currency.name}</span>
                     {settings.currency === currency.code && (
-                      <CheckCircle className="w-5 h-5 text-[#ff7f00] ml-auto" />
+                      <CheckCircle className="w-5 h-5 text-[var(--dash-brand)] ml-auto" />
                     )}
                   </button>
                 ))}
@@ -753,9 +759,9 @@ export default function ParametresPage() {
             </div>
 
             {/* Languages */}
-            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6">
-              <h3 className="text-lg font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
-                <Languages className="w-5 h-5 text-[#ff7f00]" />
+            <div className="dash-card p-6">
+              <h3 className="font-display text-lg font-bold text-[var(--dash-ink)] mb-4 flex items-center gap-2">
+                <Languages className="w-5 h-5 text-[var(--dash-brand)]" />
                 Langues disponibles
               </h3>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-6">
@@ -769,15 +775,15 @@ export default function ParametresPage() {
                       className={`
                         flex items-center gap-3 p-3 rounded-2xl border transition-all
                         ${isActive
-                          ? 'border-[#ff7f00] bg-[#ff7f00]/10 text-slate-800 dark:text-white'
-                          : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 text-slate-400 dark:text-slate-500 hover:text-slate-600'
+                          ? 'border-[var(--dash-brand)] bg-[var(--dash-brand-soft)] text-[var(--dash-ink)]'
+                          : 'border-[var(--dash-border)] hover:border-[var(--dash-border-strong)] text-[var(--dash-muted-2)] hover:text-[var(--dash-muted)]'
                         }
                       `}
                     >
-                      <span className="text-xl">{lang.flag}</span>
+                      <Globe className="w-4 h-4 shrink-0" />
                       <span className="text-sm">{lang.name}</span>
                       {isDefault && (
-                        <span className="ml-auto text-[10px] bg-black text-white px-1.5 py-0.5 rounded font-bold">
+                        <span className="ml-auto text-[10px] bg-[var(--dash-brand)] text-white px-1.5 py-0.5 rounded font-bold">
                           Défaut
                         </span>
                       )}
@@ -786,18 +792,18 @@ export default function ParametresPage() {
                 })}
               </div>
 
-              <div className="border-t border-slate-200 dark:border-slate-700 pt-4">
-                <label className="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-2">
+              <div className="border-t border-[var(--dash-border)] pt-4">
+                <label className="block text-sm font-medium text-[var(--dash-muted)] mb-2">
                   Langue par défaut
                 </label>
                 <select
                   value={settings.default_language}
                   onChange={(e) => setSettings({ ...settings, default_language: e.target.value })}
-                  className="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-[#ff7f00]"
+                  className="w-full px-4 py-3 bg-[var(--dash-card)] border border-[var(--dash-border)] rounded-xl text-[var(--dash-ink)] focus:outline-none focus:border-[var(--dash-brand)]"
                 >
                   {AVAILABLE_LANGUAGES.filter(lang => settings.languages.split(',').includes(lang.code)).map((lang) => (
                     <option key={lang.code} value={lang.code}>
-                      {lang.flag} {lang.name}
+                      {lang.name}
                     </option>
                   ))}
                 </select>
@@ -810,48 +816,53 @@ export default function ParametresPage() {
         {!loading && activeTab === 'email' && (
           <div className="space-y-6">
             {/* Provider Selection */}
-            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6">
-              <h3 className="text-lg font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
-                <Server className="w-5 h-5 text-[#ff7f00]" />
+            <div className="dash-card p-6">
+              <h3 className="font-display text-lg font-bold text-[var(--dash-ink)] mb-4 flex items-center gap-2">
+                <Server className="w-5 h-5 text-[var(--dash-brand)]" />
                 Fournisseur Email
               </h3>
               <div className="grid md:grid-cols-2 gap-4">
-                {EMAIL_PROVIDERS.map((provider) => (
-                  <button
-                    key={provider.id}
-                    onClick={() => setEmailSettings({ ...emailSettings, provider: provider.id })}
-                    className={`
-                      flex items-start gap-4 p-4 rounded-2xl border transition-all text-left
-                      ${emailSettings.provider === provider.id
-                        ? 'border-[#ff7f00] bg-[#ff7f00]/10'
-                        : 'border-slate-200 dark:border-slate-700 hover:border-slate-300'
-                      }
-                    `}
-                  >
-                    <span className="text-2xl">{provider.icon}</span>
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2">
-                        <h4 className="text-slate-800 dark:text-white font-semibold">{provider.name}</h4>
-                        {emailSettings.provider === provider.id && (
-                          <CheckCircle className="w-5 h-5 text-[#ff7f00]" />
-                        )}
+                {EMAIL_PROVIDERS.map((provider) => {
+                  const Icon = provider.icon;
+                  return (
+                    <button
+                      key={provider.id}
+                      onClick={() => setEmailSettings({ ...emailSettings, provider: provider.id })}
+                      className={`
+                        flex items-start gap-4 p-4 rounded-2xl border transition-all text-left
+                        ${emailSettings.provider === provider.id
+                          ? 'border-[var(--dash-brand)] bg-[var(--dash-brand-soft)]'
+                          : 'border-[var(--dash-border)] hover:border-[var(--dash-border-strong)]'
+                        }
+                      `}
+                    >
+                      <span className="w-10 h-10 rounded-xl bg-[var(--dash-bg-3)] flex items-center justify-center shrink-0">
+                        <Icon className="w-5 h-5 text-[var(--dash-brand)]" />
+                      </span>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <h4 className="text-[var(--dash-ink)] font-semibold">{provider.name}</h4>
+                          {emailSettings.provider === provider.id && (
+                            <CheckCircle className="w-5 h-5 text-[var(--dash-brand)]" />
+                          )}
+                        </div>
+                        <p className="text-[var(--dash-muted)] text-sm mt-1">{provider.description}</p>
                       </div>
-                      <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">{provider.description}</p>
-                    </div>
-                  </button>
-                ))}
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
             {/* Sender Settings */}
-            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6">
-              <h3 className="text-lg font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
-                <Mail className="w-5 h-5 text-[#ff7f00]" />
+            <div className="dash-card p-6">
+              <h3 className="font-display text-lg font-bold text-[var(--dash-ink)] mb-4 flex items-center gap-2">
+                <Mail className="w-5 h-5 text-[var(--dash-brand)]" />
                 Expéditeur
               </h3>
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-2">
+                  <label className="block text-sm font-medium text-[var(--dash-muted)] mb-2">
                     Email expéditeur
                   </label>
                   <input
@@ -859,11 +870,11 @@ export default function ParametresPage() {
                     value={emailSettings.fromEmail}
                     onChange={(e) => setEmailSettings({ ...emailSettings, fromEmail: e.target.value })}
                     placeholder="noreply@votredomaine.com"
-                    className="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-[#ff7f00]"
+                    className="w-full px-4 py-3 bg-[var(--dash-card)] border border-[var(--dash-border)] rounded-xl text-[var(--dash-ink)] focus:outline-none focus:border-[var(--dash-brand)]"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-2">
+                  <label className="block text-sm font-medium text-[var(--dash-muted)] mb-2">
                     Nom affiché
                   </label>
                   <input
@@ -871,19 +882,19 @@ export default function ParametresPage() {
                     value={emailSettings.fromName}
                     onChange={(e) => setEmailSettings({ ...emailSettings, fromName: e.target.value })}
                     placeholder="QRTrans"
-                    className="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-[#ff7f00]"
+                    className="w-full px-4 py-3 bg-[var(--dash-card)] border border-[var(--dash-border)] rounded-xl text-[var(--dash-ink)] focus:outline-none focus:border-[var(--dash-brand)]"
                   />
                 </div>
               </div>
             </div>
 
             {/* Email Destination — 2 Sub-Tabs */}
-            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6">
-              <h3 className="text-lg font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
-                <Bell className="w-5 h-5 text-[#ff7f00]" />
+            <div className="dash-card p-6">
+              <h3 className="font-display text-lg font-bold text-[var(--dash-ink)] mb-4 flex items-center gap-2">
+                <Bell className="w-5 h-5 text-[var(--dash-brand)]" />
                 Destinataire des notifications
               </h3>
-              <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
+              <p className="text-sm text-[var(--dash-muted)] mb-4">
                 Sélectionnez un mode pour configurer l&apos;email de destination des notifications.
               </p>
 
@@ -893,13 +904,13 @@ export default function ParametresPage() {
                   onClick={() => setEmailSubTab('colis')}
                   className={`flex items-center gap-2 px-5 py-3 rounded-xl font-medium transition-all text-sm ${
                     emailSubTab === 'colis'
-                      ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/25'
-                      : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
+                      ? 'bg-[var(--dash-emerald)] text-white shadow-md'
+                      : 'bg-[var(--dash-bg-3)] text-[var(--dash-ink-2)] hover:bg-[var(--dash-border)]'
                   }`}
                 >
                   <Package className="w-4 h-4" />
                   Colis
-                  <span className={`text-xs px-2 py-0.5 rounded-full ${emailSubTab === 'colis' ? 'bg-white/20' : 'bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400'}`}>
+                  <span className={`text-xs px-2 py-0.5 rounded-full ${emailSubTab === 'colis' ? 'bg-white/20' : 'bg-[var(--dash-emerald-soft)] text-[var(--dash-emerald)]'}`}>
                     Opérationnel
                   </span>
                 </button>
@@ -907,13 +918,13 @@ export default function ParametresPage() {
                   onClick={() => setEmailSubTab('system')}
                   className={`flex items-center gap-2 px-5 py-3 rounded-xl font-medium transition-all text-sm ${
                     emailSubTab === 'system'
-                      ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/25'
-                      : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
+                      ? 'bg-[var(--dash-brand)] text-white shadow-md'
+                      : 'bg-[var(--dash-bg-3)] text-[var(--dash-ink-2)] hover:bg-[var(--dash-border)]'
                   }`}
                 >
                   <Settings className="w-4 h-4" />
                   Système
-                  <span className={`text-xs px-2 py-0.5 rounded-full ${emailSubTab === 'system' ? 'bg-white/20' : 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400'}`}>
+                  <span className={`text-xs px-2 py-0.5 rounded-full ${emailSubTab === 'system' ? 'bg-white/20' : 'bg-[var(--dash-brand-soft)] text-[var(--dash-brand)]'}`}>
                     Admin
                   </span>
                 </button>
@@ -923,7 +934,7 @@ export default function ParametresPage() {
               {emailSubTab === 'colis' && (
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-2">
+                    <label className="block text-sm font-medium text-[var(--dash-muted)] mb-2">
                       Email de destination — Notifications Colis
                     </label>
                     <input
@@ -931,32 +942,35 @@ export default function ParametresPage() {
                       value={emailSettings.recipientColisEmail || ''}
                       onChange={(e) => setEmailSettings({ ...emailSettings, recipientColisEmail: e.target.value || null })}
                       placeholder="colis@votredomaine.com"
-                      className="w-full px-4 py-3 bg-white dark:bg-slate-800 border-2 border-orange-300 dark:border-orange-700 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-orange-500 transition-colors"
+                      className="w-full px-4 py-3 bg-[var(--dash-card)] border-2 border-[var(--dash-emerald)] rounded-xl text-[var(--dash-ink)] focus:outline-none focus:border-[var(--dash-emerald)] transition-colors"
                     />
                   </div>
-                  <div className="bg-orange-50 dark:bg-orange-500/10 border border-orange-200 dark:border-orange-800 rounded-xl p-4">
-                    <p className="text-sm font-medium text-orange-700 dark:text-orange-300 mb-3">
+                  <div className="bg-[var(--dash-emerald-soft)] border border-[var(--dash-emerald)] rounded-xl p-4">
+                    <p className="text-sm font-medium text-[var(--dash-emerald)] mb-3">
                       Cet email reçoit les notifications suivantes :
                     </p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                       {[
-                        { icon: '🚀', label: 'Colis activé', desc: 'Quand un colis est activé et en transit' },
-                        { icon: '✅', label: 'Colis livré', desc: 'Livraison confirmée (chauffeur ou PIN)' },
-                        { icon: '🚨', label: 'Colis perdu', desc: 'Signalement de colis perdu' },
-                        { icon: '🔍', label: 'Colis retrouvé', desc: 'Colis précédemment perdu et retrouvé' },
-                      ].map((item) => (
-                        <div key={item.label} className="flex items-start gap-2">
-                          <span className="text-base mt-0.5">{item.icon}</span>
-                          <div>
-                            <p className="text-sm font-medium text-slate-700 dark:text-slate-300">{item.label}</p>
-                            <p className="text-xs text-slate-500 dark:text-slate-400">{item.desc}</p>
+                        { icon: Rocket, label: 'Colis activé', desc: 'Quand un colis est activé et en transit' },
+                        { icon: CheckCircle, label: 'Colis livré', desc: 'Livraison confirmée (chauffeur ou PIN)' },
+                        { icon: ShieldAlert, label: 'Colis perdu', desc: 'Signalement de colis perdu' },
+                        { icon: SearchIcon, label: 'Colis retrouvé', desc: 'Colis précédemment perdu et retrouvé' },
+                      ].map((item) => {
+                        const Icon = item.icon;
+                        return (
+                          <div key={item.label} className="flex items-start gap-2">
+                            <Icon className="w-4 h-4 text-[var(--dash-emerald)] mt-0.5 shrink-0" />
+                            <div>
+                              <p className="text-sm font-medium text-[var(--dash-ink-2)]">{item.label}</p>
+                              <p className="text-xs text-[var(--dash-muted)]">{item.desc}</p>
+                            </div>
                           </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   </div>
                   {emailSettings.recipientColisEmail && (
-                    <div className="flex items-center gap-2 text-sm text-emerald-600 dark:text-emerald-400">
+                    <div className="flex items-center gap-2 text-sm text-[var(--dash-emerald)]">
                       <CheckCircle className="w-4 h-4" />
                       <span>Les notifications colis seront envoyées à <strong>{emailSettings.recipientColisEmail}</strong></span>
                     </div>
@@ -968,7 +982,7 @@ export default function ParametresPage() {
               {emailSubTab === 'system' && (
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-2">
+                    <label className="block text-sm font-medium text-[var(--dash-muted)] mb-2">
                       Email de destination — Notifications Système
                     </label>
                     <input
@@ -976,32 +990,35 @@ export default function ParametresPage() {
                       value={emailSettings.recipientSystemEmail || ''}
                       onChange={(e) => setEmailSettings({ ...emailSettings, recipientSystemEmail: e.target.value || null })}
                       placeholder="admin@votredomaine.com"
-                      className="w-full px-4 py-3 bg-white dark:bg-slate-800 border-2 border-blue-300 dark:border-blue-700 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-blue-500 transition-colors"
+                      className="w-full px-4 py-3 bg-[var(--dash-card)] border-2 border-[var(--dash-brand)] rounded-xl text-[var(--dash-ink)] focus:outline-none focus:border-[var(--dash-brand)] transition-colors"
                     />
                   </div>
-                  <div className="bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-800 rounded-xl p-4">
-                    <p className="text-sm font-medium text-blue-700 dark:text-blue-300 mb-3">
+                  <div className="bg-[var(--dash-brand-soft)] border border-[var(--dash-brand)] rounded-xl p-4">
+                    <p className="text-sm font-medium text-[var(--dash-brand)] mb-3">
                       Cet email reçoit les notifications suivantes :
                     </p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                       {[
-                        { icon: '🏢', label: 'Nouvelle agence', desc: 'Création d\'une agence partenaire' },
-                        { icon: '🆕', label: 'Nouveau lead CRM', desc: 'Nouveau prospect ajouté' },
-                        { icon: '💬', label: 'Message agence', desc: 'Message envoyé par une agence' },
-                        { icon: '👤', label: 'Inscription partenaire', desc: 'Nouveau partenaire inscrit' },
-                      ].map((item) => (
-                        <div key={item.label} className="flex items-start gap-2">
-                          <span className="text-base mt-0.5">{item.icon}</span>
-                          <div>
-                            <p className="text-sm font-medium text-slate-700 dark:text-slate-300">{item.label}</p>
-                            <p className="text-xs text-slate-500 dark:text-slate-400">{item.desc}</p>
+                        { icon: Building, label: 'Nouvelle agence', desc: 'Création d\'une agence partenaire' },
+                        { icon: UserPlus, label: 'Nouveau lead CRM', desc: 'Nouveau prospect ajouté' },
+                        { icon: MessageSquare, label: 'Message agence', desc: 'Message envoyé par une agence' },
+                        { icon: UserPlus, label: 'Inscription partenaire', desc: 'Nouveau partenaire inscrit' },
+                      ].map((item) => {
+                        const Icon = item.icon;
+                        return (
+                          <div key={item.label} className="flex items-start gap-2">
+                            <Icon className="w-4 h-4 text-[var(--dash-brand)] mt-0.5 shrink-0" />
+                            <div>
+                              <p className="text-sm font-medium text-[var(--dash-ink-2)]">{item.label}</p>
+                              <p className="text-xs text-[var(--dash-muted)]">{item.desc}</p>
+                            </div>
                           </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   </div>
                   {emailSettings.recipientSystemEmail && (
-                    <div className="flex items-center gap-2 text-sm text-emerald-600 dark:text-emerald-400">
+                    <div className="flex items-center gap-2 text-sm text-[var(--dash-emerald)]">
                       <CheckCircle className="w-4 h-4" />
                       <span>Les notifications système seront envoyées à <strong>{emailSettings.recipientSystemEmail}</strong></span>
                     </div>
@@ -1012,15 +1029,15 @@ export default function ParametresPage() {
 
             {/* SMTP Settings - Only show when SMTP is selected */}
             {emailSettings.provider === 'smtp' && (
-              <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6">
-                <h3 className="text-lg font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
-                  <Server className="w-5 h-5 text-[#ff7f00]" />
+              <div className="dash-card p-6">
+                <h3 className="font-display text-lg font-bold text-[var(--dash-ink)] mb-4 flex items-center gap-2">
+                  <Server className="w-5 h-5 text-[var(--dash-brand)]" />
                   Configuration SMTP
                 </h3>
                 <div className="grid gap-4">
                   <div className="grid md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-2">
+                      <label className="block text-sm font-medium text-[var(--dash-muted)] mb-2">
                         Serveur SMTP (Hôte)
                       </label>
                       <input
@@ -1028,11 +1045,11 @@ export default function ParametresPage() {
                         value={emailSettings.smtpHost || ''}
                         onChange={(e) => setEmailSettings({ ...emailSettings, smtpHost: e.target.value || null })}
                         placeholder="smtp.example.com"
-                        className="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-[#ff7f00]"
+                        className="w-full px-4 py-3 bg-[var(--dash-card)] border border-[var(--dash-border)] rounded-xl text-[var(--dash-ink)] focus:outline-none focus:border-[var(--dash-brand)]"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-2">
+                      <label className="block text-sm font-medium text-[var(--dash-muted)] mb-2">
                         Port
                       </label>
                       <input
@@ -1040,13 +1057,13 @@ export default function ParametresPage() {
                         value={emailSettings.smtpPort || ''}
                         onChange={(e) => setEmailSettings({ ...emailSettings, smtpPort: e.target.value ? parseInt(e.target.value) : null })}
                         placeholder="587"
-                        className="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-[#ff7f00]"
+                        className="w-full px-4 py-3 bg-[var(--dash-card)] border border-[var(--dash-border)] rounded-xl text-[var(--dash-ink)] focus:outline-none focus:border-[var(--dash-brand)]"
                       />
                     </div>
                   </div>
                   <div className="grid md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-2">
+                      <label className="block text-sm font-medium text-[var(--dash-muted)] mb-2">
                         Nom d&apos;utilisateur
                       </label>
                       <input
@@ -1054,11 +1071,11 @@ export default function ParametresPage() {
                         value={emailSettings.smtpUser || ''}
                         onChange={(e) => setEmailSettings({ ...emailSettings, smtpUser: e.target.value || null })}
                         placeholder="user@example.com"
-                        className="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-[#ff7f00]"
+                        className="w-full px-4 py-3 bg-[var(--dash-card)] border border-[var(--dash-border)] rounded-xl text-[var(--dash-ink)] focus:outline-none focus:border-[var(--dash-brand)]"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-2">
+                      <label className="block text-sm font-medium text-[var(--dash-muted)] mb-2">
                         Mot de passe
                       </label>
                       <div className="relative">
@@ -1067,12 +1084,12 @@ export default function ParametresPage() {
                           value={emailSettings.smtpPassword || ''}
                           onChange={(e) => setEmailSettings({ ...emailSettings, smtpPassword: e.target.value || null })}
                           placeholder="••••••••"
-                          className="w-full px-4 py-3 pr-12 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-[#ff7f00]"
+                          className="w-full px-4 py-3 pr-12 bg-[var(--dash-card)] border border-[var(--dash-border)] rounded-xl text-[var(--dash-ink)] focus:outline-none focus:border-[var(--dash-brand)]"
                         />
                         <button
                           type="button"
                           onClick={() => setShowPassword(!showPassword)}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--dash-muted)] hover:text-[var(--dash-ink-2)]"
                         >
                           {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                         </button>
@@ -1080,7 +1097,7 @@ export default function ParametresPage() {
                     </div>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-2">
+                    <label className="block text-sm font-medium text-[var(--dash-muted)] mb-2">
                       Chiffrement
                     </label>
                     <div className="flex gap-3">
@@ -1091,8 +1108,8 @@ export default function ParametresPage() {
                           className={`
                             px-4 py-2 rounded-xl border transition-all text-sm
                             ${emailSettings.smtpEncryption === option.id
-                              ? 'border-[#ff7f00] bg-[#ff7f00]/10 text-slate-800 dark:text-white'
-                              : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 text-slate-600 dark:text-slate-400'
+                              ? 'border-[var(--dash-brand)] bg-[var(--dash-brand-soft)] text-[var(--dash-ink)]'
+                              : 'border-[var(--dash-border)] hover:border-[var(--dash-border-strong)] text-[var(--dash-muted)]'
                             }
                           `}
                         >
@@ -1106,9 +1123,9 @@ export default function ParametresPage() {
             )}
 
             {/* Test Email Section */}
-            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6">
-              <h3 className="text-lg font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
-                <Send className="w-5 h-5 text-[#ff7f00]" />
+            <div className="dash-card p-6">
+              <h3 className="font-display text-lg font-bold text-[var(--dash-ink)] mb-4 flex items-center gap-2">
+                <Send className="w-5 h-5 text-[var(--dash-brand)]" />
                 Tester la configuration
               </h3>
               <div className="flex gap-4">
@@ -1117,12 +1134,12 @@ export default function ParametresPage() {
                   value={testEmail}
                   onChange={(e) => setTestEmail(e.target.value)}
                   placeholder="votre@email.com"
-                  className="flex-1 px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-[#ff7f00]"
+                  className="flex-1 px-4 py-3 bg-[var(--dash-card)] border border-[var(--dash-border)] rounded-xl text-[var(--dash-ink)] focus:outline-none focus:border-[var(--dash-brand)]"
                 />
                 <button
                   onClick={handleTestEmail}
                   disabled={sendingTest}
-                  className="flex items-center gap-2 px-6 py-3 bg-[#ff7f00] text-white rounded-xl font-medium hover:bg-[#ff6600] transition-colors disabled:opacity-50"
+                  className="btn-brand btn-magnetic inline-flex items-center gap-2 px-6 py-3 rounded-xl font-medium disabled:opacity-50"
                 >
                   {sendingTest ? (
                     <>
@@ -1137,28 +1154,28 @@ export default function ParametresPage() {
                   )}
                 </button>
               </div>
-              
+
               {/* Test Result */}
               {testResult && (
                 <div className={`mt-4 p-4 rounded-xl flex items-start gap-3 ${
                   testResult.warning
                     ? 'bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-800'
-                    : testResult.success 
-                    ? 'bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-800' 
+                    : testResult.success
+                    ? 'bg-[var(--dash-emerald-soft)] border border-[var(--dash-emerald)]'
                     : 'bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-800'
                 }`}>
                   {testResult.warning ? (
                     <AlertCircle className="w-5 h-5 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
                   ) : testResult.success ? (
-                    <CheckCircle className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                    <CheckCircle className="w-5 h-5 text-[var(--dash-emerald)]" />
                   ) : (
                     <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400" />
                   )}
                   <span className={`text-sm ${
-                    testResult.warning 
-                      ? 'text-amber-800 dark:text-amber-200' 
-                      : testResult.success 
-                      ? 'text-emerald-800 dark:text-emerald-200' 
+                    testResult.warning
+                      ? 'text-amber-800 dark:text-amber-200'
+                      : testResult.success
+                      ? 'text-[var(--dash-emerald)]'
                       : 'text-red-800 dark:text-red-200'
                   }`}>
                     {testResult.message}
@@ -1179,9 +1196,9 @@ export default function ParametresPage() {
                 </div>
               )}
               {emailSaved && (
-                <div className="p-3 rounded-xl flex items-center gap-2 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-800">
-                  <CheckCircle className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-                  <span className="text-sm text-emerald-800 dark:text-emerald-200">Configuration email enregistrée avec succès !</span>
+                <div className="p-3 rounded-xl flex items-center gap-2 bg-[var(--dash-emerald-soft)] border border-[var(--dash-emerald)]">
+                  <CheckCircle className="w-5 h-5 text-[var(--dash-emerald)]" />
+                  <span className="text-sm text-[var(--dash-emerald)]">Configuration email enregistrée avec succès !</span>
                 </div>
               )}
               <div className="flex justify-end">
@@ -1191,8 +1208,8 @@ export default function ParametresPage() {
                   className={`
                     flex items-center gap-2 px-6 py-3 rounded-2xl font-bold shadow-lg transition-all
                     ${emailSaving
-                      ? 'bg-slate-400 text-white cursor-wait'
-                      : 'bg-black text-white hover:bg-slate-800 hover:scale-105 active:scale-95'
+                      ? 'bg-[var(--dash-muted-2)] text-white cursor-wait'
+                      : 'btn-brand btn-magnetic'
                     }
                   `}
                 >
@@ -1229,8 +1246,8 @@ export default function ParametresPage() {
               className={`
                 flex items-center gap-2 px-6 py-3 rounded-2xl font-bold shadow-lg transition-all
                 ${saved
-                  ? 'bg-emerald-600 text-white'
-                  : 'bg-black text-white hover:bg-slate-800 hover:scale-105'
+                  ? 'bg-[var(--dash-emerald)] text-white'
+                  : 'btn-brand btn-magnetic'
                 }
               `}
             >

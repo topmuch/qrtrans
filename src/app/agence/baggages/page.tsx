@@ -14,10 +14,13 @@ import {
   X,
   Plus,
   Filter,
-  AlertOctagon
+  AlertOctagon,
+  PackageCheck,
+  Truck,
 } from "lucide-react";
 import { useAgency } from '../layout';
 import { isActive, isPending, isLost, isInTransit, isDelivered } from '@/lib/status';
+import KpiCard from '@/components/dashboard/KpiCard';
 
 interface Baggage {
   id: string;
@@ -57,7 +60,7 @@ export default function BaggagesPage() {
   const [statusFilter, setStatusFilter] = useState('all');
   const [selectedBaggage, setSelectedBaggage] = useState<Baggage | null>(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
-  const [actionLoading, setActionLoading] = useState<string | null>(null); // Track which baggage action is loading
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
 
   useEffect(() => {
     fetchBaggages();
@@ -101,8 +104,6 @@ export default function BaggagesPage() {
     setFilteredBaggages(filtered);
   };
 
-  // AGENCY-FIX: Split filtered baggages into in_transit/delivered, activated, and pending sections
-  // Include lost/found/blocked/in_transit/delivered in activated so NO baggage vanishes from UI
   const transitBaggages = filteredBaggages.filter(b =>
     isInTransit(b.status) || isDelivered(b.status)
   );
@@ -110,7 +111,6 @@ export default function BaggagesPage() {
     (isActive(b.status) || b.travelerFirstName !== null || b.status === 'lost' || b.status === 'found' || b.status === 'blocked')
     && !isInTransit(b.status) && !isDelivered(b.status)
   );
-  // Check BOTH travelerFirstName AND travelerLastName for null
   const pendingBaggages = filteredBaggages.filter(b =>
     isPending(b.status) && b.travelerFirstName === null && b.travelerLastName === null
   );
@@ -138,9 +138,8 @@ export default function BaggagesPage() {
     });
   };
 
-  // Handle Declare Lost
   const handleDeclareLost = async (baggageId: string) => {
-    if (!confirm('⚠️ Êtes-vous sûr de vouloir déclarer ce colis comme perdu ?\n\nUne alerte sera envoyée au SuperAdmin.')) return;
+    if (!confirm('Êtes-vous sûr de vouloir déclarer ce colis comme perdu ? Une alerte sera envoyée au SuperAdmin.')) return;
 
     setActionLoading(baggageId);
     try {
@@ -150,8 +149,7 @@ export default function BaggagesPage() {
       const data = await response.json();
 
       if (response.ok) {
-        // Update local state
-        setBaggages(prev => prev.map(b => 
+        setBaggages(prev => prev.map(b =>
           b.id === baggageId ? { ...b, status: 'lost' } : b
         ));
         setShowDetailModal(false);
@@ -167,9 +165,8 @@ export default function BaggagesPage() {
     }
   };
 
-  // Handle Mark Found
   const handleMarkFound = async (baggageId: string) => {
-    if (!confirm('✅ Marquer ce colis comme retrouvé ?')) return;
+    if (!confirm('Marquer ce colis comme retrouvé ?')) return;
 
     setActionLoading(baggageId);
     try {
@@ -179,8 +176,7 @@ export default function BaggagesPage() {
       const data = await response.json();
 
       if (response.ok) {
-        // Update local state
-        setBaggages(prev => prev.map(b => 
+        setBaggages(prev => prev.map(b =>
           b.id === baggageId ? { ...b, status: 'found' } : b
         ));
         setShowDetailModal(false);
@@ -197,24 +193,32 @@ export default function BaggagesPage() {
   };
 
   const getStatusBadge = (status: string) => {
-    const statusConfig: Record<string, { label: string; className: string }> = {
-      pending_activation: { label: 'En attente', className: 'bg-amber-100 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400' },
-      active: { label: 'Actif', className: 'bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400' },
-      scanned: { label: 'Scanné', className: 'bg-blue-100 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400' },
-      in_transit: { label: 'En transit', className: 'bg-orange-100 dark:bg-orange-500/10 text-orange-700 dark:text-orange-400' },
-      delivered: { label: 'Livré', className: 'bg-green-100 dark:bg-green-500/10 text-green-700 dark:text-green-400' },
-      lost: { label: 'Perdu', className: 'bg-rose-100 dark:bg-rose-500/10 text-rose-700 dark:text-rose-400' },
-      found: { label: 'Retrouvé', className: 'bg-green-100 dark:bg-green-500/10 text-green-700 dark:text-green-400' },
-      blocked: { label: 'Bloqué', className: 'bg-slate-100 dark:bg-slate-500/10 text-slate-600 dark:text-slate-400' },
+    const statusConfig: Record<string, string> = {
+      pending_activation: 'dash-badge dash-badge-warning',
+      active: 'dash-badge dash-badge-success',
+      scanned: 'dash-badge dash-badge-info',
+      in_transit: 'dash-badge dash-badge-warning',
+      delivered: 'dash-badge dash-badge-success',
+      lost: 'dash-badge dash-badge-danger',
+      found: 'dash-badge dash-badge-success',
+      blocked: 'dash-badge dash-badge-neutral',
     };
 
-    const config = statusConfig[status] || { label: status, className: 'bg-slate-100 dark:bg-slate-500/10 text-slate-600 dark:text-slate-400' };
+    const labels: Record<string, string> = {
+      pending_activation: 'En attente',
+      active: 'Actif',
+      scanned: 'Scanné',
+      in_transit: 'En transit',
+      delivered: 'Livré',
+      lost: 'Perdu',
+      found: 'Retrouvé',
+      blocked: 'Bloqué',
+    };
 
-    return (
-      <span className={`px-3 py-1 rounded-full text-xs font-medium ${config.className}`}>
-        {config.label}
-      </span>
-    );
+    const cls = statusConfig[status] || 'dash-badge dash-badge-neutral';
+    const label = labels[status] || status;
+
+    return <span className={cls}>{label}</span>;
   };
 
   const filterButtons = [
@@ -229,60 +233,68 @@ export default function BaggagesPage() {
   return (
     <div className="max-w-7xl mx-auto">
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-slate-800 dark:text-white">Gestion des colis</h1>
-        <p className="text-slate-500 dark:text-slate-400 mt-1">Liste complète des colis de votre agence</p>
+      <div className="mb-6">
+        <h1 className="font-display text-2xl font-bold text-[var(--dash-ink)] flex items-center gap-2">
+          <Luggage className="w-6 h-6 text-[var(--dash-brand)]" />
+          Gestion des colis
+        </h1>
+        <p className="text-sm text-[var(--dash-muted)] mt-1">Liste complète des colis de votre agence</p>
       </div>
 
-      {/* Stats Cards - Multicolored */}
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
-        <div className="kpi-card kpi-card-green p-5">
-          <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center mb-3">
-            <Luggage className="w-5 h-5 text-white" />
-          </div>
-          <p className="text-2xl font-bold text-white">{baggages.length}</p>
-          <p className="text-sm text-white/80">Total colis</p>
-        </div>
-        <div className="kpi-card kpi-card-orange p-5">
-          <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center mb-3">
-            <MapPin className="w-5 h-5 text-white" />
-          </div>
-          <p className="text-2xl font-bold text-white">{baggages.filter(b => isInTransit(b.status)).length}</p>
-          <p className="text-sm text-white/80">En transit</p>
-        </div>
-        <div className="kpi-card kpi-card-blue p-5">
-          <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center mb-3">
-            <CheckCircle className="w-5 h-5 text-white" />
-          </div>
-          <p className="text-2xl font-bold text-white">{baggages.filter(b => isDelivered(b.status)).length}</p>
-          <p className="text-sm text-white/80">Livrés</p>
-        </div>
-        <div className="kpi-card kpi-card-purple p-5">
-          <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center mb-3">
-            <Clock className="w-5 h-5 text-white" />
-          </div>
-          <p className="text-2xl font-bold text-white">{baggages.filter(b => isPending(b.status)).length}</p>
-          <p className="text-sm text-white/80">En attente</p>
-        </div>
-        <div className="kpi-card kpi-card-red p-5">
-          <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center mb-3">
-            <AlertTriangle className="w-5 h-5 text-white" />
-          </div>
-          <p className="text-2xl font-bold text-white">{baggages.filter(b => isLost(b.status)).length}</p>
-          <p className="text-sm text-white/80">Perdus</p>
-        </div>
+      {/* Stats Cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
+        <KpiCard
+          label="Total colis"
+          value={baggages.length}
+          subtitle="Tous statuts"
+          icon={Luggage}
+          color="brand"
+          loading={loading}
+        />
+        <KpiCard
+          label="En transit"
+          value={baggages.filter(b => isInTransit(b.status)).length}
+          subtitle="En cours d'acheminement"
+          icon={Truck}
+          color="amber"
+          loading={loading}
+        />
+        <KpiCard
+          label="Livrés"
+          value={baggages.filter(b => isDelivered(b.status)).length}
+          subtitle="Reçus par destinataire"
+          icon={PackageCheck}
+          color="emerald"
+          loading={loading}
+        />
+        <KpiCard
+          label="En attente"
+          value={baggages.filter(b => isPending(b.status)).length}
+          subtitle="Non assignés"
+          icon={Clock}
+          color="violet"
+          loading={loading}
+        />
+        <KpiCard
+          label="Perdus"
+          value={baggages.filter(b => isLost(b.status)).length}
+          subtitle="À retrouver"
+          icon={AlertTriangle}
+          color="rose"
+          loading={loading}
+        />
       </div>
 
       {/* Search Bar */}
-      <div className="mb-6">
+      <div className="mb-4">
         <div className="relative">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--dash-muted-2)]" />
           <input
             type="text"
             placeholder="Rechercher par nom ou référence..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl py-3 pl-12 pr-4 text-slate-700 dark:text-slate-200 placeholder-slate-400 focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all"
+            className="w-full bg-[var(--dash-card)] border border-[var(--dash-border)] rounded-xl py-3 pl-12 pr-4 text-[var(--dash-ink)] placeholder-[var(--dash-muted-2)] focus:ring-2 focus:ring-[var(--dash-brand-soft)] focus:border-[var(--dash-brand)] transition-all"
           />
         </div>
       </div>
@@ -293,10 +305,10 @@ export default function BaggagesPage() {
           <button
             key={btn.id}
             onClick={() => setStatusFilter(btn.id)}
-            className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
               statusFilter === btn.id
-                ? 'bg-amber-500 text-white shadow-lg'
-                : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800'
+                ? 'bg-[var(--dash-brand)] text-white'
+                : 'bg-[var(--dash-card)] text-[var(--dash-muted)] hover:bg-[var(--dash-bg-3)] border border-[var(--dash-border)]'
             }`}
           >
             {btn.label}
@@ -304,97 +316,86 @@ export default function BaggagesPage() {
         ))}
       </div>
 
-      {/* AGENCY-FIX: Loading state */}
+      {/* Loading state */}
       {loading ? (
-        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
-          <div className="text-center py-12">
-            <div className="flex items-center justify-center gap-3">
-              <div className="w-6 h-6 border-2 border-amber-500/30 border-t-amber-500 rounded-full animate-spin" />
-              <span className="text-slate-500">Chargement...</span>
-            </div>
+        <div className="dash-card p-12 text-center">
+          <div className="flex items-center justify-center gap-3">
+            <div className="w-6 h-6 border-2 border-[var(--dash-brand)]/30 border-t-[var(--dash-brand)] rounded-full animate-spin" />
+            <span className="text-[var(--dash-muted)]">Chargement...</span>
           </div>
         </div>
       ) : filteredBaggages.length === 0 ? (
-        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
-          <div className="text-center py-12">
-            <div className="flex flex-col items-center">
-              <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mb-4">
-                <Luggage className="w-8 h-8 text-slate-400" />
-              </div>
-              <p className="text-slate-500 dark:text-slate-400">Aucun colis trouvé</p>
-            </div>
+        <div className="dash-card p-12 text-center">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[var(--dash-bg-3)] mb-4">
+            <Luggage className="w-8 h-8 text-[var(--dash-muted)]" />
           </div>
+          <p className="text-[var(--dash-muted)]">Aucun colis trouvé</p>
         </div>
       ) : (
         <>
           {/* Section 1 — Colis en transit / livrés */}
           {transitBaggages.length > 0 && (
-            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden mb-6">
-              <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800 bg-orange-50/50 dark:bg-orange-500/5">
+            <div className="dash-card overflow-hidden mb-6">
+              <div className="px-6 py-4 border-b border-[var(--dash-border)] bg-[var(--dash-bg-3)]">
                 <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-orange-500" />
-                  <h2 className="text-sm font-semibold text-slate-800 dark:text-white">
+                  <Truck className="w-4 h-4 text-[var(--dash-brand)]" />
+                  <h2 className="text-sm font-semibold text-[var(--dash-ink)]">
                     Colis en transit / livrés ({transitBaggages.length})
                   </h2>
                 </div>
               </div>
               <div className="overflow-x-auto">
-                <table className="w-full">
+                <table className="dash-table">
                   <thead>
-                    <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
-                      <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm">Référence</th>
-                      <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm">Expéditeur</th>
-                      <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm hidden md:table-cell">Trajet</th>
-                      <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm">Statut</th>
-                      <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm">Actions</th>
+                    <tr>
+                      <th>Référence</th>
+                      <th>Expéditeur</th>
+                      <th className="hidden md:table-cell">Trajet</th>
+                      <th>Statut</th>
+                      <th>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     {transitBaggages.map((baggage) => (
-                      <tr
-                        key={baggage.id}
-                        className={`border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors ${
-                          isDelivered(baggage.status) ? 'bg-green-50/50 dark:bg-green-500/5' : ''
-                        }`}
-                      >
-                        <td className="px-6 py-4">
+                      <tr key={baggage.id}>
+                        <td>
                           <div className="flex items-center gap-2">
-                            <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${isDelivered(baggage.status) ? 'bg-green-100 dark:bg-green-500/10' : 'bg-orange-100 dark:bg-orange-500/10'}`}>
-                              <QrCode className={`w-4 h-4 ${isDelivered(baggage.status) ? 'text-green-500' : 'text-orange-500'}`} />
+                            <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${isDelivered(baggage.status) ? 'bg-[var(--dash-emerald-soft)]' : 'bg-[var(--dash-brand-soft)]'}`}>
+                              <QrCode className={`w-4 h-4 ${isDelivered(baggage.status) ? 'text-[var(--dash-emerald)]' : 'text-[var(--dash-brand)]'}`} />
                             </div>
-                            <span className="text-slate-800 dark:text-white font-mono font-medium">
+                            <span className="text-[var(--dash-ink)] font-mono font-medium">
                               {baggage.reference}
                             </span>
                           </div>
                         </td>
-                        <td className="px-6 py-4">
-                          <span className="text-slate-800 dark:text-white font-medium">
+                        <td>
+                          <span className="text-[var(--dash-ink)] font-medium">
                             {baggage.travelerFirstName || '—'}
                           </span>
                           {baggage.receiverName && (
-                            <p className="text-slate-400 dark:text-slate-500 text-xs mt-0.5">
+                            <p className="text-[var(--dash-muted-2)] text-xs mt-0.5">
                               → {baggage.receiverName}
                             </p>
                           )}
                         </td>
-                        <td className="px-6 py-4 hidden md:table-cell">
-                          <span className="text-slate-600 dark:text-slate-300 text-sm">
+                        <td className="hidden md:table-cell">
+                          <span className="text-[var(--dash-ink-2)] text-sm">
                             {baggage.departureCity || '—'} → {baggage.destination || '—'}
                           </span>
                         </td>
-                        <td className="px-6 py-4">
+                        <td>
                           {getStatusBadge(baggage.status)}
                         </td>
-                        <td className="px-6 py-4">
+                        <td>
                           <button
                             onClick={() => {
                               setSelectedBaggage(baggage);
                               setShowDetailModal(true);
                             }}
-                            className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors group"
+                            className="p-2 rounded-lg hover:bg-[var(--dash-bg-3)] transition-colors group"
                             title="Voir détails"
                           >
-                            <Eye className="w-4 h-4 text-slate-400 group-hover:text-amber-500" />
+                            <Eye className="w-4 h-4 text-[var(--dash-muted)] group-hover:text-[var(--dash-brand)]" />
                           </button>
                         </td>
                       </tr>
@@ -402,89 +403,83 @@ export default function BaggagesPage() {
                   </tbody>
                 </table>
               </div>
-              <div className="px-6 py-4 border-t border-slate-200 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50">
-                <span className="text-slate-500 dark:text-slate-400 text-sm">
+              <div className="px-6 py-4 border-t border-[var(--dash-border)] bg-[var(--dash-bg-3)]">
+                <span className="text-[var(--dash-muted)] text-sm">
                   {transitBaggages.length} colis en transit / livré(s)
                 </span>
               </div>
             </div>
           )}
 
-          {/* AGENCY-FIX: Section 2 — Bagages activés */}
+          {/* Section 2 — Bagages activés */}
           {activatedBaggages.length > 0 && (
-            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden mb-6">
-              <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800 bg-emerald-50/50 dark:bg-emerald-500/5">
+            <div className="dash-card overflow-hidden mb-6">
+              <div className="px-6 py-4 border-b border-[var(--dash-border)] bg-[var(--dash-bg-3)]">
                 <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-emerald-500" />
-                  <h2 className="text-sm font-semibold text-slate-800 dark:text-white">
+                  <CheckCircle className="w-4 h-4 text-[var(--dash-emerald)]" />
+                  <h2 className="text-sm font-semibold text-[var(--dash-ink)]">
                     Colis activés ({activatedBaggages.length})
                   </h2>
                 </div>
               </div>
               <div className="overflow-x-auto">
-                <table className="w-full">
+                <table className="dash-table">
                   <thead>
-                    <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
-                      <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm">Référence</th>
-                      <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm">Pèlerin</th>
-                      <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm hidden md:table-cell">Dernier scan</th>
-                      <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm">Statut</th>
-                      <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm">Actions</th>
+                    <tr>
+                      <th>Référence</th>
+                      <th>Pèlerin</th>
+                      <th className="hidden md:table-cell">Dernier scan</th>
+                      <th>Statut</th>
+                      <th>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     {activatedBaggages.map((baggage) => (
-                      <tr
-                        key={baggage.id}
-                        className={`border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors ${
-                          baggage.status === 'lost' ? 'bg-rose-50/50 dark:bg-rose-500/5' : ''
-                        }`}
-                      >
-                        <td className="px-6 py-4">
+                      <tr key={baggage.id}>
+                        <td>
                           <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-500/10 flex items-center justify-center">
-                              <QrCode className="w-4 h-4 text-emerald-500" />
+                            <div className="w-8 h-8 rounded-lg bg-[var(--dash-emerald-soft)] flex items-center justify-center">
+                              <QrCode className="w-4 h-4 text-[var(--dash-emerald)]" />
                             </div>
-                            <span className="text-slate-800 dark:text-white font-mono font-medium">
+                            <span className="text-[var(--dash-ink)] font-mono font-medium">
                               {baggage.reference}
                             </span>
                           </div>
                         </td>
-                        <td className="px-6 py-4">
-                          {/* AGENCY-FIX: Fallback "Non assigné" when both names are null */}
+                        <td>
                           {baggage.travelerFirstName || baggage.travelerLastName ? (
-                            <span className="text-slate-800 dark:text-white font-medium">
+                            <span className="text-[var(--dash-ink)] font-medium">
                               {baggage.travelerFirstName} {baggage.travelerLastName}
                             </span>
                           ) : (
-                            <span className="px-2 py-1 bg-amber-100 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 rounded-full text-xs font-medium">
+                            <span className="dash-badge dash-badge-warning">
                               Non assigné
                             </span>
                           )}
                         </td>
-                        <td className="px-6 py-4 hidden md:table-cell">
+                        <td className="hidden md:table-cell">
                           {baggage.lastScanDate ? (
-                            <span className="text-slate-600 dark:text-slate-300">{formatDateTime(baggage.lastScanDate)}</span>
+                            <span className="text-[var(--dash-ink-2)]">{formatDateTime(baggage.lastScanDate)}</span>
                           ) : (
-                            <span className="text-slate-400 dark:text-slate-500">Jamais</span>
+                            <span className="text-[var(--dash-muted-2)]">Jamais</span>
                           )}
                         </td>
-                        <td className="px-6 py-4">
+                        <td>
                           {getStatusBadge(baggage.status)}
                         </td>
-                        <td className="px-6 py-4">
+                        <td>
                           <div className="flex items-center gap-2">
                             {isActive(baggage.status) && (
                               <button
                                 onClick={() => handleDeclareLost(baggage.id)}
                                 disabled={actionLoading === baggage.id}
-                                className="p-2 rounded-lg bg-rose-100 dark:bg-rose-500/10 hover:bg-rose-200 dark:hover:bg-rose-500/20 transition-colors group"
+                                className="p-2 rounded-lg bg-red-50 dark:bg-red-500/10 hover:bg-red-100 dark:hover:bg-red-500/20 transition-colors group"
                                 title="Déclarer perdu"
                               >
                                 {actionLoading === baggage.id ? (
-                                  <div className="w-4 h-4 border-2 border-rose-500/30 border-t-rose-500 rounded-full animate-spin" />
+                                  <div className="w-4 h-4 border-2 border-red-500/30 border-t-red-500 rounded-full animate-spin" />
                                 ) : (
-                                  <AlertOctagon className="w-4 h-4 text-rose-500" />
+                                  <AlertOctagon className="w-4 h-4 text-red-500" />
                                 )}
                               </button>
                             )}
@@ -492,13 +487,13 @@ export default function BaggagesPage() {
                               <button
                                 onClick={() => handleMarkFound(baggage.id)}
                                 disabled={actionLoading === baggage.id}
-                                className="p-2 rounded-lg bg-emerald-100 dark:bg-emerald-500/10 hover:bg-emerald-200 dark:hover:bg-emerald-500/20 transition-colors group"
+                                className="p-2 rounded-lg bg-[var(--dash-emerald-soft)] hover:opacity-80 transition-opacity group"
                                 title="Marquer retrouvé"
                               >
                                 {actionLoading === baggage.id ? (
-                                  <div className="w-4 h-4 border-2 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin" />
+                                  <div className="w-4 h-4 border-2 border-[var(--dash-emerald)]/30 border-t-[var(--dash-emerald)] rounded-full animate-spin" />
                                 ) : (
-                                  <CheckCircle className="w-4 h-4 text-emerald-500" />
+                                  <CheckCircle className="w-4 h-4 text-[var(--dash-emerald)]" />
                                 )}
                               </button>
                             )}
@@ -507,10 +502,10 @@ export default function BaggagesPage() {
                                 setSelectedBaggage(baggage);
                                 setShowDetailModal(true);
                               }}
-                              className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors group"
+                              className="p-2 rounded-lg hover:bg-[var(--dash-bg-3)] transition-colors group"
                               title="Voir détails"
                             >
-                              <Eye className="w-4 h-4 text-slate-400 group-hover:text-amber-500" />
+                              <Eye className="w-4 h-4 text-[var(--dash-muted)] group-hover:text-[var(--dash-brand)]" />
                             </button>
                           </div>
                         </td>
@@ -519,78 +514,75 @@ export default function BaggagesPage() {
                   </tbody>
                 </table>
               </div>
-              <div className="px-6 py-4 border-t border-slate-200 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50">
-                <span className="text-slate-500 dark:text-slate-400 text-sm">
+              <div className="px-6 py-4 border-t border-[var(--dash-border)] bg-[var(--dash-bg-3)]">
+                <span className="text-[var(--dash-muted)] text-sm">
                   {activatedBaggages.length} colis activé(s)
                 </span>
               </div>
             </div>
           )}
 
-          {/* AGENCY-FIX: Section 2 — QR en attente d'activation */}
+          {/* Section 3 — QR en attente d'activation */}
           {pendingBaggages.length > 0 && (
-            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-amber-200 dark:border-amber-800 overflow-hidden">
-              <div className="px-6 py-4 border-b border-amber-200 dark:border-amber-800 bg-amber-50/50 dark:bg-amber-500/5">
+            <div className="dash-card overflow-hidden">
+              <div className="px-6 py-4 border-b border-[var(--dash-border)] bg-[var(--dash-bg-3)]">
                 <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-amber-500" />
-                  <h2 className="text-sm font-semibold text-slate-800 dark:text-white">
-                    QR en attente d'activation ({pendingBaggages.length})
+                  <Clock className="w-4 h-4 text-amber-500" />
+                  <h2 className="text-sm font-semibold text-[var(--dash-ink)]">
+                    QR en attente d&apos;activation ({pendingBaggages.length})
                   </h2>
                 </div>
               </div>
               <div className="overflow-x-auto">
-                <table className="w-full">
+                <table className="dash-table">
                   <thead>
-                    <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
-                      <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm">Référence</th>
-                      <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm">Pèlerin</th>
-                      <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm hidden md:table-cell">Type</th>
-                      <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm hidden md:table-cell">Créé le</th>
-                      <th className="text-left px-6 py-4 text-slate-500 dark:text-slate-400 font-medium text-sm">Actions</th>
+                    <tr>
+                      <th>Référence</th>
+                      <th>Pèlerin</th>
+                      <th className="hidden md:table-cell">Type</th>
+                      <th className="hidden md:table-cell">Créé le</th>
+                      <th>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     {pendingBaggages.map((baggage) => (
-                      <tr
-                        key={baggage.id}
-                        className="border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
-                      >
-                        <td className="px-6 py-4">
+                      <tr key={baggage.id}>
+                        <td>
                           <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 rounded-lg bg-amber-100 dark:bg-amber-500/10 flex items-center justify-center">
+                            <div className="w-8 h-8 rounded-lg bg-amber-100 dark:bg-amber-500/15 flex items-center justify-center">
                               <QrCode className="w-4 h-4 text-amber-500" />
                             </div>
-                            <span className="text-slate-800 dark:text-white font-mono font-medium">
+                            <span className="text-[var(--dash-ink)] font-mono font-medium">
                               {baggage.reference}
                             </span>
                           </div>
                         </td>
-                        <td className="px-6 py-4">
-                          <span className="px-2 py-1 bg-amber-100 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 rounded-full text-xs font-medium">
+                        <td>
+                          <span className="dash-badge dash-badge-warning">
                             Non assigné
                           </span>
                         </td>
-                        <td className="px-6 py-4 hidden md:table-cell">
-                          <span className="text-slate-600 dark:text-slate-300 text-sm capitalize">
+                        <td className="hidden md:table-cell">
+                          <span className="text-[var(--dash-ink-2)] text-sm capitalize">
                             {baggage.baggageType === 'cabine' ? 'Cabine' : 'Soute'}
                           </span>
                         </td>
-                        <td className="px-6 py-4 hidden md:table-cell">
-                          <span className="text-slate-400 dark:text-slate-500 text-sm">
+                        <td className="hidden md:table-cell">
+                          <span className="text-[var(--dash-muted)] text-sm">
                             {formatDate(baggage.createdAt)}
                           </span>
                         </td>
-                        <td className="px-6 py-4">
+                        <td>
                           <div className="flex items-center gap-2">
                             <button
                               onClick={() => {
                                 setSelectedBaggage(baggage);
                                 setShowDetailModal(true);
                               }}
-                              className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors group"
+                              className="p-2 rounded-lg hover:bg-[var(--dash-bg-3)] transition-colors group"
                               title="Voir détails"
                             >
-                              <Eye className="w-4 h-4 text-slate-400 group-hover:text-amber-500" />
+                              <Eye className="w-4 h-4 text-[var(--dash-muted)] group-hover:text-[var(--dash-brand)]" />
                             </button>
                           </div>
                         </td>
@@ -599,17 +591,17 @@ export default function BaggagesPage() {
                   </tbody>
                 </table>
               </div>
-              <div className="px-6 py-4 border-t border-slate-200 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50">
-                <span className="text-slate-500 dark:text-slate-400 text-sm">
-                  {pendingBaggages.length} QR en attente d'activation
+              <div className="px-6 py-4 border-t border-[var(--dash-border)] bg-[var(--dash-bg-3)]">
+                <span className="text-[var(--dash-muted)] text-sm">
+                  {pendingBaggages.length} QR en attente d&apos;activation
                 </span>
               </div>
             </div>
           )}
 
           {/* Footer global */}
-          <div className="text-center">
-            <span className="text-slate-400 dark:text-slate-500 text-xs">
+          <div className="text-center mt-4">
+            <span className="text-[var(--dash-muted-2)] text-xs">
               {filteredBaggages.length} colis affiché(s) sur {baggages.length}
             </span>
           </div>
@@ -619,35 +611,35 @@ export default function BaggagesPage() {
       {/* Detail Modal */}
       {showDetailModal && selectedBaggage && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
-          <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto shadow-xl border border-slate-200 dark:border-slate-800">
-            <div className="flex items-center justify-between p-6 border-b border-slate-200 dark:border-slate-800">
-              <h2 className="text-lg font-bold text-slate-800 dark:text-white">Détails du colis</h2>
+          <div className="bg-[var(--dash-card)] rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto shadow-xl border border-[var(--dash-border)]">
+            <div className="flex items-center justify-between p-6 border-b border-[var(--dash-border)]">
+              <h2 className="font-display text-lg font-bold text-[var(--dash-ink)]">Détails du colis</h2>
               <button
                 onClick={() => {
                   setShowDetailModal(false);
                   setSelectedBaggage(null);
                 }}
-                className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                className="p-2 rounded-lg hover:bg-[var(--dash-bg-3)] transition-colors"
               >
-                <X className="w-5 h-5 text-slate-400" />
+                <X className="w-5 h-5 text-[var(--dash-muted)]" />
               </button>
             </div>
             <div className="p-6 space-y-4">
               <div className="flex items-center gap-3">
                 <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
-                  isInTransit(selectedBaggage.status) ? 'bg-orange-100 dark:bg-orange-500/10' :
-                  isDelivered(selectedBaggage.status) ? 'bg-green-100 dark:bg-green-500/10' :
-                  'bg-amber-100 dark:bg-amber-500/10'
+                  isInTransit(selectedBaggage.status) ? 'bg-[var(--dash-brand-soft)]' :
+                  isDelivered(selectedBaggage.status) ? 'bg-[var(--dash-emerald-soft)]' :
+                  'bg-amber-100 dark:bg-amber-500/15'
                 }`}>
                   <QrCode className={`w-6 h-6 ${
-                    isInTransit(selectedBaggage.status) ? 'text-orange-500' :
-                    isDelivered(selectedBaggage.status) ? 'text-green-500' :
+                    isInTransit(selectedBaggage.status) ? 'text-[var(--dash-brand)]' :
+                    isDelivered(selectedBaggage.status) ? 'text-[var(--dash-emerald)]' :
                     'text-amber-500'
                   }`} />
                 </div>
                 <div>
-                  <p className="text-slate-800 dark:text-white font-mono font-bold">{selectedBaggage.reference}</p>
-                  <p className="text-slate-500 dark:text-slate-400 text-sm">{selectedBaggage.type === 'hajj' ? 'Hajj 2026' : 'Voyageur'}</p>
+                  <p className="text-[var(--dash-ink)] font-mono font-bold">{selectedBaggage.reference}</p>
+                  <p className="text-[var(--dash-muted)] text-sm">{selectedBaggage.type === 'hajj' ? 'Hajj 2026' : 'Voyageur'}</p>
                 </div>
               </div>
 
@@ -661,81 +653,81 @@ export default function BaggagesPage() {
                 <div className="space-y-3">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <p className="text-slate-500 dark:text-slate-400 text-xs mb-1">Expéditeur</p>
-                      <p className="text-slate-800 dark:text-white font-medium text-sm">{selectedBaggage.travelerFirstName || '—'}</p>
+                      <p className="text-[var(--dash-muted)] text-xs mb-1">Expéditeur</p>
+                      <p className="text-[var(--dash-ink)] font-medium text-sm">{selectedBaggage.travelerFirstName || '—'}</p>
                       {selectedBaggage.whatsappOwner && (
-                        <p className="text-slate-400 dark:text-slate-500 text-xs">{selectedBaggage.whatsappOwner}</p>
+                        <p className="text-[var(--dash-muted)] text-xs">{selectedBaggage.whatsappOwner}</p>
                       )}
                     </div>
                     <div>
-                      <p className="text-slate-500 dark:text-slate-400 text-xs mb-1">Destinataire</p>
-                      <p className="text-slate-800 dark:text-white font-medium text-sm">{selectedBaggage.receiverName || '—'}</p>
+                      <p className="text-[var(--dash-muted)] text-xs mb-1">Destinataire</p>
+                      <p className="text-[var(--dash-ink)] font-medium text-sm">{selectedBaggage.receiverName || '—'}</p>
                       {selectedBaggage.receiverWhatsapp && (
-                        <p className="text-slate-400 dark:text-slate-500 text-xs">{selectedBaggage.receiverWhatsapp}</p>
+                        <p className="text-[var(--dash-muted)] text-xs">{selectedBaggage.receiverWhatsapp}</p>
                       )}
                     </div>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <p className="text-slate-500 dark:text-slate-400 text-xs mb-1">Trajet</p>
-                      <p className="text-slate-800 dark:text-white font-medium text-sm">{selectedBaggage.departureCity || '—'} → {selectedBaggage.destination || '—'}</p>
+                      <p className="text-[var(--dash-muted)] text-xs mb-1">Trajet</p>
+                      <p className="text-[var(--dash-ink)] font-medium text-sm">{selectedBaggage.departureCity || '—'} → {selectedBaggage.destination || '—'}</p>
                     </div>
                     <div>
-                      <p className="text-slate-500 dark:text-slate-400 text-xs mb-1">Compagnie</p>
-                      <p className="text-slate-800 dark:text-white font-medium text-sm">{selectedBaggage.busCompany || selectedBaggage.airlineName || '—'}</p>
+                      <p className="text-[var(--dash-muted)] text-xs mb-1">Compagnie</p>
+                      <p className="text-[var(--dash-ink)] font-medium text-sm">{selectedBaggage.busCompany || selectedBaggage.airlineName || '—'}</p>
                     </div>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <p className="text-slate-500 dark:text-slate-400 text-xs mb-1">Départ</p>
-                      <p className="text-slate-800 dark:text-white text-sm">
+                      <p className="text-[var(--dash-muted)] text-xs mb-1">Départ</p>
+                      <p className="text-[var(--dash-ink)] text-sm">
                         {selectedBaggage.departureDate ? formatDate(selectedBaggage.departureDate) : '—'}
                         {selectedBaggage.departureTime ? ` à ${selectedBaggage.departureTime}` : ''}
                       </p>
                     </div>
                     <div>
-                      <p className="text-slate-500 dark:text-slate-400 text-xs mb-1">Lieu de livraison</p>
-                      <p className="text-slate-800 dark:text-white text-sm">{selectedBaggage.deliveryLocation || '—'}</p>
+                      <p className="text-[var(--dash-muted)] text-xs mb-1">Lieu de livraison</p>
+                      <p className="text-[var(--dash-ink)] text-sm">{selectedBaggage.deliveryLocation || '—'}</p>
                     </div>
                   </div>
                   {isDelivered(selectedBaggage.status) && (
                     <div>
-                      <p className="text-slate-500 dark:text-slate-400 text-xs mb-1">Livré le</p>
-                      <p className="text-green-600 dark:text-green-400 font-medium text-sm">{formatDateTime(selectedBaggage.deliveredAt || selectedBaggage.arrivedAt)}</p>
+                      <p className="text-[var(--dash-muted)] text-xs mb-1">Livré le</p>
+                      <p className="text-[var(--dash-emerald)] font-medium text-sm">{formatDateTime(selectedBaggage.deliveredAt || selectedBaggage.arrivedAt)}</p>
                     </div>
                   )}
                 </div>
               ) : (
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <p className="text-slate-500 dark:text-slate-400 text-sm">Pèlerin</p>
+                    <p className="text-[var(--dash-muted)] text-sm">Pèlerin</p>
                     {selectedBaggage.travelerFirstName || selectedBaggage.travelerLastName ? (
-                      <p className="text-slate-800 dark:text-white font-medium">{selectedBaggage.travelerFirstName} {selectedBaggage.travelerLastName}</p>
+                      <p className="text-[var(--dash-ink)] font-medium">{selectedBaggage.travelerFirstName} {selectedBaggage.travelerLastName}</p>
                     ) : (
-                      <span className="px-2 py-1 bg-amber-100 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 rounded-full text-xs font-medium">
+                      <span className="dash-badge dash-badge-warning">
                         À attribuer
                       </span>
                     )}
                   </div>
                   <div>
-                    <p className="text-slate-500 dark:text-slate-400 text-sm">Type</p>
-                    <p className="text-slate-800 dark:text-white">{selectedBaggage.baggageType} #{selectedBaggage.baggageIndex}</p>
+                    <p className="text-[var(--dash-muted)] text-sm">Type</p>
+                    <p className="text-[var(--dash-ink)]">{selectedBaggage.baggageType} #{selectedBaggage.baggageIndex}</p>
                   </div>
                 </div>
               )}
 
-              {/* Créé le / Dernier scan — non-colis fields */}
+              {/* Créé le / Dernier scan */}
               {!isInTransit(selectedBaggage.status) && !isDelivered(selectedBaggage.status) && (
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <p className="text-slate-500 dark:text-slate-400 text-sm">Créé le</p>
-                    <p className="text-slate-800 dark:text-white">{formatDate(selectedBaggage.createdAt)}</p>
+                    <p className="text-[var(--dash-muted)] text-sm">Créé le</p>
+                    <p className="text-[var(--dash-ink)]">{formatDate(selectedBaggage.createdAt)}</p>
                   </div>
                   <div>
-                    <p className="text-slate-500 dark:text-slate-400 text-sm">Dernier scan</p>
-                    <p className="text-slate-800 dark:text-white">{formatDateTime(selectedBaggage.lastScanDate)}</p>
+                    <p className="text-[var(--dash-muted)] text-sm">Dernier scan</p>
+                    <p className="text-[var(--dash-ink)]">{formatDateTime(selectedBaggage.lastScanDate)}</p>
                     {selectedBaggage.lastLocation && (
-                      <p className="text-slate-500 dark:text-slate-400 text-sm flex items-center gap-1 mt-1">
+                      <p className="text-[var(--dash-muted)] text-sm flex items-center gap-1 mt-1">
                         <MapPin className="w-3 h-3" />
                         {selectedBaggage.lastLocation}
                       </p>
@@ -744,7 +736,7 @@ export default function BaggagesPage() {
                 </div>
               )}
 
-              {/* AGENCY-FIX: Attribuer edit form for unassigned non-transit baggages */}
+              {/* Attribuer edit form for unassigned non-transit baggages */}
               {(!selectedBaggage.travelerFirstName && !selectedBaggage.travelerLastName) && !isInTransit(selectedBaggage.status) && !isDelivered(selectedBaggage.status) && (
                 <div className="p-4 bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-800 rounded-xl">
                   <h4 className="text-amber-700 dark:text-amber-400 font-medium mb-3">Attribuer ce colis</h4>
@@ -753,20 +745,20 @@ export default function BaggagesPage() {
                       <input
                         type="text"
                         placeholder="Prénom"
-                        className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-800 dark:text-white"
+                        className="w-full px-3 py-2 bg-[var(--dash-card)] border border-[var(--dash-border)] rounded-lg text-sm text-[var(--dash-ink)]"
                         onChange={(e) => setSelectedBaggage({ ...selectedBaggage, travelerFirstName: e.target.value })}
                       />
                       <input
                         type="text"
                         placeholder="Nom"
-                        className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-800 dark:text-white"
+                        className="w-full px-3 py-2 bg-[var(--dash-card)] border border-[var(--dash-border)] rounded-lg text-sm text-[var(--dash-ink)]"
                         onChange={(e) => setSelectedBaggage({ ...selectedBaggage, travelerLastName: e.target.value })}
                       />
                     </div>
                     <input
                       type="tel"
                       placeholder="WhatsApp (ex: +33612345678)"
-                      className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-800 dark:text-white"
+                      className="w-full px-3 py-2 bg-[var(--dash-card)] border border-[var(--dash-border)] rounded-lg text-sm text-[var(--dash-ink)]"
                       onChange={(e) => setSelectedBaggage({ ...selectedBaggage, whatsappOwner: e.target.value })}
                     />
                     <button
@@ -790,7 +782,7 @@ export default function BaggagesPage() {
                           console.error('Error updating baggage:', error);
                         }
                       }}
-                      className="w-full py-2 bg-[#ff7f00] hover:bg-[#ff9f00] text-white rounded-lg text-sm font-medium transition-colors"
+                      className="btn-brand btn-magnetic w-full py-2 rounded-lg text-sm font-medium"
                     >
                       Enregistrer
                     </button>
@@ -798,13 +790,12 @@ export default function BaggagesPage() {
                 </div>
               )}
 
-              <div className="pt-4 border-t border-slate-200 dark:border-slate-800 space-y-3">
-                {/* Action Buttons based on status */}
+              <div className="pt-4 border-t border-[var(--dash-border)] space-y-3">
                 {isActive(selectedBaggage.status) && !isInTransit(selectedBaggage.status) && !isDelivered(selectedBaggage.status) && (
                   <button
                     onClick={() => handleDeclareLost(selectedBaggage.id)}
                     disabled={actionLoading === selectedBaggage.id}
-                    className="w-full py-3 bg-rose-500 text-white rounded-xl hover:bg-rose-600 transition-colors font-medium flex items-center justify-center gap-2 disabled:opacity-50"
+                    className="w-full py-3 bg-red-500 text-white rounded-xl hover:bg-red-600 transition-colors font-medium inline-flex items-center justify-center gap-2 disabled:opacity-50"
                   >
                     {actionLoading === selectedBaggage.id ? (
                       <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -821,7 +812,7 @@ export default function BaggagesPage() {
                   <button
                     onClick={() => handleMarkFound(selectedBaggage.id)}
                     disabled={actionLoading === selectedBaggage.id}
-                    className="w-full py-3 bg-emerald-500 text-white rounded-xl hover:bg-emerald-600 transition-colors font-medium flex items-center justify-center gap-2 disabled:opacity-50"
+                    className="btn-emerald btn-magnetic w-full py-3 rounded-xl font-medium inline-flex items-center justify-center gap-2 disabled:opacity-50"
                   >
                     {actionLoading === selectedBaggage.id ? (
                       <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -836,7 +827,7 @@ export default function BaggagesPage() {
 
                 <Link
                   href={`/scan/${selectedBaggage.reference}`}
-                  className="block w-full text-center py-3 bg-amber-500 text-white rounded-xl hover:bg-amber-600 transition-colors font-medium"
+                  className="block w-full text-center py-3 bg-[var(--dash-brand)] text-white rounded-xl hover:opacity-90 transition-opacity font-medium"
                 >
                   Tester le scan
                 </Link>

@@ -1,14 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
 import {
   Plus,
   Edit,
@@ -17,8 +13,6 @@ import {
   BarChart3,
   MousePointer,
   Image as ImageIcon,
-  Calendar,
-  Target,
   RefreshCw,
   X,
   Save,
@@ -28,8 +22,11 @@ import {
   TrendingUp,
   Users,
   Building2,
-  Globe
+  Globe,
+  Megaphone,
+  Target,
 } from "lucide-react";
+import KpiCard from '@/components/dashboard/KpiCard';
 
 interface Advertisement {
   id: string;
@@ -89,18 +86,18 @@ export default function PublicitesPage() {
   const [loading, setLoading] = useState(true);
   const [authError, setAuthError] = useState<string | null>(null);
   const [agencies, setAgencies] = useState<Agency[]>([]);
-  
+
   // Filters
   const [statusFilter, setStatusFilter] = useState('all');
   const [agencyFilter, setAgencyFilter] = useState('all');
   const [page, setPage] = useState(1);
-  
+
   // Modal state
   const [showModal, setShowModal] = useState(false);
   const [modalMode, setModalMode] = useState<'create' | 'edit'>('create');
   const [selectedAd, setSelectedAd] = useState<Advertisement | null>(null);
   const [saving, setSaving] = useState(false);
-  
+
   // Form state
   const [formData, setFormData] = useState({
     title: '',
@@ -116,7 +113,7 @@ export default function PublicitesPage() {
     status: 'draft',
     priority: 0
   });
-  
+
   // Stats
   const [stats, setStats] = useState<StatsSummary | null>(null);
   const [topAds, setTopAds] = useState<TopAd[]>([]);
@@ -138,7 +135,7 @@ export default function PublicitesPage() {
       params.append('limit', '10');
 
       const response = await fetch(`/api/admin/advertisements?${params}`, { credentials: 'same-origin' });
-      
+
       if (response.status === 401) {
         setAuthError('Session expirée — Veuillez vous reconnecter');
         return;
@@ -147,9 +144,9 @@ export default function PublicitesPage() {
         setAuthError('Accès non autorisé — Permissions insuffisantes');
         return;
       }
-      
+
       const result = await response.json();
-      
+
       if (result.advertisements) {
         setData(result);
         setAgencies(result.agencies || []);
@@ -168,11 +165,11 @@ export default function PublicitesPage() {
   const fetchStats = async () => {
     try {
       const response = await fetch('/api/admin/advertisements/stats', { credentials: 'same-origin' });
-      
+
       if (response.status === 401 || response.status === 403) {
         return; // Stats are non-critical, don't show auth error
       }
-      
+
       const result = await response.json();
       if (result.summary) {
         setStats(result.summary);
@@ -233,8 +230,8 @@ export default function PublicitesPage() {
     try {
       const url = '/api/admin/advertisements';
       const method = modalMode === 'create' ? 'POST' : 'PUT';
-      const body = modalMode === 'create' 
-        ? formData 
+      const body = modalMode === 'create'
+        ? formData
         : { id: selectedAd?.id, ...formData };
 
       const response = await fetch(url, {
@@ -282,7 +279,7 @@ export default function PublicitesPage() {
 
   const toggleStatus = async (ad: Advertisement) => {
     const newStatus = ad.status === 'active' ? 'paused' : 'active';
-    
+
     try {
       const response = await fetch('/api/admin/advertisements', {
         method: 'PUT',
@@ -305,15 +302,21 @@ export default function PublicitesPage() {
   };
 
   const getStatusBadge = (status: string) => {
-    const styles: Record<string, { bg: string; text: string; icon: React.ElementType }> = {
-      active: { bg: 'bg-emerald-100 dark:bg-emerald-900/30', text: 'text-emerald-700 dark:text-emerald-400', icon: Play },
-      paused: { bg: 'bg-amber-100 dark:bg-amber-900/30', text: 'text-amber-700 dark:text-amber-400', icon: Pause },
-      draft: { bg: 'bg-slate-100 dark:bg-slate-700', text: 'text-slate-600 dark:text-slate-400', icon: Edit },
-      expired: { bg: 'bg-red-100 dark:bg-red-900/30', text: 'text-red-700 dark:text-red-400', icon: AlertCircle }
+    const styles: Record<string, string> = {
+      active: 'dash-badge dash-badge-success',
+      paused: 'dash-badge dash-badge-warning',
+      draft: 'dash-badge dash-badge-neutral',
+      expired: 'dash-badge dash-badge-danger'
     };
-    
-    const style = styles[status] || styles.draft;
-    const Icon = style.icon;
+    const icons: Record<string, React.ElementType> = {
+      active: Play,
+      paused: Pause,
+      draft: Edit,
+      expired: AlertCircle
+    };
+
+    const cls = styles[status] || styles.draft;
+    const Icon = icons[status] || icons.draft;
     const labels: Record<string, string> = {
       active: 'Active',
       paused: 'En pause',
@@ -322,7 +325,7 @@ export default function PublicitesPage() {
     };
 
     return (
-      <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs ${style.bg} ${style.text}`}>
+      <span className={cls}>
         <Icon className="w-3 h-3" />
         {labels[status] || status}
       </span>
@@ -332,7 +335,7 @@ export default function PublicitesPage() {
   const getTargetBadge = (scope: string, agencyId: string | null) => {
     if (scope === 'all') {
       return (
-        <span className="inline-flex items-center gap-1 text-xs text-slate-600 dark:text-slate-400">
+        <span className="inline-flex items-center gap-1 text-xs text-[var(--dash-muted)]">
           <Globe className="w-3 h-3" />
           Toutes les agences
         </span>
@@ -340,7 +343,7 @@ export default function PublicitesPage() {
     }
     if (scope === 'agents') {
       return (
-        <span className="inline-flex items-center gap-1 text-xs text-blue-600 dark:text-blue-400">
+        <span className="inline-flex items-center gap-1 text-xs text-[var(--dash-brand)]">
           <Users className="w-3 h-3" />
           Agents commerciaux
         </span>
@@ -349,7 +352,7 @@ export default function PublicitesPage() {
     if (scope === 'agency' && agencyId) {
       const agency = agencies.find(a => a.id === agencyId);
       return (
-        <span className="inline-flex items-center gap-1 text-xs text-purple-600 dark:text-purple-400">
+        <span className="inline-flex items-center gap-1 text-xs text-[var(--dash-brand)]">
           <Building2 className="w-3 h-3" />
           {agency?.name || 'Agence spécifique'}
         </span>
@@ -366,121 +369,126 @@ export default function PublicitesPage() {
   return (
     <div className="max-w-7xl mx-auto">
       {/* Page Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800 dark:text-white">Gestion des Publicités</h1>
-          <p className="text-slate-500 dark:text-slate-400 mt-1">Créez et gérez les bannières publicitaires pour les agences</p>
+          <h1 className="font-display text-2xl font-bold text-[var(--dash-ink)] flex items-center gap-2">
+            <Megaphone className="w-6 h-6 text-[var(--dash-brand)]" />
+            Gestion des Publicités
+          </h1>
+          <p className="text-sm text-[var(--dash-muted)] mt-1">Créez et gérez les bannières publicitaires pour les agences</p>
         </div>
         <div className="flex gap-3">
-          <Button
+          <button
             onClick={() => setShowStats(!showStats)}
-            variant="outline"
-            className="border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium border border-[var(--dash-border)] bg-[var(--dash-card)] text-[var(--dash-ink-2)] hover:bg-[var(--dash-bg-3)] transition-colors"
           >
-            <BarChart3 className="w-4 h-4 mr-2" />
+            <BarChart3 className="w-4 h-4" />
             Statistiques
-          </Button>
-          <Button
+          </button>
+          <button
             onClick={openCreateModal}
-            className="bg-[#ff7f00] hover:bg-[#ff7f00]/90 text-white rounded-xl"
+            className="btn-brand btn-magnetic inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium"
           >
-            <Plus className="w-4 h-4 mr-2" />
+            <Plus className="w-4 h-4" />
             Nouvelle publicité
-          </Button>
+          </button>
         </div>
       </div>
 
       {/* Auth Error Banner */}
       {authError && (
-        <div className="mb-6 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-800 rounded-xl p-4">
-          <p className="text-red-600 dark:text-red-400 text-sm font-medium">{authError}</p>
+        <div className="mb-6 bg-[var(--dash-bg-3)] border border-[var(--dash-border-strong)] rounded-xl p-4">
+          <p className="text-[var(--dash-ink-2)] text-sm font-medium">{authError}</p>
         </div>
       )}
 
       {/* Stats Overview */}
       {stats && (
-        <div className={`grid gap-4 mb-8 ${showStats ? 'grid-cols-2 sm:grid-cols-5' : 'grid-cols-2 sm:grid-cols-4'}`}>
-          <Card className="bg-white dark:bg-slate-800 border-slate-100 dark:border-slate-700 shadow-sm rounded-2xl">
-            <CardContent className="p-4 text-center">
-              <p className="text-3xl font-bold text-slate-800 dark:text-white">{stats.totalAds}</p>
-              <p className="text-slate-500 dark:text-slate-400 text-sm">Total</p>
-            </CardContent>
-          </Card>
-          <Card className="bg-white dark:bg-slate-800 border-emerald-200 dark:border-emerald-800 shadow-sm rounded-2xl">
-            <CardContent className="p-4 text-center">
-              <p className="text-3xl font-bold text-emerald-600 dark:text-emerald-400">{stats.activeAds}</p>
-              <p className="text-slate-500 dark:text-slate-400 text-sm">Actives</p>
-            </CardContent>
-          </Card>
-          <Card className="bg-white dark:bg-slate-800 border-slate-100 dark:border-slate-700 shadow-sm rounded-2xl">
-            <CardContent className="p-4 text-center">
-              <p className="text-3xl font-bold text-blue-600 dark:text-blue-400">{stats.totalImpressions.toLocaleString()}</p>
-              <p className="text-slate-500 dark:text-slate-400 text-sm">Impressions</p>
-            </CardContent>
-          </Card>
-          <Card className="bg-white dark:bg-slate-800 border-slate-100 dark:border-slate-700 shadow-sm rounded-2xl">
-            <CardContent className="p-4 text-center">
-              <p className="text-3xl font-bold text-purple-600 dark:text-purple-400">{stats.totalClicks.toLocaleString()}</p>
-              <p className="text-slate-500 dark:text-slate-400 text-sm">Clics</p>
-            </CardContent>
-          </Card>
+        <div className={`grid gap-4 mb-6 ${showStats ? 'grid-cols-2 sm:grid-cols-5' : 'grid-cols-2 sm:grid-cols-4'}`}>
+          <KpiCard
+            label="Total"
+            value={stats.totalAds}
+            subtitle="Publicités"
+            icon={Megaphone}
+            color="brand"
+          />
+          <KpiCard
+            label="Actives"
+            value={stats.activeAds}
+            subtitle="En cours"
+            icon={Play}
+            color="emerald"
+          />
+          <KpiCard
+            label="Impressions"
+            value={stats.totalImpressions}
+            subtitle="Vues cumulées"
+            icon={Eye}
+            color="cyan"
+          />
+          <KpiCard
+            label="Clics"
+            value={stats.totalClicks}
+            subtitle="Interactions"
+            icon={MousePointer}
+            color="violet"
+          />
           {showStats && (
-            <Card className="bg-white dark:bg-slate-800 border-amber-200 dark:border-amber-800 shadow-sm rounded-2xl">
-              <CardContent className="p-4 text-center">
-                <p className="text-3xl font-bold text-amber-600 dark:text-amber-400">{stats.avgCtr}%</p>
-                <p className="text-slate-500 dark:text-slate-400 text-sm">CTR Moyen</p>
-              </CardContent>
-            </Card>
+            <KpiCard
+              label="CTR Moyen"
+              value={`${stats.avgCtr}%`}
+              subtitle="Taux de clics"
+              icon={Target}
+              color="amber"
+            />
           )}
         </div>
       )}
 
       {/* Top Ads */}
       {showStats && topAds.length > 0 && (
-        <Card className="bg-white dark:bg-slate-800 border-slate-100 dark:border-slate-700 shadow-sm rounded-2xl mb-8">
-          <CardContent className="p-5">
-            <h3 className="text-sm font-medium text-slate-600 dark:text-slate-400 mb-4 flex items-center gap-2">
-              <TrendingUp className="w-4 h-4" />
-              Top 3 Publicités par Clics
-            </h3>
-            <div className="space-y-3">
-              {topAds.map((ad, index) => (
-                <div key={ad.id} className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-700/50 rounded-xl">
-                  <div className="flex items-center gap-3">
-                    <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
-                      index === 0 ? 'bg-amber-100 text-amber-700' :
-                      index === 1 ? 'bg-slate-200 text-slate-600' :
-                      'bg-orange-100 text-orange-700'
-                    }`}>
-                      {index + 1}
-                    </span>
-                    <span className="text-slate-800 dark:text-white font-medium">{ad.title}</span>
-                  </div>
-                  <div className="flex items-center gap-4 text-sm">
-                    <span className="text-slate-500 dark:text-slate-400">
-                      {ad.impressions.toLocaleString()} imp.
-                    </span>
-                    <span className="text-purple-600 dark:text-purple-400 font-medium">
-                      {ad.clicks.toLocaleString()} clics
-                    </span>
-                    <span className="text-emerald-600 dark:text-emerald-400 font-medium">
-                      {ad.ctr}% CTR
-                    </span>
-                  </div>
+        <div className="dash-card p-5 mb-6">
+          <h3 className="text-sm font-medium text-[var(--dash-muted)] mb-4 flex items-center gap-2">
+            <TrendingUp className="w-4 h-4" />
+            Top 3 Publicités par Clics
+          </h3>
+          <div className="space-y-3">
+            {topAds.map((ad, index) => (
+              <div key={ad.id} className="flex items-center justify-between p-3 bg-[var(--dash-bg-3)] rounded-xl">
+                <div className="flex items-center gap-3">
+                  <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
+                    index === 0 ? 'bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-400' :
+                    index === 1 ? 'bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-300' :
+                    'bg-orange-100 text-orange-700 dark:bg-orange-500/20 dark:text-orange-400'
+                  }`}>
+                    {index + 1}
+                  </span>
+                  <span className="text-[var(--dash-ink)] font-medium">{ad.title}</span>
                 </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+                <div className="flex items-center gap-4 text-sm">
+                  <span className="text-[var(--dash-muted)]">
+                    {ad.impressions.toLocaleString()} imp.
+                  </span>
+                  <span className="text-[var(--dash-brand)] font-medium">
+                    {ad.clicks.toLocaleString()} clics
+                  </span>
+                  <span className="text-[var(--dash-emerald)] font-medium">
+                    {ad.ctr}% CTR
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       )}
 
       {/* Filters */}
       <div className="flex flex-wrap gap-4 mb-6">
         <Select value={statusFilter} onValueChange={(v) => { setStatusFilter(v); setPage(1); }}>
-          <SelectTrigger className="w-40 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-xl">
+          <SelectTrigger className="w-40 bg-[var(--dash-card)] border-[var(--dash-border)] text-[var(--dash-ink)] rounded-lg">
             <SelectValue placeholder="Statut" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="bg-[var(--dash-card)] border-[var(--dash-border)] text-[var(--dash-ink)]">
             <SelectItem value="all">Tous les statuts</SelectItem>
             <SelectItem value="active">Actives</SelectItem>
             <SelectItem value="paused">En pause</SelectItem>
@@ -490,10 +498,10 @@ export default function PublicitesPage() {
         </Select>
 
         <Select value={agencyFilter} onValueChange={(v) => { setAgencyFilter(v); setPage(1); }}>
-          <SelectTrigger className="w-48 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-xl">
+          <SelectTrigger className="w-48 bg-[var(--dash-card)] border-[var(--dash-border)] text-[var(--dash-ink)] rounded-lg">
             <SelectValue placeholder="Agence" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="bg-[var(--dash-card)] border-[var(--dash-border)] text-[var(--dash-ink)]">
             <SelectItem value="all">Toutes les agences</SelectItem>
             {agencies.map(agency => (
               <SelectItem key={agency.id} value={agency.id}>{agency.name}</SelectItem>
@@ -501,48 +509,35 @@ export default function PublicitesPage() {
           </SelectContent>
         </Select>
 
-        <Button
+        <button
           onClick={() => { fetchAdvertisements(); fetchStats(); }}
-          variant="ghost"
-          size="sm"
-          className="text-slate-500 dark:text-slate-400"
+          className="inline-flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-[var(--dash-muted)] hover:bg-[var(--dash-bg-3)] transition-colors"
         >
           <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-        </Button>
+          <span className="sr-only">Rafraîchir</span>
+        </button>
       </div>
 
       {/* Advertisements Table */}
-      <Card className="bg-white dark:bg-slate-800 border-slate-100 dark:border-slate-700 shadow-sm rounded-2xl overflow-hidden">
+      <div className="dash-card overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-slate-50 dark:bg-slate-700/50 border-b border-slate-200 dark:border-slate-700">
+          <table className="dash-table">
+            <thead>
               <tr>
-                <th className="text-left px-5 py-3 text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                  Publicité
-                </th>
-                <th className="text-left px-5 py-3 text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                  Cible
-                </th>
-                <th className="text-left px-5 py-3 text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                  Statut
-                </th>
-                <th className="text-left px-5 py-3 text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                  Dates
-                </th>
-                <th className="text-left px-5 py-3 text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                  Stats
-                </th>
-                <th className="text-right px-5 py-3 text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                  Actions
-                </th>
+                <th>Publicité</th>
+                <th>Cible</th>
+                <th>Statut</th>
+                <th>Dates</th>
+                <th>Stats</th>
+                <th className="text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
+            <tbody>
               {loading ? (
                 <tr>
                   <td colSpan={6} className="px-5 py-12 text-center">
                     <div className="flex items-center justify-center">
-                      <div className="w-8 h-8 border-2 border-[#ff7f00]/30 border-t-[#ff7f00] rounded-full animate-spin" />
+                      <div className="w-8 h-8 border-2 border-[var(--dash-brand)]/30 border-t-[var(--dash-brand)] rounded-full animate-spin" />
                     </div>
                   </td>
                 </tr>
@@ -550,110 +545,105 @@ export default function PublicitesPage() {
                 <tr>
                   <td colSpan={6} className="px-5 py-12 text-center">
                     <div className="flex flex-col items-center">
-                      <ImageIcon className="w-12 h-12 text-slate-300 dark:text-slate-600 mb-3" />
-                      <p className="text-slate-500 dark:text-slate-400">Aucune publicité trouvée</p>
-                      <Button
+                      <ImageIcon className="w-12 h-12 text-[var(--dash-muted-2)] mb-3" />
+                      <p className="text-[var(--dash-muted)]">Aucune publicité trouvée</p>
+                      <button
                         onClick={openCreateModal}
-                        variant="link"
-                        className="text-[#ff7f00] mt-2"
+                        className="mt-2 text-[var(--dash-brand)] hover:underline text-sm font-medium"
                       >
                         Créer la première publicité
-                      </Button>
+                      </button>
                     </div>
                   </td>
                 </tr>
               ) : (
                 data?.advertisements.map((ad) => (
-                  <tr key={ad.id} className="hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors">
-                    <td className="px-5 py-4">
+                  <tr key={ad.id}>
+                    <td>
                       <div className="flex items-center gap-3">
-                        <div className="w-16 h-10 rounded-lg overflow-hidden bg-slate-100 dark:bg-slate-700 flex-shrink-0">
+                        <div className="w-16 h-10 rounded-lg overflow-hidden bg-[var(--dash-bg-3)] flex-shrink-0">
                           {ad.imageUrl ? (
-                            <img 
-                              src={ad.imageUrl} 
+                            <img
+                              src={ad.imageUrl}
                               alt={ad.title}
                               className="w-full h-full object-cover"
                             />
                           ) : (
                             <div className="w-full h-full flex items-center justify-center">
-                              <ImageIcon className="w-4 h-4 text-slate-400" />
+                              <ImageIcon className="w-4 h-4 text-[var(--dash-muted-2)]" />
                             </div>
                           )}
                         </div>
                         <div>
-                          <p className="font-medium text-slate-800 dark:text-white">{ad.title}</p>
+                          <p className="font-medium text-[var(--dash-ink)]">{ad.title}</p>
                           {ad.description && (
-                            <p className="text-xs text-slate-500 dark:text-slate-400 truncate max-w-xs">
+                            <p className="text-xs text-[var(--dash-muted)] truncate max-w-xs">
                               {ad.description}
                             </p>
                           )}
                         </div>
                       </div>
                     </td>
-                    <td className="px-5 py-4">
+                    <td>
                       {getTargetBadge(ad.targetScope, ad.agencyId)}
                     </td>
-                    <td className="px-5 py-4">
+                    <td>
                       {getStatusBadge(ad.status)}
                     </td>
-                    <td className="px-5 py-4">
+                    <td>
                       <div className="text-sm">
-                        <p className="text-slate-800 dark:text-white">
+                        <p className="text-[var(--dash-ink)]">
                           {new Date(ad.startDate).toLocaleDateString('fr-FR')}
                         </p>
                         {ad.endDate && (
-                          <p className="text-slate-500 dark:text-slate-400 text-xs">
+                          <p className="text-[var(--dash-muted)] text-xs">
                             → {new Date(ad.endDate).toLocaleDateString('fr-FR')}
                           </p>
                         )}
                       </div>
                     </td>
-                    <td className="px-5 py-4">
+                    <td>
                       <div className="flex items-center gap-4 text-sm">
-                        <span className="flex items-center gap-1 text-slate-600 dark:text-slate-400">
+                        <span className="flex items-center gap-1 text-[var(--dash-ink-2)]">
                           <Eye className="w-3 h-3" />
                           {ad.impressions.toLocaleString()}
                         </span>
-                        <span className="flex items-center gap-1 text-purple-600 dark:text-purple-400">
+                        <span className="flex items-center gap-1 text-[var(--dash-brand)]">
                           <MousePointer className="w-3 h-3" />
                           {ad.clicks.toLocaleString()}
                         </span>
-                        <span className="text-emerald-600 dark:text-emerald-400 font-medium">
+                        <span className="text-[var(--dash-emerald)] font-medium">
                           {calculateCtr(ad)}%
                         </span>
                       </div>
                     </td>
-                    <td className="px-5 py-4 text-right">
+                    <td className="text-right">
                       <div className="flex items-center justify-end gap-2">
-                        <Button
+                        <button
                           onClick={() => toggleStatus(ad)}
-                          variant="ghost"
-                          size="sm"
-                          className="h-8 w-8 p-0"
+                          className="p-2 rounded-lg hover:bg-[var(--dash-bg-3)] transition-colors"
                           title={ad.status === 'active' ? 'Mettre en pause' : 'Activer'}
                         >
                           {ad.status === 'active' ? (
-                            <Pause className="w-4 h-4 text-amber-500" />
+                            <Pause className="w-4 h-4 text-[var(--dash-ink-2)]" />
                           ) : (
-                            <Play className="w-4 h-4 text-emerald-500" />
+                            <Play className="w-4 h-4 text-[var(--dash-emerald)]" />
                           )}
-                        </Button>
-                        <Button
+                        </button>
+                        <button
                           onClick={() => openEditModal(ad)}
-                          variant="ghost"
-                          size="sm"
-                          className="h-8 w-8 p-0"
+                          className="p-2 rounded-lg hover:bg-[var(--dash-bg-3)] transition-colors"
+                          title="Modifier"
                         >
-                          <Edit className="w-4 h-4 text-slate-500" />
-                        </Button>
-                        <Button
+                          <Edit className="w-4 h-4 text-[var(--dash-muted)]" />
+                        </button>
+                        <button
                           onClick={() => handleDelete(ad.id)}
-                          variant="ghost"
-                          size="sm"
-                          className="h-8 w-8 p-0"
+                          className="p-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
+                          title="Supprimer"
                         >
                           <Trash2 className="w-4 h-4 text-red-500" />
-                        </Button>
+                        </button>
                       </div>
                     </td>
                   </tr>
@@ -665,90 +655,84 @@ export default function PublicitesPage() {
 
         {/* Pagination */}
         {data && data.pagination.totalPages > 1 && (
-          <div className="flex items-center justify-between px-5 py-4 border-t border-slate-100 dark:border-slate-700">
-            <p className="text-sm text-slate-500 dark:text-slate-400">
+          <div className="flex items-center justify-between px-5 py-4 border-t border-[var(--dash-border)]">
+            <p className="text-sm text-[var(--dash-muted)]">
               Affichage de {((page - 1) * 10) + 1} à {Math.min(page * 10, data.pagination.total)} sur {data.pagination.total}
             </p>
             <div className="flex gap-2">
-              <Button
+              <button
                 onClick={() => setPage(p => Math.max(1, p - 1))}
                 disabled={page === 1}
-                variant="outline"
-                size="sm"
-                className="rounded-lg"
+                className="px-3 py-1.5 rounded-lg text-sm font-medium border border-[var(--dash-border)] bg-[var(--dash-card)] text-[var(--dash-ink-2)] hover:bg-[var(--dash-bg-3)] disabled:opacity-50 transition-colors"
               >
                 Précédent
-              </Button>
-              <Button
+              </button>
+              <button
                 onClick={() => setPage(p => Math.min(data.pagination.totalPages, p + 1))}
                 disabled={page === data.pagination.totalPages}
-                variant="outline"
-                size="sm"
-                className="rounded-lg"
+                className="px-3 py-1.5 rounded-lg text-sm font-medium border border-[var(--dash-border)] bg-[var(--dash-card)] text-[var(--dash-ink-2)] hover:bg-[var(--dash-bg-3)] disabled:opacity-50 transition-colors"
               >
                 Suivant
-              </Button>
+              </button>
             </div>
           </div>
         )}
-      </Card>
+      </div>
 
       {/* Create/Edit Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <Card className="bg-white dark:bg-slate-800 rounded-2xl max-w-2xl w-full shadow-2xl max-h-[90vh] overflow-y-auto">
-            <CardContent className="p-6">
+          <div className="bg-[var(--dash-card)] border border-[var(--dash-border)] rounded-2xl max-w-2xl w-full shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-lg font-semibold text-slate-800 dark:text-white">
+                <h3 className="font-display text-lg font-semibold text-[var(--dash-ink)]">
                   {modalMode === 'create' ? 'Nouvelle publicité' : 'Modifier la publicité'}
                 </h3>
-                <Button
-                  variant="ghost"
-                  size="sm"
+                <button
                   onClick={() => setShowModal(false)}
-                  className="h-8 w-8 p-0 rounded-full"
+                  className="p-2 rounded-full hover:bg-[var(--dash-bg-3)] text-[var(--dash-muted)] transition-colors"
                 >
                   <X className="w-4 h-4" />
-                </Button>
+                </button>
               </div>
 
               <div className="space-y-5">
                 {/* Title */}
                 <div>
-                  <Label className="text-slate-700 dark:text-slate-300">Titre *</Label>
+                  <Label className="text-[var(--dash-ink-2)]">Titre *</Label>
                   <Input
                     value={formData.title}
                     onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                     placeholder="Ex: Offre spéciale Hajj 2026"
-                    className="mt-1 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700"
+                    className="mt-1 bg-[var(--dash-card)] border-[var(--dash-border)] text-[var(--dash-ink)]"
                   />
                 </div>
 
                 {/* Description */}
                 <div>
-                  <Label className="text-slate-700 dark:text-slate-300">Description</Label>
+                  <Label className="text-[var(--dash-ink-2)]">Description</Label>
                   <Textarea
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                     placeholder="Description courte de l'offre..."
                     rows={2}
-                    className="mt-1 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700"
+                    className="mt-1 bg-[var(--dash-card)] border-[var(--dash-border)] text-[var(--dash-ink)]"
                   />
                 </div>
 
                 {/* Image URL */}
                 <div>
-                  <Label className="text-slate-700 dark:text-slate-300">URL de l'image *</Label>
+                  <Label className="text-[var(--dash-ink-2)]">URL de l&apos;image *</Label>
                   <Input
                     value={formData.imageUrl}
                     onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
                     placeholder="https://exemple.com/banniere.jpg"
-                    className="mt-1 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700"
+                    className="mt-1 bg-[var(--dash-card)] border-[var(--dash-border)] text-[var(--dash-ink)]"
                   />
                   {formData.imageUrl && (
-                    <div className="mt-2 rounded-lg overflow-hidden bg-slate-100 dark:bg-slate-700 h-24">
-                      <img 
-                        src={formData.imageUrl} 
+                    <div className="mt-2 rounded-lg overflow-hidden bg-[var(--dash-bg-3)] h-24">
+                      <img
+                        src={formData.imageUrl}
                         alt="Preview"
                         className="w-full h-full object-cover"
                         onError={(e) => {
@@ -761,28 +745,26 @@ export default function PublicitesPage() {
 
                 {/* Link URL */}
                 <div>
-                  <Label className="text-slate-700 dark:text-slate-300">URL du lien (optionnel)</Label>
+                  <Label className="text-[var(--dash-ink-2)]">URL du lien (optionnel)</Label>
                   <Input
                     value={formData.linkUrl}
                     onChange={(e) => setFormData({ ...formData, linkUrl: e.target.value })}
                     placeholder="https://exemple.com/offre"
-                    className="mt-1 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700"
+                    className="mt-1 bg-[var(--dash-card)] border-[var(--dash-border)] text-[var(--dash-ink)]"
                   />
                 </div>
 
                 {/* Position - Fixed to footer only */}
                 <div>
-                  <Label className="text-slate-700 dark:text-slate-300">Emplacement</Label>
-                  <div className="mt-1 p-3 bg-slate-100 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
+                  <Label className="text-[var(--dash-ink-2)]">Emplacement</Label>
+                  <div className="mt-1 p-3 bg-[var(--dash-bg-3)] rounded-xl border border-[var(--dash-border)]">
                     <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-lg bg-[#ff7f00]/20 flex items-center justify-center">
-                        <svg className="w-4 h-4 text-[#ff7f00]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                        </svg>
+                      <div className="w-8 h-8 rounded-lg bg-[var(--dash-brand-soft)] flex items-center justify-center">
+                        <Target className="w-4 h-4 text-[var(--dash-brand)]" />
                       </div>
                       <div>
-                        <p className="font-medium text-slate-700 dark:text-slate-300">Footer (Bas de page)</p>
-                        <p className="text-xs text-slate-500 dark:text-slate-400">Affiché en bas du tableau de bord agence</p>
+                        <p className="font-medium text-[var(--dash-ink)]">Footer (Bas de page)</p>
+                        <p className="text-xs text-[var(--dash-muted)]">Affiché en bas du tableau de bord agence</p>
                       </div>
                     </div>
                   </div>
@@ -791,15 +773,15 @@ export default function PublicitesPage() {
 
                 {/* Target Scope */}
                 <div>
-                  <Label className="text-slate-700 dark:text-slate-300">Ciblage</Label>
-                  <Select 
-                    value={formData.targetScope} 
+                  <Label className="text-[var(--dash-ink-2)]">Ciblage</Label>
+                  <Select
+                    value={formData.targetScope}
                     onValueChange={(v) => setFormData({ ...formData, targetScope: v, agencyId: '' })}
                   >
-                    <SelectTrigger className="mt-1 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700">
+                    <SelectTrigger className="mt-1 bg-[var(--dash-card)] border-[var(--dash-border)] text-[var(--dash-ink)]">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="bg-[var(--dash-card)] border-[var(--dash-border)] text-[var(--dash-ink)]">
                       <SelectItem value="all">
                         <div className="flex items-center gap-2">
                           <Globe className="w-4 h-4" />
@@ -825,15 +807,15 @@ export default function PublicitesPage() {
                 {/* Agency Selection */}
                 {formData.targetScope === 'agency' && (
                   <div>
-                    <Label className="text-slate-700 dark:text-slate-300">Sélectionner l'agence</Label>
-                    <Select 
-                      value={formData.agencyId} 
+                    <Label className="text-[var(--dash-ink-2)]">Sélectionner l&apos;agence</Label>
+                    <Select
+                      value={formData.agencyId}
                       onValueChange={(v) => setFormData({ ...formData, agencyId: v })}
                     >
-                      <SelectTrigger className="mt-1 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700">
+                      <SelectTrigger className="mt-1 bg-[var(--dash-card)] border-[var(--dash-border)] text-[var(--dash-ink)]">
                         <SelectValue placeholder="Choisir une agence" />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="bg-[var(--dash-card)] border-[var(--dash-border)] text-[var(--dash-ink)]">
                         {agencies.map(agency => (
                           <SelectItem key={agency.id} value={agency.id}>{agency.name}</SelectItem>
                         ))}
@@ -845,21 +827,21 @@ export default function PublicitesPage() {
                 {/* Dates */}
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label className="text-slate-700 dark:text-slate-300">Date de début *</Label>
+                    <Label className="text-[var(--dash-ink-2)]">Date de début *</Label>
                     <Input
                       type="date"
                       value={formData.startDate}
                       onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-                      className="mt-1 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700"
+                      className="mt-1 bg-[var(--dash-card)] border-[var(--dash-border)] text-[var(--dash-ink)]"
                     />
                   </div>
                   <div>
-                    <Label className="text-slate-700 dark:text-slate-300">Date de fin</Label>
+                    <Label className="text-[var(--dash-ink-2)]">Date de fin</Label>
                     <Input
                       type="date"
                       value={formData.endDate}
                       onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
-                      className="mt-1 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700"
+                      className="mt-1 bg-[var(--dash-card)] border-[var(--dash-border)] text-[var(--dash-ink)]"
                     />
                   </div>
                 </div>
@@ -867,15 +849,15 @@ export default function PublicitesPage() {
                 {/* Status and Priority */}
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label className="text-slate-700 dark:text-slate-300">Statut</Label>
-                    <Select 
-                      value={formData.status} 
+                    <Label className="text-[var(--dash-ink-2)]">Statut</Label>
+                    <Select
+                      value={formData.status}
                       onValueChange={(v) => setFormData({ ...formData, status: v })}
                     >
-                      <SelectTrigger className="mt-1 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700">
+                      <SelectTrigger className="mt-1 bg-[var(--dash-card)] border-[var(--dash-border)] text-[var(--dash-ink)]">
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="bg-[var(--dash-card)] border-[var(--dash-border)] text-[var(--dash-ink)]">
                         <SelectItem value="draft">Brouillon</SelectItem>
                         <SelectItem value="active">Active</SelectItem>
                         <SelectItem value="paused">En pause</SelectItem>
@@ -883,14 +865,14 @@ export default function PublicitesPage() {
                     </Select>
                   </div>
                   <div>
-                    <Label className="text-slate-700 dark:text-slate-300">Priorité</Label>
+                    <Label className="text-[var(--dash-ink-2)]">Priorité</Label>
                     <Input
                       type="number"
                       value={formData.priority}
                       onChange={(e) => setFormData({ ...formData, priority: parseInt(e.target.value) || 0 })}
-                      className="mt-1 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700"
+                      className="mt-1 bg-[var(--dash-card)] border-[var(--dash-border)] text-[var(--dash-ink)]"
                     />
-                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                    <p className="text-xs text-[var(--dash-muted)] mt-1">
                       Plus élevé = affichage prioritaire
                     </p>
                   </div>
@@ -898,29 +880,28 @@ export default function PublicitesPage() {
               </div>
 
               {/* Footer */}
-              <div className="flex justify-end gap-3 mt-6 pt-6 border-t border-slate-100 dark:border-slate-700">
-                <Button
-                  variant="outline"
+              <div className="flex justify-end gap-3 mt-6 pt-6 border-t border-[var(--dash-border)]">
+                <button
                   onClick={() => setShowModal(false)}
-                  className="border-slate-200 dark:border-slate-700"
+                  className="px-4 py-2 rounded-lg text-sm font-medium border border-[var(--dash-border)] bg-[var(--dash-card)] text-[var(--dash-ink-2)] hover:bg-[var(--dash-bg-3)] transition-colors"
                 >
                   Annuler
-                </Button>
-                <Button
+                </button>
+                <button
                   onClick={handleSave}
                   disabled={saving}
-                  className="bg-[#ff7f00] hover:bg-[#ff7f00]/90 text-white"
+                  className="btn-brand btn-magnetic inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium disabled:opacity-60"
                 >
                   {saving ? (
-                    <RefreshCw className="w-4 h-4 animate-spin mr-2" />
+                    <RefreshCw className="w-4 h-4 animate-spin" />
                   ) : (
-                    <Save className="w-4 h-4 mr-2" />
+                    <Save className="w-4 h-4" />
                   )}
                   Enregistrer
-                </Button>
+                </button>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
       )}
     </div>

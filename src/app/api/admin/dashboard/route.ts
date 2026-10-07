@@ -31,7 +31,59 @@ export async function GET() {
     // Get agencies count
     const agenciesCount = await db.agency.count();
 
-    // Calculate statistics
+    // ─── Helpers for sparkline + delta computation ─────────
+    // Returns last N days of counts + delta % vs previous N days
+    function computeSparklineAndDelta(
+      filterFn: (b: typeof baggages[number], createdAt: Date) => boolean,
+      days = 12
+    ): { sparkline: number[]; delta: number | null } {
+      const now = new Date();
+      const currentPeriod: number[] = [];
+      const previousPeriod: number[] = [];
+
+      for (let i = days - 1; i >= 0; i--) {
+        const dayEnd = new Date(now);
+        dayEnd.setDate(dayEnd.getDate() - i);
+        dayEnd.setHours(23, 59, 59, 999);
+        const dayStart = new Date(dayEnd);
+        dayStart.setHours(0, 0, 0, 0);
+
+        const count = baggages.filter(b => {
+          const createdAt = new Date(b.createdAt);
+          return createdAt >= dayStart && createdAt <= dayEnd && filterFn(b, createdAt);
+        }).length;
+        currentPeriod.push(count);
+      }
+
+      // Previous period (days N+1 to 2N)
+      for (let i = days * 2 - 1; i >= days; i--) {
+        const dayEnd = new Date(now);
+        dayEnd.setDate(dayEnd.getDate() - i);
+        dayEnd.setHours(23, 59, 59, 999);
+        const dayStart = new Date(dayEnd);
+        dayStart.setHours(0, 0, 0, 0);
+
+        const count = baggages.filter(b => {
+          const createdAt = new Date(b.createdAt);
+          return createdAt >= dayStart && createdAt <= dayEnd && filterFn(b, createdAt);
+        }).length;
+        previousPeriod.push(count);
+      }
+
+      const currentSum = currentPeriod.reduce((a, b) => a + b, 0);
+      const previousSum = previousPeriod.reduce((a, b) => a + b, 0);
+
+      let delta: number | null = null;
+      if (previousSum > 0) {
+        delta = Math.round(((currentSum - previousSum) / previousSum) * 100 * 10) / 10;
+      } else if (currentSum > 0) {
+        delta = 100; // +100% if previous was 0 and current > 0
+      }
+
+      return { sparkline: currentPeriod, delta };
+    }
+
+    // ─── Compute KPIs with sparklines + deltas ─────────
     const totalQR = baggages.length;
     const activeBaggages = baggages.filter(b => isActive(b.status)).length;
 
@@ -49,6 +101,16 @@ export async function GET() {
       new Date(b.expiresAt) <= sevenDaysFromNow && 
       new Date(b.expiresAt) > now
     ).length;
+
+    // ─── Sparklines + deltas per KPI (last 12 days) ─────
+    const totalQRStats = computeSparklineAndDelta(() => true);
+    const activeStats = computeSparklineAndDelta((b) => isActive(b.status));
+    const travelersStats = computeSparklineAndDelta((b) => !!b.travelerFirstName);
+    const expiringStats = computeSparklineAndDelta((b) =>
+      Boolean(b.expiresAt &&
+      new Date(b.expiresAt) <= sevenDaysFromNow &&
+      new Date(b.expiresAt) > now)
+    );
 
     // Get daily activations for the last 7 days
     const last7Days: { day: string; count: number }[] = [];
@@ -140,10 +202,22 @@ export async function GET() {
       totalAgencies: agenciesCount,
     };
 
+    // Per-KPI sparkline + delta data (last 12 days vs previous 12 days)
+    const kpiTrends = {
+      totalQR: totalQRStats,
+      activeBaggages: activeStats,
+      uniqueTravelers: travelersStats,
+      expiringSoon: expiringStats,
+      // Static for KPIs without time-series data
+      pendingOrders: { sparkline: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], delta: null },
+      totalAgencies: { sparkline: [agenciesCount], delta: null },
+    };
+
     return NextResponse.json({
       stats,
       dailyActivations: last7Days,
       recentActivities,
+      kpiTrends,
     });
   } catch (error) {
     console.error('Error fetching dashboard data:', error);

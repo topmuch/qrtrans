@@ -78,22 +78,6 @@ function generateDefaultActivations(): DailyActivation[] {
   });
 }
 
-/** Stable mock delta for a given KPI seed (between -5 and +15). */
-function mockDelta(seed: number): number {
-  const rand = Math.sin(seed * 9301 + 49297) * 233280;
-  const frac = rand - Math.floor(rand); // 0..1
-  return Math.round((frac * 20 - 5) * 10) / 10;
-}
-
-/** Stable 12-point sparkline for a given KPI seed. */
-function mockSparkline(seed: number): number[] {
-  return Array.from({ length: 12 }, (_, i) => {
-    const rand = Math.sin((seed + 1) * (i + 1) * 12.9898) * 43758.5453;
-    const frac = rand - Math.floor(rand);
-    return Math.round(frac * 40 + 5);
-  });
-}
-
 // ─────────────────────────────────────────────────────────────────────────────
 // Quick Actions
 // ─────────────────────────────────────────────────────────────────────────────
@@ -321,6 +305,14 @@ export default function DashboardPage() {
   const [dailyActivations, setDailyActivations] = useState<DailyActivation[]>([]);
   const [recentActivities, setRecentActivities] = useState<RecentActivity[]>([]);
   const [loading, setLoading] = useState(true);
+  const [kpiTrends, setKpiTrends] = useState<{
+    totalQR: { sparkline: number[]; delta: number | null };
+    activeBaggages: { sparkline: number[]; delta: number | null };
+    uniqueTravelers: { sparkline: number[]; delta: number | null };
+    expiringSoon: { sparkline: number[]; delta: number | null };
+    pendingOrders: { sparkline: number[]; delta: number | null };
+    totalAgencies: { sparkline: number[]; delta: number | null };
+  } | null>(null);
 
   useEffect(() => {
     const checkNewMessages = async () => {
@@ -349,6 +341,9 @@ export default function DashboardPage() {
         setStats(data.stats || stats);
         setDailyActivations(data.dailyActivations || generateDefaultActivations());
         setRecentActivities(data.recentActivities || []);
+        if (data.kpiTrends) {
+          setKpiTrends(data.kpiTrends);
+        }
       } else {
         setDailyActivations(generateDefaultActivations());
       }
@@ -369,8 +364,8 @@ export default function DashboardPage() {
         subtitle: `${stats.activeBaggages} actifs`,
         icon: QrCode,
         color: 'brand' as const,
-        delta: mockDelta(1),
-        sparkline: mockSparkline(1),
+        delta: kpiTrends?.totalQR?.delta ?? undefined,
+        sparkline: kpiTrends?.totalQR?.sparkline,
       },
       {
         label: 'QR Activés',
@@ -378,8 +373,8 @@ export default function DashboardPage() {
         subtitle: 'En service',
         icon: CheckCircle,
         color: 'emerald' as const,
-        delta: mockDelta(2),
-        sparkline: mockSparkline(2),
+        delta: kpiTrends?.activeBaggages?.delta ?? undefined,
+        sparkline: kpiTrends?.activeBaggages?.sparkline,
       },
       {
         label: 'Voyageurs',
@@ -387,8 +382,8 @@ export default function DashboardPage() {
         subtitle: 'Utilisateurs uniques',
         icon: Users,
         color: 'violet' as const,
-        delta: mockDelta(3),
-        sparkline: mockSparkline(3),
+        delta: kpiTrends?.uniqueTravelers?.delta ?? undefined,
+        sparkline: kpiTrends?.uniqueTravelers?.sparkline,
       },
       {
         label: 'Commandes',
@@ -396,8 +391,8 @@ export default function DashboardPage() {
         subtitle: 'En attente',
         icon: ShoppingCart,
         color: 'amber' as const,
-        delta: mockDelta(4),
-        sparkline: mockSparkline(4),
+        delta: kpiTrends?.pendingOrders?.delta ?? undefined,
+        sparkline: kpiTrends?.pendingOrders?.sparkline,
       },
       {
         label: 'Agences',
@@ -405,8 +400,8 @@ export default function DashboardPage() {
         subtitle: 'Partenaires',
         icon: Building2,
         color: 'cyan' as const,
-        delta: mockDelta(5),
-        sparkline: mockSparkline(5),
+        delta: kpiTrends?.totalAgencies?.delta ?? undefined,
+        sparkline: kpiTrends?.totalAgencies?.sparkline,
       },
       {
         label: 'Expiration',
@@ -414,11 +409,11 @@ export default function DashboardPage() {
         subtitle: 'À renouveler',
         icon: AlertTriangle,
         color: 'rose' as const,
-        delta: mockDelta(6),
-        sparkline: mockSparkline(6),
+        delta: kpiTrends?.expiringSoon?.delta ?? undefined,
+        sparkline: kpiTrends?.expiringSoon?.sparkline,
       },
     ],
-    [stats],
+    [stats, kpiTrends],
   );
 
   // Map daily activations to chart data, fall back to mock when empty/all zero
