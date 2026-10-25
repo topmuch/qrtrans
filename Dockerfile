@@ -5,7 +5,7 @@
 # ── Stage 1: Build ──
 FROM node:20-alpine AS builder
 
-ARG CACHEBUST=20
+ARG CACHEBUST=21
 
 # Install required packages for building
 RUN apk add --no-cache git sqlite build-base
@@ -32,7 +32,7 @@ RUN bun run build
 # ── Stage 2: Production (minimal image) ──
 FROM node:20-alpine AS runner
 
-ARG CACHEBUST=20
+ARG CACHEBUST=21
 
 # Only install runtime essentials
 RUN apk add --no-cache sqlite-libs
@@ -56,21 +56,10 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 
-# Copy runtime-only node_modules
+# Copy runtime-only node_modules (Prisma client + CLI)
 COPY --from=builder --chown=nextjs:nodejs /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder --chown=nextjs:nodejs /app/node_modules/@prisma ./node_modules/@prisma
 COPY --from=builder --chown=nextjs:nodejs /app/node_modules/prisma ./node_modules/prisma
-
-# Copy runtime packages needed by API routes
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules/qrcode ./node_modules/qrcode
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules/pngjs ./node_modules/pngjs
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules/dijkstrajs ./node_modules/dijkstrajs
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules/jszip ./node_modules/jszip
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules/nodemailer ./node_modules/nodemailer
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules/mailparser ./node_modules/mailparser
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules/iconv-lite ./node_modules/iconv-lite
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules/he ./node_modules/he
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules/mimetic ./node_modules/mimetic 2>/dev/null || true
 
 # Copy Prisma schema + migration script
 COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
