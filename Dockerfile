@@ -30,5 +30,5 @@ ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 ENV DATABASE_URL=file:/app/data/move.db
 
-# Start command - sync schema and start server
-CMD sh -c "mkdir -p /app/data && export DATABASE_URL=file:/app/data/move.db && npx prisma db push --skip-generate 2>/dev/null || true && exec node .next/standalone/server.js"
+# Start command - sync schema, seed database, and start server
+CMD sh -c "mkdir -p /app/data && export DATABASE_URL=file:/app/data/move.db && npx prisma db push --skip-generate 2>/dev/null || true && bun run prisma/seed.ts 2>/dev/null || true && exec node .next/standalone/server.js"
