@@ -27,7 +27,7 @@ function LoginRedirect() {
   return (
     <div className="min-h-screen bg-[#FBFCFE] flex items-center justify-center">
       <div className="flex items-center gap-3">
-        <Loader2 className="w-6 h-6 text-[#1E4B7A] animate-spin" />
+        <Loader2 className="w-6 h-6 text-[#00256D] animate-spin" />
         <span className="text-[#5B7088]">Redirection...</span>
       </div>
     </div>
@@ -59,16 +59,16 @@ const ROLES = [
     title: 'Espace Agence',
     description: 'Pour les transporteurs et agences de voyage',
     features: ['Gestion des colis', 'QR codes en 1 clic', 'Dashboard temps réel', 'Notifications WhatsApp'],
-    accent: 'from-[#1E4B7A] to-[#487AA8]',
+    accent: 'from-[#00256D] to-[#1A5DAA]',
   },
   {
     id: 'superadmin' as const,
     href: '/admin/connexion',
     icon: Shield,
     title: 'Espace Administrateur',
-    description: 'Pour les administrateurs système QRTrans',
+    description: 'Pour les administrateurs système Mov',
     features: ['Contrôle centralisé', 'Gestion des agences', 'Logs & sécurité', 'API & intégrations'],
-    accent: 'from-[#0F2D52] to-[#1E4B7A]',
+    accent: 'from-[#001A4D] to-[#00256D]',
   },
 ];
 
@@ -100,7 +100,7 @@ function LoginChoice() {
           <Link href="/">
             <Image
               src="/brand/logo.png"
-              alt="QRTrans"
+              alt="Mov"
               width={240}
               height={71}
               className="h-14 w-auto object-contain"
@@ -111,9 +111,9 @@ function LoginChoice() {
 
         {/* Heading */}
         <motion.div variants={fadeUp} custom={1} className="text-center mb-12">
-          <p className="font-display text-xs uppercase tracking-[0.3em] text-[#1E4B7A] mb-3 flex items-center justify-center gap-2">
+          <p className="font-display text-xs uppercase tracking-[0.3em] text-[#00256D] mb-3 flex items-center justify-center gap-2">
             <Sparkles className="w-3.5 h-3.5" />
-            Bienvenue sur QRTrans
+            Bienvenue sur Mov
           </p>
           <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold text-[#0F1B2E] tracking-tight leading-[1.05]">
             Choisissez votre espace.
@@ -130,7 +130,7 @@ function LoginChoice() {
             <motion.div key={role.id} variants={fadeUp} custom={3}>
               <Link
                 href={role.href}
-                className="group block glass-light-strong rounded-3xl p-8 border border-[#1E4B7A]/15 hover:border-[#1E4B7A]/40 transition-all duration-500 hover:shadow-2xl hover:shadow-[#1E4B7A]/15 hover:-translate-y-1"
+                className="group block glass-light-strong rounded-3xl p-8 border border-[#00256D]/15 hover:border-[#00256D]/40 transition-all duration-500 hover:shadow-2xl hover:shadow-[#00256D]/15 hover:-translate-y-1"
               >
                 {/* Icon tile */}
                 <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${role.accent} flex items-center justify-center shadow-lg mb-6 group-hover:scale-110 transition-transform`}>
@@ -149,19 +149,19 @@ function LoginChoice() {
                 <ul className="space-y-2.5 mb-8">
                   {role.features.map((feat) => (
                     <li key={feat} className="flex items-center gap-2.5 text-sm text-[#0F1B2E]/80">
-                      <span className="w-1.5 h-1.5 rounded-full bg-gradient-to-br from-[#1E4B7A] to-[#487AA8]" />
+                      <span className="w-1.5 h-1.5 rounded-full bg-gradient-to-br from-[#00256D] to-[#1A5DAA]" />
                       {feat}
                     </li>
                   ))}
                 </ul>
 
                 {/* CTA */}
-                <div className="flex items-center justify-between pt-4 border-t border-[#1E4B7A]/10">
-                  <span className="text-sm font-bold text-[#1E4B7A] group-hover:text-[#0F2D52] transition-colors">
+                <div className="flex items-center justify-between pt-4 border-t border-[#00256D]/10">
+                  <span className="text-sm font-bold text-[#00256D] group-hover:text-[#001A4D] transition-colors">
                     Se connecter
                   </span>
-                  <div className="w-9 h-9 rounded-xl bg-[#1E4B7A]/10 group-hover:bg-[#1E4B7A] flex items-center justify-center transition-colors">
-                    <ArrowRight className="w-4 h-4 text-[#1E4B7A] group-hover:text-white transition-colors" />
+                  <div className="w-9 h-9 rounded-xl bg-[#00256D]/10 group-hover:bg-[#00256D] flex items-center justify-center transition-colors">
+                    <ArrowRight className="w-4 h-4 text-[#00256D] group-hover:text-white transition-colors" />
                   </div>
                 </div>
               </Link>
@@ -172,7 +172,7 @@ function LoginChoice() {
         {/* Footer */}
         <motion.div variants={fadeUp} custom={4} className="mt-12 text-center">
           <p className="text-xs text-[#5B7088]">
-            © {new Date().getFullYear()} QRTrans — Tous droits réservés
+            © {new Date().getFullYear()} Mov — Tous droits réservés
           </p>
         </motion.div>
       </motion.div>
@@ -188,7 +188,7 @@ export default function LoginPage() {
   if (!mounted) {
     return (
       <div className="min-h-screen bg-[#FBFCFE] flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-[#1E4B7A] animate-spin" />
+        <Loader2 className="w-8 h-8 text-[#00256D] animate-spin" />
       </div>
     );
   }

@@ -30,7 +30,7 @@ function Navigation() {
             <div className="w-10 h-10 bg-gradient-to-br from-[#ff2a6d] to-[#d35400] rounded-lg flex items-center justify-center shadow-lg shadow-[#ff2a6d]/20">
               <QrCode className="w-6 h-6 text-white" />
             </div>
-            <span className="text-xl font-bold text-[#ff2a6d]">QRTrans</span>
+            <span className="text-xl font-bold text-[#ff2a6d]">Mov</span>
           </Link>
 
           {/* Desktop Nav */}
@@ -223,7 +223,7 @@ function AdvantagesSection() {
         {/* Title */}
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-            Pourquoi choisir <span className="text-[#d35400]">QRTrans Voyageurs ?</span>
+            Pourquoi choisir <span className="text-[#d35400]">Mov Voyageurs ?</span>
           </h2>
         </div>
 
@@ -360,13 +360,13 @@ function TestimonialsSection() {
     {
       name: "Sophie Martin",
       role: "Voyageuse fréquente",
-      content: "Simple, efficace et pas cher. J'ai utilisé QRTrans pour tous mes voyages cette année. Plus de stress !",
+      content: "Simple, efficace et pas cher. J'ai utilisé Mov pour tous mes voyages cette année. Plus de stress !",
       avatar: "👩🏻"
     },
     {
       name: "Thomas Dubois",
       role: "Business traveler",
-      content: "Je voyage souvent pour le travail. Avec QRTrans, je suis tranquille. L'activation prend 30 secondes top chrono.",
+      content: "Je voyage souvent pour le travail. Avec Mov, je suis tranquille. L'activation prend 30 secondes top chrono.",
       avatar: "👨🏻"
     }
   ];
@@ -440,7 +440,7 @@ function CTASection() {
         <p className="mt-8 text-[#e0e6f0]/70 text-sm">
           Vous êtes une agence ?{' '}
           <Link href="/devenir-partenaire" className="text-[#ffd700] font-medium hover:underline">
-            Devenez partenaire QRTrans
+            Devenez partenaire Mov
           </Link>
         </p>
       </div>
@@ -460,7 +460,7 @@ function Footer() {
               <div className="w-10 h-10 bg-gradient-to-br from-[#ff2a6d] to-[#d35400] rounded-lg flex items-center justify-center">
                 <QrCode className="w-6 h-6 text-white" />
               </div>
-              <span className="text-xl font-bold bg-gradient-to-r from-[#ff2a6d] to-[#d35400] bg-clip-text text-transparent">QRTrans</span>
+              <span className="text-xl font-bold bg-gradient-to-r from-[#ff2a6d] to-[#d35400] bg-clip-text text-transparent">Mov</span>
             </div>
             <p className="text-[#a0a8b8] text-sm">
               Protection intelligente des colis pour voyageurs et pèlerins.
@@ -496,7 +496,7 @@ function Footer() {
               </li>
               <li className="flex items-center gap-2">
                 <Mail className="w-4 h-4 text-[#d35400]" />
-                contact@qrtrans.com
+                contact@newvisioncargo.pro
               </li>
               <li className="flex items-center gap-2">
                 <MapPinned className="w-4 h-4 text-[#d35400]" />
@@ -509,7 +509,7 @@ function Footer() {
         {/* Bottom Bar */}
         <div className="border-t border-[#1a2238] pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-[#a0a8b8] text-sm">
-            © {new Date().getFullYear()} QRTrans. Tous droits réservés.
+            © {new Date().getFullYear()} Mov. Tous droits réservés.
           </p>
 
           <div className="flex items-center gap-4">

@@ -18,7 +18,7 @@ interface KpiCardProps {
 }
 
 const COLOR_TILES: Record<string, string> = {
-  brand: 'from-[#1E4B7A] to-[#487AA8]',
+  brand: 'from-[#00256D] to-[#1A5DAA]',
   emerald: 'from-[#10B981] to-[#34D399]',
   amber: 'from-[#F59E0B] to-[#FBBF24]',
   rose: 'from-[#EF4444] to-[#F87171]',

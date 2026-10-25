@@ -622,7 +622,7 @@ export default function MessagesPage() {
               )}
               {selectedMessage.senderEmail && selectedMessage.type !== 'assistance_agence' && (
                 <a
-                  href={`mailto:${selectedMessage.senderEmail}?subject=Re: Votre message sur QRTrans`}
+                  href={`mailto:${selectedMessage.senderEmail}?subject=Re: Votre message sur Mov`}
                   className="btn-brand inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium"
                 >
                   <Send className="w-4 h-4" aria-hidden="true" />
@@ -719,7 +719,7 @@ export default function MessagesPage() {
                           recipientAgencyId: selectedMessage.agencyId,
                           subject: `Re: ${selectedMessage.subject || 'Votre demande d\'assistance'}`,
                           content: replyContent,
-                          senderName: 'Support QRTrans',
+                          senderName: 'Support Mov',
                         }),
                       });
 

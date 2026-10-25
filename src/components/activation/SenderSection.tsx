@@ -15,7 +15,7 @@ interface SenderSectionProps {
 }
 
 const INPUT_CLS =
-  'h-12 sm:h-14 !bg-white border-[#1E4B7A]/15 focus-visible:ring-[#1E4B7A]/20 focus-visible:border-[#1E4B7A]/60 text-sm sm:text-base text-gray-900 placeholder:text-gray-500';
+  'h-12 sm:h-14 !bg-white border-[#00256D]/15 focus-visible:ring-[#00256D]/20 focus-visible:border-[#00256D]/60 text-sm sm:text-base text-gray-900 placeholder:text-gray-500';
 
 export default function SenderSection({
   senderName, setSenderName,
@@ -26,22 +26,22 @@ export default function SenderSection({
   const t = (fr: string, en: string) => lang === 'fr' ? fr : en;
 
   return (
-    <div className="glass-card-light rounded-2xl p-4 sm:p-6 border border-[#1E4B7A]/20">
-      <h2 className="font-display text-lg sm:text-xl font-bold text-[#1E4B7A] mb-4 sm:mb-6 flex items-center gap-2">
-        <Upload className="w-5 h-5 text-[#1E4B7A]" />
+    <div className="glass-card-light rounded-2xl p-4 sm:p-6 border border-[#00256D]/20">
+      <h2 className="font-display text-lg sm:text-xl font-bold text-[#00256D] mb-4 sm:mb-6 flex items-center gap-2">
+        <Upload className="w-5 h-5 text-[#00256D]" />
         {t('EXPÉDITEUR', 'SENDER')}
       </h2>
 
       <div className="space-y-4 sm:space-y-6">
         {/* ─── Section A: Coordonnées Expéditeur ─── */}
-        <div className="border-2 border-dashed border-[#1E4B7A]/30 rounded-xl p-3 sm:p-4">
-          <p className="font-display text-xs sm:text-sm font-bold text-[#1E4B7A] uppercase tracking-wider mb-2 sm:mb-3">
+        <div className="border-2 border-dashed border-[#00256D]/30 rounded-xl p-3 sm:p-4">
+          <p className="font-display text-xs sm:text-sm font-bold text-[#00256D] uppercase tracking-wider mb-2 sm:mb-3">
             {t('Coordonnées Expéditeur', 'Sender Details')}
           </p>
           <div className="space-y-3 sm:space-y-4">
             <div className="space-y-1.5">
               <Label htmlFor="sender_name" className="text-sm sm:text-base font-semibold text-[#0F1B2E]">
-                {t('Nom Complet', 'Full Name')} <span className="text-[#1E4B7A]">*</span>
+                {t('Nom Complet', 'Full Name')} <span className="text-[#00256D]">*</span>
               </Label>
               <Input
                 id="sender_name"

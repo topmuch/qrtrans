@@ -175,7 +175,7 @@ export default function AgencyReportsPage() {
               title="Évolution quotidienne"
               subtitle="Création de colis par jour"
               data={dailyChartData}
-              color="#1E4B7A"
+              color="#00256D"
               loading={loading}
             />
             <AreaChartCard

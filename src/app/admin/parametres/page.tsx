@@ -263,8 +263,8 @@ export default function ParametresPage() {
 
   const [emailSettings, setEmailSettings] = useState<EmailSettingsData>({
     provider: 'console',
-    fromEmail: 'noreply@qrtrans.com',
-    fromName: 'QRTrans',
+    fromEmail: 'noreply@newvisioncargo.pro',
+    fromName: 'Mov',
     recipientColisEmail: null,
     recipientSystemEmail: null,
     smtpHost: null,
@@ -482,7 +482,7 @@ export default function ParametresPage() {
       {/* Page Header */}
       <div className="mb-8">
         <h1 className="font-display text-2xl font-bold text-[var(--dash-ink)]">Paramètres</h1>
-        <p className="text-sm text-[var(--dash-muted)] mt-1">Configurez votre application QRTrans</p>
+        <p className="text-sm text-[var(--dash-muted)] mt-1">Configurez votre application Mov</p>
       </div>
       <div className="max-w-4xl mx-auto">
         {/* Header */}
@@ -882,7 +882,7 @@ export default function ParametresPage() {
                     type="text"
                     value={emailSettings.fromName}
                     onChange={(e) => setEmailSettings({ ...emailSettings, fromName: e.target.value })}
-                    placeholder="QRTrans"
+                    placeholder="Mov"
                     className="w-full px-4 py-3 bg-[var(--dash-card)] border border-[var(--dash-border)] rounded-xl text-[var(--dash-ink)] focus:outline-none focus:border-[var(--dash-brand)]"
                   />
                 </div>

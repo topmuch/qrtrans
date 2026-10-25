@@ -34,20 +34,20 @@ const FAQ_CATEGORIES: FAQCategory[] = [
   {
     title: 'Général',
     icon: HelpCircle,
-    description: 'Les bases de QRTrans et de notre offre.',
+    description: 'Les bases de Mov et de notre offre.',
     questions: [
       {
-        question: "Qu'est-ce que QRTrans ?",
+        question: "Qu'est-ce que Mov ?",
         answer:
-          "QRTrans est une plateforme de traçabilité et de sécurité logistique pour le transport inter-villes au Sénégal. Elle permet d'activer, tracer et sécuriser les colis grâce à des QR codes, des notifications WhatsApp automatiques et des codes PIN de retrait.",
+          "Mov est une plateforme de traçabilité et de sécurité logistique pour le transport inter-villes au Sénégal. Elle permet d'activer, tracer et sécuriser les colis grâce à des QR codes, des notifications WhatsApp automatiques et des codes PIN de retrait.",
       },
       {
-        question: 'Comment fonctionne QRTrans ?',
+        question: 'Comment fonctionne Mov ?',
         answer:
           "Le chauffeur scanne le QR code du colis, active l'expédition via un formulaire digital, un code PIN est généré et envoyé au destinataire par WhatsApp. À l'arrivée, le destinataire saisit le PIN pour récupérer son colis.",
       },
       {
-        question: 'QRTrans est-il gratuit ?',
+        question: 'Mov est-il gratuit ?',
         answer:
           "L'inscription est gratuite pour les agences. Les tarifs dépendent du volume de colis et du forfait choisi. Contactez-nous pour un devis personnalisé.",
       },
@@ -61,12 +61,12 @@ const FAQ_CATEGORIES: FAQCategory[] = [
       {
         question: 'Comment activer un colis ?',
         answer:
-          "Scannez le QR code avec votre smartphone ou saisissez la référence sur le site QRTrans. Remplissez le formulaire d'activation (expéditeur, destinataire, itinéraire) et validez.",
+          "Scannez le QR code avec votre smartphone ou saisissez la référence sur le site Mov. Remplissez le formulaire d'activation (expéditeur, destinataire, itinéraire) et validez.",
       },
       {
         question: "Que faire si je n'ai pas de réseau ?",
         answer:
-          "QRTrans dispose d'un mode hors-ligne. Activez et scannez vos colis sans connexion internet. La synchronisation se fait automatiquement dès que le réseau revient.",
+          "Mov dispose d'un mode hors-ligne. Activez et scannez vos colis sans connexion internet. La synchronisation se fait automatiquement dès que le réseau revient.",
       },
       {
         question: 'Comment suivre mon colis ?',
@@ -88,7 +88,7 @@ const FAQ_CATEGORIES: FAQCategory[] = [
       {
         question: 'Mes données sont-elles protégées ?',
         answer:
-          'Oui, toutes les données sont chiffrées de bout en bout et hébergées de manière sécurisée en France. QRTrans est entièrement conforme au RGPD.',
+          'Oui, toutes les données sont chiffrées de bout en bout et hébergées de manière sécurisée en France. Mov est entièrement conforme au RGPD.',
       },
     ],
   },
@@ -103,7 +103,7 @@ function FAQItem({ question, answer }: FAQ) {
   return (
     <div
       className={`glass-card-light overflow-hidden transition-all ${
-        isOpen ? 'border-[#1E4B7A]/40' : ''
+        isOpen ? 'border-[#00256D]/40' : ''
       }`}
     >
       <button
@@ -117,20 +117,20 @@ function FAQItem({ question, answer }: FAQ) {
         <div
           className={`flex-shrink-0 w-9 h-9 rounded-lg flex items-center justify-center transition-all ${
             isOpen
-              ? 'bg-[#1E4B7A]/15 border border-[#1E4B7A]/40 rotate-180'
-              : 'bg-[#1E4B7A]/5 border border-[#1E4B7A]/15'
+              ? 'bg-[#00256D]/15 border border-[#00256D]/40 rotate-180'
+              : 'bg-[#00256D]/5 border border-[#00256D]/15'
           }`}
         >
           <ChevronDown
             className={`w-4 h-4 transition-colors ${
-              isOpen ? 'text-[#1E4B7A]' : 'text-[#5B7088]'
+              isOpen ? 'text-[#00256D]' : 'text-[#5B7088]'
             }`}
           />
         </div>
       </button>
       {isOpen && (
         <div className="px-5 sm:px-6 pb-5 sm:pb-6">
-          <div className="border-t border-[#1E4B7A]/10 pt-4">
+          <div className="border-t border-[#00256D]/10 pt-4">
             <p className="text-[#5B7088] leading-relaxed text-sm sm:text-base">
               {answer}
             </p>
@@ -163,8 +163,8 @@ export default function FAQPage() {
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl mx-auto text-center">
             <div className="reveal-up inline-flex items-center gap-2.5 px-4 py-2 mb-7 rounded-full glass-light">
-              <MessageCircleQuestion className="w-4 h-4 text-[#1E4B7A]" />
-              <span className="text-xs sm:text-sm font-medium text-[#1E4B7A] tracking-wide">
+              <MessageCircleQuestion className="w-4 h-4 text-[#00256D]" />
+              <span className="text-xs sm:text-sm font-medium text-[#00256D] tracking-wide">
                 FAQ
               </span>
             </div>
@@ -175,19 +175,19 @@ export default function FAQPage() {
             </h1>
 
             <p className="reveal-up mt-6 text-lg sm:text-xl text-[#5B7088] max-w-2xl mx-auto leading-relaxed">
-              Trouvez rapidement les réponses à vos questions sur QRTrans, son
+              Trouvez rapidement les réponses à vos questions sur Mov, son
               fonctionnement, son utilisation et sa sécurité.
             </p>
 
             <div className="reveal-up mt-8 flex flex-wrap items-center justify-center gap-3">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-light text-sm text-[#1E4B7A]">
-                <HelpCircle className="w-4 h-4 text-[#1E4B7A]" />
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-light text-sm text-[#00256D]">
+                <HelpCircle className="w-4 h-4 text-[#00256D]" />
                 <span>
                   <strong className="text-[#0F1B2E]">{totalQuestions}</strong> questions
                 </span>
               </div>
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-light text-sm text-[#1E4B7A]">
-                <MessageCircleQuestion className="w-4 h-4 text-[#1E4B7A]" />
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-light text-sm text-[#00256D]">
+                <MessageCircleQuestion className="w-4 h-4 text-[#00256D]" />
                 <span>
                   <strong className="text-[#0F1B2E]">{FAQ_CATEGORIES.length}</strong> catégories
                 </span>
@@ -207,8 +207,8 @@ export default function FAQPage() {
             return (
               <div key={category.title} className="reveal-up" style={{ transitionDelay: `${catIdx * 60}ms` }}>
                 <div className="flex items-center gap-4 mb-6">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#1E4B7A]/15 to-[#487AA8]/5 border border-[#1E4B7A]/25 flex items-center justify-center">
-                    <CategoryIcon className="w-6 h-6 text-[#1E4B7A]" />
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#00256D]/15 to-[#1A5DAA]/5 border border-[#00256D]/25 flex items-center justify-center">
+                    <CategoryIcon className="w-6 h-6 text-[#00256D]" />
                   </div>
                   <div>
                     <h2 className="font-display text-xl sm:text-2xl font-bold text-[#0F1B2E]">
@@ -216,7 +216,7 @@ export default function FAQPage() {
                     </h2>
                     <p className="text-sm text-[#5B7088]">{category.description}</p>
                   </div>
-                  <span className="ml-auto hidden sm:inline-flex items-center justify-center px-3 py-1 rounded-full text-xs font-semibold text-[#1E4B7A] bg-[#1E4B7A]/10 border border-[#1E4B7A]/25">
+                  <span className="ml-auto hidden sm:inline-flex items-center justify-center px-3 py-1 rounded-full text-xs font-semibold text-[#00256D] bg-[#00256D]/10 border border-[#00256D]/25">
                     {category.questions.length} Q
                   </span>
                 </div>
@@ -252,8 +252,8 @@ export default function FAQPage() {
               }}
             />
             <div className="relative text-center">
-              <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-[#1E4B7A]/10 border border-[#1E4B7A]/25 mb-5">
-                <HelpCircle className="w-7 h-7 text-[#1E4B7A]" />
+              <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-[#00256D]/10 border border-[#00256D]/25 mb-5">
+                <HelpCircle className="w-7 h-7 text-[#00256D]" />
               </div>
               <h3 className="font-display text-2xl sm:text-3xl font-bold text-[#0F1B2E] mb-4 leading-tight">
                 Vous n&apos;avez pas trouvé votre{' '}
@@ -261,7 +261,7 @@ export default function FAQPage() {
               </h3>
               <p className="text-[#5B7088] mb-8 max-w-xl mx-auto leading-relaxed">
                 Notre équipe est disponible pour répondre à toutes vos questions et vous
-                accompagner dans l&apos;utilisation de QRTrans.
+                accompagner dans l&apos;utilisation de Mov.
               </p>
               <Link
                 href="/contact"

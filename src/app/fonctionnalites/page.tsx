@@ -41,7 +41,7 @@ const FEATURES: Feature[] = [
     description:
       'Scan instantané du QR code, formulaire digital pré-rempli, mise en route immédiate. Zéro papier, zéro friction.',
     span: 'lg:col-span-2',
-    accent: 'from-[#1E4B7A]/15 via-[#1E4B7A]/5 to-transparent',
+    accent: 'from-[#00256D]/15 via-[#00256D]/5 to-transparent',
   },
   {
     icon: MessageCircle,
@@ -49,7 +49,7 @@ const FEATURES: Feature[] = [
     description:
       'Expéditeur et destinataire informés à chaque étape du trajet via WhatsApp. Aucune application à installer.',
     span: '',
-    accent: 'from-[#487AA8]/15 via-[#487AA8]/5 to-transparent',
+    accent: 'from-[#1A5DAA]/15 via-[#1A5DAA]/5 to-transparent',
   },
   {
     icon: Lock,
@@ -65,7 +65,7 @@ const FEATURES: Feature[] = [
     description:
       'Position du colis en direct, historique des scans horodatés et géolocalisés à chaque étape du transport.',
     span: 'lg:col-span-2',
-    accent: 'from-[#1E4B7A]/15 via-[#1E4B7A]/5 to-transparent',
+    accent: 'from-[#00256D]/15 via-[#00256D]/5 to-transparent',
   },
   {
     icon: LayoutDashboard,
@@ -96,7 +96,7 @@ const STEPS: Step[] = [
     icon: ScanLine,
     title: 'Scan',
     description:
-      "Le chauffeur scanne le QR code du colis avec son smartphone — depuis l'application QRTrans ou n'importe quel lecteur.",
+      "Le chauffeur scanne le QR code du colis avec son smartphone — depuis l'application Mov ou n'importe quel lecteur.",
   },
   {
     icon: Smartphone,
@@ -143,7 +143,7 @@ function SectionHeadingLight({
   return (
     <div className={`${alignClass} max-w-3xl`}>
       {eyebrow && (
-        <p className="font-display text-xs sm:text-sm uppercase tracking-[0.3em] text-[#1E4B7A] mb-4 reveal-up">
+        <p className="font-display text-xs sm:text-sm uppercase tracking-[0.3em] text-[#00256D] mb-4 reveal-up">
           {eyebrow}
         </p>
       )}
@@ -177,9 +177,9 @@ export default function FonctionnalitesPage() {
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl mx-auto text-center">
             <div className="reveal-up inline-flex items-center gap-2.5 px-4 py-2 mb-7 rounded-full glass-light">
-              <Sparkles className="w-4 h-4 text-[#1E4B7A]" />
-              <span className="text-xs sm:text-sm font-medium text-[#1E4B7A] tracking-wide">
-                Fonctionnalités QRTrans
+              <Sparkles className="w-4 h-4 text-[#00256D]" />
+              <span className="text-xs sm:text-sm font-medium text-[#00256D] tracking-wide">
+                Fonctionnalités Mov
               </span>
             </div>
 
@@ -205,7 +205,7 @@ export default function FonctionnalitesPage() {
               </Link>
               <Link
                 href="/securite"
-                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl glass-light text-[#0F1B2E] font-semibold hover:border-[#1E4B7A]/40 transition-all"
+                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl glass-light text-[#0F1B2E] font-semibold hover:border-[#00256D]/40 transition-all"
               >
                 Voir la sécurité
               </Link>
@@ -245,8 +245,8 @@ export default function FonctionnalitesPage() {
                     className={`absolute -top-12 -right-12 w-40 h-40 rounded-full bg-gradient-to-br ${feature.accent} blur-2xl pointer-events-none`}
                   />
                   <div className="relative">
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#1E4B7A]/15 to-[#487AA8]/5 border border-[#1E4B7A]/25 flex items-center justify-center mb-5">
-                      <feature.icon className="w-6 h-6 text-[#1E4B7A]" />
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#00256D]/15 to-[#1A5DAA]/5 border border-[#00256D]/25 flex items-center justify-center mb-5">
+                      <feature.icon className="w-6 h-6 text-[#00256D]" />
                     </div>
                     <h3 className="font-display text-xl font-bold text-[#0F1B2E] mb-2 leading-snug">
                       {feature.title}
@@ -281,7 +281,7 @@ export default function FonctionnalitesPage() {
 
           <div className="mt-16 relative">
             {/* Horizontal connecting line (desktop) — steel-blue gradient */}
-            <div className="hidden lg:block absolute top-7 left-[12.5%] right-[12.5%] h-0.5 bg-gradient-to-r from-[#1E4B7A]/20 via-[#1E4B7A]/60 to-[#1E4B7A]/20" />
+            <div className="hidden lg:block absolute top-7 left-[12.5%] right-[12.5%] h-0.5 bg-gradient-to-r from-[#00256D]/20 via-[#00256D]/60 to-[#00256D]/20" />
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-4">
               {STEPS.map((step, index) => (
@@ -291,9 +291,9 @@ export default function FonctionnalitesPage() {
                   style={{ transitionDelay: `${index * 80}ms` }}
                 >
                   {/* Numbered badge — steel-blue gradient */}
-                  <div className="relative z-10 w-14 h-14 rounded-2xl bg-gradient-to-br from-[#1E4B7A] to-[#487AA8] flex items-center justify-center shadow-lg shadow-[#1E4B7A]/30 mb-5">
+                  <div className="relative z-10 w-14 h-14 rounded-2xl bg-gradient-to-br from-[#00256D] to-[#1A5DAA] flex items-center justify-center shadow-lg shadow-[#00256D]/30 mb-5">
                     <step.icon className="w-6 h-6 text-white" />
-                    <span className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-[#0F1B2E] border border-[#1E4B7A]/60 flex items-center justify-center text-xs font-bold text-[#6BA3D6]">
+                    <span className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-[#0F1B2E] border border-[#00256D]/60 flex items-center justify-center text-xs font-bold text-[#6BA3D6]">
                       {index + 1}
                     </span>
                   </div>
@@ -334,7 +334,7 @@ export default function FonctionnalitesPage() {
                   <span className="text-gradient-blue">logistique colis</span> ?
                 </h3>
                 <p className="text-[#5B7088] mb-6 leading-relaxed">
-                  Rejoignez plus de 500 agences qui ont déjà fait confiance à QRTrans
+                  Rejoignez plus de 500 agences qui ont déjà fait confiance à Mov
                   pour sécuriser leurs envois et améliorer leur expérience client.
                 </p>
                 <div className="flex flex-wrap gap-3">
@@ -347,7 +347,7 @@ export default function FonctionnalitesPage() {
                   </Link>
                   <Link
                     href="/contact"
-                    className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl glass-light text-[#0F1B2E] font-semibold hover:border-[#1E4B7A]/40 transition-all"
+                    className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl glass-light text-[#0F1B2E] font-semibold hover:border-[#00256D]/40 transition-all"
                   >
                     Nous contacter
                   </Link>
@@ -355,8 +355,8 @@ export default function FonctionnalitesPage() {
               </div>
               <ul className="space-y-3">
                 {HIGHLIGHTS.map((h) => (
-                  <li key={h} className="flex items-start gap-3 text-sm text-[#1E4B7A]">
-                    <CheckCircle2 className="w-5 h-5 text-[#1E4B7A] flex-shrink-0 mt-0.5" />
+                  <li key={h} className="flex items-start gap-3 text-sm text-[#00256D]">
+                    <CheckCircle2 className="w-5 h-5 text-[#00256D] flex-shrink-0 mt-0.5" />
                     <span>{h}</span>
                   </li>
                 ))}

@@ -98,7 +98,7 @@ function HajjActivateContent() {
             <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
               <QrCode className="w-5 h-5 text-white" />
             </div>
-            <span className="font-bold text-white">QRTrans</span>
+            <span className="font-bold text-white">Mov</span>
           </div>
         </div>
       </nav>
@@ -273,7 +273,7 @@ function HajjActivateContent() {
                 <Input
                   id="whatsapp"
                   type="tel"
-                  placeholder="+221 78 485 82 26"
+                  placeholder="+235 66 35 25 05"
                   value={formData.whatsapp}
                   onChange={(e) => setFormData({ ...formData, whatsapp: e.target.value })}
                   className="bg-white/10 border-white/20 text-white placeholder:text-white/40"
@@ -318,8 +318,8 @@ function HajjActivateContent() {
         <div className="mt-8 text-center">
           <p className="text-white/60 text-sm">
             Besoin d&apos;aide ? Contactez votre agence ou{' '}
-            <a href="mailto:contact@qrtrans.com" className="text-white underline">
-              contact@qrtrans.com
+            <a href="mailto:contact@newvisioncargo.pro" className="text-white underline">
+              contact@newvisioncargo.pro
             </a>
           </p>
         </div>

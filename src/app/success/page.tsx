@@ -128,9 +128,9 @@ function SuccessContent() {
       ctx.textAlign = 'center';
       ctx.fillText('✓ Activation Réussie', canvas.width / 2, 100);
 
-      // Draw QRTrans logo text
+      // Draw Mov logo text
       ctx.font = 'bold 24px Arial';
-      ctx.fillText('QRTrans', canvas.width / 2, 150);
+      ctx.fillText('Mov', canvas.width / 2, 150);
 
       // Draw QR code area (white background)
       ctx.fillStyle = '#ffffff';
@@ -207,12 +207,12 @@ function SuccessContent() {
         // Footer
         ctx.font = '14px Arial';
         ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
-        ctx.fillText('QRTrans - Protégez vos colis, en toute sérénité', canvas.width / 2, 850);
-        ctx.fillText('www.qrtrans.pro', canvas.width / 2, 880);
+        ctx.fillText('Mov - Protégez vos colis, en toute sérénité', canvas.width / 2, 850);
+        ctx.fillText('www.mov.newvisioncargo.pro', canvas.width / 2, 880);
 
         // Download
         const link = document.createElement('a');
-        link.download = `QRTrans-${activationData.reference}.png`;
+        link.download = `Mov-${activationData.reference}.png`;
         link.href = canvas.toDataURL('image/png');
         link.click();
 
@@ -247,8 +247,8 @@ function SuccessContent() {
 
     const trackingUrl = typeof window !== 'undefined' ? `${window.location.origin}/activate/${activationData.reference}` : '';
     const shareData = {
-      title: 'QRTrans - Preuve d\'activation',
-      text: `Mon colis ${activationData.reference} est protégé par QRTrans. Voici votre lien de suivi :`,
+      title: 'Mov - Preuve d\'activation',
+      text: `Mon colis ${activationData.reference} est protégé par Mov. Voici votre lien de suivi :`,
       url: trackingUrl,
     };
 
@@ -510,7 +510,7 @@ function SuccessContent() {
 
         {/* Footer */}
         <div className="text-center mt-6 text-white/50 text-sm">
-          <p>Un problème ? <a href="mailto:contact@qrtrans.com" className="underline">contact@qrtrans.com</a></p>
+          <p>Un problème ? <a href="mailto:contact@newvisioncargo.pro" className="underline">contact@newvisioncargo.pro</a></p>
         </div>
       </div>
     </main>

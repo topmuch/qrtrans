@@ -35,20 +35,20 @@ export default function SiteHeader({ theme = 'light' }: { theme?: 'light' | 'dar
   const headerBg = scrolled
     ? isDark
       ? 'bg-[#060B1F]/80 backdrop-blur-xl border-b border-white/10 py-3'
-      : 'bg-white/80 backdrop-blur-xl border-b border-[#1E4B7A]/10 py-3'
+      : 'bg-white/80 backdrop-blur-xl border-b border-[#00256D]/10 py-3'
     : 'bg-transparent py-5';
   const logoTextClass = isDark ? 'text-white' : 'text-[#0F1B2E]';
   const linkClass = (active: boolean) =>
     active
       ? isDark
         ? 'text-emerald-300 bg-white/5'
-        : 'text-[#1E4B7A] bg-[#1E4B7A]/5'
+        : 'text-[#00256D] bg-[#00256D]/5'
       : isDark
       ? 'text-white/80 hover:text-white hover:bg-white/5'
-      : 'text-[#1E4B7A]/80 hover:text-[#0F1B2E] hover:bg-[#1E4B7A]/5';
+      : 'text-[#00256D]/80 hover:text-[#0F1B2E] hover:bg-[#00256D]/5';
   const loginLinkClass = isDark
     ? 'text-white/80 hover:text-white'
-    : 'text-[#1E4B7A] hover:text-[#0F1B2E]';
+    : 'text-[#00256D] hover:text-[#0F1B2E]';
 
   return (
     <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${headerBg}`}>
@@ -57,7 +57,7 @@ export default function SiteHeader({ theme = 'light' }: { theme?: 'light' | 'dar
         <Link href="/" className="flex items-center group shrink-0">
           <Image
             src="/brand/logo.png"
-            alt="QRTrans"
+            alt="Mov"
             width={180}
             height={53}
             className="h-9 sm:h-11 w-auto object-contain transition-transform group-hover:scale-[1.02]"
@@ -91,7 +91,7 @@ export default function SiteHeader({ theme = 'light' }: { theme?: 'light' | 'dar
             className={`btn-magnetic relative overflow-hidden px-5 py-2.5 rounded-xl text-sm font-bold shadow-lg transition-all ${
               isDark
                 ? 'bg-gradient-to-r from-[#10B981] to-[#34D399] text-[#060B1F] shadow-emerald-500/30 hover:shadow-emerald-500/50'
-                : 'bg-gradient-to-r from-[#1E4B7A] to-[#487AA8] text-white shadow-[#1E4B7A]/30 hover:shadow-[#1E4B7A]/50'
+                : 'bg-gradient-to-r from-[#00256D] to-[#1A5DAA] text-white shadow-[#00256D]/30 hover:shadow-[#00256D]/50'
             }`}
           >
             Devenir partenaire
@@ -112,7 +112,7 @@ export default function SiteHeader({ theme = 'light' }: { theme?: 'light' | 'dar
       {/* Mobile dropdown */}
       {menuOpen && (
         <div className={`lg:hidden absolute top-full left-0 right-0 backdrop-blur-xl border-b animate-in fade-in slide-in-from-top-2 duration-200 ${
-          isDark ? 'bg-[#060B1F]/95 border-white/10' : 'bg-white/95 border-[#1E4B7A]/10'
+          isDark ? 'bg-[#060B1F]/95 border-white/10' : 'bg-white/95 border-[#00256D]/10'
         }`}>
           <div className="max-w-7xl mx-auto px-4 py-6 space-y-1">
             {NAV_LINKS.map((link) => (
@@ -124,10 +124,10 @@ export default function SiteHeader({ theme = 'light' }: { theme?: 'light' | 'dar
                 {link.label}
               </Link>
             ))}
-            <div className={`pt-3 mt-3 border-t space-y-2 ${isDark ? 'border-white/10' : 'border-[#1E4B7A]/10'}`}>
+            <div className={`pt-3 mt-3 border-t space-y-2 ${isDark ? 'border-white/10' : 'border-[#00256D]/10'}`}>
               <Link
                 href="/login"
-                className={`block px-4 py-3 rounded-lg text-base font-medium ${loginLinkClass} hover:bg-[#1E4B7A]/5`}
+                className={`block px-4 py-3 rounded-lg text-base font-medium ${loginLinkClass} hover:bg-[#00256D]/5`}
               >
                 Connexion
               </Link>
@@ -136,7 +136,7 @@ export default function SiteHeader({ theme = 'light' }: { theme?: 'light' | 'dar
                 className={`block px-4 py-3 rounded-lg text-base font-bold text-center ${
                   isDark
                     ? 'bg-gradient-to-r from-[#10B981] to-[#34D399] text-[#060B1F]'
-                    : 'bg-gradient-to-r from-[#1E4B7A] to-[#487AA8] text-white'
+                    : 'bg-gradient-to-r from-[#00256D] to-[#1A5DAA] text-white'
                 }`}
               >
                 Devenir partenaire

@@ -278,7 +278,7 @@ export default function EtiquettesPage() {
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `QRTrans-${set.setId}.zip`;
+      a.download = `Mov-${set.setId}.zip`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -330,7 +330,7 @@ export default function EtiquettesPage() {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: `QRTrans - ${set.setId}`,
+          title: `Mov - ${set.setId}`,
           text: `${set.qrCount} QR codes pour ${set.agencyName || 'agence'}`,
           url: shareUrl,
         });
@@ -764,7 +764,7 @@ export default function EtiquettesPage() {
                           level="H"
                           includeMargin={true}
                           bgColor="#f8fafc"
-                          fgColor="#1E4B7A"
+                          fgColor="#00256D"
                         />
                         {/* Download overlay on hover */}
                         <div className="absolute inset-0 flex items-center justify-center bg-black/30 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">

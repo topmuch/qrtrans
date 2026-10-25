@@ -111,7 +111,7 @@ export default function AssistancePage() {
     {
       icon: <Mail className="w-5 h-5" />,
       title: "Email",
-      value: "support@qrtrans.com",
+      value: "support@newvisioncargo.pro",
       subtitle: "Réponse sous 24h"
     },
     {
@@ -399,7 +399,7 @@ export default function AssistancePage() {
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2 flex-wrap">
-                        <h3 className="font-semibold text-[var(--dash-ink)]">Support QRTrans</h3>
+                        <h3 className="font-semibold text-[var(--dash-ink)]">Support Mov</h3>
                         <span className="dash-badge dash-badge-success">
                           Réponse
                         </span>

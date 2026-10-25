@@ -82,7 +82,7 @@ function ActivateContent() {
         <ActivationHeader qrCode={qrCode} onLangChange={setLang} currentLang={lang} />
         <div className="flex items-center justify-center py-24 sm:py-32">
           <div className="text-center">
-            <Loader2 className="w-8 h-8 sm:w-10 sm:h-10 text-[#1E4B7A] animate-spin mx-auto mb-3" />
+            <Loader2 className="w-8 h-8 sm:w-10 sm:h-10 text-[#00256D] animate-spin mx-auto mb-3" />
             <p className="text-sm sm:text-base text-[#5B7088]">Vérification en cours...</p>
           </div>
         </div>
@@ -107,7 +107,7 @@ export default function ActivatePage() {
       fallback={
         <div className="min-h-screen bg-light-hero">
           <div className="flex items-center justify-center py-32">
-            <Loader2 className="w-8 h-8 text-[#1E4B7A] animate-spin" />
+            <Loader2 className="w-8 h-8 text-[#00256D] animate-spin" />
           </div>
         </div>
       }

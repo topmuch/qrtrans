@@ -87,7 +87,7 @@ function ResetPasswordContent() {
         {!success ? (
           <>
             <motion.div variants={fadeUp} custom={0} className="flex justify-center mb-6">
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#1E4B7A] to-[#487AA8] flex items-center justify-center shadow-lg shadow-[#1E4B7A]/20">
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#00256D] to-[#1A5DAA] flex items-center justify-center shadow-lg shadow-[#00256D]/20">
                 <Lock className="w-8 h-8 text-white" />
               </div>
             </motion.div>
@@ -101,7 +101,7 @@ function ResetPasswordContent() {
                 <label className="block text-sm font-semibold text-[#0F1B2E] mb-2">
                   Nouveau mot de passe
                 </label>
-                <div className="relative rounded-2xl border-2 border-[#1E4B7A]/15 hover:border-[#1E4B7A]/30 focus-within:border-[#1E4B7A] focus-within:shadow-lg focus-within:shadow-[#1E4B7A]/10 transition-all bg-white/50">
+                <div className="relative rounded-2xl border-2 border-[#00256D]/15 hover:border-[#00256D]/30 focus-within:border-[#00256D] focus-within:shadow-lg focus-within:shadow-[#00256D]/10 transition-all bg-white/50">
                   <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[#5B7088]">
                     <Lock className="w-[18px] h-[18px]" />
                   </div>
@@ -116,7 +116,7 @@ function ResetPasswordContent() {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-[#5B7088] hover:text-[#1E4B7A] transition-colors p-1"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-[#5B7088] hover:text-[#00256D] transition-colors p-1"
                     tabIndex={-1}
                     aria-label="Afficher/masquer le mot de passe"
                   >
@@ -129,7 +129,7 @@ function ResetPasswordContent() {
                 <label className="block text-sm font-semibold text-[#0F1B2E] mb-2">
                   Confirmer le mot de passe
                 </label>
-                <div className="relative rounded-2xl border-2 border-[#1E4B7A]/15 hover:border-[#1E4B7A]/30 focus-within:border-[#1E4B7A] focus-within:shadow-lg focus-within:shadow-[#1E4B7A]/10 transition-all bg-white/50">
+                <div className="relative rounded-2xl border-2 border-[#00256D]/15 hover:border-[#00256D]/30 focus-within:border-[#00256D] focus-within:shadow-lg focus-within:shadow-[#00256D]/10 transition-all bg-white/50">
                   <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[#5B7088]">
                     <Shield className="w-[18px] h-[18px]" />
                   </div>
@@ -208,7 +208,7 @@ export default function ResetPasswordPage() {
     <Suspense
       fallback={
         <div className="min-h-screen bg-[#FBFCFE] flex items-center justify-center">
-          <RefreshCw className="w-8 h-8 text-[#1E4B7A] animate-spin" />
+          <RefreshCw className="w-8 h-8 text-[#00256D] animate-spin" />
         </div>
       }
     >

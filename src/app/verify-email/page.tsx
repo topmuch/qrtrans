@@ -138,8 +138,8 @@ function VerifyEmailContent() {
         {status === 'loading' && token && (
           <motion.div variants={fadeUp} custom={0} className="text-center py-8">
             <div className="flex justify-center mb-6">
-              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#1E4B7A]/10 to-[#487AA8]/10 border border-[#1E4B7A]/20 flex items-center justify-center">
-                <RefreshCw className="w-10 h-10 text-[#1E4B7A] animate-spin" />
+              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#00256D]/10 to-[#1A5DAA]/10 border border-[#00256D]/20 flex items-center justify-center">
+                <RefreshCw className="w-10 h-10 text-[#00256D] animate-spin" />
               </div>
             </div>
             <p className="text-sm text-[#5B7088]">Vérification de votre email...</p>
@@ -185,7 +185,7 @@ function VerifyEmailContent() {
             )}
 
             <motion.div variants={fadeUp} custom={0} className="flex justify-center mb-6">
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#1E4B7A] to-[#487AA8] flex items-center justify-center shadow-lg shadow-[#1E4B7A]/20">
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#00256D] to-[#1A5DAA] flex items-center justify-center shadow-lg shadow-[#00256D]/20">
                 <Mail className="w-8 h-8 text-white" />
               </div>
             </motion.div>
@@ -199,7 +199,7 @@ function VerifyEmailContent() {
                 <label className="block text-sm font-semibold text-[#0F1B2E] mb-2">
                   Adresse email
                 </label>
-                <div className="relative rounded-2xl border-2 border-[#1E4B7A]/15 hover:border-[#1E4B7A]/30 focus-within:border-[#1E4B7A] focus-within:shadow-lg focus-within:shadow-[#1E4B7A]/10 transition-all bg-white/50">
+                <div className="relative rounded-2xl border-2 border-[#00256D]/15 hover:border-[#00256D]/30 focus-within:border-[#00256D] focus-within:shadow-lg focus-within:shadow-[#00256D]/10 transition-all bg-white/50">
                   <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[#5B7088]">
                     <Mail className="w-[18px] h-[18px]" />
                   </div>
@@ -222,7 +222,7 @@ function VerifyEmailContent() {
                   value={code}
                   onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
                   placeholder="000000"
-                  className="w-full px-4 py-3.5 border-2 border-[#1E4B7A]/15 hover:border-[#1E4B7A]/30 focus:border-[#1E4B7A] focus:shadow-lg focus:shadow-[#1E4B7A]/10 bg-white/50 rounded-2xl text-center text-2xl tracking-[0.5em] font-mono font-bold text-[#1E4B7A] focus:outline-none transition-all"
+                  className="w-full px-4 py-3.5 border-2 border-[#00256D]/15 hover:border-[#00256D]/30 focus:border-[#00256D] focus:shadow-lg focus:shadow-[#00256D]/10 bg-white/50 rounded-2xl text-center text-2xl tracking-[0.5em] font-mono font-bold text-[#00256D] focus:outline-none transition-all"
                   maxLength={6}
                 />
               </motion.div>
@@ -255,7 +255,7 @@ function VerifyEmailContent() {
                 custom={6}
                 onClick={resendVerification}
                 disabled={verifying || !email}
-                className="w-full py-3 text-[#1E4B7A] font-semibold hover:underline transition-colors disabled:opacity-50"
+                className="w-full py-3 text-[#00256D] font-semibold hover:underline transition-colors disabled:opacity-50"
               >
                 Renvoyer le code
               </motion.button>
@@ -272,7 +272,7 @@ export default function VerifyEmailPage() {
     <Suspense
       fallback={
         <div className="min-h-screen bg-[#FBFCFE] flex items-center justify-center">
-          <RefreshCw className="w-8 h-8 text-[#1E4B7A] animate-spin" />
+          <RefreshCw className="w-8 h-8 text-[#00256D] animate-spin" />
         </div>
       }
     >

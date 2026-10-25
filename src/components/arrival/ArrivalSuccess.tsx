@@ -144,7 +144,7 @@ export default function ArrivalSuccess({
       {/* ── Section: Notifier ── */}
       <div className="glass-card-light rounded-xl p-5 space-y-3">
         <h3 className="font-display text-xs font-bold text-[#5B7088] uppercase tracking-widest flex items-center gap-2">
-          <Send className="w-3.5 h-3.5 text-[#1E4B7A]" />
+          <Send className="w-3.5 h-3.5 text-[#00256D]" />
           {t('Notifier les contacts', 'Notify contacts')}
         </h3>
         <p className="text-xs text-[#5B7088]">
@@ -206,7 +206,7 @@ export default function ArrivalSuccess({
         <button
           type="button"
           onClick={copyLink}
-          className="flex items-center gap-2 w-full h-12 text-sm font-semibold text-[#5B7088] hover:text-[#1E4B7A] transition-colors"
+          className="flex items-center gap-2 w-full h-12 text-sm font-semibold text-[#5B7088] hover:text-[#00256D] transition-colors"
         >
           <Copy className="w-4 h-4" />
           {copied ? t('Copié !', 'Copied!') : t('Copier le lien de suivi', 'Copy tracking link')}
@@ -215,7 +215,7 @@ export default function ArrivalSuccess({
         <button
           type="button"
           onClick={() => router.push(suiviUrl)}
-          className="flex items-center gap-2 w-full h-12 text-sm font-semibold text-[#5B7088] hover:text-[#1E4B7A] transition-colors"
+          className="flex items-center gap-2 w-full h-12 text-sm font-semibold text-[#5B7088] hover:text-[#00256D] transition-colors"
         >
           <Package className="w-4 h-4" />
           {t('Voir le suivi du colis', 'View package tracking')}
@@ -224,7 +224,7 @@ export default function ArrivalSuccess({
         <button
           type="button"
           onClick={() => router.push('/')}
-          className="flex items-center gap-2 w-full h-12 text-sm font-semibold text-[#5B7088] hover:text-[#1E4B7A] transition-colors"
+          className="flex items-center gap-2 w-full h-12 text-sm font-semibold text-[#5B7088] hover:text-[#00256D] transition-colors"
         >
           <Home className="w-4 h-4" />
           {t("Retour à l'accueil", 'Back to home')}

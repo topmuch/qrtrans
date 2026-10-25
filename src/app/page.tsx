@@ -2,7 +2,7 @@
 export const dynamic = 'force-dynamic';
 
 /* ═══════════════════════════════════════════════════════════════════
-   QRTrans — Home Page  ·  Editorial Premium Design
+   Mov — Home Page  ·  Editorial Premium Design
    "Apple-meets-Linear" editorial narrative with asymmetric layouts,
    sticky scroll sections, ghost section numbers, marquee ticker,
    faux-app delivery card mockup, full-bleed dark stats band, and
@@ -89,7 +89,7 @@ const STEPS: { num: string; icon: LucideIcon; title: string; desc: string; gradi
     icon: Smartphone,
     title: 'Saisie des infos',
     desc: 'Expéditeur, destinataire, téléphone, itinéraire : le formulaire est guidé et pré-rempli.',
-    gradient: 'from-[#1E4B7A] to-[#3B82F6]',
+    gradient: 'from-[#00256D] to-[#3B82F6]',
   },
   {
     num: '03',
@@ -167,7 +167,7 @@ const TESTIMONIALS: {
 }[] = [
   {
     quote:
-      "Depuis QRTrans, nous n'avons plus aucune contestation de livraison. Le code PIN a réglé 100% de nos litiges clients.",
+      "Depuis Mov, nous n'avons plus aucune contestation de livraison. Le code PIN a réglé 100% de nos litiges clients.",
     name: 'Awa Diop',
     agency: 'Wari Dakar',
     role: 'Responsable agence',
@@ -274,12 +274,12 @@ export default function HomePage() {
             {/* LEFT — 60% (col-span-7) */}
             <div className="lg:col-span-7">
               {/* eyebrow pill */}
-              <div className="reveal-up inline-flex items-center gap-2.5 rounded-full border border-[#1E4B7A]/15 bg-white/70 backdrop-blur-md px-4 py-1.5 shadow-sm">
+              <div className="reveal-up inline-flex items-center gap-2.5 rounded-full border border-[#00256D]/15 bg-white/70 backdrop-blur-md px-4 py-1.5 shadow-sm">
                 <span className="relative flex h-2 w-2">
                   <span className="absolute inline-flex h-full w-full rounded-full bg-[#10B981] opacity-60 animate-ping" />
                   <span className="relative inline-flex h-2 w-2 rounded-full bg-[#10B981]" />
                 </span>
-                <span className="text-xs sm:text-sm font-medium text-[#1E4B7A]">
+                <span className="text-xs sm:text-sm font-medium text-[#00256D]">
                   Traçabilité de colis · République du Sénégal
                 </span>
               </div>
@@ -302,14 +302,14 @@ export default function HomePage() {
                 className="reveal-up mt-7 flex flex-col sm:flex-row gap-3 max-w-lg"
               >
                 <div className="relative flex-1">
-                  <QrCode className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#1E4B7A]/60 pointer-events-none" />
+                  <QrCode className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#00256D]/60 pointer-events-none" />
                   <input
                     type="text"
                     value={refValue}
                     onChange={(e) => setRefValue(e.target.value)}
                     placeholder="Référence colis — ex. VOL26-WRQZNE"
                     aria-label="Référence du colis"
-                    className="w-full rounded-xl border border-[#1E4B7A]/20 bg-white/90 backdrop-blur-md py-3.5 pl-12 pr-4 text-sm sm:text-base text-[#0A1426] placeholder:text-[#5B7088]/70 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#1E4B7A]/30 focus:border-[#1E4B7A]/40 transition-all"
+                    className="w-full rounded-xl border border-[#00256D]/20 bg-white/90 backdrop-blur-md py-3.5 pl-12 pr-4 text-sm sm:text-base text-[#0A1426] placeholder:text-[#5B7088]/70 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#00256D]/30 focus:border-[#00256D]/40 transition-all"
                   />
                 </div>
                 <button
@@ -327,12 +327,12 @@ export default function HomePage() {
                   <span className="font-display font-bold text-2xl sm:text-3xl text-[#0A1426]">10K+</span>
                   <span className="text-xs sm:text-sm text-[#5B7088]">colis</span>
                 </div>
-                <span className="hidden sm:block h-6 w-px bg-[#1E4B7A]/15" />
+                <span className="hidden sm:block h-6 w-px bg-[#00256D]/15" />
                 <div className="flex items-baseline gap-2">
                   <span className="font-display font-bold text-2xl sm:text-3xl text-[#0A1426]">500+</span>
                   <span className="text-xs sm:text-sm text-[#5B7088]">agences</span>
                 </div>
-                <span className="hidden sm:block h-6 w-px bg-[#1E4B7A]/15" />
+                <span className="hidden sm:block h-6 w-px bg-[#00256D]/15" />
                 <div className="flex items-baseline gap-2">
                   <Star className="w-4 h-4 text-[#10B981] fill-[#10B981]" />
                   <span className="font-display font-bold text-2xl sm:text-3xl text-[#0A1426]">4.9</span>
@@ -368,7 +368,7 @@ export default function HomePage() {
           ═══════════════════════════════════════════════════════════ */}
       <section className="relative">
         <div className="divider-blue" />
-        <div className="marquee-pause bg-[#0F2D52] py-4 overflow-hidden">
+        <div className="marquee-pause bg-[#001A4D] py-4 overflow-hidden">
           <div className="marquee-track flex items-center whitespace-nowrap">
             {[...MARQUEE_ITEMS, ...MARQUEE_ITEMS].map((item, i) => (
               <span
@@ -385,7 +385,7 @@ export default function HomePage() {
       </section>
 
       {/* ═══════════════════════════════════════════════════════════
-          SECTION 3 — "Pourquoi QRTrans" (asymmetric sticky scroll)
+          SECTION 3 — "Pourquoi Mov" (asymmetric sticky scroll)
           ═══════════════════════════════════════════════════════════ */}
       <section className="relative bg-light-hero py-20 lg:py-32 overflow-hidden">
         <div className="absolute inset-0 bg-grid-light bg-grid-fade-light opacity-40 pointer-events-none" />
@@ -394,7 +394,7 @@ export default function HomePage() {
             {/* LEFT sticky 40% (col-span-5) */}
             <div className="lg:col-span-5">
               <div className="lg:sticky lg:top-32">
-                <div className="font-display font-bold text-9xl sm:text-[10rem] leading-none text-[#1E4B7A]/15 select-none">
+                <div className="font-display font-bold text-9xl sm:text-[10rem] leading-none text-[#00256D]/15 select-none">
                   01
                 </div>
                 <h2 className="reveal-up mt-4 font-display font-bold tracking-tight text-3xl sm:text-4xl lg:text-5xl text-[#0A1426] leading-[1.05]">
@@ -404,28 +404,28 @@ export default function HomePage() {
                 </h2>
                 <p className="reveal-up mt-6 max-w-md text-base sm:text-lg text-[#5B7088] leading-relaxed">
                   Chaque colis raconte une histoire : un QR code à l&apos;expédition, un PIN confidentiel
-                  à l&apos;arrivée, une notification WhatsApp à chaque étape. QRTrans rend cette histoire
+                  à l&apos;arrivée, une notification WhatsApp à chaque étape. Mov rend cette histoire
                   lisible, sécurisée et partagée — par tous les acteurs du voyage.
                 </p>
                 <Link
                   href="/fonctionnalites"
-                  className="reveal-up mt-8 inline-flex items-center gap-2 text-sm font-semibold text-[#1E4B7A] link-underline"
+                  className="reveal-up mt-8 inline-flex items-center gap-2 text-sm font-semibold text-[#00256D] link-underline"
                 >
                   Explorer les fonctionnalités
                   <ArrowUpRight className="w-4 h-4" />
                 </Link>
 
                 {/* Companion image — premium logistics photo */}
-                <div className="reveal-up mt-10 relative rounded-2xl overflow-hidden shadow-xl shadow-[#1E4B7A]/15 group/img">
+                <div className="reveal-up mt-10 relative rounded-2xl overflow-hidden shadow-xl shadow-[#00256D]/15 group/img">
                   <Image
                     src="/images/qr-scan-app.jpg"
-                    alt="Application QRTrans de scan"
+                    alt="Application Mov de scan"
                     width={1024}
                     height={1024}
                     sizes="(max-width: 1024px) 100vw, 40vw"
                     className="w-full h-auto object-cover aspect-square transition-transform duration-700 group-hover/img:scale-105"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#0F2D52]/70 via-[#0F2D52]/10 to-transparent pointer-events-none" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#001A4D]/70 via-[#001A4D]/10 to-transparent pointer-events-none" />
                   {/* Overlay caption */}
                   <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-6">
                     <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#6EE7B7]">
@@ -446,12 +446,12 @@ export default function HomePage() {
                   key={card.title}
                   className="reveal-up glass-card-light p-6 sm:p-8 flex items-start gap-5"
                 >
-                  <div className="shrink-0 w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-[#1E4B7A] to-[#487AA8] flex items-center justify-center shadow-lg shadow-[#1E4B7A]/20">
+                  <div className="shrink-0 w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-[#00256D] to-[#1A5DAA] flex items-center justify-center shadow-lg shadow-[#00256D]/20">
                     <card.icon className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-3">
-                      <span className="font-display text-xs font-bold text-[#1E4B7A]/40">
+                      <span className="font-display text-xs font-bold text-[#00256D]/40">
                         0{i + 1}
                       </span>
                       <h3 className="font-display font-bold text-lg sm:text-xl text-[#0A1426]">
@@ -478,7 +478,7 @@ export default function HomePage() {
       <section className="relative section-light py-20 lg:py-32">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
-            <span className="reveal-up inline-block text-xs font-bold uppercase tracking-[0.2em] text-[#1E4B7A]/60">
+            <span className="reveal-up inline-block text-xs font-bold uppercase tracking-[0.2em] text-[#00256D]/60">
               Le processus
             </span>
             <h2 className="reveal-up mt-3 font-display font-bold tracking-tight text-3xl sm:text-4xl lg:text-5xl text-[#0A1426] leading-[1.05]">
@@ -529,7 +529,7 @@ export default function HomePage() {
       {/* ═══════════════════════════════════════════════════════════
           SECTION 5 — Big Numbers (full-bleed dark band)
           ═══════════════════════════════════════════════════════════ */}
-      <section className="relative bg-[#0F2D52] py-20 lg:py-28 overflow-hidden">
+      <section className="relative bg-[#001A4D] py-20 lg:py-28 overflow-hidden">
         {/* Background image with dark overlay for premium editorial feel */}
         <Image
           src="/images/africa-transport.jpg"
@@ -538,7 +538,7 @@ export default function HomePage() {
           sizes="100vw"
           className="object-cover opacity-15"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#0F2D52] via-[#0F2D52]/85 to-[#0F2D52]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#001A4D] via-[#001A4D]/85 to-[#001A4D]" />
         {/* subtle radial highlight */}
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[60rem] h-[40rem] bg-[radial-gradient(ellipse_at_center,rgba(72,122,168,0.25),transparent_60%)]" />
@@ -554,7 +554,7 @@ export default function HomePage() {
           <div className="mt-16 lg:mt-20 max-w-3xl mx-auto text-center">
             <Quote className="w-8 h-8 text-[#10B981] mx-auto opacity-60" />
             <p className="mt-4 font-display italic text-xl sm:text-2xl lg:text-3xl text-white/80 leading-snug">
-              « QRTrans a révolutionné notre façon d&apos;envoyer des colis. Nos clients savent où est
+              « Mov a révolutionné notre façon d&apos;envoyer des colis. Nos clients savent où est
               leur paquet, à la minute près. »
             </p>
             <p className="mt-4 text-sm text-white/50">
@@ -570,7 +570,7 @@ export default function HomePage() {
       <section className="relative py-20 lg:py-32 section-light-reverse">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
-            <span className="reveal-up inline-block text-xs font-bold uppercase tracking-[0.2em] text-[#1E4B7A]/60">
+            <span className="reveal-up inline-block text-xs font-bold uppercase tracking-[0.2em] text-[#00256D]/60">
               La boîte à outils
             </span>
             <h2 className="reveal-up mt-3 font-display font-bold tracking-tight text-3xl sm:text-4xl lg:text-5xl text-[#0A1426] leading-[1.05]">
@@ -587,7 +587,7 @@ export default function HomePage() {
                 }`}
               >
                 <div
-                  className={`shrink-0 rounded-2xl bg-gradient-to-br from-[#1E4B7A] to-[#487AA8] flex items-center justify-center shadow-lg shadow-[#1E4B7A]/20 ${
+                  className={`shrink-0 rounded-2xl bg-gradient-to-br from-[#00256D] to-[#1A5DAA] flex items-center justify-center shadow-lg shadow-[#00256D]/20 ${
                     card.featured ? 'w-16 h-16' : 'w-12 h-12'
                   }`}
                 >
@@ -612,19 +612,19 @@ export default function HomePage() {
                 {card.featured && (
                   <>
                     {/* Dashboard mockup image */}
-                    <div className="relative mt-7 rounded-2xl overflow-hidden border border-[#1E4B7A]/15 shadow-xl shadow-[#1E4B7A]/10 group/img">
+                    <div className="relative mt-7 rounded-2xl overflow-hidden border border-[#00256D]/15 shadow-xl shadow-[#00256D]/10 group/img">
                       <Image
                         src="/images/dashboard-mockup.jpg"
-                        alt="Aperçu du tableau de bord QRTrans"
+                        alt="Aperçu du tableau de bord Mov"
                         width={1344}
                         height={768}
                         sizes="(max-width: 1024px) 100vw, 50vw"
                         className="w-full h-auto object-cover transition-transform duration-700 group-hover/img:scale-105"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-[#0F2D52]/40 via-transparent to-transparent pointer-events-none" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#001A4D]/40 via-transparent to-transparent pointer-events-none" />
                       {/* Floating badge */}
-                      <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-md border border-[#1E4B7A]/20 rounded-full px-3 py-1.5 shadow-md">
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-[#1E4B7A] flex items-center gap-1.5">
+                      <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-md border border-[#00256D]/20 rounded-full px-3 py-1.5 shadow-md">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-[#00256D] flex items-center gap-1.5">
                           <span className="w-1.5 h-1.5 rounded-full bg-[#10B981] pulse-soft" />
                           Live preview
                         </span>
@@ -632,7 +632,7 @@ export default function HomePage() {
                     </div>
                     <Link
                       href="/devenir-partenaire"
-                      className="mt-7 inline-flex items-center gap-2 text-sm font-semibold text-[#1E4B7A] link-underline self-start"
+                      className="mt-7 inline-flex items-center gap-2 text-sm font-semibold text-[#00256D] link-underline self-start"
                     >
                       Devenir partenaire
                       <ArrowUpRight className="w-4 h-4" />
@@ -655,7 +655,7 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-end justify-between gap-6 flex-wrap">
             <div className="max-w-2xl">
-              <span className="reveal-up inline-block text-xs font-bold uppercase tracking-[0.2em] text-[#1E4B7A]/60">
+              <span className="reveal-up inline-block text-xs font-bold uppercase tracking-[0.2em] text-[#00256D]/60">
                 Ils nous font confiance
               </span>
               <h2 className="reveal-up mt-3 font-display font-bold tracking-tight text-3xl sm:text-4xl lg:text-5xl text-[#0A1426] leading-[1.05]">
@@ -664,7 +664,7 @@ export default function HomePage() {
             </div>
             <Link
               href="/a-propos"
-              className="hidden sm:inline-flex items-center gap-2 text-sm font-semibold text-[#1E4B7A] link-underline"
+              className="hidden sm:inline-flex items-center gap-2 text-sm font-semibold text-[#00256D] link-underline"
             >
               Lire toutes les histoires
               <ArrowUpRight className="w-4 h-4" />
@@ -694,7 +694,7 @@ export default function HomePage() {
                     <p className="font-semibold text-sm text-[#0A1426] truncate">{t.name}</p>
                     <p className="text-xs text-[#5B7088] truncate">{t.agency}</p>
                   </div>
-                  <Quote className="w-6 h-6 text-[#1E4B7A]/30 shrink-0" />
+                  <Quote className="w-6 h-6 text-[#00256D]/30 shrink-0" />
                 </div>
                 <p className="font-display italic text-base sm:text-lg text-[#0A1426] leading-relaxed flex-1">
                   "{t.quote}"
@@ -728,9 +728,9 @@ export default function HomePage() {
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#FBFCFE]/40 to-[#FBFCFE] pointer-events-none" />
 
         <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <span className="reveal-up inline-flex items-center gap-2 rounded-full border border-[#1E4B7A]/15 bg-white/70 backdrop-blur-md px-4 py-1.5 shadow-sm">
+          <span className="reveal-up inline-flex items-center gap-2 rounded-full border border-[#00256D]/15 bg-white/70 backdrop-blur-md px-4 py-1.5 shadow-sm">
             <Zap className="w-3.5 h-3.5 text-[#10B981]" />
-            <span className="text-xs sm:text-sm font-medium text-[#1E4B7A]">
+            <span className="text-xs sm:text-sm font-medium text-[#00256D]">
               Prêt à sécuriser vos colis ?
             </span>
           </span>
@@ -756,7 +756,7 @@ export default function HomePage() {
             </Link>
             <Link
               href="/contact"
-              className="inline-flex items-center justify-center gap-2 rounded-xl px-6 py-3.5 text-sm sm:text-base font-semibold text-[#0A1426] border border-[#1E4B7A]/20 bg-white/70 backdrop-blur-md hover:bg-white hover:border-[#1E4B7A]/40 transition-all w-full sm:w-auto"
+              className="inline-flex items-center justify-center gap-2 rounded-xl px-6 py-3.5 text-sm sm:text-base font-semibold text-[#0A1426] border border-[#00256D]/20 bg-white/70 backdrop-blur-md hover:bg-white hover:border-[#00256D]/40 transition-all w-full sm:w-auto"
             >
               Parler à un expert
               <ArrowUpRight className="w-4 h-4" />
@@ -782,14 +782,14 @@ function DeliveryCardMockup() {
   return (
     <div className="relative reveal-scale">
       {/* glow behind card */}
-      <div className="absolute -inset-4 bg-gradient-to-br from-[#1E4B7A]/20 via-[#487AA8]/10 to-[#10B981]/10 blur-3xl opacity-60 pointer-events-none" />
+      <div className="absolute -inset-4 bg-gradient-to-br from-[#00256D]/20 via-[#1A5DAA]/10 to-[#10B981]/10 blur-3xl opacity-60 pointer-events-none" />
 
-      <div className="animate-float-slow relative glass-light-strong rounded-3xl p-5 sm:p-6 shadow-2xl shadow-[#0F2D52]/20">
+      <div className="animate-float-slow relative glass-light-strong rounded-3xl p-5 sm:p-6 shadow-2xl shadow-[#001A4D]/20">
         {/* TOP — logo + reference + status */}
         <div className="flex items-center justify-between gap-3">
           <Image
             src="/brand/logo.png"
-            alt="QRTrans"
+            alt="Mov"
             width={180}
             height={53}
             className="h-4 w-auto object-contain"
@@ -808,7 +808,7 @@ function DeliveryCardMockup() {
         </div>
 
         {/* MIDDLE — route visualization */}
-        <div className="mt-6 rounded-2xl bg-gradient-to-br from-[#EEF5FC] to-white border border-[#1E4B7A]/10 p-5">
+        <div className="mt-6 rounded-2xl bg-gradient-to-br from-[#EEF5FC] to-white border border-[#00256D]/10 p-5">
           <div className="flex items-center justify-between text-[10px] uppercase tracking-wider text-[#5B7088] mb-3">
             <span>Itinéraire</span>
             <span className="flex items-center gap-1">
@@ -818,7 +818,7 @@ function DeliveryCardMockup() {
           <div className="relative">
             <div className="flex items-center justify-between">
               <div className="flex flex-col items-center gap-1">
-                <span className="w-3 h-3 rounded-full bg-[#1E4B7A] ring-4 ring-[#1E4B7A]/15" />
+                <span className="w-3 h-3 rounded-full bg-[#00256D] ring-4 ring-[#00256D]/15" />
                 <p className="font-display font-bold text-sm text-[#0A1426]">Dakar</p>
               </div>
               <div className="flex-1 mx-3 relative h-6 flex items-center">
@@ -832,14 +832,14 @@ function DeliveryCardMockup() {
                     y1="6"
                     x2="98"
                     y2="6"
-                    stroke="#487AA8"
+                    stroke="#1A5DAA"
                     strokeWidth="1.2"
                     className="dash-flow"
                   />
                 </svg>
                 <div className="plane-travel absolute top-1/2 -translate-y-1/2">
-                  <div className="w-7 h-7 rounded-full bg-white border border-[#1E4B7A]/20 flex items-center justify-center shadow-md">
-                    <Plane className="w-3.5 h-3.5 text-[#1E4B7A] rotate-90" />
+                  <div className="w-7 h-7 rounded-full bg-white border border-[#00256D]/20 flex items-center justify-center shadow-md">
+                    <Plane className="w-3.5 h-3.5 text-[#00256D] rotate-90" />
                   </div>
                 </div>
               </div>
@@ -862,11 +862,11 @@ function DeliveryCardMockup() {
         <div className="mt-5">
           <div className="flex items-center justify-between text-[10px] uppercase tracking-wider text-[#5B7088] mb-1.5">
             <span>Progression</span>
-            <span className="font-semibold text-[#1E4B7A]">62%</span>
+            <span className="font-semibold text-[#00256D]">62%</span>
           </div>
-          <div className="h-1.5 w-full rounded-full bg-[#1E4B7A]/10 overflow-hidden">
+          <div className="h-1.5 w-full rounded-full bg-[#00256D]/10 overflow-hidden">
             <div
-              className="h-full rounded-full bg-gradient-to-r from-[#1E4B7A] to-[#10B981]"
+              className="h-full rounded-full bg-gradient-to-r from-[#00256D] to-[#10B981]"
               style={{ width: '62%' }}
             />
           </div>
@@ -878,8 +878,8 @@ function DeliveryCardMockup() {
 
 function BottomTile({ icon: Icon, label, value }: { icon: LucideIcon; label: string; value: string }) {
   return (
-    <div className="rounded-xl border border-[#1E4B7A]/10 bg-white/70 backdrop-blur-md p-3">
-      <Icon className="w-3.5 h-3.5 text-[#1E4B7A]/60" />
+    <div className="rounded-xl border border-[#00256D]/10 bg-white/70 backdrop-blur-md p-3">
+      <Icon className="w-3.5 h-3.5 text-[#00256D]/60" />
       <p className="mt-1.5 text-[10px] uppercase tracking-wider text-[#5B7088]">{label}</p>
       <p className="text-xs font-semibold text-[#0A1426]">{value}</p>
     </div>
@@ -911,11 +911,11 @@ function BigStat({
 function SectionDivider({ icon: Icon }: { icon: LucideIcon }) {
   return (
     <div className="flex items-center justify-center gap-4 sm:gap-6 py-12 lg:py-16">
-      <div className="h-px w-16 sm:w-32 bg-gradient-to-r from-transparent to-[#1E4B7A]/30" />
-      <div className="flex items-center justify-center w-10 h-10 rounded-full bg-white border border-[#1E4B7A]/15 shadow-sm">
-        <Icon className="w-4 h-4 text-[#1E4B7A]" />
+      <div className="h-px w-16 sm:w-32 bg-gradient-to-r from-transparent to-[#00256D]/30" />
+      <div className="flex items-center justify-center w-10 h-10 rounded-full bg-white border border-[#00256D]/15 shadow-sm">
+        <Icon className="w-4 h-4 text-[#00256D]" />
       </div>
-      <div className="h-px w-16 sm:w-32 bg-gradient-to-l from-transparent to-[#1E4B7A]/30" />
+      <div className="h-px w-16 sm:w-32 bg-gradient-to-l from-transparent to-[#00256D]/30" />
     </div>
   );
 }

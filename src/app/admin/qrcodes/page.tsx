@@ -130,7 +130,7 @@ export default function QRCodesPage() {
       ctx.fillStyle = '#ffffff';
       ctx.font = 'bold 24px Arial';
       ctx.textAlign = 'center';
-      ctx.fillText('QRTrans - QR Codes', canvas.width / 2, 40);
+      ctx.fillText('Mov - QR Codes', canvas.width / 2, 40);
 
       ctx.font = '16px Arial';
       ctx.fillStyle = '#94A3B8';
@@ -164,7 +164,7 @@ export default function QRCodesPage() {
             ctx.drawImage(img, x + 20, y + 20, qrSize - 40, qrSize - 40);
 
             // Draw reference text
-            ctx.fillStyle = set.type === 'hajj' ? '#0d5e34' : '#1E4B7A';
+            ctx.fillStyle = set.type === 'hajj' ? '#0d5e34' : '#00256D';
             ctx.font = 'bold 14px Arial';
             ctx.textAlign = 'center';
             ctx.fillText(set.references[i], x + qrSize / 2, y + qrSize - 15);
@@ -184,11 +184,11 @@ export default function QRCodesPage() {
       ctx.fillStyle = '#94A3B8';
       ctx.font = '12px Arial';
       ctx.textAlign = 'center';
-      ctx.fillText('QRTrans - Protégez vos colis, en toute sérénité.', canvas.width / 2, canvas.height - 20);
+      ctx.fillText('Mov - Protégez vos colis, en toute sérénité.', canvas.width / 2, canvas.height - 20);
 
       // Download
       const link = document.createElement('a');
-      link.download = `QRTrans-${set.setId}.png`;
+      link.download = `Mov-${set.setId}.png`;
       link.href = canvas.toDataURL('image/png');
       link.click();
 
@@ -203,18 +203,18 @@ export default function QRCodesPage() {
 
   // Simple QR code SVG generator (fallback)
   const generateQRCodeSVG = (url: string, type: string) => {
-    const color = type === 'hajj' ? '#0d5e34' : '#1E4B7A';
+    const color = type === 'hajj' ? '#0d5e34' : '#00256D';
     return `<rect width="200" height="200" fill="white"/>
       <text x="100" y="100" text-anchor="middle" fill="${color}" font-size="10">${url.slice(-20)}</text>`;
   };
 
   const handleShareSet = async (set: QRSet) => {
-    const shareText = `QRTrans - ${set.setId}\n${set.qrCount} QR codes générés\nType: ${set.type === 'hajj' ? 'Hajj 2026' : 'Voyageur'}`;
+    const shareText = `Mov - ${set.setId}\n${set.qrCount} QR codes générés\nType: ${set.type === 'hajj' ? 'Hajj 2026' : 'Voyageur'}`;
 
     if (navigator.share) {
       try {
         await navigator.share({
-          title: `QRTrans - ${set.setId}`,
+          title: `Mov - ${set.setId}`,
           text: shareText,
           url: window.location.href,
         });
@@ -483,7 +483,7 @@ export default function QRCodesPage() {
                       level="H"
                       includeMargin={true}
                       bgColor="#ffffff"
-                      fgColor={selectedSet.type === 'hajj' ? '#0d5e34' : '#1E4B7A'}
+                      fgColor={selectedSet.type === 'hajj' ? '#0d5e34' : '#00256D'}
                     />
                     <p className="text-slate-800 font-mono font-bold mt-2 text-sm">
                       {ref}

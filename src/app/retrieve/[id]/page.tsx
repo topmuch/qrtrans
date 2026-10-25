@@ -128,7 +128,7 @@ function getTimelineLineIcon(title: string): { icon: React.ReactNode; bg: string
   if (t.includes('pin') || t.includes('retrait')) return { icon: <Lock className="w-3 h-3 text-amber-600" />, bg: 'bg-amber-50 border border-amber-200' };
   if (t.includes('scan')) return { icon: <QrCode className="w-3 h-3 text-indigo-600" />, bg: 'bg-indigo-50 border border-indigo-200' };
   if (t.includes('avert') || t.includes('warning') || t.includes('⚠')) return { icon: <AlertTriangle className="w-3 h-3 text-orange-600" />, bg: 'bg-orange-50 border border-orange-200' };
-  return { icon: <Clock className="w-3 h-3 text-[#5B7088]" />, bg: 'bg-[#1E4B7A]/5 border border-[#1E4B7A]/10' };
+  return { icon: <Clock className="w-3 h-3 text-[#5B7088]" />, bg: 'bg-[#00256D]/5 border border-[#00256D]/10' };
 }
 
 // ═══════════════════════════════════════════════════
@@ -175,7 +175,7 @@ function RetrieveHeader({
       ? 'bg-emerald-50 border border-emerald-200 text-emerald-700'
       : isPending
         ? 'bg-amber-50 border border-amber-200 text-amber-700'
-        : 'bg-[#1E4B7A]/5 border border-[#1E4B7A]/15 text-[#5B7088]';
+        : 'bg-[#00256D]/5 border border-[#00256D]/15 text-[#5B7088]';
 
   const badgeIcon = isInTransit ? <Truck className="w-3 h-3" /> : isDelivered ? <CheckCircle className="w-3 h-3" /> : <Clock className="w-3 h-3" />;
   const badgeText = isInTransit
@@ -185,14 +185,14 @@ function RetrieveHeader({
       : t('En attente', 'Pending');
 
   return (
-    <header className="sticky top-0 z-40 glass-light-strong border-b border-[#1E4B7A]/10 safe-area-inset-top">
+    <header className="sticky top-0 z-40 glass-light-strong border-b border-[#00256D]/10 safe-area-inset-top">
       <div className="max-w-[600px] mx-auto px-4 h-16 flex items-center justify-between">
         <div className="flex flex-col shrink-0">
           <Image
             src="/brand/logo.png"
             width={150}
             height={44}
-            alt="QRTrans"
+            alt="Mov"
             className="h-8 sm:h-10 w-auto object-contain"
             priority
           />
@@ -207,7 +207,7 @@ function RetrieveHeader({
           </div>
           <button
             onClick={() => onLangChange(lang === 'fr' ? 'en' : 'fr')}
-            className="flex items-center gap-1 text-xs font-medium text-[#5B7088] hover:text-[#1E4B7A] transition-colors px-2 py-1.5 rounded-md hover:bg-[#1E4B7A]/5"
+            className="flex items-center gap-1 text-xs font-medium text-[#5B7088] hover:text-[#00256D] transition-colors px-2 py-1.5 rounded-md hover:bg-[#00256D]/5"
             aria-label="Switch language"
           >
             <Globe className="w-3.5 h-3.5" />
@@ -238,24 +238,24 @@ function TrajetCard({ colis, lang }: { colis: ColisData; lang: 'fr' | 'en' }) {
       {/* Route header */}
       <div className="flex items-center gap-3">
         <div className="flex items-center gap-2 flex-1 min-w-0">
-          <div className="w-8 h-8 rounded-lg bg-[#1E4B7A]/10 border border-[#1E4B7A]/20 flex items-center justify-center flex-shrink-0">
-            <Navigation className="w-4 h-4 text-[#1E4B7A]" />
+          <div className="w-8 h-8 rounded-lg bg-[#00256D]/10 border border-[#00256D]/20 flex items-center justify-center flex-shrink-0">
+            <Navigation className="w-4 h-4 text-[#00256D]" />
           </div>
           <div className="min-w-0">
             <p className="text-xs text-[#5B7088] font-medium">{t('Trajet', 'Route')}</p>
             <p className="font-bold text-[#0F1B2E] text-sm truncate">
-              {colis.departureCity || '—'} <span className="text-[#1E4B7A]">→</span> {colis.arrivalCity || '—'}
+              {colis.departureCity || '—'} <span className="text-[#00256D]">→</span> {colis.arrivalCity || '—'}
             </p>
           </div>
         </div>
-        <div className="w-8 h-8 rounded-lg bg-[#1E4B7A]/5 border border-[#1E4B7A]/10 flex items-center justify-center flex-shrink-0 text-[#1E4B7A]">
+        <div className="w-8 h-8 rounded-lg bg-[#00256D]/5 border border-[#00256D]/10 flex items-center justify-center flex-shrink-0 text-[#00256D]">
           <TransportGlyph mode={colis.transportType} />
         </div>
       </div>
 
       {/* Dates */}
       <div className="grid grid-cols-2 gap-3">
-        <div className="bg-[#1E4B7A]/5 border border-[#1E4B7A]/10 rounded-xl p-3">
+        <div className="bg-[#00256D]/5 border border-[#00256D]/10 rounded-xl p-3">
           <p className="text-xs text-[#5B7088]">{t('Départ', 'Departure')}</p>
           <p className="font-bold text-[#0F1B2E] text-sm mt-0.5">
             {formatDate(colis.departureDate, lang)}
@@ -266,7 +266,7 @@ function TrajetCard({ colis, lang }: { colis: ColisData; lang: 'fr' | 'en' }) {
             </p>
           )}
         </div>
-        <div className="bg-[#1E4B7A]/5 border border-[#1E4B7A]/10 rounded-xl p-3">
+        <div className="bg-[#00256D]/5 border border-[#00256D]/10 rounded-xl p-3">
           <p className="text-xs text-[#5B7088]">{t('Arrivée prévue', 'Est. arrival')}</p>
           <p className="font-bold text-[#0F1B2E] text-sm mt-0.5">
             {colis.estimatedArrival || formatDate(colis.departureDate, lang)}
@@ -284,14 +284,14 @@ function TrajetCard({ colis, lang }: { colis: ColisData; lang: 'fr' | 'en' }) {
         <div className="flex items-center justify-between">
           {steps.map((step, i) => (
             <div key={i} className="flex items-center gap-1.5">
-              <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${step.done ? 'bg-gradient-to-br from-[#1E4B7A] to-[#487AA8] text-white' : 'bg-[#1E4B7A]/10 text-[#5B7088]'}`}>
+              <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${step.done ? 'bg-gradient-to-br from-[#00256D] to-[#1A5DAA] text-white' : 'bg-[#00256D]/10 text-[#5B7088]'}`}>
                 {step.done ? '✓' : i + 1}
               </div>
-              <span className={`text-xs font-medium hidden sm:inline ${step.done ? 'text-[#1E4B7A]' : 'text-[#5B7088]'}`}>
+              <span className={`text-xs font-medium hidden sm:inline ${step.done ? 'text-[#00256D]' : 'text-[#5B7088]'}`}>
                 {step.label}
               </span>
               {i < steps.length - 1 && (
-                <div className={`w-8 sm:w-16 h-1 rounded-full mx-1 ${step.done ? 'bg-[#487AA8]/60' : 'bg-[#1E4B7A]/10'}`} />
+                <div className={`w-8 sm:w-16 h-1 rounded-full mx-1 ${step.done ? 'bg-[#1A5DAA]/60' : 'bg-[#00256D]/10'}`} />
               )}
             </div>
           ))}
@@ -309,8 +309,8 @@ function ContactRow({ name, phone, label, t }: { name: string; phone: string; la
   const tel = phone.replace(/[^0-9+]/g, '');
   if (!name && !phone) return null;
   return (
-    <div className="flex items-center gap-3 bg-[#1E4B7A]/5 border border-[#1E4B7A]/10 rounded-xl p-3">
-      <div className="w-10 h-10 rounded-full bg-[#1E4B7A]/5 border border-[#1E4B7A]/10 flex items-center justify-center flex-shrink-0">
+    <div className="flex items-center gap-3 bg-[#00256D]/5 border border-[#00256D]/10 rounded-xl p-3">
+      <div className="w-10 h-10 rounded-full bg-[#00256D]/5 border border-[#00256D]/10 flex items-center justify-center flex-shrink-0">
         <User className="w-5 h-5 text-[#5B7088]" />
       </div>
       <div className="flex-1 min-w-0">
@@ -333,7 +333,7 @@ function ContactRow({ name, phone, label, t }: { name: string; phone: string; la
         {tel && (
           <a
             href={`tel:${tel}`}
-            className="w-10 h-10 rounded-xl bg-[#1E4B7A]/5 border border-[#1E4B7A]/10 flex items-center justify-center hover:bg-[#1E4B7A]/10 transition-colors"
+            className="w-10 h-10 rounded-xl bg-[#00256D]/5 border border-[#00256D]/10 flex items-center justify-center hover:bg-[#00256D]/10 transition-colors"
             aria-label={`${t('Appeler', 'Call')} ${name}`}
           >
             <Phone className="w-4 h-4 text-[#5B7088]" />
@@ -350,7 +350,7 @@ function ContactsCard({ colis, lang }: { colis: ColisData; lang: 'fr' | 'en' }) 
   return (
     <div className="glass-card-light rounded-2xl p-5 space-y-3">
       <div className="flex items-center gap-2">
-        <Package className="w-4 h-4 text-[#1E4B7A]" />
+        <Package className="w-4 h-4 text-[#00256D]" />
         <h3 className="font-display text-sm font-bold text-[#0F1B2E] uppercase tracking-wider">
           {t('Contacts', 'Contacts')}
         </h3>
@@ -392,14 +392,14 @@ function LogisticsCard({ colis, lang }: { colis: ColisData; lang: 'fr' | 'en' })
   return (
     <div className="glass-card-light rounded-2xl p-5 space-y-3">
       <div className="flex items-center gap-2">
-        <Truck className="w-4 h-4 text-[#1E4B7A]" />
+        <Truck className="w-4 h-4 text-[#00256D]" />
         <h3 className="font-display text-sm font-bold text-[#0F1B2E] uppercase tracking-wider">
           {t('Logistique & Retrait', 'Logistics & Pickup')}
         </h3>
       </div>
 
       {/* Payment */}
-      <div className="flex items-center gap-3 bg-[#1E4B7A]/5 border border-[#1E4B7A]/10 rounded-xl p-3">
+      <div className="flex items-center gap-3 bg-[#00256D]/5 border border-[#00256D]/10 rounded-xl p-3">
         <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ backgroundColor: isPaid ? 'rgba(16,185,129,0.12)' : 'rgba(245,158,11,0.12)' }}>
           <Banknote className="w-4 h-4" style={{ color: isPaid ? '#10B981' : '#F59E0B' }} />
         </div>
@@ -415,7 +415,7 @@ function LogisticsCard({ colis, lang }: { colis: ColisData; lang: 'fr' | 'en' })
 
       {/* Pickup address */}
       {colis.pickupAddress && (
-        <div className="flex items-center gap-3 bg-[#1E4B7A]/5 border border-[#1E4B7A]/10 rounded-xl p-3">
+        <div className="flex items-center gap-3 bg-[#00256D]/5 border border-[#00256D]/10 rounded-xl p-3">
           <div className="w-8 h-8 rounded-lg bg-sky-50 border border-sky-200 flex items-center justify-center flex-shrink-0">
             <MapPinned className="w-4 h-4 text-sky-600" />
           </div>
@@ -439,7 +439,7 @@ function LogisticsCard({ colis, lang }: { colis: ColisData; lang: 'fr' | 'en' })
 
       {/* Driver phone */}
       {colis.driverPhone && colis.shareDriverPhone && (
-        <div className="flex items-center gap-3 bg-[#1E4B7A]/5 border border-[#1E4B7A]/10 rounded-xl p-3">
+        <div className="flex items-center gap-3 bg-[#00256D]/5 border border-[#00256D]/10 rounded-xl p-3">
           <div className="w-8 h-8 rounded-lg bg-orange-50 border border-orange-200 flex items-center justify-center flex-shrink-0">
             <Truck className="w-4 h-4 text-orange-600" />
           </div>
@@ -459,8 +459,8 @@ function LogisticsCard({ colis, lang }: { colis: ColisData; lang: 'fr' | 'en' })
 
       {/* Baggage info */}
       {baggageLabel && (
-        <div className="flex items-center gap-3 bg-[#1E4B7A]/5 border border-[#1E4B7A]/10 rounded-xl p-3">
-          <div className="w-8 h-8 rounded-lg bg-[#1E4B7A]/5 border border-[#1E4B7A]/10 flex items-center justify-center flex-shrink-0">
+        <div className="flex items-center gap-3 bg-[#00256D]/5 border border-[#00256D]/10 rounded-xl p-3">
+          <div className="w-8 h-8 rounded-lg bg-[#00256D]/5 border border-[#00256D]/10 flex items-center justify-center flex-shrink-0">
             <Package className="w-4 h-4 text-[#5B7088]" />
           </div>
           <div>
@@ -488,7 +488,7 @@ function TimelineCard({ timeline, lang }: { timeline: TimelineEntry[]; lang: 'fr
     return (
       <div className="glass-card-light rounded-2xl p-5">
         <div className="flex items-center gap-2 mb-3">
-          <Clock className="w-4 h-4 text-[#1E4B7A]" />
+          <Clock className="w-4 h-4 text-[#00256D]" />
           <h3 className="font-display text-sm font-bold text-[#0F1B2E] uppercase tracking-wider">
             {t('Historique', 'History')}
           </h3>
@@ -503,7 +503,7 @@ function TimelineCard({ timeline, lang }: { timeline: TimelineEntry[]; lang: 'fr
   return (
     <div className="glass-card-light rounded-2xl p-5">
       <div className="flex items-center gap-2 mb-4">
-        <Clock className="w-4 h-4 text-[#1E4B7A]" />
+        <Clock className="w-4 h-4 text-[#00256D]" />
         <h3 className="font-display text-sm font-bold text-[#0F1B2E] uppercase tracking-wider">
           {t('Historique', 'History')}
         </h3>
@@ -523,7 +523,7 @@ function TimelineCard({ timeline, lang }: { timeline: TimelineEntry[]; lang: 'fr
                   {lineIcon.icon}
                 </div>
                 {!isLast && (
-                  <div className="w-0.5 flex-1 bg-[#1E4B7A]/10 my-0.5" />
+                  <div className="w-0.5 flex-1 bg-[#00256D]/10 my-0.5" />
                 )}
               </div>
 
@@ -549,7 +549,7 @@ function TimelineCard({ timeline, lang }: { timeline: TimelineEntry[]; lang: 'fr
         <button
           type="button"
           onClick={() => setExpanded(!expanded)}
-          className="flex items-center justify-center gap-1 w-full pt-3 mt-2 border-t border-[#1E4B7A]/10 text-sm font-medium text-[#5B7088] hover:text-[#1E4B7A] transition-colors"
+          className="flex items-center justify-center gap-1 w-full pt-3 mt-2 border-t border-[#00256D]/10 text-sm font-medium text-[#5B7088] hover:text-[#00256D] transition-colors"
         >
           {expanded
             ? t('Voir moins', 'Show less')
@@ -715,7 +715,7 @@ function DeliverySuccess({
             </>
           ) : (
             <>
-              <MessageCircle className="w-4 h-4 text-[#1E4B7A]" />
+              <MessageCircle className="w-4 h-4 text-[#00256D]" />
               {t('Notifier par WhatsApp', 'Notify via WhatsApp')}
             </>
           )}
@@ -771,7 +771,7 @@ function DeliverySuccess({
       <button
         type="button"
         onClick={handleCopyLink}
-        className="flex items-center justify-center gap-2 w-full h-12 bg-[#1E4B7A]/5 hover:bg-[#1E4B7A]/10 border border-[#1E4B7A]/10 rounded-xl text-sm font-semibold text-[#1E4B7A] transition-colors"
+        className="flex items-center justify-center gap-2 w-full h-12 bg-[#00256D]/5 hover:bg-[#00256D]/10 border border-[#00256D]/10 rounded-xl text-sm font-semibold text-[#00256D] transition-colors"
       >
         <Copy className="w-4 h-4" />
         {copied ? t('Lien copié !', 'Link copied!') : t('Copier le lien de suivi', 'Copy tracking link')}
@@ -781,7 +781,7 @@ function DeliverySuccess({
       <div className="text-center pt-2">
         <Link
           href="/"
-          className="inline-flex items-center gap-2 text-sm text-[#5B7088] hover:text-[#1E4B7A] transition-colors no-underline"
+          className="inline-flex items-center gap-2 text-sm text-[#5B7088] hover:text-[#00256D] transition-colors no-underline"
         >
           <Home className="w-4 h-4" />
           {t("Retour à l'accueil", 'Back to home')}
@@ -1018,7 +1018,7 @@ function RetrieveContent() {
         <RetrieveHeader qrCode={reference} status="loading" lang={currentLang} onLangChange={setCurrentLang} />
         <div className="flex items-center justify-center py-32">
           <div className="text-center">
-            <Loader2 className="w-8 h-8 text-[#1E4B7A] animate-spin mx-auto mb-3" />
+            <Loader2 className="w-8 h-8 text-[#00256D] animate-spin mx-auto mb-3" />
             <p className="text-sm text-[#5B7088]">{tFn('Vérification du colis...', 'Verifying package...')}</p>
           </div>
         </div>
@@ -1135,7 +1135,7 @@ function RetrieveContent() {
               : tFn('Préparation à la livraison', 'Delivery preparation')}
           </h1>
           <div className="flex items-center gap-2 mt-1">
-            <span className="font-mono bg-[#1E4B7A]/5 border border-[#1E4B7A]/10 px-2.5 py-1 rounded-lg text-sm font-bold text-[#0F1B2E]">
+            <span className="font-mono bg-[#00256D]/5 border border-[#00256D]/10 px-2.5 py-1 rounded-lg text-sm font-bold text-[#0F1B2E]">
               #{reference}
             </span>
             {colis?.pin_masked && !confirmed && (
@@ -1198,7 +1198,7 @@ function RetrieveContent() {
 
       {/* ─── Sticky Bottom Action ─── */}
       {isNormal && colis && colis.pinAttempts < 3 && (
-        <div className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-xl border-t border-[#1E4B7A]/10 shadow-[0_-4px_24px_rgba(30,75,122,0.08)] z-30">
+        <div className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-xl border-t border-[#00256D]/10 shadow-[0_-4px_24px_rgba(30,75,122,0.08)] z-30">
           <div className="max-w-[600px] mx-auto px-4 py-4 safe-area-inset-bottom">
             <button
               type="button"
@@ -1244,10 +1244,10 @@ export default function RetrievePage() {
       fallback={
         <div className="min-h-screen bg-[#F4F7FB]">
           <div className="max-w-[600px] mx-auto px-4 h-16 flex items-center justify-center">
-            <Loader2 className="w-6 h-6 text-[#1E4B7A] animate-spin" />
+            <Loader2 className="w-6 h-6 text-[#00256D] animate-spin" />
           </div>
           <div className="flex items-center justify-center py-32">
-            <Loader2 className="w-8 h-8 text-[#1E4B7A] animate-spin" />
+            <Loader2 className="w-8 h-8 text-[#00256D] animate-spin" />
           </div>
         </div>
       }

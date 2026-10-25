@@ -42,14 +42,14 @@ const CONFIGS: Record<LoginVariant, LoginConfig> = {
     type: 'agence',
     title: 'Espace Agence',
     subtitle: 'Connectez-vous à votre espace professionnel',
-    demoEmail: 'agence@qrtrans.com',
+    demoEmail: 'agency@newvisioncargo.pro',
     demoPassword: 'agence123',
     demoLabel: 'Agence',
     role: 'agency',
     redirectPath: '/agence/tableau-de-bord',
     badgeLabel: 'Espace Agence',
     badgeIcon: Building2,
-    leftTitle: 'QRTrans pour les professionnels du voyage',
+    leftTitle: 'Mov pour les professionnels du voyage',
     leftSubtitle: 'Gérez vos colis, vos clients, vos QR codes — depuis un seul tableau de bord premium.',
     leftTagline: 'Conçu pour la performance',
     switchText: 'Vous êtes administrateur ?',
@@ -66,14 +66,14 @@ const CONFIGS: Record<LoginVariant, LoginConfig> = {
     type: 'superadmin',
     title: 'Espace Administrateur',
     subtitle: 'Accès réservé aux administrateurs système',
-    demoEmail: 'admin@qrtrans.com',
+    demoEmail: 'admin@newvisioncargo.pro',
     demoPassword: 'admin123',
     demoLabel: 'SuperAdmin',
     role: 'superadmin',
     redirectPath: '/admin/tableau-de-bord',
     badgeLabel: 'Espace Administrateur',
     badgeIcon: Shield,
-    leftTitle: 'QRTrans — Contrôle centralisé',
+    leftTitle: 'Mov — Contrôle centralisé',
     leftSubtitle: 'Gérez agences, QR codes, utilisateurs et API — tout depuis un seul panneau.',
     leftTagline: 'Sécurité & Performance',
     switchText: 'Vous êtes une agence ?',
@@ -177,7 +177,7 @@ export default function LoginPage({ variant }: { variant: LoginVariant }) {
           <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-2 border border-white/20 group-hover:bg-white/15 transition-colors shadow-lg shadow-black/20">
             <Image
               src="/brand/logo.png"
-              alt="QRTrans"
+              alt="Mov"
               width={140}
               height={42}
               className="h-8 w-auto object-contain"
@@ -272,8 +272,8 @@ export default function LoginPage({ variant }: { variant: LoginVariant }) {
             </label>
             <div className={`relative rounded-2xl border-2 transition-all duration-300 ${
               focusedField === 'email'
-                ? 'border-[#1E4B7A] shadow-lg shadow-[#1E4B7A]/10 bg-white'
-                : 'border-[#1E4B7A]/15 hover:border-[#1E4B7A]/30 bg-white/50'
+                ? 'border-[#00256D] shadow-lg shadow-[#00256D]/10 bg-white'
+                : 'border-[#00256D]/15 hover:border-[#00256D]/30 bg-white/50'
             }`}>
               <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[#5B7088]">
                 <Mail className="w-[18px] h-[18px]" />
@@ -285,7 +285,7 @@ export default function LoginPage({ variant }: { variant: LoginVariant }) {
                 onFocus={() => setFocusedField('email')}
                 onBlur={() => setFocusedField(null)}
                 className="w-full pl-11 pr-4 py-3.5 bg-transparent text-[#0F1B2E] placeholder-[#5B7088]/60 focus:outline-none text-sm font-medium rounded-2xl"
-                placeholder={variant === 'agence' ? 'vous@agence.com' : 'admin@qrtrans.com'}
+                placeholder={variant === 'agence' ? 'vous@agence.com' : 'admin@newvisioncargo.pro'}
                 required
               />
             </div>
@@ -298,8 +298,8 @@ export default function LoginPage({ variant }: { variant: LoginVariant }) {
             </label>
             <div className={`relative rounded-2xl border-2 transition-all duration-300 ${
               focusedField === 'password'
-                ? 'border-[#1E4B7A] shadow-lg shadow-[#1E4B7A]/10 bg-white'
-                : 'border-[#1E4B7A]/15 hover:border-[#1E4B7A]/30 bg-white/50'
+                ? 'border-[#00256D] shadow-lg shadow-[#00256D]/10 bg-white'
+                : 'border-[#00256D]/15 hover:border-[#00256D]/30 bg-white/50'
             }`}>
               <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[#5B7088]">
                 <Lock className="w-[18px] h-[18px]" />
@@ -317,7 +317,7 @@ export default function LoginPage({ variant }: { variant: LoginVariant }) {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-[#5B7088] hover:text-[#1E4B7A] transition-colors p-1 rounded-lg hover:bg-[#1E4B7A]/5"
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-[#5B7088] hover:text-[#00256D] transition-colors p-1 rounded-lg hover:bg-[#00256D]/5"
                 tabIndex={-1}
                 aria-label="Afficher/masquer le mot de passe"
               >
@@ -334,7 +334,7 @@ export default function LoginPage({ variant }: { variant: LoginVariant }) {
                   type="checkbox"
                   checked={rememberMe}
                   onChange={(e) => setRememberMe(e.target.checked)}
-                  className="peer h-4 w-4 rounded border-2 border-[#1E4B7A]/30 appearance-none cursor-pointer checked:border-[#1E4B7A] checked:bg-[#1E4B7A] transition-colors"
+                  className="peer h-4 w-4 rounded border-2 border-[#00256D]/30 appearance-none cursor-pointer checked:border-[#00256D] checked:bg-[#00256D] transition-colors"
                 />
                 <svg className="absolute left-0.5 top-0.5 w-3 h-3 text-white opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
@@ -344,7 +344,7 @@ export default function LoginPage({ variant }: { variant: LoginVariant }) {
             </label>
             <Link
               href="/forgot-password"
-              className="text-sm font-semibold text-[#1E4B7A] hover:underline transition-colors"
+              className="text-sm font-semibold text-[#00256D] hover:underline transition-colors"
             >
               Mot de passe oublié ?
             </Link>
@@ -376,24 +376,24 @@ export default function LoginPage({ variant }: { variant: LoginVariant }) {
         <motion.div
           variants={fadeUp}
           custom={4}
-          className="p-4 bg-[#1E4B7A]/[0.04] rounded-2xl border border-[#1E4B7A]/10"
+          className="p-4 bg-[#00256D]/[0.04] rounded-2xl border border-[#00256D]/10"
         >
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-xs font-bold text-[#1E4B7A]/70 uppercase tracking-wider flex items-center gap-2">
+            <h3 className="text-xs font-bold text-[#00256D]/70 uppercase tracking-wider flex items-center gap-2">
               <Zap className="w-3.5 h-3.5" />
               Compte démo
             </h3>
             <button
               type="button"
               onClick={fillDemo}
-              className="text-xs font-bold text-[#1E4B7A] hover:underline transition-colors flex items-center gap-1"
+              className="text-xs font-bold text-[#00256D] hover:underline transition-colors flex items-center gap-1"
             >
               Auto-remplir
               <ArrowRight className="w-3 h-3" />
             </button>
           </div>
           <div className="flex items-center gap-3">
-            <span className="inline-flex items-center px-3 py-1.5 rounded-xl text-xs font-bold bg-[#1E4B7A]/10 text-[#1E4B7A] border border-[#1E4B7A]/20">
+            <span className="inline-flex items-center px-3 py-1.5 rounded-xl text-xs font-bold bg-[#00256D]/10 text-[#00256D] border border-[#00256D]/20">
               {config.demoLabel}
             </span>
             <span className="text-xs text-[#5B7088] font-mono">
@@ -408,7 +408,7 @@ export default function LoginPage({ variant }: { variant: LoginVariant }) {
             {config.switchText}{' '}
             <Link
               href={config.switchHref}
-              className="font-bold text-[#1E4B7A] hover:underline transition-colors"
+              className="font-bold text-[#00256D] hover:underline transition-colors"
             >
               {config.switchLink} →
             </Link>

@@ -28,16 +28,16 @@ export default function ContactsCard({
     : `Hello ${receiverName}, regarding your package #${reference}.`;
 
   return (
-    <div className="glass-card-light rounded-xl p-5 border-l-4 border-l-[#1E4B7A]">
+    <div className="glass-card-light rounded-xl p-5 border-l-4 border-l-[#00256D]">
       <h2 className="font-display text-base font-bold text-[#0F1B2E] mb-4 flex items-center gap-2">
-        <MessageCircle className="w-4 h-4 text-[#1E4B7A]" />
+        <MessageCircle className="w-4 h-4 text-[#00256D]" />
         {t('Contacts', 'Contacts')}
       </h2>
 
       <div className="space-y-4">
         {/* ENVOYEUR */}
-        <div className="bg-[#1E4B7A]/5 border border-[#1E4B7A]/10 rounded-lg p-4">
-          <p className="text-xs font-bold text-[#1E4B7A] uppercase tracking-wider mb-2 flex items-center gap-1.5">
+        <div className="bg-[#00256D]/5 border border-[#00256D]/10 rounded-lg p-4">
+          <p className="text-xs font-bold text-[#00256D] uppercase tracking-wider mb-2 flex items-center gap-1.5">
             <Upload className="w-3.5 h-3.5" />
             {t('Envoyeur', 'Sender')}
           </p>
@@ -48,7 +48,7 @@ export default function ContactsCard({
             <div className="flex gap-2 mt-3">
               <a
                 href={`tel:${senderPhone}`}
-                className="inline-flex items-center gap-1.5 px-3 h-10 bg-[#1E4B7A]/5 hover:bg-[#1E4B7A]/10 border border-[#1E4B7A]/10 text-[#1E4B7A] rounded-lg text-xs font-semibold transition-colors no-underline"
+                className="inline-flex items-center gap-1.5 px-3 h-10 bg-[#00256D]/5 hover:bg-[#00256D]/10 border border-[#00256D]/10 text-[#00256D] rounded-lg text-xs font-semibold transition-colors no-underline"
               >
                 <Phone className="w-3.5 h-3.5" />
                 {t('Appeler', 'Call')}
@@ -67,8 +67,8 @@ export default function ContactsCard({
         </div>
 
         {/* RECEVEUR */}
-        <div className="bg-[#1E4B7A]/5 border border-[#1E4B7A]/10 rounded-lg p-4">
-          <p className="text-xs font-bold text-[#1E4B7A] uppercase tracking-wider mb-2 flex items-center gap-1.5">
+        <div className="bg-[#00256D]/5 border border-[#00256D]/10 rounded-lg p-4">
+          <p className="text-xs font-bold text-[#00256D] uppercase tracking-wider mb-2 flex items-center gap-1.5">
             <Download className="w-3.5 h-3.5" />
             {t('Receveur', 'Receiver')}
           </p>
@@ -79,7 +79,7 @@ export default function ContactsCard({
             <div className="flex gap-2 mt-3">
               <a
                 href={`tel:${receiverPhone}`}
-                className="inline-flex items-center gap-1.5 px-3 h-10 bg-[#1E4B7A]/5 hover:bg-[#1E4B7A]/10 border border-[#1E4B7A]/10 text-[#1E4B7A] rounded-lg text-xs font-semibold transition-colors no-underline"
+                className="inline-flex items-center gap-1.5 px-3 h-10 bg-[#00256D]/5 hover:bg-[#00256D]/10 border border-[#00256D]/10 text-[#00256D] rounded-lg text-xs font-semibold transition-colors no-underline"
               >
                 <Phone className="w-3.5 h-3.5" />
                 {t('Appeler', 'Call')}

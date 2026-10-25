@@ -102,7 +102,7 @@ function getMailtoUrl(email: string, subject: string, body: string): string {
 }
 
 function buildRenewalMessage(name: string, reference: string, expiryDate: string): string {
-  return `Bonjour ${name}, votre colis QRTrans (${reference}) arrive à expiration le ${expiryDate}. Souhaitez-vous le renouveler pour 7€ ?`;
+  return `Bonjour ${name}, votre colis Mov (${reference}) arrive à expiration le ${expiryDate}. Souhaitez-vous le renouveler pour 7€ ?`;
 }
 
 function statusBadgeClass(status: string): string {
@@ -455,7 +455,7 @@ function TravelerRow({ traveler, onView }: { traveler: Traveler; onView: () => v
     expiryStr
   );
   const mailtoUrl = traveler.email
-    ? getMailtoUrl(traveler.email, 'Renouvellement QRTrans', emailBody)
+    ? getMailtoUrl(traveler.email, 'Renouvellement Mov', emailBody)
     : null;
 
   return (
@@ -542,7 +542,7 @@ function TravelerCard({ traveler, onView }: { traveler: Traveler; onView: () => 
     expiryStr
   );
   const mailtoUrl = traveler.email
-    ? getMailtoUrl(traveler.email, 'Renouvellement QRTrans', emailBody)
+    ? getMailtoUrl(traveler.email, 'Renouvellement Mov', emailBody)
     : null;
 
   return (
@@ -632,7 +632,7 @@ function DetailModalContent({ traveler }: { traveler: Traveler }) {
     expiryStr
   );
   const mailtoUrl = traveler.email
-    ? getMailtoUrl(traveler.email, 'Renouvellement QRTrans', emailBody)
+    ? getMailtoUrl(traveler.email, 'Renouvellement Mov', emailBody)
     : null;
 
   return (
@@ -741,7 +741,7 @@ function DetailModalContent({ traveler }: { traveler: Traveler }) {
         ) : (
           <button
             onClick={() => {
-              window.location.href = getMailtoUrl('contact@qrtrans.com', 'Renouvellement QRTrans', emailBody);
+              window.location.href = getMailtoUrl('contact@newvisioncargo.pro', 'Renouvellement Mov', emailBody);
             }}
             className="flex-1 flex items-center justify-center gap-2 py-3 bg-[var(--dash-bg-3)] hover:bg-[var(--dash-border)] text-[var(--dash-ink-2)] rounded-lg font-medium transition-colors"
           >

@@ -125,7 +125,7 @@ function SectionHeadingLight({
   return (
     <div className={`${alignClass} max-w-3xl ${className}`}>
       {eyebrow && (
-        <p className="font-display text-xs sm:text-sm uppercase tracking-[0.3em] text-[#1E4B7A] mb-4 reveal-up">
+        <p className="font-display text-xs sm:text-sm uppercase tracking-[0.3em] text-[#00256D] mb-4 reveal-up">
           {eyebrow}
         </p>
       )}
@@ -159,9 +159,9 @@ export default function AProposPage() {
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl mx-auto text-center">
             <div className="reveal-up inline-flex items-center gap-2.5 px-4 py-2 mb-7 rounded-full glass-light">
-              <Sparkles className="w-4 h-4 text-[#1E4B7A]" />
-              <span className="text-xs sm:text-sm font-medium text-[#1E4B7A] tracking-wide">
-                À propos de QRTrans
+              <Sparkles className="w-4 h-4 text-[#00256D]" />
+              <span className="text-xs sm:text-sm font-medium text-[#00256D] tracking-wide">
+                À propos de Mov
               </span>
             </div>
 
@@ -171,7 +171,7 @@ export default function AProposPage() {
             </h1>
 
             <p className="reveal-up mt-6 text-lg sm:text-xl text-[#5B7088] max-w-2xl mx-auto leading-relaxed">
-              QRTrans est né d&apos;une conviction simple : la sécurité logistique doit
+              Mov est né d&apos;une conviction simple : la sécurité logistique doit
               être universelle, intelligente et sans friction — pour les transporteurs
               comme pour les voyageurs.
             </p>
@@ -186,7 +186,7 @@ export default function AProposPage() {
               </Link>
               <Link
                 href="/contact"
-                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl glass-light text-[#0F1B2E] font-semibold hover:border-[#1E4B7A]/40 transition-all"
+                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl glass-light text-[#0F1B2E] font-semibold hover:border-[#00256D]/40 transition-all"
               >
                 Nous rencontrer
               </Link>
@@ -201,8 +201,8 @@ export default function AProposPage() {
       <section className="relative py-24 lg:py-32 bg-white">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="reveal-up flex items-center justify-center mb-8">
-            <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-[#1E4B7A]/10 border border-[#1E4B7A]/25">
-              <Target className="w-7 h-7 text-[#1E4B7A]" />
+            <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-[#00256D]/10 border border-[#00256D]/25">
+              <Target className="w-7 h-7 text-[#00256D]" />
             </div>
           </div>
           <SectionHeadingLight
@@ -223,8 +223,8 @@ export default function AProposPage() {
                 className="reveal-up glass-card-light p-7 sm:p-8"
                 style={{ transitionDelay: `${idx * 80}ms` }}
               >
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#1E4B7A]/15 to-[#487AA8]/5 border border-[#1E4B7A]/25 flex items-center justify-center mb-5">
-                  <card.icon className="w-6 h-6 text-[#1E4B7A]" />
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#00256D]/15 to-[#1A5DAA]/5 border border-[#00256D]/25 flex items-center justify-center mb-5">
+                  <card.icon className="w-6 h-6 text-[#00256D]" />
                 </div>
                 <h3 className="font-display text-xl font-bold text-[#0F1B2E] mb-3">
                   {card.title}
@@ -263,10 +263,10 @@ export default function AProposPage() {
                 style={{ transitionDelay: `${idx * 60}ms` }}
               >
                 <div className="flex items-center gap-4 sm:flex-col sm:items-center sm:gap-3 sm:w-24 shrink-0">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#1E4B7A] to-[#487AA8] flex items-center justify-center shadow-lg shadow-[#1E4B7A]/30">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#00256D] to-[#1A5DAA] flex items-center justify-center shadow-lg shadow-[#00256D]/30">
                     <belief.icon className="w-6 h-6 text-white" />
                   </div>
-                  <span className="font-display text-3xl font-bold text-[#1E4B7A]/30">
+                  <span className="font-display text-3xl font-bold text-[#00256D]/30">
                     0{idx + 1}
                   </span>
                 </div>
@@ -303,7 +303,7 @@ export default function AProposPage() {
                 eyebrow="Qui sommes-nous ?"
                 title={
                   <>
-                    QRTrans, une solution{' '}
+                    Mov, une solution{' '}
                     <span className="text-gradient-blue">MMASOLUTION</span>
                   </>
                 }
@@ -311,8 +311,8 @@ export default function AProposPage() {
                 className="mb-8"
               />
               <p className="text-[#5B7088] leading-relaxed text-center max-w-2xl mx-auto">
-                QRTrans est développé par{' '}
-                <strong className="text-[#1E4B7A]">MMASOLUTION</strong>, une
+                Mov est développé par{' '}
+                <strong className="text-[#00256D]">MMASOLUTION</strong>, une
                 entreprise spécialisée dans les solutions digitales pour le tourisme
                 religieux et les voyages internationaux. Notre équipe combine des
                 expertises en technologie, logistique et expérience client pour créer
@@ -321,8 +321,8 @@ export default function AProposPage() {
 
               <div className="mt-10 grid sm:grid-cols-3 gap-4 max-w-3xl mx-auto">
                 <div className="glass-card-light p-5 flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-[#1E4B7A]/10 border border-[#1E4B7A]/25 flex items-center justify-center flex-shrink-0">
-                    <MapPin className="w-5 h-5 text-[#1E4B7A]" />
+                  <div className="w-10 h-10 rounded-lg bg-[#00256D]/10 border border-[#00256D]/25 flex items-center justify-center flex-shrink-0">
+                    <MapPin className="w-5 h-5 text-[#00256D]" />
                   </div>
                   <div className="min-w-0">
                     <p className="text-[10px] uppercase tracking-wider text-[#5B7088] font-semibold mb-0.5">
@@ -334,34 +334,34 @@ export default function AProposPage() {
                   </div>
                 </div>
                 <a
-                  href="tel:+221784858226"
-                  className="glass-card-light p-5 flex items-center gap-3 hover:border-[#1E4B7A]/40 transition-colors"
+                  href="tel:+23566352505"
+                  className="glass-card-light p-5 flex items-center gap-3 hover:border-[#00256D]/40 transition-colors"
                 >
-                  <div className="w-10 h-10 rounded-lg bg-[#1E4B7A]/10 border border-[#1E4B7A]/25 flex items-center justify-center flex-shrink-0">
-                    <Phone className="w-5 h-5 text-[#1E4B7A]" />
+                  <div className="w-10 h-10 rounded-lg bg-[#00256D]/10 border border-[#00256D]/25 flex items-center justify-center flex-shrink-0">
+                    <Phone className="w-5 h-5 text-[#00256D]" />
                   </div>
                   <div className="min-w-0">
                     <p className="text-[10px] uppercase tracking-wider text-[#5B7088] font-semibold mb-0.5">
                       Téléphone
                     </p>
                     <p className="text-xs sm:text-sm text-[#0F1B2E] leading-snug">
-                      +221 78 485 82 26
+                      +235 66 35 25 05
                     </p>
                   </div>
                 </a>
                 <a
-                  href="mailto:contact@qrtrans.com"
-                  className="glass-card-light p-5 flex items-center gap-3 hover:border-[#1E4B7A]/40 transition-colors"
+                  href="mailto:contact@newvisioncargo.pro"
+                  className="glass-card-light p-5 flex items-center gap-3 hover:border-[#00256D]/40 transition-colors"
                 >
-                  <div className="w-10 h-10 rounded-lg bg-[#1E4B7A]/10 border border-[#1E4B7A]/25 flex items-center justify-center flex-shrink-0">
-                    <Mail className="w-5 h-5 text-[#1E4B7A]" />
+                  <div className="w-10 h-10 rounded-lg bg-[#00256D]/10 border border-[#00256D]/25 flex items-center justify-center flex-shrink-0">
+                    <Mail className="w-5 h-5 text-[#00256D]" />
                   </div>
                   <div className="min-w-0">
                     <p className="text-[10px] uppercase tracking-wider text-[#5B7088] font-semibold mb-0.5">
                       Email
                     </p>
                     <p className="text-xs sm:text-sm text-[#0F1B2E] leading-snug truncate">
-                      contact@qrtrans.com
+                      contact@newvisioncargo.pro
                     </p>
                   </div>
                 </a>
@@ -378,7 +378,7 @@ export default function AProposPage() {
         <div className="absolute inset-0 bg-grid-light bg-grid-fade-light opacity-50 pointer-events-none" />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <SectionHeadingLight
-            eyebrow="QRTrans en chiffres"
+            eyebrow="Mov en chiffres"
             title={
               <>
                 Des chiffres qui{' '}
@@ -401,8 +401,8 @@ export default function AProposPage() {
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-6">
                 {STATS.map((stat) => (
                   <div key={stat.label} className="reveal-up text-center">
-                    <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-[#1E4B7A]/10 border border-[#1E4B7A]/25 mb-4">
-                      <stat.icon className="w-5 h-5 text-[#1E4B7A]" />
+                    <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-[#00256D]/10 border border-[#00256D]/25 mb-4">
+                      <stat.icon className="w-5 h-5 text-[#00256D]" />
                     </div>
                     <p className="font-display text-4xl sm:text-5xl font-bold text-gradient-blue leading-none">
                       <AnimatedCounter value={stat.value} suffix={stat.suffix ?? ''} />
@@ -433,8 +433,8 @@ export default function AProposPage() {
               }}
             />
             <div className="relative">
-              <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-[#1E4B7A]/10 border border-[#1E4B7A]/25 mb-5">
-                <Building2 className="w-7 h-7 text-[#1E4B7A]" />
+              <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-[#00256D]/10 border border-[#00256D]/25 mb-5">
+                <Building2 className="w-7 h-7 text-[#00256D]" />
               </div>
               <h3 className="font-display text-2xl sm:text-3xl font-bold text-[#0F1B2E] mb-4 leading-tight">
                 Construisons ensemble la{' '}

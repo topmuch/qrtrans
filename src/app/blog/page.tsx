@@ -47,7 +47,7 @@ const ARTICLES: Article[] = [
     excerpt:
       "La bonne gestion des itinéraires et le suivi en temps réel permettent aux chauffeurs et agences de gagner du temps et d'améliorer leur rentabilité.",
     href: '/blog/optimiser-tournees',
-    accent: 'from-[#1E4B7A]/15 via-[#487AA8]/5 to-transparent',
+    accent: 'from-[#00256D]/15 via-[#1A5DAA]/5 to-transparent',
   },
   {
     title: 'Réglementation du transport de marchandises au Sénégal',
@@ -59,7 +59,7 @@ const ARTICLES: Article[] = [
     accent: 'from-orange-500/15 via-orange-500/5 to-transparent',
   },
   {
-    title: 'Comment QRTrans réduit les pertes de colis de 90 %',
+    title: 'Comment Mov réduit les pertes de colis de 90 %',
     category: 'Actu',
     date: '28 Avril 2026',
     excerpt:
@@ -72,7 +72,7 @@ const ARTICLES: Article[] = [
     category: 'Tutoriel',
     date: '20 Avril 2026',
     excerpt:
-      "Pas à pas pour activer votre premier colis sur QRTrans, du scan du QR code à la notification WhatsApp.",
+      "Pas à pas pour activer votre premier colis sur Mov, du scan du QR code à la notification WhatsApp.",
     href: '/blog/premiere-activation',
     accent: 'from-cyan-500/15 via-cyan-500/5 to-transparent',
   },
@@ -105,7 +105,7 @@ function SectionHeadingLight({
   return (
     <div className={`${alignClass} max-w-3xl`}>
       {eyebrow && (
-        <p className="font-display text-xs sm:text-sm uppercase tracking-[0.3em] text-[#1E4B7A] mb-4 reveal-up">
+        <p className="font-display text-xs sm:text-sm uppercase tracking-[0.3em] text-[#00256D] mb-4 reveal-up">
           {eyebrow}
         </p>
       )}
@@ -149,8 +149,8 @@ export default function BlogPage() {
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl mx-auto text-center">
             <div className="reveal-up inline-flex items-center gap-2.5 px-4 py-2 mb-7 rounded-full glass-light">
-              <Newspaper className="w-4 h-4 text-[#1E4B7A]" />
-              <span className="text-xs sm:text-sm font-medium text-[#1E4B7A] tracking-wide">
+              <Newspaper className="w-4 h-4 text-[#00256D]" />
+              <span className="text-xs sm:text-sm font-medium text-[#00256D] tracking-wide">
                 Blog & Ressources
               </span>
             </div>
@@ -204,7 +204,7 @@ export default function BlogPage() {
                     {/* Badge + Date */}
                     <div className="flex items-center justify-between mb-4">
                       <span
-                        className="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-semibold border bg-[#1E4B7A]/10 border-[#1E4B7A]/25 text-[#1E4B7A]"
+                        className="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-semibold border bg-[#00256D]/10 border-[#00256D]/25 text-[#00256D]"
                       >
                         {article.category}
                       </span>
@@ -216,7 +216,7 @@ export default function BlogPage() {
 
                     {/* Title */}
                     <h3
-                      className={`font-display font-bold text-[#0F1B2E] mb-3 leading-snug group-hover:text-[#1E4B7A] transition-colors ${
+                      className={`font-display font-bold text-[#0F1B2E] mb-3 leading-snug group-hover:text-[#00256D] transition-colors ${
                         idx === 0 ? 'text-2xl sm:text-3xl' : 'text-lg'
                       }`}
                     >
@@ -235,7 +235,7 @@ export default function BlogPage() {
                     {/* Read more */}
                     <Link
                       href={article.href}
-                      className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#1E4B7A] hover:text-[#0F1B2E] group/link"
+                      className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#00256D] hover:text-[#0F1B2E] group/link"
                     >
                       Lire la suite
                       <ArrowRight className="w-4 h-4 group-hover/link:translate-x-1 transition-transform" />
@@ -275,8 +275,8 @@ export default function BlogPage() {
             />
 
             <div className="relative max-w-xl mx-auto text-center">
-              <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-[#1E4B7A]/10 border border-[#1E4B7A]/25 mb-5">
-                <Mail className="w-7 h-7 text-[#1E4B7A]" />
+              <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-[#00256D]/10 border border-[#00256D]/25 mb-5">
+                <Mail className="w-7 h-7 text-[#00256D]" />
               </div>
 
               <h2 className="font-display text-2xl sm:text-3xl font-bold text-[#0F1B2E] mb-3 tracking-tight">
@@ -289,9 +289,9 @@ export default function BlogPage() {
               </p>
 
               {subscribed ? (
-                <div className="flex items-center justify-center gap-3 bg-[#1E4B7A]/10 border border-[#1E4B7A]/25 rounded-xl p-4">
-                  <CheckCircle2 className="w-5 h-5 text-[#1E4B7A]" />
-                  <span className="text-[#1E4B7A] font-semibold text-sm">
+                <div className="flex items-center justify-center gap-3 bg-[#00256D]/10 border border-[#00256D]/25 rounded-xl p-4">
+                  <CheckCircle2 className="w-5 h-5 text-[#00256D]" />
+                  <span className="text-[#00256D] font-semibold text-sm">
                     Merci ! Vous êtes maintenant abonné à notre newsletter.
                   </span>
                 </div>
@@ -306,7 +306,7 @@ export default function BlogPage() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
-                    className="flex-1 h-12 px-4 rounded-xl bg-white border border-[#1E4B7A]/15 text-[#0F1B2E] placeholder:text-[#5B7088]/60 focus:outline-none focus:border-[#1E4B7A]/60 focus:ring-2 focus:ring-[#1E4B7A]/15 text-sm transition-colors"
+                    className="flex-1 h-12 px-4 rounded-xl bg-white border border-[#00256D]/15 text-[#0F1B2E] placeholder:text-[#5B7088]/60 focus:outline-none focus:border-[#00256D]/60 focus:ring-2 focus:ring-[#00256D]/15 text-sm transition-colors"
                   />
                   <button
                     type="submit"
@@ -319,7 +319,7 @@ export default function BlogPage() {
               )}
 
               <div className="mt-6 inline-flex items-center gap-2 text-xs text-[#5B7088]">
-                <BookOpen className="w-3.5 h-3.5 text-[#1E4B7A]" />
+                <BookOpen className="w-3.5 h-3.5 text-[#00256D]" />
                 <span>1 à 2 emails par mois, jamais plus.</span>
               </div>
             </div>

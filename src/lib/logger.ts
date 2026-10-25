@@ -1,5 +1,5 @@
 /**
- * Centralized logger for QRTrans monitoring.
+ * Centralized logger for Mov monitoring.
  * Writes to console (sync) + database (async fire-and-forget).
  */
 

@@ -58,7 +58,7 @@ const PILLARS: Pillar[] = [
     icon: FileCheck,
     title: 'Conformité RGPD',
     description:
-      'QRTrans respecte intégralement le RGPD et la loi sénégalaise sur la protection des données personnelles.',
+      'Mov respecte intégralement le RGPD et la loi sénégalaise sur la protection des données personnelles.',
     bullets: [
       'Droit à l’effacement garanti',
       'Hébergement Union Européenne',
@@ -114,7 +114,7 @@ function SectionHeadingLight({
   return (
     <div className={`${alignClass} max-w-3xl`}>
       {eyebrow && (
-        <p className="font-display text-xs sm:text-sm uppercase tracking-[0.3em] text-[#1E4B7A] mb-4 reveal-up">
+        <p className="font-display text-xs sm:text-sm uppercase tracking-[0.3em] text-[#00256D] mb-4 reveal-up">
           {eyebrow}
         </p>
       )}
@@ -147,8 +147,8 @@ export default function SecuritePage() {
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl mx-auto text-center">
             <div className="reveal-up inline-flex items-center gap-2.5 px-4 py-2 mb-7 rounded-full glass-light">
-              <Shield className="w-4 h-4 text-[#1E4B7A]" />
-              <span className="text-xs sm:text-sm font-medium text-[#1E4B7A] tracking-wide">
+              <Shield className="w-4 h-4 text-[#00256D]" />
+              <span className="text-xs sm:text-sm font-medium text-[#00256D] tracking-wide">
                 Sécurité & Protection
               </span>
             </div>
@@ -159,7 +159,7 @@ export default function SecuritePage() {
             </h1>
 
             <p className="reveal-up mt-6 text-lg sm:text-xl text-[#5B7088] max-w-2xl mx-auto leading-relaxed">
-              QRTrans applique un système de sécurité multi-couches : chiffrement
+              Mov applique un système de sécurité multi-couches : chiffrement
               bout-en-bout, code PIN anti-fraude et conformité RGPD totale. Zéro colis
               perdu depuis notre lancement.
             </p>
@@ -174,7 +174,7 @@ export default function SecuritePage() {
               </Link>
               <Link
                 href="/fonctionnalites"
-                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl glass-light text-[#0F1B2E] font-semibold hover:border-[#1E4B7A]/40 transition-all"
+                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl glass-light text-[#0F1B2E] font-semibold hover:border-[#00256D]/40 transition-all"
               >
                 Voir les fonctionnalités
               </Link>
@@ -216,8 +216,8 @@ export default function SecuritePage() {
                   }}
                 />
                 <div className="relative">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#1E4B7A]/15 to-[#487AA8]/5 border border-[#1E4B7A]/25 flex items-center justify-center mb-5">
-                    <pillar.icon className="w-6 h-6 text-[#1E4B7A]" />
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#00256D]/15 to-[#1A5DAA]/5 border border-[#00256D]/25 flex items-center justify-center mb-5">
+                    <pillar.icon className="w-6 h-6 text-[#00256D]" />
                   </div>
                   <h3 className="font-display text-xl font-bold text-[#0F1B2E] mb-3">
                     {pillar.title}
@@ -227,8 +227,8 @@ export default function SecuritePage() {
                   </p>
                   <ul className="space-y-2.5">
                     {pillar.bullets.map((b) => (
-                      <li key={b} className="flex items-start gap-2.5 text-sm text-[#1E4B7A]">
-                        <CheckCircle2 className="w-4 h-4 text-[#1E4B7A] flex-shrink-0 mt-0.5" />
+                      <li key={b} className="flex items-start gap-2.5 text-sm text-[#00256D]">
+                        <CheckCircle2 className="w-4 h-4 text-[#00256D] flex-shrink-0 mt-0.5" />
                         <span>{b}</span>
                       </li>
                     ))}
@@ -254,7 +254,7 @@ export default function SecuritePage() {
                 <span className="text-gradient-blue">les plus strictes</span>
               </>
             }
-            subtitle="QRTrans respecte intégralement les standards européens et internationaux en matière de protection des données et de sécurité applicative."
+            subtitle="Mov respecte intégralement les standards européens et internationaux en matière de protection des données et de sécurité applicative."
           />
 
           <div className="mt-16 grid grid-cols-2 lg:grid-cols-4 gap-5">
@@ -264,8 +264,8 @@ export default function SecuritePage() {
                 className="reveal-up glass-card-light p-6 flex flex-col items-center text-center"
                 style={{ transitionDelay: `${idx * 60}ms` }}
               >
-                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#1E4B7A]/15 to-[#487AA8]/5 border border-[#1E4B7A]/25 flex items-center justify-center mb-4">
-                  <cert.icon className="w-7 h-7 text-[#1E4B7A]" />
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#00256D]/15 to-[#1A5DAA]/5 border border-[#00256D]/25 flex items-center justify-center mb-4">
+                  <cert.icon className="w-7 h-7 text-[#00256D]" />
                 </div>
                 <p className="font-display text-base font-bold text-[#0F1B2E] leading-snug">
                   {cert.label}
@@ -315,12 +315,12 @@ export default function SecuritePage() {
                       className={`inline-flex items-center justify-center w-12 h-12 rounded-xl border mb-4 ${
                         stat.emeraldAccent
                           ? 'bg-emerald-500/10 border-emerald-500/30'
-                          : 'bg-[#1E4B7A]/10 border-[#1E4B7A]/25'
+                          : 'bg-[#00256D]/10 border-[#00256D]/25'
                       }`}
                     >
                       <stat.icon
                         className={`w-5 h-5 ${
-                          stat.emeraldAccent ? 'text-emerald-600' : 'text-[#1E4B7A]'
+                          stat.emeraldAccent ? 'text-emerald-600' : 'text-[#00256D]'
                         }`}
                       />
                     </div>
@@ -360,8 +360,8 @@ export default function SecuritePage() {
               }}
             />
             <div className="relative">
-              <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-[#1E4B7A]/10 border border-[#1E4B7A]/25 mb-5">
-                <Globe className="w-7 h-7 text-[#1E4B7A]" />
+              <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-[#00256D]/10 border border-[#00256D]/25 mb-5">
+                <Globe className="w-7 h-7 text-[#00256D]" />
               </div>
               <h3 className="font-display text-2xl sm:text-3xl font-bold text-[#0F1B2E] mb-4 leading-tight">
                 Une question sur notre{' '}

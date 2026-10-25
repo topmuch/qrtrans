@@ -103,7 +103,7 @@ function formatTime(iso: string, lang: 'fr' | 'en') {
 
 function getEventDotColor(_type: string): string {
   // All timeline dots use a uniform steel-blue gradient (light theme brand mark).
-  return 'bg-gradient-to-br from-[#1E4B7A] to-[#487AA8]';
+  return 'bg-gradient-to-br from-[#00256D] to-[#1A5DAA]';
 }
 
 // ═══════════════════════════════════════════════════
@@ -142,7 +142,7 @@ function MessageCard({
       {/* Header */}
       <button
         onClick={() => setExpanded(!expanded)}
-        className="w-full flex items-center gap-3 px-4 py-3.5 hover:bg-[#1E4B7A]/5 transition-colors text-left"
+        className="w-full flex items-center gap-3 px-4 py-3.5 hover:bg-[#00256D]/5 transition-colors text-left"
       >
         <div
           className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
@@ -176,7 +176,7 @@ function MessageCard({
       {expanded && entry.messageContent && (
         <div className="px-4 pb-4 space-y-3">
           {/* WhatsApp message preview */}
-          <div className="bg-[#F4F7FB] border border-[#1E4B7A]/10 rounded-lg p-3 relative">
+          <div className="bg-[#F4F7FB] border border-[#00256D]/10 rounded-lg p-3 relative">
             {/* WhatsApp header */}
             <div className="flex items-center gap-2 mb-2">
               <svg viewBox="0 0 24 24" className="w-4 h-4 text-[#25D366]" fill="currentColor">
@@ -205,7 +205,7 @@ function MessageCard({
             )}
             <button
               onClick={handleCopyMessage}
-              className="flex items-center gap-1.5 px-3 py-2 bg-[#1E4B7A]/5 hover:bg-[#1E4B7A]/10 border border-[#1E4B7A]/10 rounded-lg text-xs font-medium text-[#1E4B7A] transition-colors"
+              className="flex items-center gap-1.5 px-3 py-2 bg-[#00256D]/5 hover:bg-[#00256D]/10 border border-[#00256D]/10 rounded-lg text-xs font-medium text-[#00256D] transition-colors"
             >
               <Copy className="w-3.5 h-3.5" />
               {copied ? t('Copié !', 'Copied!') : t('Copier', 'Copy')}
@@ -291,7 +291,7 @@ export default function SuiviPage() {
         <SuiviHeader reference={reference} lang={lang} onLangChange={setLang} />
         <div className="flex items-center justify-center py-32">
           <div className="text-center">
-            <Loader2 className="w-8 h-8 text-[#1E4B7A] animate-spin mx-auto mb-3" />
+            <Loader2 className="w-8 h-8 text-[#00256D] animate-spin mx-auto mb-3" />
             <p className="text-sm text-[#5B7088]">{t('Chargement du suivi...', 'Loading tracking...')}</p>
           </div>
         </div>
@@ -329,7 +329,7 @@ export default function SuiviPage() {
         {/* ─── STATUS BANNER ─── */}
         {colis && (
           <div
-            className="glass-light-strong rounded-2xl p-5 relative overflow-hidden border border-[#1E4B7A]/10"
+            className="glass-light-strong rounded-2xl p-5 relative overflow-hidden border border-[#00256D]/10"
           >
             {/* Status accent glow */}
             <div
@@ -342,7 +342,7 @@ export default function SuiviPage() {
                     : '#F59E0B',
               }}
             />
-            <div className="absolute -bottom-8 -left-8 w-24 h-24 rounded-full bg-[#1E4B7A]/5 blur-xl" />
+            <div className="absolute -bottom-8 -left-8 w-24 h-24 rounded-full bg-[#00256D]/5 blur-xl" />
 
             <div className="relative space-y-3">
               <div className="flex items-center justify-between gap-3">
@@ -372,7 +372,7 @@ export default function SuiviPage() {
                   </div>
                 </div>
                 <div
-                  className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 border border-[#1E4B7A]/10 bg-[#1E4B7A]/5 text-[#1E4B7A]"
+                  className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 border border-[#00256D]/10 bg-[#00256D]/5 text-[#00256D]"
                   aria-hidden
                 >
                   <TransportGlyph mode={colis.transportMode || colis.transportIcon} />
@@ -380,12 +380,12 @@ export default function SuiviPage() {
               </div>
 
               {/* Route */}
-              <div className="flex items-center gap-3 bg-[#1E4B7A]/5 border border-[#1E4B7A]/10 rounded-xl px-4 py-3">
+              <div className="flex items-center gap-3 bg-[#00256D]/5 border border-[#00256D]/10 rounded-xl px-4 py-3">
                 <div className="text-center flex-1 min-w-0">
                   <p className="text-lg font-bold text-[#0F1B2E] truncate">{colis.departureCity}</p>
                   <p className="text-[10px] text-[#5B7088] uppercase tracking-wide">{t('Départ', 'Departure')}</p>
                 </div>
-                <div className="flex items-center gap-1 text-[#1E4B7A] flex-shrink-0">
+                <div className="flex items-center gap-1 text-[#00256D] flex-shrink-0">
                   <ArrowRight className="w-5 h-5" />
                 </div>
                 <div className="text-center flex-1 min-w-0">
@@ -401,7 +401,7 @@ export default function SuiviPage() {
         {colis && (
           <div className="glass-card-light rounded-2xl p-5 space-y-3">
             <div className="flex items-center gap-2 mb-1">
-              <Package className="w-4 h-4 text-[#1E4B7A]" />
+              <Package className="w-4 h-4 text-[#00256D]" />
               <h3 className="font-display text-xs font-semibold text-[#5B7088] uppercase tracking-wider">
                 {t('Détails du colis', 'Package details')}
               </h3>
@@ -441,10 +441,10 @@ export default function SuiviPage() {
         <div>
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-display text-sm font-bold text-[#0F1B2E] flex items-center gap-2">
-              <ListChecks className="w-4 h-4 text-[#1E4B7A]" />
+              <ListChecks className="w-4 h-4 text-[#00256D]" />
               {t('Historique du voyage', 'Journey history')}
             </h2>
-            <span className="text-xs font-medium text-[#1E4B7A]">
+            <span className="text-xs font-medium text-[#00256D]">
               {timeline.length} {t('événement(s)', 'event(s)')}
             </span>
           </div>
@@ -459,7 +459,7 @@ export default function SuiviPage() {
           ) : (
             <div className="relative">
               {/* Timeline line */}
-              <div className="absolute left-[15px] top-2 bottom-2 w-0.5 bg-gradient-to-b from-[#1E4B7A]/40 via-[#1E4B7A]/10 to-transparent" />
+              <div className="absolute left-[15px] top-2 bottom-2 w-0.5 bg-gradient-to-b from-[#00256D]/40 via-[#00256D]/10 to-transparent" />
 
               <div className="space-y-3">
                 {timeline.map((entry, index) => (
@@ -482,7 +482,7 @@ export default function SuiviPage() {
 
                       {/* Time */}
                       <div className="flex items-center gap-2 mb-1.5">
-                        <span className="text-xs font-bold text-[#1E4B7A]">
+                        <span className="text-xs font-bold text-[#00256D]">
                           {formatTime(entry.timestamp, lang)}
                         </span>
                       </div>
@@ -501,7 +501,7 @@ export default function SuiviPage() {
         <div className="text-center pt-4">
           <Link
             href="/"
-            className="inline-flex items-center gap-2 text-sm text-[#5B7088] hover:text-[#1E4B7A] transition-colors no-underline"
+            className="inline-flex items-center gap-2 text-sm text-[#5B7088] hover:text-[#00256D] transition-colors no-underline"
           >
             <Home className="w-4 h-4" />
             {t("Retour à l'accueil", 'Back to home')}
@@ -526,14 +526,14 @@ function SuiviHeader({
   onLangChange: (lang: 'fr' | 'en') => void;
 }) {
   return (
-    <header className="sticky top-0 z-50 glass-light-strong border-b border-[#1E4B7A]/10 safe-area-inset-top">
+    <header className="sticky top-0 z-50 glass-light-strong border-b border-[#00256D]/10 safe-area-inset-top">
       <div className="max-w-[600px] mx-auto px-4 h-16 flex items-center justify-between">
         <div className="flex flex-col shrink-0">
           <Image
             src="/brand/logo.png"
             width={150}
             height={44}
-            alt="QRTrans"
+            alt="Mov"
             className="h-8 sm:h-10 w-auto object-contain"
             priority
           />
@@ -542,15 +542,15 @@ function SuiviHeader({
           )}
         </div>
         <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1.5 bg-[#1E4B7A]/10 border border-[#1E4B7A]/30 rounded-full px-3 py-1.5">
-            <Truck className="w-3.5 h-3.5 text-[#1E4B7A]" />
-            <span className="text-xs font-semibold text-[#1E4B7A]">
+          <div className="flex items-center gap-1.5 bg-[#00256D]/10 border border-[#00256D]/30 rounded-full px-3 py-1.5">
+            <Truck className="w-3.5 h-3.5 text-[#00256D]" />
+            <span className="text-xs font-semibold text-[#00256D]">
               {lang === 'fr' ? 'Suivi' : 'Tracking'}
             </span>
           </div>
           <button
             onClick={() => onLangChange(lang === 'fr' ? 'en' : 'fr')}
-            className="flex items-center gap-1 text-xs font-medium text-[#5B7088] hover:text-[#1E4B7A] transition-colors px-2 py-1.5 rounded-md hover:bg-[#1E4B7A]/5"
+            className="flex items-center gap-1 text-xs font-medium text-[#5B7088] hover:text-[#00256D] transition-colors px-2 py-1.5 rounded-md hover:bg-[#00256D]/5"
             aria-label="Switch language"
           >
             <Globe className="w-3.5 h-3.5" />
@@ -559,10 +559,10 @@ function SuiviHeader({
         </div>
       </div>
       {/* Title bar */}
-      <div className="border-t border-[#1E4B7A]/10">
+      <div className="border-t border-[#00256D]/10">
         <div className="max-w-[600px] mx-auto px-4 py-3">
-          <h1 className="font-display text-sm font-semibold text-[#1E4B7A] flex items-center gap-2">
-            <ListChecks className="w-4 h-4 text-[#1E4B7A]" />
+          <h1 className="font-display text-sm font-semibold text-[#00256D] flex items-center gap-2">
+            <ListChecks className="w-4 h-4 text-[#00256D]" />
             {lang === 'fr' ? 'Suivi du voyage' : 'Journey tracking'}
           </h1>
         </div>
@@ -590,13 +590,13 @@ function InfoItem({
 }) {
   const Wrapper = href ? 'a' : 'div';
   const wrapperProps = href
-    ? { href, target: '_blank' as const, rel: 'noopener noreferrer' as const, className: 'flex items-start gap-2.5 no-underline hover:bg-[#1E4B7A]/5 rounded-lg p-1 -m-1 transition-colors cursor-pointer' }
+    ? { href, target: '_blank' as const, rel: 'noopener noreferrer' as const, className: 'flex items-start gap-2.5 no-underline hover:bg-[#00256D]/5 rounded-lg p-1 -m-1 transition-colors cursor-pointer' }
     : { className: 'flex items-start gap-2.5' };
 
   return (
     <Wrapper {...wrapperProps}>
-      <div className="w-7 h-7 rounded-lg bg-[#1E4B7A]/10 border border-[#1E4B7A]/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-        <Icon className="w-3.5 h-3.5 text-[#1E4B7A]" />
+      <div className="w-7 h-7 rounded-lg bg-[#00256D]/10 border border-[#00256D]/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+        <Icon className="w-3.5 h-3.5 text-[#00256D]" />
       </div>
       <div className="min-w-0">
         <p className="text-[11px] text-[#5B7088] font-medium">{label}</p>

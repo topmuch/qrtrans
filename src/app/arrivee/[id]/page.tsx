@@ -91,7 +91,7 @@ function ArriveeContent() {
         <ArriveeHeader qrCode={qrCode} lang={lang} label={t("Confirmation d'Arrivée", 'Arrival Confirmation')} />
         <div className="flex items-center justify-center py-32">
           <div className="text-center">
-            <Loader2 className="w-8 h-8 text-[#1E4B7A] animate-spin mx-auto mb-3" />
+            <Loader2 className="w-8 h-8 text-[#00256D] animate-spin mx-auto mb-3" />
             <p className="text-sm text-[#5B7088]">{t('Chargement...', 'Loading...')}</p>
           </div>
         </div>
@@ -231,21 +231,21 @@ function ArriveeContent() {
 
 function ArriveeHeader({ qrCode, lang, label }: { qrCode: string; lang: 'fr' | 'en'; label: string }) {
   return (
-    <header className="sticky top-0 z-50 glass-light-strong border-b border-[#1E4B7A]/10 safe-area-inset-top">
+    <header className="sticky top-0 z-50 glass-light-strong border-b border-[#00256D]/10 safe-area-inset-top">
       <div className="max-w-[600px] mx-auto px-4 h-16 flex items-center justify-between">
         <div className="flex flex-col shrink-0">
           <Image
             src="/brand/logo.png"
             width={150}
             height={44}
-            alt="QRTrans"
+            alt="Mov"
             className="h-8 sm:h-10 w-auto object-contain"
             priority
           />
           {qrCode && <span className="text-[10px] font-mono text-[#5B7088] leading-tight mt-0.5">{qrCode}</span>}
         </div>
         <span className="text-sm text-[#5B7088] flex items-center gap-1.5">
-          <Package className="w-4 h-4 text-[#1E4B7A]" />
+          <Package className="w-4 h-4 text-[#00256D]" />
           {label}
         </span>
       </div>
@@ -263,10 +263,10 @@ export default function ArriveePage() {
       fallback={
         <div className="min-h-screen bg-[#F4F7FB]">
           <div className="max-w-[600px] mx-auto px-4 h-16 flex items-center justify-center">
-            <Loader2 className="w-6 h-6 text-[#1E4B7A] animate-spin" />
+            <Loader2 className="w-6 h-6 text-[#00256D] animate-spin" />
           </div>
           <div className="flex items-center justify-center py-32">
-            <Loader2 className="w-8 h-8 text-[#1E4B7A] animate-spin" />
+            <Loader2 className="w-8 h-8 text-[#00256D] animate-spin" />
           </div>
         </div>
       }

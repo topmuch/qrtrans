@@ -59,7 +59,7 @@ export default function ForgotPasswordPage() {
         {!sent ? (
           <>
             <motion.div variants={fadeUp} custom={0} className="flex justify-center mb-6">
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#1E4B7A] to-[#487AA8] flex items-center justify-center shadow-lg shadow-[#1E4B7A]/20">
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#00256D] to-[#1A5DAA] flex items-center justify-center shadow-lg shadow-[#00256D]/20">
                 <Mail className="w-8 h-8 text-white" />
               </div>
             </motion.div>
@@ -74,7 +74,7 @@ export default function ForgotPasswordPage() {
                 <label className="block text-sm font-semibold text-[#0F1B2E] mb-2">
                   Adresse email
                 </label>
-                <div className="relative rounded-2xl border-2 border-[#1E4B7A]/15 hover:border-[#1E4B7A]/30 focus-within:border-[#1E4B7A] focus-within:shadow-lg focus-within:shadow-[#1E4B7A]/10 transition-all bg-white/50">
+                <div className="relative rounded-2xl border-2 border-[#00256D]/15 hover:border-[#00256D]/30 focus-within:border-[#00256D] focus-within:shadow-lg focus-within:shadow-[#00256D]/10 transition-all bg-white/50">
                   <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[#5B7088]">
                     <Mail className="w-[18px] h-[18px]" />
                   </div>
@@ -127,13 +127,13 @@ export default function ForgotPasswordPage() {
             </h3>
             <p className="text-sm text-[#5B7088] mb-8 leading-relaxed">
               Si un compte existe avec l&apos;adresse{' '}
-              <span className="font-semibold text-[#1E4B7A]">{email}</span>,
+              <span className="font-semibold text-[#00256D]">{email}</span>,
               vous recevrez un email avec les instructions pour réinitialiser
               votre mot de passe.
             </p>
             <button
               onClick={() => setSent(false)}
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl border border-[#1E4B7A]/20 hover:border-[#1E4B7A]/40 hover:bg-[#1E4B7A]/5 text-[#1E4B7A] font-semibold text-sm transition-all"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl border border-[#00256D]/20 hover:border-[#00256D]/40 hover:bg-[#00256D]/5 text-[#00256D] font-semibold text-sm transition-all"
             >
               <ArrowRight className="w-4 h-4" />
               Renvoyer un autre email

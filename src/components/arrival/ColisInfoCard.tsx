@@ -29,9 +29,9 @@ export default function ColisInfoCard({
   const typeLabel = transportType === 'bus' ? 'BUS' : 'GP';
 
   return (
-    <div className="glass-card-light rounded-xl p-5 border-l-4 border-l-[#1E4B7A]">
+    <div className="glass-card-light rounded-xl p-5 border-l-4 border-l-[#00256D]">
       <h2 className="font-display text-base font-bold text-[#0F1B2E] mb-4 flex items-center gap-2">
-        <Package className="w-4 h-4 text-[#1E4B7A]" />
+        <Package className="w-4 h-4 text-[#00256D]" />
         {t('Détails du Colis', 'Package Details')}
       </h2>
 
@@ -60,7 +60,7 @@ export default function ColisInfoCard({
 
         <div className="flex items-center justify-between">
           <span className="text-sm text-[#5B7088]">{t('Départ', 'Departure')}</span>
-          <span className="font-medium text-[#1E4B7A] text-sm">
+          <span className="font-medium text-[#00256D] text-sm">
             {formatDate(departureDate)} {departureTime || ''}
           </span>
         </div>

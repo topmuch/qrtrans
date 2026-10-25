@@ -408,7 +408,7 @@ export default function ActivationForm({ qrCode, lang }: ActivationFormProps) {
           type="button"
           onClick={handleReset}
           disabled={loading}
-          className="flex items-center justify-center w-full h-12 sm:h-14 border-2 border-[#1E4B7A]/20 hover:border-[#1E4B7A]/40 text-[#1E4B7A] hover:text-[#1E4B7A] rounded-xl font-bold text-sm sm:text-base transition-colors disabled:opacity-50 bg-[#1E4B7A]/5 hover:bg-[#1E4B7A]/10"
+          className="flex items-center justify-center w-full h-12 sm:h-14 border-2 border-[#00256D]/20 hover:border-[#00256D]/40 text-[#00256D] hover:text-[#00256D] rounded-xl font-bold text-sm sm:text-base transition-colors disabled:opacity-50 bg-[#00256D]/5 hover:bg-[#00256D]/10"
         >
           <X className="w-4 h-4 mr-1.5" />
           {t('Annuler', 'Cancel')}

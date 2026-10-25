@@ -22,7 +22,7 @@ const categories = [
     icon: Smartphone,
     title: 'Guide Chauffeur',
     description:
-      "Apprenez à scanner, activer et livrer des colis avec l'application QRTrans.",
+      "Apprenez à scanner, activer et livrer des colis avec l'application Mov.",
     link: '#',
     color: '#FF6B35',
     bgColor: 'bg-orange-50',
@@ -40,7 +40,7 @@ const categories = [
     icon: Package,
     title: 'Guide Activation de Colis',
     description:
-      "Processus complet d'activation et de suivi d'un colis QRTrans.",
+      "Processus complet d'activation et de suivi d'un colis Mov.",
     link: '#',
     color: '#10B981',
     bgColor: 'bg-emerald-50',
@@ -61,7 +61,7 @@ const quickSteps = [
     step: 1,
     title: 'Créez votre compte agence',
     description:
-      'Inscrivez-vous gratuitement sur QRTrans et recevez vos identifiants.',
+      'Inscrivez-vous gratuitement sur Mov et recevez vos identifiants.',
     icon: Users,
   },
   {
@@ -103,7 +103,7 @@ export default function DocumentationPage() {
   return (
     <SecondaryPageLayout
       title="Documentation"
-      subtitle="Guides complets pour utiliser toutes les fonctionnalités de QRTrans"
+      subtitle="Guides complets pour utiliser toutes les fonctionnalités de Mov"
     >
       <motion.div
         variants={containerVariants}

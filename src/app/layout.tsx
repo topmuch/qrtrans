@@ -23,7 +23,7 @@ const spaceGrotesk = Space_Grotesk({
 const jsonLdSoftwareApplication = JSON.stringify({
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
-  name: "QRTrans",
+  name: "Mov",
   applicationCategory: "BusinessApplication",
   operatingSystem: "Web, iOS, Android",
   description: "Plateforme de traçabilité de colis par QR code pour le transport inter-villes au Sénégal. Notifications WhatsApp automatiques, code PIN de retrait sécurisé, suivi GPS en temps réel, dashboard agence.",
@@ -56,25 +56,25 @@ const jsonLdSoftwareApplication = JSON.stringify({
     { "@type": "Country", name: "Guinée" },
     { "@type": "Country", name: "Côte d'Ivoire" }
   ],
-  url: "https://qrtrans.pro",
-  logo: "https://qrtrans.pro/icons/icon-512x512.png",
+  url: "https://mov.newvisioncargo.pro",
+  logo: "https://mov.newvisioncargo.pro/icons/icon-512x512.png",
   sameAs: [
     "https://facebook.com/qrtrans.sn",
     "https://linkedin.com/company/qrtrans",
-    "https://wa.me/221784858226"
+    "https://wa.me/23566352505"
   ]
 });
 
 const jsonLdWebSite = JSON.stringify({
   "@context": "https://schema.org",
   "@type": "WebSite",
-  name: "QRTrans",
-  url: "https://qrtrans.pro",
+  name: "Mov",
+  url: "https://mov.newvisioncargo.pro",
   potentialAction: {
     "@type": "SearchAction",
     target: {
       "@type": "EntryPoint",
-      urlTemplate: "https://qrtrans.pro/suivi/{search_term_string}"
+      urlTemplate: "https://mov.newvisioncargo.pro/suivi/{search_term_string}"
     },
     "query-input": "required name=search_term_string"
   }
@@ -84,11 +84,11 @@ const jsonLdService = JSON.stringify({
   "@context": "https://schema.org",
   "@type": "Service",
   name: "Traçabilité de Colis par QR Code",
-  description: "Activez, tracez et sécurisez vos colis inter-villes avec QRTrans. Activation QR code, notifications WhatsApp, code PIN de retrait, suivi GPS en temps réel.",
+  description: "Activez, tracez et sécurisez vos colis inter-villes avec Mov. Activation QR code, notifications WhatsApp, code PIN de retrait, suivi GPS en temps réel.",
   provider: {
     "@type": "Organization",
-    name: "QRTrans",
-    url: "https://qrtrans.pro"
+    name: "Mov",
+    url: "https://mov.newvisioncargo.pro"
   },
   areaServed: [
     { "@type": "Country", name: "Sénégal" },
@@ -115,22 +115,22 @@ const jsonLdPlace = JSON.stringify({
 
 export const metadata: Metadata = {
   title: {
-    default: "QRTrans — Traçabilité de Colis par QR Code au Sénégal",
-    template: "%s | QRTrans",
+    default: "Mov — Traçabilité de Colis par QR Code au Sénégal",
+    template: "%s | Mov",
   },
   description: "Plateforme de traçabilité de colis par QR code pour le transport inter-villes au Sénégal. Activation en 30s, notifications WhatsApp automatiques, code PIN sécurisé, suivi GPS temps réel, dashboard agence.",
   keywords: [
-    "QRTrans", "QR code colis", "traçabilité colis", "transport inter-villes Sénégal",
+    "Mov", "QR code colis", "traçabilité colis", "transport inter-villes Sénégal",
     "logistique Sénégal", "suivi colis", "notifications WhatsApp", "code PIN livraison",
     "GPS colis", "dashboard agence transport", "chauffeur livreur",
     "colis Dakar Ziguinchor", "colis Dakar Saint-Louis", "colis Touba Thiès",
     "expédition colis Sénégal", "livraison colis Sénégal", "sécurité colis",
     "agence transport Sénégal", "Mali Guinée Côte d'Ivoire"
   ],
-  authors: [{ name: "QRTrans Team" }],
+  authors: [{ name: "Mov Team" }],
   creator: "MMASOLUTION",
-  publisher: "QRTrans",
-  metadataBase: new URL("https://qrtrans.pro"),
+  publisher: "Mov",
+  metadataBase: new URL("https://mov.newvisioncargo.pro"),
   category: "business",
 
   // PWA Icons
@@ -150,10 +150,10 @@ export const metadata: Metadata = {
 
   // Open Graph — optimisé pour le partage social
   openGraph: {
-    title: "QRTrans — Traçabilité de Colis par QR Code au Sénégal",
+    title: "Mov — Traçabilité de Colis par QR Code au Sénégal",
     description: "Activez un colis en 30 secondes avec un QR code. Notifications WhatsApp automatiques, code PIN sécurisé, suivi GPS temps réel. Solution complète pour agences de transport.",
-    url: "https://qrtrans.pro",
-    siteName: "QRTrans",
+    url: "https://mov.newvisioncargo.pro",
+    siteName: "Mov",
     type: "website",
     locale: "fr_FR",
     alternateLocale: ["en_US", "ar_SA"],
@@ -162,7 +162,7 @@ export const metadata: Metadata = {
         url: "/icons/icon-512x512.png",
         width: 512,
         height: 512,
-        alt: "QRTrans — Traçabilité de Colis par QR Code",
+        alt: "Mov — Traçabilité de Colis par QR Code",
       },
     ],
   },
@@ -170,7 +170,7 @@ export const metadata: Metadata = {
   // Twitter Card
   twitter: {
     card: "summary_large_image",
-    title: "QRTrans — Traçabilité de Colis par QR Code au Sénégal",
+    title: "Mov — Traçabilité de Colis par QR Code au Sénégal",
     description: "Activez un colis en 30 secondes. Notifications WhatsApp, code PIN sécurisé, suivi GPS. Solution pour agences de transport.",
     images: ["/icons/icon-512x512.png"],
     creator: "@qrtrans_sn",
@@ -181,10 +181,10 @@ export const metadata: Metadata = {
   manifest: "/manifest.json",
 
   // App info
-  applicationName: "QRTrans",
+  applicationName: "Mov",
   appleWebApp: {
     capable: true,
-    title: "QRTrans",
+    title: "Mov",
     statusBarStyle: "black-translucent",
     startupImage: [
       { url: "/icons/icon-512x512.png", media: "(device-width: 320px)" },
@@ -213,11 +213,11 @@ export const metadata: Metadata = {
 
   // Alternates
   alternates: {
-    canonical: "https://qrtrans.pro",
+    canonical: "https://mov.newvisioncargo.pro",
     languages: {
-      "fr": "https://qrtrans.pro",
-      "en": "https://qrtrans.pro/?lang=en",
-      "ar": "https://qrtrans.pro/?lang=ar",
+      "fr": "https://mov.newvisioncargo.pro",
+      "en": "https://mov.newvisioncargo.pro/?lang=en",
+      "ar": "https://mov.newvisioncargo.pro/?lang=ar",
     },
   },
 
@@ -268,8 +268,8 @@ export default function RootLayout({
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        <meta name="apple-mobile-web-app-title" content="QRTrans" />
-        <meta name="application-name" content="QRTrans" />
+        <meta name="apple-mobile-web-app-title" content="Mov" />
+        <meta name="application-name" content="Mov" />
         <meta name="msapplication-TileColor" content="#0A2540" />
         <meta name="msapplication-config" content="/browserconfig.xml" />
 
@@ -297,9 +297,9 @@ export default function RootLayout({
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "Organization",
-              name: "QRTrans",
-              url: "https://qrtrans.pro",
-              logo: "https://qrtrans.pro/icons/icon-512x512.png",
+              name: "Mov",
+              url: "https://mov.newvisioncargo.pro",
+              logo: "https://mov.newvisioncargo.pro/icons/icon-512x512.png",
               description: "Plateforme de traçabilité de colis par QR code pour le transport inter-villes au Sénégal. Notifications WhatsApp, code PIN, suivi GPS, dashboard agence.",
               address: {
                 "@type": "PostalAddress",
@@ -315,7 +315,7 @@ export default function RootLayout({
               sameAs: [
                 "https://facebook.com/qrtrans.sn",
                 "https://linkedin.com/company/qrtrans",
-                "https://wa.me/221784858226"
+                "https://wa.me/23566352505"
               ],
               foundingDate: "2024"
             }),

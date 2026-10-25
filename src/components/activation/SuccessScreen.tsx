@@ -181,15 +181,15 @@ export default function SuccessScreen({
 
       {/* Summary */}
       <div className="glass-card-light rounded-xl p-4 sm:p-5 space-y-2.5 sm:space-y-3">
-        <h3 className="font-display text-sm font-bold text-[#1E4B7A] uppercase tracking-widest">
+        <h3 className="font-display text-sm font-bold text-[#00256D] uppercase tracking-widest">
           {t('Résumé', 'Summary')}
         </h3>
 
         {/* Route */}
-        <div className="flex items-center gap-3 bg-[#1E4B7A]/5 border border-[#1E4B7A]/10 rounded-lg p-3">
+        <div className="flex items-center gap-3 bg-[#00256D]/5 border border-[#00256D]/10 rounded-lg p-3">
           <div className="flex-1">
             <p className="text-sm text-[#5B7088]">{t('Trajet', 'Route')}</p>
-            <p className="font-bold text-[#0F1B2E] text-base">{departureCity} <span className="text-[#1E4B7A]">→</span> {arrivalCity}</p>
+            <p className="font-bold text-[#0F1B2E] text-base">{departureCity} <span className="text-[#00256D]">→</span> {arrivalCity}</p>
           </div>
           <div className="text-right">
             <p className="text-sm text-[#5B7088]">{t('Transport', 'Transport')}</p>
@@ -198,7 +198,7 @@ export default function SuccessScreen({
         </div>
 
         {/* Departure */}
-        <div className="flex items-center gap-3 bg-[#1E4B7A]/5 border border-[#1E4B7A]/10 rounded-lg p-3">
+        <div className="flex items-center gap-3 bg-[#00256D]/5 border border-[#00256D]/10 rounded-lg p-3">
           <div className="flex-1">
             <p className="text-sm text-[#5B7088]">{t('Départ', 'Departure')}</p>
             <p className="font-bold text-[#0F1B2E] text-base">{formattedDate} {t('à', 'at')} {formattedTime}</p>
@@ -207,22 +207,22 @@ export default function SuccessScreen({
 
         {/* Baggage — only shown if a type was captured during activation */}
         {baggageDesc && (
-          <div className="bg-[#1E4B7A]/5 border border-[#1E4B7A]/10 rounded-lg p-3">
+          <div className="bg-[#00256D]/5 border border-[#00256D]/10 rounded-lg p-3">
             <p className="text-sm text-[#5B7088]">{t('Colis', 'Package')}</p>
             <p className="font-bold text-[#0F1B2E] text-base">{baggageDesc}</p>
           </div>
         )}
 
         {/* Payment */}
-        <div className="bg-[#1E4B7A]/5 border border-[#1E4B7A]/10 rounded-lg p-3">
+        <div className="bg-[#00256D]/5 border border-[#00256D]/10 rounded-lg p-3">
           <p className="text-sm text-[#5B7088]">{t('Paiement', 'Payment')}</p>
           <p className="font-bold text-[#0F1B2E] text-base">{paymentLabel}</p>
         </div>
 
         {/* Pickup address if provided */}
         {pickupAddress && (
-          <div className="bg-[#1E4B7A]/5 border border-[#1E4B7A]/10 rounded-lg p-3 flex items-start gap-2">
-            <MapPin className="w-4 h-4 text-[#1E4B7A] mt-0.5 shrink-0" />
+          <div className="bg-[#00256D]/5 border border-[#00256D]/10 rounded-lg p-3 flex items-start gap-2">
+            <MapPin className="w-4 h-4 text-[#00256D] mt-0.5 shrink-0" />
             <div>
               <p className="text-sm text-[#5B7088]">{t('Point de retrait', 'Pickup point')}</p>
               <p className="font-bold text-[#0F1B2E] text-base">{pickupAddress}</p>
@@ -232,11 +232,11 @@ export default function SuccessScreen({
 
         {/* Sender & Receiver */}
         <div className="grid grid-cols-2 gap-3">
-          <div className="bg-[#1E4B7A]/5 border border-[#1E4B7A]/10 rounded-lg p-3">
+          <div className="bg-[#00256D]/5 border border-[#00256D]/10 rounded-lg p-3">
             <p className="text-sm text-[#5B7088]">{t('Expéditeur', 'Sender')}</p>
             <p className="font-bold text-[#0F1B2E] text-base mt-0.5">{senderName}</p>
           </div>
-          <div className="bg-[#1E4B7A]/5 border border-[#1E4B7A]/10 rounded-lg p-3">
+          <div className="bg-[#00256D]/5 border border-[#00256D]/10 rounded-lg p-3">
             <p className="text-sm text-[#5B7088]">{t('Destinataire', 'Receiver')}</p>
             <p className="font-bold text-[#0F1B2E] text-base mt-0.5">{receiverName}</p>
           </div>
@@ -246,7 +246,7 @@ export default function SuccessScreen({
       {/* Section: Notifier les contacts */}
       <div className="glass-card-light rounded-xl p-4 sm:p-5 space-y-2.5 sm:space-y-3">
         <h3 className="font-display text-sm font-bold text-[#0F1B2E] uppercase tracking-widest flex items-center gap-2">
-          <Send className="w-4 h-4 text-[#1E4B7A]" />
+          <Send className="w-4 h-4 text-[#00256D]" />
           {t('Notifier les contacts', 'Notify contacts')}
         </h3>
         <p className="text-sm text-[#5B7088]">
@@ -319,7 +319,7 @@ export default function SuccessScreen({
       {/* Copy tracking link */}
       <button
         onClick={copyLink}
-        className="flex items-center justify-center gap-2 w-full h-12 sm:h-14 border-2 border-[#1E4B7A]/20 hover:border-[#1E4B7A]/40 hover:bg-[#1E4B7A]/10 rounded-xl text-sm sm:text-base font-bold text-[#1E4B7A] transition-all"
+        className="flex items-center justify-center gap-2 w-full h-12 sm:h-14 border-2 border-[#00256D]/20 hover:border-[#00256D]/40 hover:bg-[#00256D]/10 rounded-xl text-sm sm:text-base font-bold text-[#00256D] transition-all"
       >
         <Copy className="w-4 h-4" />
         {copied ? t('Copié !', 'Copied!') : t('Copier le lien de suivi', 'Copy tracking link')}
@@ -328,7 +328,7 @@ export default function SuccessScreen({
       {/* New registration */}
       <button
         onClick={onReset}
-        className="flex items-center justify-center gap-2 w-full h-12 text-[#5B7088] hover:text-[#1E4B7A] text-base transition-colors mx-auto"
+        className="flex items-center justify-center gap-2 w-full h-12 text-[#5B7088] hover:text-[#00256D] text-base transition-colors mx-auto"
       >
         <RotateCcw className="w-4 h-4" />
         {t('Enregistrer un autre colis', 'Register another package')}

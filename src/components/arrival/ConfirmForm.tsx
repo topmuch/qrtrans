@@ -88,12 +88,12 @@ export default function ConfirmForm({
     }
   };
 
-  const INPUT_CLS = `h-12 !bg-white border-[#1E4B7A]/15 text-[#0F1B2E] placeholder:text-gray-500 focus-visible:ring-[#1E4B7A]/20 focus-visible:border-[#1E4B7A]/60 text-sm ${errorCode === 'validation' && !deliveryLocation.trim() ? 'border-red-400' : ''}`;
+  const INPUT_CLS = `h-12 !bg-white border-[#00256D]/15 text-[#0F1B2E] placeholder:text-gray-500 focus-visible:ring-[#00256D]/20 focus-visible:border-[#00256D]/60 text-sm ${errorCode === 'validation' && !deliveryLocation.trim() ? 'border-red-400' : ''}`;
 
   return (
     <div className="glass-light-strong rounded-xl p-5 border-l-4 border-l-[#25D366]">
       <h2 className="font-display text-base font-bold text-[#0F1B2E] mb-4 flex items-center gap-2">
-        <Target className="w-4 h-4 text-[#1E4B7A]" />
+        <Target className="w-4 h-4 text-[#00256D]" />
         {t('Confirmation d\'Arrivée', 'Arrival Confirmation')}
       </h2>
 
@@ -106,7 +106,7 @@ export default function ConfirmForm({
             {errorCode === 'not_activated' && (
               <a
                 href={`/activate/${reference}`}
-                className="text-sm text-[#1E4B7A] underline mt-1 inline-block"
+                className="text-sm text-[#00256D] underline mt-1 inline-block"
               >
                 {t('Activer le colis maintenant →', 'Activate the package now →')}
               </a>
@@ -120,7 +120,7 @@ export default function ConfirmForm({
         {/* Lieu de dépôt */}
         <div className="space-y-1.5">
           <Label htmlFor="delivery_location" className="text-sm font-medium text-[#0F1B2E]">
-            {t('Lieu de dépôt précis', 'Precise delivery location')} <span className="text-[#1E4B7A]">*</span>
+            {t('Lieu de dépôt précis', 'Precise delivery location')} <span className="text-[#00256D]">*</span>
           </Label>
           <Input
             id="delivery_location"
@@ -136,27 +136,27 @@ export default function ConfirmForm({
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1.5">
             <Label htmlFor="arrival_date" className="text-sm font-medium text-[#0F1B2E]">
-              {t("Date d'arrivée", 'Arrival date')} <span className="text-[#1E4B7A]">*</span>
+              {t("Date d'arrivée", 'Arrival date')} <span className="text-[#00256D]">*</span>
             </Label>
             <Input
               id="arrival_date"
               type="date"
               value={arrivalDate}
               onChange={(e) => setArrivalDate(e.target.value)}
-              className="h-12 !bg-white border-[#1E4B7A]/15 text-[#0F1B2E] focus-visible:ring-[#1E4B7A]/20 focus-visible:border-[#1E4B7A]/60 text-sm [color-scheme:light]"
+              className="h-12 !bg-white border-[#00256D]/15 text-[#0F1B2E] focus-visible:ring-[#00256D]/20 focus-visible:border-[#00256D]/60 text-sm [color-scheme:light]"
               aria-required="true"
             />
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="arrival_time" className="text-sm font-medium text-[#0F1B2E]">
-              {t("Heure d'arrivée", 'Arrival time')} <span className="text-[#1E4B7A]">*</span>
+              {t("Heure d'arrivée", 'Arrival time')} <span className="text-[#00256D]">*</span>
             </Label>
             <Input
               id="arrival_time"
               type="time"
               value={arrivalTime}
               onChange={(e) => setArrivalTime(e.target.value)}
-              className="h-12 !bg-white border-[#1E4B7A]/15 text-[#0F1B2E] focus-visible:ring-[#1E4B7A]/20 focus-visible:border-[#1E4B7A]/60 text-sm [color-scheme:light]"
+              className="h-12 !bg-white border-[#00256D]/15 text-[#0F1B2E] focus-visible:ring-[#00256D]/20 focus-visible:border-[#00256D]/60 text-sm [color-scheme:light]"
               aria-required="true"
             />
           </div>
@@ -172,7 +172,7 @@ export default function ConfirmForm({
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             placeholder={t('Ex: Colis remis au gardien', 'Ex: Package handed to the guard')}
-            className="!bg-white border-[#1E4B7A]/15 text-[#0F1B2E] placeholder:text-gray-500 focus-visible:ring-[#1E4B7A]/20 focus-visible:border-[#1E4B7A]/60 text-sm min-h-[80px] resize-none"
+            className="!bg-white border-[#00256D]/15 text-[#0F1B2E] placeholder:text-gray-500 focus-visible:ring-[#00256D]/20 focus-visible:border-[#00256D]/60 text-sm min-h-[80px] resize-none"
             rows={3}
           />
         </div>

@@ -22,7 +22,7 @@ import AuroraBackground from '@/components/site/AuroraBackground';
 ---------------------------------------------------------------- */
 
 const WA_URL =
-  'https://wa.me/221784858226?text=Bonjour%20QRTrans%2C%20je%20souhaite%20en%20savoir%20plus';
+  'https://wa.me/23566352505?text=Bonjour%20Mov%2C%20je%20souhaite%20en%20savoir%20plus';
 
 type InfoCard = {
   icon: typeof Mail;
@@ -36,19 +36,19 @@ const INFO_CARDS: InfoCard[] = [
   {
     icon: MapPinned,
     label: 'Adresse',
-    value: 'Cité Alia Diène, Ouest Foire, Yoff, Dakar',
+    value: 'Avenue Charles de Gaulle, N\'Djaména, Tchad',
   },
   {
     icon: Phone,
     label: 'Téléphone',
-    value: '+221 78 485 82 26',
-    href: 'tel:+221784858226',
+    value: '+235 66 35 25 05 · +235 95 72 99 99',
+    href: 'tel:+23566352505',
   },
   {
     icon: Mail,
     label: 'Email',
-    value: 'contact@qrtrans.com',
-    href: 'mailto:contact@qrtrans.com',
+    value: 'contact@newvisioncargo.pro',
+    href: 'mailto:contact@newvisioncargo.pro',
   },
   {
     icon: MessageCircle,
@@ -87,7 +87,7 @@ function SectionHeadingLight({
   return (
     <div className={`${alignClass} max-w-3xl ${className}`}>
       {eyebrow && (
-        <p className="font-display text-xs sm:text-sm uppercase tracking-[0.3em] text-[#1E4B7A] mb-4 reveal-up">
+        <p className="font-display text-xs sm:text-sm uppercase tracking-[0.3em] text-[#00256D] mb-4 reveal-up">
           {eyebrow}
         </p>
       )}
@@ -153,7 +153,7 @@ export default function ContactPage() {
   };
 
   const inputClass =
-    'w-full px-4 py-3 rounded-xl bg-white border border-[#1E4B7A]/15 text-[#0F1B2E] placeholder:text-[#5B7088]/60 focus:outline-none focus:border-[#1E4B7A]/60 focus:ring-2 focus:ring-[#1E4B7A]/15 text-sm transition-colors';
+    'w-full px-4 py-3 rounded-xl bg-white border border-[#00256D]/15 text-[#0F1B2E] placeholder:text-[#5B7088]/60 focus:outline-none focus:border-[#00256D]/60 focus:ring-2 focus:ring-[#00256D]/15 text-sm transition-colors';
   const labelClass =
     'block text-xs font-semibold uppercase tracking-wider text-[#5B7088] mb-2';
 
@@ -169,8 +169,8 @@ export default function ContactPage() {
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl mx-auto text-center">
             <div className="reveal-up inline-flex items-center gap-2.5 px-4 py-2 mb-7 rounded-full glass-light">
-              <Headset className="w-4 h-4 text-[#1E4B7A]" />
-              <span className="text-xs sm:text-sm font-medium text-[#1E4B7A] tracking-wide">
+              <Headset className="w-4 h-4 text-[#00256D]" />
+              <span className="text-xs sm:text-sm font-medium text-[#00256D] tracking-wide">
                 Nous sommes à votre écoute
               </span>
             </div>
@@ -196,8 +196,8 @@ export default function ContactPage() {
             {INFO_CARDS.map((card, idx) => {
               const inner = (
                 <>
-                  <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-[#1E4B7A]/15 to-[#487AA8]/5 border border-[#1E4B7A]/25 flex items-center justify-center mb-4">
-                    <card.icon className="w-5 h-5 text-[#1E4B7A]" />
+                  <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-[#00256D]/15 to-[#1A5DAA]/5 border border-[#00256D]/25 flex items-center justify-center mb-4">
+                    <card.icon className="w-5 h-5 text-[#00256D]" />
                   </div>
                   <p className="text-[10px] uppercase tracking-wider text-[#5B7088] font-semibold mb-1">
                     {card.label}
@@ -207,7 +207,7 @@ export default function ContactPage() {
                   </p>
                 </>
               );
-              const className = `reveal-up glass-card-light p-5 h-full block hover:border-[#1E4B7A]/40 transition-colors ${
+              const className = `reveal-up glass-card-light p-5 h-full block hover:border-[#00256D]/40 transition-colors ${
                 card.href ? 'cursor-pointer' : ''
               }`;
               if (card.href) {
@@ -265,8 +265,8 @@ export default function ContactPage() {
               <div className="glass-light-strong rounded-3xl p-6 sm:p-8">
                 {submitted ? (
                   <div className="text-center py-10">
-                    <div className="w-16 h-16 rounded-full bg-[#1E4B7A]/10 border border-[#1E4B7A]/25 flex items-center justify-center mx-auto mb-5">
-                      <CheckCircle2 className="w-8 h-8 text-[#1E4B7A]" />
+                    <div className="w-16 h-16 rounded-full bg-[#00256D]/10 border border-[#00256D]/25 flex items-center justify-center mx-auto mb-5">
+                      <CheckCircle2 className="w-8 h-8 text-[#00256D]" />
                     </div>
                     <h3 className="font-display text-xl font-bold text-[#0F1B2E] mb-2">
                       Message envoyé !
@@ -287,7 +287,7 @@ export default function ContactPage() {
                     <div className="grid sm:grid-cols-2 gap-4">
                       <div>
                         <label className={labelClass}>
-                          Nom complet <span className="text-[#1E4B7A]">*</span>
+                          Nom complet <span className="text-[#00256D]">*</span>
                         </label>
                         <input
                           type="text"
@@ -302,7 +302,7 @@ export default function ContactPage() {
                       </div>
                       <div>
                         <label className={labelClass}>
-                          Email <span className="text-[#1E4B7A]">*</span>
+                          Email <span className="text-[#00256D]">*</span>
                         </label>
                         <input
                           type="email"
@@ -332,7 +332,7 @@ export default function ContactPage() {
                       </div>
                       <div>
                         <label className={labelClass}>
-                          Sujet <span className="text-[#1E4B7A]">*</span>
+                          Sujet <span className="text-[#00256D]">*</span>
                         </label>
                         <select
                           value={formData.subject}
@@ -356,7 +356,7 @@ export default function ContactPage() {
 
                     <div>
                       <label className={labelClass}>
-                        Message <span className="text-[#1E4B7A]">*</span>
+                        Message <span className="text-[#00256D]">*</span>
                       </label>
                       <textarea
                         placeholder="Décrivez votre demande..."
@@ -395,7 +395,7 @@ export default function ContactPage() {
                       En envoyant ce formulaire, vous acceptez notre{' '}
                       <Link
                         href="/confidentialite"
-                        className="text-[#1E4B7A] hover:text-[#0F1B2E] link-underline"
+                        className="text-[#00256D] hover:text-[#0F1B2E] link-underline"
                       >
                         politique de confidentialité
                       </Link>
@@ -434,10 +434,10 @@ export default function ContactPage() {
                   }}
                 />
                 <div className="relative w-full text-center">
-                  <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-[#1E4B7A]/10 border border-[#1E4B7A]/25 mb-4 animate-float-slow">
-                    <MapPinned className="w-7 h-7 text-[#1E4B7A]" />
+                  <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-[#00256D]/10 border border-[#00256D]/25 mb-4 animate-float-slow">
+                    <MapPinned className="w-7 h-7 text-[#00256D]" />
                   </div>
-                  <p className="text-xs uppercase tracking-[0.2em] text-[#1E4B7A] font-semibold mb-2">
+                  <p className="text-xs uppercase tracking-[0.2em] text-[#00256D] font-semibold mb-2">
                     Nous situer
                   </p>
                   <p className="font-display text-lg font-bold text-[#0F1B2E] mb-1">
@@ -450,7 +450,7 @@ export default function ContactPage() {
                     href="https://www.google.com/maps/search/?api=1&query=Cité+Alia+Diène+Ouest+Foire+Yoff+Dakar"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 mt-5 px-4 py-2 rounded-lg glass-light text-sm font-semibold text-[#0F1B2E] hover:border-[#1E4B7A]/40 transition-colors"
+                    className="inline-flex items-center gap-2 mt-5 px-4 py-2 rounded-lg glass-light text-sm font-semibold text-[#0F1B2E] hover:border-[#00256D]/40 transition-colors"
                   >
                     Ouvrir dans Google Maps
                     <ArrowRight className="w-3.5 h-3.5" />
@@ -461,8 +461,8 @@ export default function ContactPage() {
               {/* Schedule */}
               <div className="glass-card-light p-6">
                 <div className="flex items-center gap-3 mb-5">
-                  <div className="w-10 h-10 rounded-lg bg-[#1E4B7A]/10 border border-[#1E4B7A]/25 flex items-center justify-center">
-                    <Clock className="w-5 h-5 text-[#1E4B7A]" />
+                  <div className="w-10 h-10 rounded-lg bg-[#00256D]/10 border border-[#00256D]/25 flex items-center justify-center">
+                    <Clock className="w-5 h-5 text-[#00256D]" />
                   </div>
                   <div>
                     <h3 className="font-display text-sm font-bold text-[#0F1B2E]">
@@ -482,7 +482,7 @@ export default function ContactPage() {
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-[#5B7088]">Dimanche &amp; fériés</span>
-                    <span className="font-semibold text-[#1E4B7A]">
+                    <span className="font-semibold text-[#00256D]">
                       WhatsApp uniquement
                     </span>
                   </div>

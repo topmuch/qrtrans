@@ -43,7 +43,7 @@ export default function SiteLayout({
   const containerClass =
     theme === 'dark'
       ? 'min-h-screen bg-[#060B1F] text-white selection:bg-emerald-500/30 selection:text-white'
-      : 'min-h-screen bg-[#F4F7FB] text-[#0F1B2E] selection:bg-[#1E4B7A]/20 selection:text-[#0F1B2E]';
+      : 'min-h-screen bg-[#F4F7FB] text-[#0F1B2E] selection:bg-[#00256D]/20 selection:text-[#0F1B2E]';
 
   return (
     <div className={containerClass}>

@@ -976,7 +976,7 @@ body * {
 
 /* ═══════════════════════════════════════════════════════════════
    QRTRANS LIGHT PREMIUM DESIGN SYSTEM — harmonisé avec le logo
-   (bleu acier #1E4B7A + reflets #6BA3D6 + accent émeraude)
+   (bleu acier #00256D + reflets #6BA3D6 + accent émeraude)
    Added 2026-10-06 (light variant)
    ═══════════════════════════════════════════════════════════════ */
 
@@ -986,15 +986,15 @@ body * {
   --q-light-bg-2: #FFFFFF;        /* card background */
   --q-light-bg-3: #EDF2F8;        /* subtle section bg */
   --q-light-ink: #0F1B2E;         /* primary text — deep navy */
-  --q-light-ink-2: #1E4B7A;       /* secondary text — steel blue */
+  --q-light-ink-2: #00256D;       /* secondary text — steel blue */
   --q-light-muted: #5B7088;       /* muted text */
 
   /* Brand blue (extracted from logo) */
-  --q-brand-900: #0F2D52;
+  --q-brand-900: #001A4D;
   --q-brand-800: #163556;
-  --q-brand-700: #1E4B7A;         /* main brand blue */
-  --q-brand-600: #245B8F;
-  --q-brand-500: #487AA8;         /* mid steel */
+  --q-brand-700: #00256D;         /* main brand blue */
+  --q-brand-600: #003A8C;
+  --q-brand-500: #1A5DAA;         /* mid steel */
   --q-brand-400: #6BA3D6;         /* highlight blue */
   --q-brand-300: #89BDE0;
   --q-brand-200: #B5D3EA;
@@ -1011,11 +1011,11 @@ body * {
   /* Light gradients */
   --q-gradient-light-hero: radial-gradient(ellipse 80% 80% at 50% -20%, rgba(72, 122, 168, 0.18), transparent 60%), radial-gradient(ellipse 60% 50% at 80% 10%, rgba(16, 185, 129, 0.10), transparent 60%), linear-gradient(180deg, #FFFFFF 0%, #F4F7FB 40%, #EDF2F8 100%);
   --q-gradient-light-mesh: conic-gradient(from 180deg at 50% 50%, rgba(72, 122, 168, 0.06), rgba(16, 185, 129, 0.04), rgba(217, 175, 55, 0.03), rgba(72, 122, 168, 0.06));
-  --q-gradient-blue: linear-gradient(135deg, #1E4B7A 0%, #245B8F 50%, #487AA8 100%);
-  --q-gradient-blue-soft: linear-gradient(135deg, #487AA8 0%, #6BA3D6 100%);
-  --q-gradient-emerald-blue: linear-gradient(135deg, #1E4B7A 0%, #245B8F 40%, #10B981 100%);
-  --q-gradient-text-blue: linear-gradient(135deg, #0F2D52 0%, #1E4B7A 50%, #487AA8 100%);
-  --q-gradient-text-blue-emerald: linear-gradient(135deg, #1E4B7A 0%, #245B8F 40%, #10B981 100%);
+  --q-gradient-blue: linear-gradient(135deg, #00256D 0%, #003A8C 50%, #1A5DAA 100%);
+  --q-gradient-blue-soft: linear-gradient(135deg, #1A5DAA 0%, #6BA3D6 100%);
+  --q-gradient-emerald-blue: linear-gradient(135deg, #00256D 0%, #003A8C 40%, #10B981 100%);
+  --q-gradient-text-blue: linear-gradient(135deg, #001A4D 0%, #00256D 50%, #1A5DAA 100%);
+  --q-gradient-text-blue-emerald: linear-gradient(135deg, #00256D 0%, #003A8C 40%, #10B981 100%);
 
   /* Light glassmorphism */
   --q-light-glass-bg: rgba(255, 255, 255, 0.65);
@@ -1105,7 +1105,7 @@ body * {
 .gradient-border-emerald-light {
   position: relative;
   background: linear-gradient(#FFFFFF, #FFFFFF) padding-box,
-              linear-gradient(135deg, #1E4B7A, #10B981) border-box;
+              linear-gradient(135deg, #00256D, #10B981) border-box;
   border: 2px solid transparent;
 }
 
@@ -1142,7 +1142,7 @@ body * {
 .btn-brand {
   position: relative;
   overflow: hidden;
-  background: linear-gradient(135deg, #1E4B7A 0%, #245B8F 50%, #487AA8 100%);
+  background: linear-gradient(135deg, #00256D 0%, #003A8C 50%, #1A5DAA 100%);
   color: white;
   box-shadow: 0 8px 24px rgba(30, 75, 122, 0.3);
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
@@ -1191,7 +1191,7 @@ body * {
 
 /* ═══════════════════════════════════════════════════════════════
    DASHBOARD PREMIUM DESIGN SYSTEM — Brand-bleu + Emerald
-   Light: #F8FAFC bg + white cards + #1E4B7A accent
+   Light: #F8FAFC bg + white cards + #00256D accent
    Dark:  #0F172A bg + #1E293B cards + #10B981 accent
    ═══════════════════════════════════════════════════════════════ */
 
@@ -1208,12 +1208,12 @@ body * {
   --dash-ink-2: #334155;
   --dash-muted: #64748B;
   --dash-muted-2: #94A3B8;
-  --dash-brand: #1E4B7A;
-  --dash-brand-2: #487AA8;
+  --dash-brand: #00256D;
+  --dash-brand-2: #1A5DAA;
   --dash-brand-soft: #EEF5FC;
   --dash-emerald: #10B981;
   --dash-emerald-soft: #ECFDF5;
-  --dash-sidebar-bg: #1E4B7A;
+  --dash-sidebar-bg: #00256D;
   --dash-sidebar-border: rgba(255,255,255,0.12);
   --dash-sidebar-text: rgba(255,255,255,0.75);
   --dash-sidebar-text-active: #FFFFFF;
@@ -1241,7 +1241,7 @@ body * {
   --dash-brand-soft: rgba(107, 163, 214, 0.1);
   --dash-emerald: #34D399;
   --dash-emerald-soft: rgba(52, 211, 153, 0.1);
-  --dash-sidebar-bg: #0F2D52;
+  --dash-sidebar-bg: #001A4D;
   --dash-sidebar-border: rgba(255,255,255,0.10);
   --dash-sidebar-text: rgba(255,255,255,0.75);
   --dash-sidebar-text-active: #FFFFFF;

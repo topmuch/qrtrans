@@ -31,9 +31,9 @@ interface AuthShellProps {
  *
  * Color palette harmonized with brand logo:
  *   - Background: #FBFCFE → #F4F7FB (almost-white with blue tint)
- *   - Card: white glass with steel-blue border #1E4B7A/15
+ *   - Card: white glass with steel-blue border #00256D/15
  *   - Text: #0F1B2E primary, #5B7088 muted
- *   - Accent: #1E4B7A → #487AA8 (steel blue), #10B981 emerald (for success)
+ *   - Accent: #00256D → #1A5DAA (steel blue), #10B981 emerald (for success)
  */
 export default function AuthShell({
   children,
@@ -49,7 +49,7 @@ export default function AuthShell({
     return (
       <div className="min-h-screen flex bg-[#FBFCFE]">
         {/* LEFT — Side panel (premium dark brand blue) */}
-        <aside className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-gradient-to-br from-[#0F2D52] via-[#1E4B7A] to-[#245B8F]">
+        <aside className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-gradient-to-br from-[#001A4D] via-[#00256D] to-[#003A8C]">
           {/* Aurora blobs */}
           <div
             aria-hidden="true"
@@ -86,7 +86,7 @@ export default function AuthShell({
             <Link href="/" className="flex justify-center mb-8 lg:hidden">
               <Image
                 src="/brand/logo.png"
-                alt="QRTrans"
+                alt="Mov"
                 width={180}
                 height={53}
                 className="h-10 w-auto object-contain"
@@ -98,7 +98,7 @@ export default function AuthShell({
             {(eyebrow || title || subtitle) && (
               <div className="mb-8 text-center lg:text-left">
                 {eyebrow && (
-                  <p className="font-display text-xs uppercase tracking-[0.3em] text-[#1E4B7A] mb-3">
+                  <p className="font-display text-xs uppercase tracking-[0.3em] text-[#00256D] mb-3">
                     {eyebrow}
                   </p>
                 )}
@@ -114,7 +114,7 @@ export default function AuthShell({
             )}
 
             {/* Card */}
-            <div className="glass-light-strong rounded-3xl p-6 sm:p-8 shadow-xl shadow-[#1E4B7A]/8">
+            <div className="glass-light-strong rounded-3xl p-6 sm:p-8 shadow-xl shadow-[#00256D]/8">
               {children}
             </div>
 
@@ -122,7 +122,7 @@ export default function AuthShell({
             <div className="mt-6 text-center">
               <Link
                 href={backHref}
-                className="inline-flex items-center gap-2 text-sm font-medium text-[#5B7088] hover:text-[#1E4B7A] transition-colors link-underline"
+                className="inline-flex items-center gap-2 text-sm font-medium text-[#5B7088] hover:text-[#00256D] transition-colors link-underline"
               >
                 <ArrowLeft className="w-4 h-4" />
                 {backLabel}
@@ -156,7 +156,7 @@ export default function AuthShell({
         <Link href="/" className="flex justify-center mb-8">
           <Image
             src="/brand/logo.png"
-            alt="QRTrans"
+            alt="Mov"
             width={200}
             height={59}
             className="h-12 w-auto object-contain"
@@ -168,7 +168,7 @@ export default function AuthShell({
         {(eyebrow || title || subtitle) && (
           <div className="mb-8 text-center">
             {eyebrow && (
-              <p className="font-display text-xs uppercase tracking-[0.3em] text-[#1E4B7A] mb-3">
+              <p className="font-display text-xs uppercase tracking-[0.3em] text-[#00256D] mb-3">
                 {eyebrow}
               </p>
             )}
@@ -184,7 +184,7 @@ export default function AuthShell({
         )}
 
         {/* Card */}
-        <div className="glass-light-strong rounded-3xl p-6 sm:p-8 shadow-xl shadow-[#1E4B7A]/8">
+        <div className="glass-light-strong rounded-3xl p-6 sm:p-8 shadow-xl shadow-[#00256D]/8">
           {children}
         </div>
 
@@ -192,7 +192,7 @@ export default function AuthShell({
         <div className="mt-6 text-center">
           <Link
             href={backHref}
-            className="inline-flex items-center gap-2 text-sm font-medium text-[#5B7088] hover:text-[#1E4B7A] transition-colors link-underline"
+            className="inline-flex items-center gap-2 text-sm font-medium text-[#5B7088] hover:text-[#00256D] transition-colors link-underline"
           >
             <ArrowLeft className="w-4 h-4" />
             {backLabel}

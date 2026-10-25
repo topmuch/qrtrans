@@ -442,7 +442,7 @@ export default function DashboardPage() {
             Tableau de bord
           </h1>
           <p className="text-sm text-[var(--dash-muted)] mt-1">
-            Vue d&apos;ensemble de votre activité QRTrans
+            Vue d&apos;ensemble de votre activité Mov
           </p>
         </div>
         <button
@@ -483,7 +483,7 @@ export default function DashboardPage() {
           title="Activations sur 7 jours"
           subtitle={`${totalActivations} activations cette semaine`}
           data={chartData}
-          color="#1E4B7A"
+          color="#00256D"
           gradient
           height={280}
           loading={loading}

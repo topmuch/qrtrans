@@ -28,7 +28,7 @@ export default function AreaChartCard({
   data,
   height = 280,
   gradient = true,
-  color = '#1E4B7A',
+  color = '#00256D',
   loading,
 }: AreaChartCardProps) {
   if (loading) {
