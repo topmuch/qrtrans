@@ -26,11 +26,11 @@ const jsonLdSoftwareApplication = JSON.stringify({
   name: "Mov",
   applicationCategory: "BusinessApplication",
   operatingSystem: "Web, iOS, Android",
-  description: "Plateforme de traçabilité de colis par QR code pour le transport inter-villes au Sénégal. Notifications WhatsApp automatiques, code PIN de retrait sécurisé, suivi GPS en temps réel, dashboard agence.",
+  description: "Plateforme de traçabilité de colis par QR code pour le transport inter-villes au Tchad. Notifications WhatsApp automatiques, code PIN de retrait sécurisé, suivi GPS en temps réel, dashboard agence.",
   offers: {
     "@type": "Offer",
     price: "0",
-    priceCurrency: "XOF",
+    priceCurrency: "XAF",
     availability: "https://schema.org/InStock"
   },
   aggregateRating: {
@@ -51,16 +51,14 @@ const jsonLdSoftwareApplication = JSON.stringify({
     "Export CSV et reporting comptable"
   ],
   areaServed: [
-    { "@type": "Country", name: "Sénégal" },
-    { "@type": "Country", name: "Mali" },
-    { "@type": "Country", name: "Guinée" },
-    { "@type": "Country", name: "Côte d'Ivoire" }
+    { "@type": "Country", name: "Tchad" },
+    { "@type": "Country", name: "Cameroun" },
+    { "@type": "Country", name: "République Centrafricaine" },
+    { "@type": "Country", name: "Soudan" }
   ],
   url: "https://mov.newvisioncargo.pro",
   logo: "https://mov.newvisioncargo.pro/icons/icon-512x512.png",
   sameAs: [
-    "https://facebook.com/qrtrans.sn",
-    "https://linkedin.com/company/qrtrans",
     "https://wa.me/23566352505"
   ]
 });
@@ -83,18 +81,22 @@ const jsonLdWebSite = JSON.stringify({
 const jsonLdService = JSON.stringify({
   "@context": "https://schema.org",
   "@type": "Service",
-  name: "Traçabilité de Colis par QR Code",
-  description: "Activez, tracez et sécurisez vos colis inter-villes avec Mov. Activation QR code, notifications WhatsApp, code PIN de retrait, suivi GPS en temps réel.",
+  name: "Traçabilité de Colis par QR Code au Tchad",
+  description: "Activez, tracez et sécurisez vos colis inter-villes au Tchad avec Mov. Activation QR code, notifications WhatsApp, code PIN de retrait, suivi GPS en temps réel.",
   provider: {
     "@type": "Organization",
     name: "Mov",
-    url: "https://mov.newvisioncargo.pro"
+    url: "https://mov.newvisioncargo.pro",
+    parentOrganization: {
+      "@type": "Organization",
+      name: "New Vision Cargo"
+    }
   },
   areaServed: [
-    { "@type": "Country", name: "Sénégal" },
-    { "@type": "Country", name: "Mali" },
-    { "@type": "Country", name: "Guinée" },
-    { "@type": "Country", name: "Côte d'Ivoire" }
+    { "@type": "Country", name: "Tchad" },
+    { "@type": "Country", name: "Cameroun" },
+    { "@type": "Country", name: "République Centrafricaine" },
+    { "@type": "Country", name: "Soudan" }
   ],
   serviceType: "Traçabilité logistique",
   featureList: [
@@ -109,26 +111,38 @@ const jsonLdService = JSON.stringify({
 const jsonLdPlace = JSON.stringify({
   "@context": "https://schema.org",
   "@type": "Place",
-  name: "Sénégal",
-  addressCountry: "SN"
+  name: "N'Djaména, Tchad",
+  address: {
+    "@type": "PostalAddress",
+    addressCountry: "TD",
+    addressLocality: "N'Djaména",
+    addressRegion: "N'Djaména",
+    streetAddress: "Avenue Charles de Gaulle"
+  },
+  geo: {
+    "@type": "GeoCoordinates",
+    latitude: 12.1348,
+    longitude: 15.0557
+  }
 });
 
 export const metadata: Metadata = {
   title: {
-    default: "Mov — Traçabilité de Colis par QR Code au Sénégal",
+    default: "Mov — Traçabilité de Colis par QR Code au Tchad",
     template: "%s | Mov",
   },
-  description: "Plateforme de traçabilité de colis par QR code pour le transport inter-villes au Sénégal. Activation en 30s, notifications WhatsApp automatiques, code PIN sécurisé, suivi GPS temps réel, dashboard agence.",
+  description: "Plateforme de traçabilité de colis par QR code pour le transport inter-villes au Tchad. Activation en 30s, notifications WhatsApp automatiques, code PIN sécurisé, suivi GPS temps réel, dashboard agence. Service disponible à N'Djaména, Moundou, Sarh, Abéché et partout au Tchad.",
   keywords: [
-    "Mov", "QR code colis", "traçabilité colis", "transport inter-villes Sénégal",
-    "logistique Sénégal", "suivi colis", "notifications WhatsApp", "code PIN livraison",
-    "GPS colis", "dashboard agence transport", "chauffeur livreur",
-    "colis Dakar Ziguinchor", "colis Dakar Saint-Louis", "colis Touba Thiès",
-    "expédition colis Sénégal", "livraison colis Sénégal", "sécurité colis",
-    "agence transport Sénégal", "Mali Guinée Côte d'Ivoire"
+    "Mov", "QR code colis", "traçabilité colis", "transport inter-villes Tchad",
+    "logistique Tchad", "suivi colis Tchad", "notifications WhatsApp",
+    "code PIN livraison", "GPS colis", "dashboard agence transport",
+    "chauffeur livreur Tchad", "colis N'Djaména", "envoi colis Tchad",
+    "expédition colis Tchad", "livraison colis N'Djaména", "sécurité colis",
+    "agence transport Tchad", "Moundou Sarh Abéché", "New Vision Cargo",
+    "traçabilité bagage Tchad", "QR code bagage", "livraison sécurisée"
   ],
   authors: [{ name: "Mov Team" }],
-  creator: "MMASOLUTION",
+  creator: "New Vision Cargo",
   publisher: "Mov",
   metadataBase: new URL("https://mov.newvisioncargo.pro"),
   category: "business",
@@ -150,8 +164,8 @@ export const metadata: Metadata = {
 
   // Open Graph — optimisé pour le partage social
   openGraph: {
-    title: "Mov — Traçabilité de Colis par QR Code au Sénégal",
-    description: "Activez un colis en 30 secondes avec un QR code. Notifications WhatsApp automatiques, code PIN sécurisé, suivi GPS temps réel. Solution complète pour agences de transport.",
+    title: "Mov — Traçabilité de Colis par QR Code au Tchad",
+    description: "Activez un colis en 30 secondes avec un QR code. Notifications WhatsApp automatiques, code PIN sécurisé, suivi GPS temps réel. Solution complète pour agences de transport au Tchad.",
     url: "https://mov.newvisioncargo.pro",
     siteName: "Mov",
     type: "website",
@@ -162,7 +176,7 @@ export const metadata: Metadata = {
         url: "/icons/icon-512x512.png",
         width: 512,
         height: 512,
-        alt: "Mov — Traçabilité de Colis par QR Code",
+        alt: "Mov — Traçabilité de Colis par QR Code au Tchad",
       },
     ],
   },
@@ -170,11 +184,11 @@ export const metadata: Metadata = {
   // Twitter Card
   twitter: {
     card: "summary_large_image",
-    title: "Mov — Traçabilité de Colis par QR Code au Sénégal",
-    description: "Activez un colis en 30 secondes. Notifications WhatsApp, code PIN sécurisé, suivi GPS. Solution pour agences de transport.",
+    title: "Mov — Traçabilité de Colis par QR Code au Tchad",
+    description: "Activez un colis en 30 secondes. Notifications WhatsApp, code PIN sécurisé, suivi GPS. Solution pour agences de transport au Tchad.",
     images: ["/icons/icon-512x512.png"],
-    creator: "@qrtrans_sn",
-    site: "@qrtrans_sn",
+    creator: "@newvisioncargo",
+    site: "@newvisioncargo",
   },
 
   // PWA
@@ -270,8 +284,21 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="apple-mobile-web-app-title" content="Mov" />
         <meta name="application-name" content="Mov" />
-        <meta name="msapplication-TileColor" content="#0A2540" />
+        <meta name="msapplication-TileColor" content="#00256D" />
         <meta name="msapplication-config" content="/browserconfig.xml" />
+
+        {/* SEO Géographique — Ciblage Tchad pour Google */}
+        <meta name="geo.region" content="TD" />
+        <meta name="geo.placename" content="N'Djaména, Tchad" />
+        <meta name="geo.position" content="12.1348;15.0557" />
+        <meta name="ICBM" content="12.1348, 15.0557" />
+        <meta name="language" content="French" />
+        <meta name="coverage" content="Worldwide, Tchad, Chad, Africa" />
+        <meta name="target" content="tchad=logistique, transport, livraison, colis, QR code" />
+        <meta name="distribution" content="global" />
+        <meta name="rating" content="general" />
+        <meta name="revisit-after" content="7 days" />
+        <meta name="theme-color" content="#00256D" />
 
         {/* Preconnect & DNS Prefetch for performance */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -300,24 +327,39 @@ export default function RootLayout({
               name: "Mov",
               url: "https://mov.newvisioncargo.pro",
               logo: "https://mov.newvisioncargo.pro/icons/icon-512x512.png",
-              description: "Plateforme de traçabilité de colis par QR code pour le transport inter-villes au Sénégal. Notifications WhatsApp, code PIN, suivi GPS, dashboard agence.",
+              description: "Plateforme de traçabilité de colis par QR code pour le transport inter-villes au Tchad. Notifications WhatsApp, code PIN, suivi GPS, dashboard agence.",
+              parentOrganization: {
+                "@type": "Organization",
+                name: "New Vision Cargo"
+              },
               address: {
                 "@type": "PostalAddress",
-                addressCountry: "SN",
-                addressLocality: "Dakar"
+                addressCountry: "TD",
+                addressLocality: "N'Djaména",
+                addressRegion: "N'Djaména",
+                postalCode: "",
+                streetAddress: "Avenue Charles de Gaulle"
+              },
+              geo: {
+                "@type": "GeoCoordinates",
+                latitude: 12.1348,
+                longitude: 15.0557
               },
               contactPoint: {
                 "@type": "ContactPoint",
-                telephone: "+221-78-485-82-26",
+                telephone: "+235-66-35-25-05",
                 contactType: "customer service",
-                availableLanguage: ["fr", "wo", "en"]
+                areaServed: "TD",
+                availableLanguage: ["fr", "ar", "en"]
               },
               sameAs: [
-                "https://facebook.com/qrtrans.sn",
-                "https://linkedin.com/company/qrtrans",
                 "https://wa.me/23566352505"
               ],
-              foundingDate: "2024"
+              foundingDate: "2024",
+              areaServed: {
+                "@type": "Country",
+                name: "Tchad"
+              }
             }),
           }}
         />
