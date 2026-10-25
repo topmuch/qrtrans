@@ -406,7 +406,7 @@ function FormMockup() {
         { label: 'Tél. expéditeur', value: '+235 77 123 45 67' },
         { label: 'Destinataire', value: 'Ndiaye Fatou' },
         { label: 'Tél. destinataire', value: '+235 78 987 65 43' },
-        { label: 'Itinéraire', value: "N'Djamena → Moundou' },
+        { label: 'Itinéraire', value: "N'Djamena → Moundou" },
         { label: 'Type / Poids', value: 'Valise — 23 kg' },
       ].map((field, i) => (
         <motion.div
