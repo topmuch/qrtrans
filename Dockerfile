@@ -1,5 +1,8 @@
-# QRTrans (mov) - Dockerfile for Coolify
+# Mov - Dockerfile for Coolify
 FROM node:20-alpine
+
+# Force rebuild (bump CACHEBUST to invalidate Docker layer cache)
+ARG CACHEBUST=22
 
 # Install required packages
 RUN apk add --no-cache git libc6-compat sqlite
@@ -7,7 +10,7 @@ RUN npm install -g bun
 
 WORKDIR /app
 
-# Clone the repository
+# Clone the repository (always pulls latest main)
 RUN git clone https://github.com/topmuch/qrtrans.git .
 
 # Install dependencies
