@@ -7,7 +7,7 @@ echo "🚀 Starting QRTrans..."
 mkdir -p /app/data
 
 # Check if database exists, if not initialize it
-if [ ! -f /app/data/custom.db ]; then
+if [ ! -f /app/data/move.db ]; then
     echo "📦 Initializing database..."
     cd /app
     bun run db:push 2>/dev/null || npx prisma db push --skip-generate

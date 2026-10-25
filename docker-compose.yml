@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  qrtrans:
+  mov:
     build:
       context: .
       dockerfile: Dockerfile
@@ -9,7 +9,7 @@ services:
       - "3000:3000"
     environment:
       - NODE_ENV=production
-      - DATABASE_URL=file:/app/data/qrtrans.db
+      - DATABASE_URL=file:/app/data/move.db
       - NEXT_PUBLIC_BASE_URL=${NEXT_PUBLIC_BASE_URL:-http://localhost:3000}
       - NEXTAUTH_SECRET=${NEXTAUTH_SECRET:-change-me-in-production}
       - NEXTAUTH_URL=${NEXT_PUBLIC_BASE_URL:-http://localhost:3000}
@@ -26,8 +26,8 @@ services:
       - GROQ_AI_ENABLED=${GROQ_AI_ENABLED:-true}
       - GROQ_CHAT_ENABLED=${GROQ_CHAT_ENABLED:-true}
     volumes:
-      - qrtrans_data:/app/data
-      - qrtrans_uploads:/app/public/uploads
+      - mov_data:/app/data
+      - mov_uploads:/app/public/uploads
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api"]
@@ -37,5 +37,5 @@ services:
       start_period: 60s
 
 volumes:
-  qrtrans_data:
-  qrtrans_uploads:
+  mov_data:
+  mov_uploads:

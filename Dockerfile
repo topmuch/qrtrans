@@ -1,11 +1,11 @@
 # ============================================================
-# QRTrans — Multi-stage Dockerfile for Coolify (lightweight)
+# QRTrans — Multi-stage Dockerfile for Coolify (project: mov)
 # ============================================================
 
 # ── Stage 1: Build ──
 FROM node:20-alpine AS builder
 
-ARG CACHEBUST=18
+ARG CACHEBUST=19
 
 # Install required packages for building
 RUN apk add --no-cache git sqlite build-base
@@ -26,13 +26,13 @@ RUN npx prisma generate
 
 # Build the application
 ENV NEXT_TELEMETRY_DISABLED=1
-ENV DATABASE_URL=file:/app/data/qrtrans.db
+ENV DATABASE_URL=file:/app/data/move.db
 RUN bun run build
 
 # ── Stage 2: Production (minimal image) ──
 FROM node:20-alpine AS runner
 
-ARG CACHEBUST=18
+ARG CACHEBUST=19
 
 # Only install runtime essentials
 RUN apk add --no-cache sqlite-libs
@@ -42,7 +42,7 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
-ENV DATABASE_URL=file:/app/data/qrtrans.db
+ENV DATABASE_URL=file:/app/data/move.db
 ENV NEXT_TELEMETRY_DISABLED=1
 
 # Create non-root user for security
