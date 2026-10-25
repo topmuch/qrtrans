@@ -121,7 +121,7 @@ export default function VoyageSection({
               id="departure_city"
               value={departureCity}
               onChange={(e) => setDepartureCity(e.target.value)}
-              placeholder={t('Ex: N'Djamena', 'Ex: N'Djamena')}
+              placeholder={t("Ex: N'Djamena", "Ex: N'Djamena")}
               className={INPUT_CLS}
               aria-required="true"
             />

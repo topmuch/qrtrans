@@ -16,7 +16,7 @@ export const DEMO_AGENCY = {
   slug: 'diop',
   email: 'contact@francine-makela.com',
   phone: '+235 77 123 45 67',
-  address: 'N'Djamena, Tchad'
+  address: "N'Djamena, Tchad"
 };
 
 // Agency Context for sharing agency data across pages

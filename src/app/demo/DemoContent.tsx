@@ -406,7 +406,7 @@ function FormMockup() {
         { label: 'Tél. expéditeur', value: '+235 77 123 45 67' },
         { label: 'Destinataire', value: 'Ndiaye Fatou' },
         { label: 'Tél. destinataire', value: '+235 78 987 65 43' },
-        { label: 'Itinéraire', value: 'N'Djamena → Saint-Louis' },
+        { label: 'Itinéraire', value: "N'Djamena → Saint-Louis' },
         { label: 'Type / Poids', value: 'Valise — 23 kg' },
       ].map((field, i) => (
         <motion.div
@@ -655,10 +655,10 @@ function DashboardMockup() {
         </p>
         <div className="space-y-2.5">
           {[
-            { ref: 'TRSP-0038', from: 'N'Djamena', to: 'Thiès', status: 'Livré', color: '#10B981' },
-            { ref: 'TRSP-0039', from: 'N'Djamena', to: 'Kaolack', status: 'En transit', color: '#3B82F6' },
-            { ref: 'TRSP-0040', from: 'N'Djamena', to: 'Ziguinchor', status: 'En transit', color: '#3B82F6' },
-            { ref: 'TRSP-0041', from: 'N'Djamena', to: 'Saint-Louis', status: 'Livré', color: '#10B981' },
+            { ref: 'TRSP-0038', from: "N'Djamena", to: 'Thiès', status: 'Livré', color: '#10B981' },
+            { ref: 'TRSP-0039', from: "N'Djamena", to: 'Kaolack', status: 'En transit', color: '#3B82F6' },
+            { ref: 'TRSP-0040', from: "N'Djamena", to: 'Ziguinchor', status: 'En transit', color: '#3B82F6' },
+            { ref: 'TRSP-0041', from: "N'Djamena", to: 'Saint-Louis', status: 'Livré', color: '#10B981' },
           ].map((item, i) => (
             <motion.div
               key={item.ref}

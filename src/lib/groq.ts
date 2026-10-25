@@ -267,7 +267,7 @@ STRICT RULES:
  * ```ts
  * const result = await generateWhatsAppMessage({
  *   reference: 'VOL26-ZG46J2',
- *   location: { city: 'N'Djamena', country: 'Tchad' },
+ *   location: { city: "N'Djamena", country: 'Tchad' },
  *   time: '18h45',
  *   link: 'https://mov.newvisioncargo.pro/activate/VOL26-ZG46J2',
  *   language: 'fr',

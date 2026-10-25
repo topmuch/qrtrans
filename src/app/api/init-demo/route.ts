@@ -32,7 +32,7 @@ export async function GET() {
           slug: 'francine-makela',
           email: 'contact@francine-makela.com',
           phone: '+235 77 123 45 67',
-          address: 'N'Djamena, Tchad',
+          address: "N'Djamena, Tchad',
           active: true,
         }
       });

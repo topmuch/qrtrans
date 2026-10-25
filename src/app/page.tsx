@@ -169,7 +169,7 @@ const TESTIMONIALS: {
     quote:
       "Depuis Mov, nous n'avons plus aucune contestation de livraison. Le code PIN a réglé 100% de nos litiges clients.",
     name: 'Awa Diop',
-    agency: 'Wari N'Djamena',
+    agency: "Wari N'Djamena",
     role: 'Responsable agence',
     avatar: '/images/testimonial-awa.jpg',
   },

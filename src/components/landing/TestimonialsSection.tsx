@@ -20,7 +20,7 @@ const testimonials: Testimonial[] = [
     name: 'Moussa D.',
     initials: 'MD',
     role: 'Chauffeur indépendant',
-    city: 'N'Djamena-Ziguinchor',
+    city: "N'Djamena-Moundou",
     gradient: 'from-orange-400 to-orange-600',
   },
   {
