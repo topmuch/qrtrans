@@ -1,4 +1,5 @@
 'use client';
+export const dynamic = 'force-dynamic';
 
 /* ═══════════════════════════════════════════════════════════════════
    QRTrans — Home Page  ·  Editorial Premium Design
