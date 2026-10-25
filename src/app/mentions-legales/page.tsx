@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import PublicLayout from '@/components/public/PublicLayout';
 import { Metadata } from 'next';
 

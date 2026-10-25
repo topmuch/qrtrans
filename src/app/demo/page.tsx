@@ -1,3 +1,5 @@
+'use client';
+export const dynamic = 'force-dynamic';
 import Navigation from '@/components/landing/Navigation';
 import Footer from '@/components/landing/Footer';
 import WhatsAppFloat from '@/components/landing/WhatsAppFloat';
