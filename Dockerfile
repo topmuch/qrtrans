@@ -2,7 +2,7 @@
 FROM node:20-alpine
 
 # Force rebuild (bump CACHEBUST to invalidate Docker layer cache)
-ARG CACHEBUST=24
+ARG CACHEBUST=25
 
 # Install required packages
 RUN apk add --no-cache git libc6-compat sqlite

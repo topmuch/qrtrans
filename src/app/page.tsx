@@ -341,23 +341,54 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* RIGHT — 40% (col-span-5) — delivery card mockup with hero image backdrop */}
+            {/* RIGHT — 40% (col-span-5) — real hero image */}
             <div className="lg:col-span-5 mt-2 lg:mt-0 relative">
-              {/* Hero image backdrop with mask */}
-              <div className="absolute -inset-6 lg:-inset-8 -z-10 pointer-events-none">
-                <div className="relative w-full h-full">
+              {/* glow behind image */}
+              <div className="absolute -inset-4 bg-gradient-to-br from-[#00256D]/20 via-[#1A5DAA]/10 to-[#10B981]/10 blur-3xl opacity-60 pointer-events-none" />
+
+              {/* Real hero image with floating animation */}
+              <div className="animate-float-slow relative reveal-scale">
+                <div className="relative rounded-3xl overflow-hidden shadow-2xl shadow-[#001A4D]/20 border border-white/20">
                   <Image
-                    src="/images/hero-logistics.jpg"
-                    alt=""
-                    fill
+                    src="/images/hero-main.jpg"
+                    alt="Livraison de colis QR code à N'Djaména, Tchad"
+                    width={1344}
+                    height={768}
                     priority
-                    sizes="40vw"
-                    className="object-cover rounded-3xl opacity-25"
+                    sizes="(max-width: 1024px) 100vw, 40vw"
+                    className="w-full h-auto object-cover aspect-[16/10]"
                   />
-                  <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-[#FBFCFE] via-transparent to-transparent" />
+                  {/* Gradient overlay at bottom for text legibility */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#001A4D]/80 via-[#001A4D]/10 to-transparent pointer-events-none" />
+
+                  {/* Floating status badge — top right */}
+                  <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-md border border-[#00256D]/20 rounded-full px-3 py-1.5 shadow-lg flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#10B981] pulse-soft" />
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#00256D]">En transit</span>
+                  </div>
+
+                  {/* Bottom caption overlay */}
+                  <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-6">
+                    <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#6EE7B7] mb-1">
+                      Suivi en temps réel
+                    </p>
+                    <p className="font-display font-bold text-white text-lg sm:text-xl leading-tight">
+                      De N'Djaména à Moundou
+                    </p>
+                    <div className="mt-3 flex items-center gap-3">
+                      <div className="flex items-center gap-1.5 text-xs text-white/80">
+                        <Clock className="w-3.5 h-3.5" />
+                        <span>3h 30min</span>
+                      </div>
+                      <span className="w-1 h-1 rounded-full bg-white/40" />
+                      <div className="flex items-center gap-1.5 text-xs text-white/80">
+                        <Lock className="w-3.5 h-3.5" />
+                        <span>PIN sécurisé</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
-              <DeliveryCardMockup />
             </div>
           </div>
         </div>
