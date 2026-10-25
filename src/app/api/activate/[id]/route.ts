@@ -8,12 +8,12 @@ const WHATSAPP_REGEX = /^\+[1-9]\d{1,14}$/;
 
 const senderSchema = z.object({
   name: z.string().min(1, "Le nom de l'expéditeur est obligatoire"),
-  phone: z.string().regex(WHATSAPP_REGEX, 'Format WhatsApp invalide (ex: +221771234567)'),
+  phone: z.string().regex(WHATSAPP_REGEX, 'Format WhatsApp invalide (ex: +235771234567)'),
 });
 
 const receiverSchema = z.object({
   name: z.string().min(1, 'Le nom du destinataire est obligatoire'),
-  phone: z.string().regex(WHATSAPP_REGEX, 'Format WhatsApp invalide (ex: +221761234567)'),
+  phone: z.string().regex(WHATSAPP_REGEX, 'Format WhatsApp invalide (ex: +235761234567)'),
 });
 
 const baggageSchema = z.object({
@@ -226,7 +226,7 @@ Merci de votre confiance 🙏
     // Driver phone line (conditional)
     const driverLine = data.share_driver_phone && data.driver_phone
       ? `📞 Contacter le transporteur : ${data.driver_phone}`
-      : '📞 Pour toute question, contactez l\'agence au +221 78 123 00 00';
+      : '📞 Pour toute question, contactez l\'agence au +235 78 123 00 00';
 
     // Pickup address line (set by sender during activation)
     const pickupLine = data.pickup_address

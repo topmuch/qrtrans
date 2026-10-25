@@ -89,7 +89,7 @@ function buildSystemPrompt(locale: Language): string {
 🏛️ ENTREPRISE Mov :
 • Nom : Mov — édité par MMASOLUTION
 • Siège social : 43 Rue Maryse Bastié, 78300 Poissy, France
-• Origine : Né à Dakar (Sénégal), déployé dans 15 pays
+• Origine : Né à N'Djamena (Tchad), déployé dans 15 pays
 • Site web : https://mov.newvisioncargo.pro
 • Mission : Protection intelligente des colis pour voyageurs et pèlerins
 • Résaux sociaux : facebook.com/qrtrans | instagram.com/qrtrans | twitter.com/qrtrans
@@ -157,7 +157,7 @@ RÈGLES :
 🏛️ COMPANY Mov:
 • Name: Mov — published by MMASOLUTION
 • Headquarters: 43 Rue Maryse Bastié, 78300 Poissy, France
-• Origin: Born in Dakar (Senegal), deployed in 15 countries
+• Origin: Born in N'Djamena (Tchad), deployed in 15 countries
 • Website: https://mov.newvisioncargo.pro
 • Mission: Intelligent baggage protection for travelers and pilgrims
 • Social media: facebook.com/qrtrans | instagram.com/qrtrans | twitter.com/qrtrans

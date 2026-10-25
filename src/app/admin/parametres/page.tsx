@@ -84,7 +84,7 @@ const CURRENCIES = [
   { code: 'EUR', name: 'Euro (€)', symbol: '€' },
   { code: 'USD', name: 'Dollar US ($)', symbol: '$' },
   { code: 'MAD', name: 'Dirham marocain (MAD)', symbol: 'MAD' },
-  { code: 'XOF', name: 'Franc CFA (XOF)', symbol: 'XOF' },
+  { code: 'XAF', name: 'Franc CFA (XAF)', symbol: 'XAF' },
   { code: 'GBP', name: 'Livre sterling (£)', symbol: '£' },
   { code: 'SAR', name: 'Riyal saoudien (SAR)', symbol: 'SAR' },
 ];

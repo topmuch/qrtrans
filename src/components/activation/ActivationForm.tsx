@@ -62,7 +62,7 @@ export default function ActivationForm({ qrCode, lang }: ActivationFormProps) {
   const validatePhone = (value: string): string | null => {
     const cleaned = value.replace(/\s/g, '');
     if (!cleaned) return t('Numéro requis', 'Number required');
-    if (!WHATSAPP_REGEX.test(cleaned)) return t('Format invalide. Ex: +221771234567', 'Invalid format. Ex: +221771234567');
+    if (!WHATSAPP_REGEX.test(cleaned)) return t('Format invalide. Ex: +235771234567', 'Invalid format. Ex: +235771234567');
     return null;
   };
 
@@ -92,7 +92,7 @@ export default function ActivationForm({ qrCode, lang }: ActivationFormProps) {
     if (driverPhone) {
       const cleaned = driverPhone.replace(/\s/g, '');
       if (!WHATSAPP_REGEX.test(cleaned)) {
-        const dErr = t('Format invalide. Ex: +221771234567', 'Invalid format. Ex: +221771234567');
+        const dErr = t('Format invalide. Ex: +235771234567', 'Invalid format. Ex: +235771234567');
         setDriverPhoneError(dErr);
         return dErr;
       }

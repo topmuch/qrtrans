@@ -67,7 +67,7 @@ export default function SecondaryPageLayout({ children, title, subtitle }: Secon
               <span className="text-lg font-bold">Mov</span>
             </div>
             <p className="text-white/50 text-sm">
-              &copy; 2026 Mov. Tous droits réservés. Made with ❤️ au Sénégal
+              &copy; 2026 Mov. Tous droits réservés. Made with ❤️ au Tchad
             </p>
             <div className="flex items-center gap-4">
               <Link href="/confidentialite" className="text-white/50 hover:text-white text-sm transition-colors">

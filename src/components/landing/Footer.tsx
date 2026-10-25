@@ -105,7 +105,7 @@ export default function Footer() {
             </Link>
             <p className="text-white/60 text-sm leading-relaxed mb-6 max-w-xs">
               Plateforme de traçabilité et sécurité logistique pour le transport
-              inter-villes au Sénégal.
+              inter-villes au Tchad.
             </p>
             {/* Social Icons */}
             <div className="flex items-center gap-3">
@@ -148,7 +148,7 @@ export default function Footer() {
           </p>
           <p className="text-white/40 text-sm">
             Made with <span className="text-red-400">&hearts;</span> au
-            Sénégal
+            Tchad
           </p>
         </div>
       </div>

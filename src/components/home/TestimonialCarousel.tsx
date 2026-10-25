@@ -13,7 +13,7 @@ interface Testimonial {
 const testimonials: Testimonial[] = [
   {
     name: 'Moussa D.',
-    role: 'Chauffeur indépendant Dakar-Ziguinchor',
+    role: 'Chauffeur indépendant N'Djamena-Ziguinchor',
     content: "Depuis que j'utilise Mov, mes clients ne m'appellent plus toutes les 2 heures pour savoir où est leur colis. Le WhatsApp automatique change tout.",
     initials: 'MD',
     rating: 5,
@@ -34,7 +34,7 @@ const testimonials: Testimonial[] = [
   },
   {
     name: 'Aminata B.',
-    role: 'Expéditrice régulière Dakar-Thiès',
+    role: 'Expéditrice régulière N'Djamena-Thiès',
     content: "Je reçois mon lien WhatsApp dès que le colis part. Je peux suivre chaque étape en temps réel. Je recommande Mov à tout le monde.",
     initials: 'AB',
     rating: 5,

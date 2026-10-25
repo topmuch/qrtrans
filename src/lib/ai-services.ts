@@ -116,7 +116,7 @@ const CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours
 
 // Language detection based on country
 const COUNTRY_TO_LANGUAGE: Record<string, string> = {
-  'France': 'fr', 'Senegal': 'fr', 'Morocco': 'ar', 'Algeria': 'ar',
+  'France': 'fr', 'Tchad': 'fr', 'Morocco': 'ar', 'Algeria': 'ar',
   'Tunisia': 'ar', 'Saudi Arabia': 'ar', 'Egypt': 'ar', 'UAE': 'ar',
   'United States': 'en', 'United Kingdom': 'en', 'Canada': 'en',
   'Germany': 'de', 'Spain': 'es', 'Italy': 'it', 'Portugal': 'pt',

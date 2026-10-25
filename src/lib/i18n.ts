@@ -18,7 +18,7 @@ export const LANGUAGE_DIRECTION: Record<Language, 'ltr' | 'rtl'> = {
 export const COUNTRY_LANGUAGE_MAP: Record<string, Language> = {
   // French speaking countries
   'FR': 'fr', // France
-  'SN': 'fr', // Senegal
+  'TD': 'fr', // Tchad
   'BE': 'fr', // Belgium (French/Dutch/German - defaulting to French)
   'LU': 'fr', // Luxembourg
   'MC': 'fr', // Monaco

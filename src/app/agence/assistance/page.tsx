@@ -105,7 +105,7 @@ export default function AssistancePage() {
     {
       icon: <Phone className="w-5 h-5" />,
       title: "Téléphone",
-      value: "+221 33 123 45 67",
+      value: "+235 33 123 45 67",
       subtitle: "Lun-Ven, 9h-18h"
     },
     {
@@ -117,7 +117,7 @@ export default function AssistancePage() {
     {
       icon: <MapPin className="w-5 h-5" />,
       title: "Adresse",
-      value: "Dakar, Sénégal",
+      value: "N'Djamena, Tchad",
       subtitle: "Siège social"
     }
   ];

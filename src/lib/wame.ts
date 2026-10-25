@@ -137,7 +137,7 @@ Un colis destiné à votre attention est actuellement en route.
 🚌 Compagnie : ${v.company_name}
 📍 Destination : ${v.arrival_city}
 🕐 Arrivée estimée : ${v.departure_date}${pickupLine}
-${v.pin ? `🔐 *Code de retrait : ${v.pin}*\nConservez ce code. Il sera exigé à l'arrivée.\n` : ''}${v.share_driver_phone && v.driver_phone ? `📞 Contacter le transporteur : ${v.driver_phone}\n` : '📞 Pour toute question, contactez l\'agence au +221 78 123 00 00\n'}Vous serez notifié immédiatement dès l'arrivée du colis.
+${v.pin ? `🔐 *Code de retrait : ${v.pin}*\nConservez ce code. Il sera exigé à l'arrivée.\n` : ''}${v.share_driver_phone && v.driver_phone ? `📞 Contacter le transporteur : ${v.driver_phone}\n` : '📞 Pour toute question, contactez l\'agence au +235 78 123 00 00\n'}Vous serez notifié immédiatement dès l'arrivée du colis.
 
 🤝 Merci d'utiliser Mov
 

@@ -17,7 +17,7 @@ const articles: Article[] = [
     title: 'Sécuriser vos colis : 5 bonnes pratiques pour le transport inter-villes',
     badge: 'Sécurité',
     excerpt:
-      'Découvrez comment les codes QR et la traçabilité numérique réduisent les pertes et les litiges lors du transport de marchandises entre villes au Sénégal.',
+      'Découvrez comment les codes QR et la traçabilité numérique réduisent les pertes et les litiges lors du transport de marchandises entre villes au Tchad.',
     href: '#',
     bg: 'bg-[#00a885]',
     hoverShadow: 'hover:shadow-[0_8px_32px_rgba(0,168,133,0.35)]',
@@ -34,7 +34,7 @@ const articles: Article[] = [
     iconBg: 'bg-white/20',
   },
   {
-    title: 'Réglementation du transport de marchandises au Sénégal',
+    title: 'Réglementation du transport de marchandises au Tchad',
     badge: 'Conformité',
     excerpt:
       'Un guide complet sur les obligations légales, les documents requis et les normes à respecter pour le transport inter-villes de marchandises.',

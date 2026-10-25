@@ -36,7 +36,7 @@ const ARTICLES: Article[] = [
     category: 'Sécurité',
     date: '15 Mai 2026',
     excerpt:
-      'Découvrez comment les codes QR et la traçabilité numérique réduisent les pertes et les litiges lors du transport inter-villes au Sénégal.',
+      'Découvrez comment les codes QR et la traçabilité numérique réduisent les pertes et les litiges lors du transport inter-villes au Tchad.',
     href: '/blog/securiser-colis',
     accent: 'from-emerald-500/15 via-emerald-500/5 to-transparent',
   },
@@ -50,7 +50,7 @@ const ARTICLES: Article[] = [
     accent: 'from-[#00256D]/15 via-[#1A5DAA]/5 to-transparent',
   },
   {
-    title: 'Réglementation du transport de marchandises au Sénégal',
+    title: 'Réglementation du transport de marchandises au Tchad',
     category: 'Conformité',
     date: '5 Mai 2026',
     excerpt:
@@ -63,7 +63,7 @@ const ARTICLES: Article[] = [
     category: 'Actu',
     date: '28 Avril 2026',
     excerpt:
-      "Étude de cas sur l'impact de la traçabilité QR code sur les pertes de colis dans le réseau de transport Dakar-Saint-Louis.",
+      "Étude de cas sur l'impact de la traçabilité QR code sur les pertes de colis dans le réseau de transport N'Djamena-Saint-Louis.",
     href: '/blog/qrtrans-reduit-pertes',
     accent: 'from-purple-500/15 via-purple-500/5 to-transparent',
   },
@@ -77,11 +77,11 @@ const ARTICLES: Article[] = [
     accent: 'from-cyan-500/15 via-cyan-500/5 to-transparent',
   },
   {
-    title: 'Le futur de la logistique au Sénégal',
+    title: 'Le futur de la logistique au Tchad',
     category: 'Actu',
     date: '15 Avril 2026',
     excerpt:
-      "Comment la digitalisation transforme le secteur du transport inter-villes au Sénégal et en Afrique de l'Ouest.",
+      "Comment la digitalisation transforme le secteur du transport inter-villes au Tchad et en Afrique de l'Ouest.",
     href: '/blog/futur-logistique',
     accent: 'from-amber-500/15 via-amber-500/5 to-transparent',
   },
@@ -162,7 +162,7 @@ export default function BlogPage() {
 
             <p className="reveal-up mt-6 text-lg sm:text-xl text-[#5B7088] max-w-2xl mx-auto leading-relaxed">
               Conseils, études de cas et réglementation pour les transporteurs
-              inter-villes au Sénégal et en Afrique de l&apos;Ouest.
+              inter-villes au Tchad et en Afrique de l&apos;Ouest.
             </p>
           </div>
         </div>

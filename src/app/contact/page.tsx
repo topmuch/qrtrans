@@ -322,7 +322,7 @@ export default function ContactPage() {
                         <label className={labelClass}>Téléphone</label>
                         <input
                           type="tel"
-                          placeholder="+221 7X XXX XX XX"
+                          placeholder="+235 7X XXX XX XX"
                           value={formData.phone}
                           onChange={(e) =>
                             setFormData({ ...formData, phone: e.target.value })
@@ -444,10 +444,10 @@ export default function ContactPage() {
                     Cité Alia Diène, Ouest Foire
                   </p>
                   <p className="text-sm text-[#5B7088]">
-                    Yoff, Dakar — Sénégal
+                    Yoff, N'Djamena — Tchad
                   </p>
                   <a
-                    href="https://www.google.com/maps/search/?api=1&query=Cité+Alia+Diène+Ouest+Foire+Yoff+Dakar"
+                    href="https://www.google.com/maps/search/?api=1&query=Cité+Alia+Diène+Ouest+Foire+Yoff+N'Djamena"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 mt-5 px-4 py-2 rounded-lg glass-light text-sm font-semibold text-[#0F1B2E] hover:border-[#00256D]/40 transition-colors"

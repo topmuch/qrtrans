@@ -169,7 +169,7 @@ const TESTIMONIALS: {
     quote:
       "Depuis Mov, nous n'avons plus aucune contestation de livraison. Le code PIN a réglé 100% de nos litiges clients.",
     name: 'Awa Diop',
-    agency: 'Wari Dakar',
+    agency: 'Wari N'Djamena',
     role: 'Responsable agence',
     avatar: '/images/testimonial-awa.jpg',
   },
@@ -280,7 +280,7 @@ export default function HomePage() {
                   <span className="relative inline-flex h-2 w-2 rounded-full bg-[#10B981]" />
                 </span>
                 <span className="text-xs sm:text-sm font-medium text-[#00256D]">
-                  Traçabilité de colis · République du Sénégal
+                  Traçabilité de colis · République du Tchad
                 </span>
               </div>
 
@@ -293,7 +293,7 @@ export default function HomePage() {
 
               {/* subtitle */}
               <p className="reveal-up mt-6 sm:mt-8 max-w-md text-base sm:text-lg text-[#5B7088] leading-relaxed">
-                La plateforme de traçabilité pensée pour les agences de transport inter-villes au Sénégal.
+                La plateforme de traçabilité pensée pour les agences de transport inter-villes au Tchad.
               </p>
 
               {/* tracking input + button */}
@@ -589,7 +589,7 @@ export default function HomePage() {
               leur paquet, à la minute près. »
             </p>
             <p className="mt-4 text-sm text-white/50">
-              — Awa Diop, Responsable agence · Wari Dakar
+              — Awa Diop, Responsable agence · Wari N'Djamena
             </p>
           </div>
         </div>
@@ -850,7 +850,7 @@ function DeliveryCardMockup() {
             <div className="flex items-center justify-between">
               <div className="flex flex-col items-center gap-1">
                 <span className="w-3 h-3 rounded-full bg-[#00256D] ring-4 ring-[#00256D]/15" />
-                <p className="font-display font-bold text-sm text-[#0A1426]">Dakar</p>
+                <p className="font-display font-bold text-sm text-[#0A1426]">N'Djamena</p>
               </div>
               <div className="flex-1 mx-3 relative h-6 flex items-center">
                 <svg

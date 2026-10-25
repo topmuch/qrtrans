@@ -7,7 +7,6 @@ import { Input } from '@/components/ui/input';
 
 // ─── Country Calling Codes ───────────────────────────────
 const COUNTRY_CALLING_CODES: Record<string, { code: string; flag: string }> = {
-  SN: { code: '+221', flag: '🇸🇳' },
   CI: { code: '+225', flag: '🇨🇮' },
   ML: { code: '+223', flag: '🇲🇱' },
   GN: { code: '+224', flag: '🇬🇳' },
@@ -99,8 +98,8 @@ const COUNTRY_CALLING_CODES: Record<string, { code: string; flag: string }> = {
   AU: { code: '+61', flag: '🇦🇺' },
 };
 
-// Fallback: Senegal
-const FALLBACK_COUNTRY = 'SN';
+// Fallback: Tchad
+const FALLBACK_COUNTRY = 'TD';
 
 // ─── Interface ───────────────────────────────────────────
 interface SmartPhoneInputProps {
@@ -158,8 +157,8 @@ export default function SmartPhoneInput({
   const [localInput, setLocalInput] = useState<string>('');
   const [detected, setDetected] = useState(false);
 
-  const callingCode = COUNTRY_CALLING_CODES[countryCode]?.code || '+221';
-  const flag = COUNTRY_CALLING_CODES[countryCode]?.flag || '🇸🇳';
+  const callingCode = COUNTRY_CALLING_CODES[countryCode]?.code || '+235';
+  const flag = COUNTRY_CALLING_CODES[countryCode]?.flag || '🇹🇩';
 
   // ─── Auto-detect country on mount ─────────────────────
   useEffect(() => {
@@ -176,7 +175,7 @@ export default function SmartPhoneInput({
           setDetected(true);
         }
       } catch {
-        // Fallback to SN (Senegal) — already the default
+        // Fallback to SN (Tchad) — already the default
         if (!cancelled) setDetected(false);
       }
     }

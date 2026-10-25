@@ -225,13 +225,13 @@ function TestimonialsSection() {
   const testimonials = [
     {
       name: "Amadou Diallo",
-      role: "Directeur, Pèlerins du Sénégal",
+      role: "Directeur, Pèlerins du Tchad",
       text: "Mov a réduit de 90% les pertes de colis lors du Hajj 2025. Un service révolutionnaire.",
       avatar: "AD"
     },
     {
       name: "Sophie Martin",
-      role: "Responsable client, Voyage Senegal",
+      role: "Responsable client, Voyage Tchad",
       text: "Simple, efficace et pas cher. Nos clients adorent la notification WhatsApp instantanée.",
       avatar: "SM"
     }

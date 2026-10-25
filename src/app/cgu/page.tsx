@@ -181,7 +181,7 @@ export default function CGU() {
             <strong className="text-[#0A2540]">Email :</strong>{' '}
             <a href="mailto:contact@newvisioncargo.pro" className="text-[#FF6B35] hover:underline">contact@newvisioncargo.pro</a>
             <br />
-            <strong className="text-[#0A2540]">Adresse :</strong> Cité Alia Diène, Ouest Foire, Yoff, Sénégal
+            <strong className="text-[#0A2540]">Adresse :</strong> Cité Alia Diène, Ouest Foire, Yoff, Tchad
           </p>
         </section>
 

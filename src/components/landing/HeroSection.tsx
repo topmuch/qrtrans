@@ -63,7 +63,7 @@ export default function HeroSection() {
         <FadeIn>
           <div className="inline-flex items-center gap-2 mb-8 px-5 py-2.5 bg-white/15 backdrop-blur-md border border-white/25 rounded-full">
             <span className="text-sm font-medium text-white tracking-wide">
-              🇸🇳 Solution de traçabilité certifiée pour le transport inter-villes
+              🇹🇩 Solution de traçabilité certifiée pour le transport inter-villes
             </span>
           </div>
         </FadeIn>

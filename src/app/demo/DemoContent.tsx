@@ -47,7 +47,7 @@ const steps = [
     details: [
       'Nom de l\'expéditeur : Diallo Mamadou',
       'Nom du destinataire : Ndiaye Fatou',
-      'Itinéraire : Dakar → Saint-Louis',
+      'Itinéraire : N'Djamena → Saint-Louis',
       'Type de colis : Valise 23kg',
       'Frais de livraison : 5 000 FCFA',
     ],
@@ -77,7 +77,7 @@ const steps = [
       'Le colis est suivi en temps réel. À l\'arrivée, le destinataire entre le code PIN pour valider la réception.',
     details: [
       'Suivi GPS en temps réel',
-      'Statut : En transit Dakar → Saint-Louis',
+      'Statut : En transit N'Djamena → Saint-Louis',
       'Arrivée prévue : 14h30',
       'Validation par code PIN à la livraison',
     ],
@@ -403,10 +403,10 @@ function FormMockup() {
 
       {[
         { label: 'Expéditeur', value: 'Diallo Mamadou' },
-        { label: 'Tél. expéditeur', value: '+221 77 123 45 67' },
+        { label: 'Tél. expéditeur', value: '+235 77 123 45 67' },
         { label: 'Destinataire', value: 'Ndiaye Fatou' },
-        { label: 'Tél. destinataire', value: '+221 78 987 65 43' },
-        { label: 'Itinéraire', value: 'Dakar → Saint-Louis' },
+        { label: 'Tél. destinataire', value: '+235 78 987 65 43' },
+        { label: 'Itinéraire', value: 'N'Djamena → Saint-Louis' },
         { label: 'Type / Poids', value: 'Valise — 23 kg' },
       ].map((field, i) => (
         <motion.div
@@ -484,7 +484,7 @@ function PinNotificationMockup() {
               📦 Ndiaye Fatou (Client)
             </p>
             <p className="text-xs text-[#075E54]/80 mt-1">
-              Votre colis TRSP-2026-0042 est en route Dakar → Saint-Louis.
+              Votre colis TRSP-2026-0042 est en route N'Djamena → Saint-Louis.
               Code de retrait : <strong>482 915</strong>
             </p>
           </div>
@@ -531,7 +531,7 @@ function TrackingMockup() {
         <div className="flex items-center justify-between mb-4">
           <div className="text-center">
             <MapPin className="w-5 h-5 text-[#10B981] mx-auto mb-1" />
-            <p className="text-sm font-bold text-[#0A2540]">Dakar</p>
+            <p className="text-sm font-bold text-[#0A2540]">N'Djamena</p>
             <p className="text-xs text-gray-400">Départ 08:00</p>
           </div>
           <div className="flex-1 mx-4 relative">
@@ -554,7 +554,7 @@ function TrackingMockup() {
       {/* Timeline */}
       <div className="space-y-0">
         {[
-          { time: '08:00', label: 'Colis pris en charge à Dakar', done: true },
+          { time: '08:00', label: 'Colis pris en charge à N'Djamena', done: true },
           { time: '09:15', label: 'Passage au péage de Thiès', done: true },
           { time: '10:45', label: 'En route vers Louga', done: true },
           { time: '~14:30', label: 'Arrivée à Saint-Louis', done: false },
@@ -655,10 +655,10 @@ function DashboardMockup() {
         </p>
         <div className="space-y-2.5">
           {[
-            { ref: 'TRSP-0038', from: 'Dakar', to: 'Thiès', status: 'Livré', color: '#10B981' },
-            { ref: 'TRSP-0039', from: 'Dakar', to: 'Kaolack', status: 'En transit', color: '#3B82F6' },
-            { ref: 'TRSP-0040', from: 'Dakar', to: 'Ziguinchor', status: 'En transit', color: '#3B82F6' },
-            { ref: 'TRSP-0041', from: 'Dakar', to: 'Saint-Louis', status: 'Livré', color: '#10B981' },
+            { ref: 'TRSP-0038', from: 'N'Djamena', to: 'Thiès', status: 'Livré', color: '#10B981' },
+            { ref: 'TRSP-0039', from: 'N'Djamena', to: 'Kaolack', status: 'En transit', color: '#3B82F6' },
+            { ref: 'TRSP-0040', from: 'N'Djamena', to: 'Ziguinchor', status: 'En transit', color: '#3B82F6' },
+            { ref: 'TRSP-0041', from: 'N'Djamena', to: 'Saint-Louis', status: 'Livré', color: '#10B981' },
           ].map((item, i) => (
             <motion.div
               key={item.ref}

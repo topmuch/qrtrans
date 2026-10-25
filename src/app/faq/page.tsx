@@ -39,7 +39,7 @@ const FAQ_CATEGORIES: FAQCategory[] = [
       {
         question: "Qu'est-ce que Mov ?",
         answer:
-          "Mov est une plateforme de traçabilité et de sécurité logistique pour le transport inter-villes au Sénégal. Elle permet d'activer, tracer et sécuriser les colis grâce à des QR codes, des notifications WhatsApp automatiques et des codes PIN de retrait.",
+          "Mov est une plateforme de traçabilité et de sécurité logistique pour le transport inter-villes au Tchad. Elle permet d'activer, tracer et sécuriser les colis grâce à des QR codes, des notifications WhatsApp automatiques et des codes PIN de retrait.",
       },
       {
         question: 'Comment fonctionne Mov ?',

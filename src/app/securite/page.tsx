@@ -58,7 +58,7 @@ const PILLARS: Pillar[] = [
     icon: FileCheck,
     title: 'Conformité RGPD',
     description:
-      'Mov respecte intégralement le RGPD et la loi sénégalaise sur la protection des données personnelles.',
+      'Mov respecte intégralement le RGPD et la loi tchadaise sur la protection des données personnelles.',
     bullets: [
       'Droit à l’effacement garanti',
       'Hébergement Union Européenne',

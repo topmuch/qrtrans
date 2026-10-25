@@ -8,7 +8,7 @@ import FadeIn from './FadeIn';
 const checklistItems = [
   'Réduction de 70% des appels "Où est mon colis ?"',
   'Validation PIN = 0 litige sur la remise',
-  'Détection IP = saisie téléphone simplifiée (+221 auto)',
+  'Détection IP = saisie téléphone simplifiée (+235 auto)',
   'Conformité RGPD & journal d\'audit complet',
 ];
 

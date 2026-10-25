@@ -135,7 +135,7 @@ export default function Confidentialite() {
             <strong className="text-[#0A2540]">Email :</strong>{' '}
             <a href="mailto:contact@newvisioncargo.pro" className="text-[#FF6B35] hover:underline">contact@newvisioncargo.pro</a>
             <br />
-            <strong className="text-[#0A2540]">Adresse :</strong> Cité Alia Diène, Ouest Foire, Yoff, Sénégal
+            <strong className="text-[#0A2540]">Adresse :</strong> Cité Alia Diène, Ouest Foire, Yoff, Tchad
           </p>
           <p className="text-gray-600 leading-relaxed">
             Vous avez également le droit d&apos;introduire une réclamation auprès de la CNIL (Commission Nationale de l&apos;Informatique et des Libertés) si vous estimez que le traitement de vos données n&apos;est pas conforme à la réglementation.

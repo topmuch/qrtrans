@@ -31,8 +31,8 @@ export async function GET() {
           name: 'FRANCINE MAKELA',
           slug: 'francine-makela',
           email: 'contact@francine-makela.com',
-          phone: '+221 77 123 45 67',
-          address: 'Dakar, Sénégal',
+          phone: '+235 77 123 45 67',
+          address: 'N'Djamena, Tchad',
           active: true,
         }
       });

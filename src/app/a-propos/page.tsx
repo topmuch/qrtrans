@@ -54,7 +54,7 @@ const VALUE_CARDS: ValueCard[] = [
     icon: HeartHandshake,
     title: 'Confiance',
     description:
-      'Plus de 10 000 colis protégés à travers le Sénégal et l’Afrique de l’Ouest, avec un taux de récupération de 98 %. La preuve par le résultat.',
+      'Plus de 10 000 colis protégés à travers le Tchad et l’Afrique de l’Ouest, avec un taux de récupération de 98 %. La preuve par le résultat.',
   },
 ];
 
@@ -329,7 +329,7 @@ export default function AProposPage() {
                       Adresse
                     </p>
                     <p className="text-xs sm:text-sm text-[#0F1B2E] leading-snug">
-                      Cité Alia Diène, Ouest Foire, Yoff, Dakar
+                      Cité Alia Diène, Ouest Foire, Yoff, N'Djamena
                     </p>
                   </div>
                 </div>

@@ -328,7 +328,7 @@ function smartTruncate(message: string, maxChars: number, locale: WhatsAppLocale
  * const msg = generatePreFilledMessage({
  *   baggage: { reference: 'VOL26-VABJZS', bagType: 'soute', transportMode: 'flight',
  *     airlineName: 'Air France', flightNumber: 'AF1234', destination: 'Paris' },
- *   scanData: { city: 'Dakar', address: '', context: 'departure_airport_urgent' },
+ *   scanData: { city: 'N'Djamena', address: '', context: 'departure_airport_urgent' },
  *   finder: { name: 'Ouslane Diop', whatsapp: '+23566352505' },
  *   locale: 'fr',
  * });

@@ -15,8 +15,8 @@ export const DEMO_AGENCY = {
   name: 'FRANCINE MAKELA',
   slug: 'diop',
   email: 'contact@francine-makela.com',
-  phone: '+221 77 123 45 67',
-  address: 'Dakar, Sénégal'
+  phone: '+235 77 123 45 67',
+  address: 'N'Djamena, Tchad'
 };
 
 // Agency Context for sharing agency data across pages
