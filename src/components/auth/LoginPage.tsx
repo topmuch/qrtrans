@@ -176,7 +176,7 @@ export default function LoginPage({ variant }: { variant: LoginVariant }) {
         <Link href="/" className="flex items-center gap-3 group">
           <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-2 border border-white/20 group-hover:bg-white/15 transition-colors shadow-lg shadow-black/20">
             <Image
-              src="/brand/logo.png"
+              src="/brand/logo-white.png"
               alt="Mov"
               width={140}
               height={42}

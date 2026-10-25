@@ -94,7 +94,7 @@ export default function DashboardShell({
         <div className={`flex items-center gap-2.5 h-16 border-b border-[var(--dash-sidebar-border)] ${sidebarCollapsed ? 'justify-center px-2' : 'px-4'}`}>
           <Link href="/" className="flex items-center gap-2.5 min-w-0">
             <Image
-              src="/brand/logo.png"
+              src="/brand/logo-white.png"
               alt="Mov"
               width={sidebarCollapsed ? 32 : 120}
               height={sidebarCollapsed ? 32 : 36}
@@ -161,7 +161,7 @@ export default function DashboardShell({
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setMobileSidebarOpen(false)} />
           <aside className="relative w-64 bg-[var(--dash-sidebar-bg)] border-r border-[var(--dash-sidebar-border)] flex flex-col">
             <div className="flex items-center justify-between h-16 px-4 border-b border-[var(--dash-sidebar-border)]">
-              <Image src="/brand/logo.png" alt="Mov" width={100} height={30} className="h-6 w-auto" />
+              <Image src="/brand/logo-white.png" alt="Mov" width={100} height={30} className="h-6 w-auto" />
               <button onClick={() => setMobileSidebarOpen(false)} className="p-1.5 rounded-lg hover:bg-[var(--dash-sidebar-hover)]">
                 <X className="w-5 h-5 text-[var(--dash-sidebar-text)]" />
               </button>
